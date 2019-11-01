@@ -535,11 +535,11 @@
                 <version>${smt-bss-cpc-model.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.zjhcsoft.bss</groupId>
-                <artifactId>cooperate-service-api</artifactId>
-                <version>${cooperate-service-api.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.bss</groupId>-->
+                <!--<artifactId>cooperate-service-api</artifactId>-->
+                <!--<version>${cooperate-service-api.version}</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>com.zjtelcom.cpct.dubbo</groupId>

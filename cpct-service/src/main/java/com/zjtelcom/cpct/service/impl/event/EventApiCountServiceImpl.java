@@ -132,21 +132,28 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
             Map<String, Object> eventCountMap = new HashMap<>();
             Long initId = Long.valueOf(eventCount.get("mktCampaignId"));
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(initId);
-            eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
-            eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectCampaignByInitId(initId);
+            if (mktCampaignDO != null) {
+                eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
+                eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+            }
 
             ContactEvt eventCode = contactEvtMapper.getEventByEventNbr(eventCount.get("eventCode"));
-            eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
-            eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+            if (eventCode != null) {
+                eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
+                eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+            }
+
 
             Channel channel = contactChannelMapper.selectByCode(eventCount.get("channelCode"));
-            eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
-            eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+            if (channel != null) {
+                eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
+                eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+            }
             try {
                 eventCountMap.put("orderDate", strToDateFormat(eventCount.get("orderDate"))); // 统计日期
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("orderDate事件转换出错");
             }
 
             Integer instNum = Integer.valueOf(eventCount.get("instNum"));
