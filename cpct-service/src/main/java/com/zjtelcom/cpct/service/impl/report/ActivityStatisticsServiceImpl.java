@@ -994,7 +994,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
 
     /**
-     * 超过3个月的活动下线
+     * 超过3个月的未试算或派单的活动下线
      */
     @Override
     public void MoreThan3MonthsOffline() {
