@@ -794,6 +794,7 @@
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%test%'
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
+        AND  #{createDate} > t.CREATE_DATE
         AND t.MKT_CAMPAIGN_ID NOT IN (
         SELECT
         p1.CAMPAIGN_ID
