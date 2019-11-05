@@ -62,6 +62,7 @@ import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
+import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SyncActivityService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -268,6 +269,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private MktCampaignCompleteMapper mktCampaignCompleteMapper;
     @Autowired(required = false)
     private OpenCompleteMktCampaignService openCompleteMktCampaignService;
+    @Autowired
+    private ActivityStatisticsService activityStatisticsService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -363,6 +366,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setTacheCd("1300");
                 mktCamComplete.setTacheValueCd("10");
                 mktCamComplete.setBeginTime(new Date());
+                mktCamComplete.setEndTime(new Date());
                 mktCamComplete.setSort(Long.valueOf("3"));
                 mktCamComplete.setStatusCd("1100");
                 mktCamComplete.setStatusDate(new Date());
@@ -799,7 +803,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1100");
             if(mktCampaignComplete != null && !mktCampaignComplete.getTacheValueCd().equals("11")) {
                 mktCampaignComplete.setEndTime(new Date());
-                mktCampaignComplete.setStatusCd("1300");
+                mktCampaignComplete.setStatusCd("1200");
                 mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
                 mktCampaignComplete.setUpdateDate(new Date());
                 mktCampaignCompleteMapper.update(mktCampaignComplete);
@@ -813,6 +817,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setTacheCd("1200");
                     mktCamComplete.setTacheValueCd("10");
                     mktCamComplete.setBeginTime(new Date());
+                    mktCamComplete.setEndTime(new Date());
                     mktCamComplete.setSort(Long.valueOf("2"));
                     mktCamComplete.setStatusCd("1100");
                     mktCamComplete.setStatusDate(new Date());
@@ -1238,6 +1243,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
                     mktCamComplete.setTacheCd("1400");
                     mktCamComplete.setBeginTime(new Date());
+                    mktCamComplete.setEndTime(new Date());
                     mktCamComplete.setSort(Long.valueOf("4"));
                     mktCamComplete.setStatusCd("1100");
                     mktCamComplete.setStatusDate(new Date());
@@ -1342,11 +1348,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(campaignId);
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setAttrValue(String.valueOf(lastTime.getTime()));
+                redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfAttrDO.getEvtContactConfId());
             }
             mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
 
             campaignDO.setPlanEndTime(lastTime);
             mktCampaignMapper.updateByPrimaryKey(campaignDO);
+            redisUtils.del("MKT_CAMPAIGN_" + campaignId);
+
             maps.put("resultCode", CODE_SUCCESS);
             maps.put("resultMsg", "延期成功");
         } catch (Exception e) {
@@ -2537,6 +2546,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> dueMktCampaign() {
+        activityStatisticsService.MoreThan3MonthsOffline();
         Map<String, Object> result = new HashMap<>();
         // 查出所有已经发布的活动
         try {

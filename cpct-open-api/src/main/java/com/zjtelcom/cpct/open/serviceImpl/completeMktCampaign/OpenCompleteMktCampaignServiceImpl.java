@@ -151,19 +151,28 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         //配置营销互动反馈单
         StringBuilder detaileTacheList = new StringBuilder();
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
+            logger.info(JSON.toJSONString(mktCampaignComplete));
             SysParams sysParams = sysParamsMapper.findParamsByValue("JTCAMPAIGN_NODE", mktCampaignComplete.getTacheCd());
             detaileTacheList.append(sysParams.getParamName()).append(" 开始：").append(sdf.format(mktCampaignComplete.getBeginTime()));
             detaileTacheList.append(" 结束：").append(sdf.format(mktCampaignComplete.getEndTime()));
-            detaileTacheList.append(" 处理人：").append("#").append("\r\n");
+            detaileTacheList.append(" 处理人：").append("Y33010117205").append("#").append("\r\n");
             if(mktCampaignComplete.getTacheCd().equals(tacheCd)) {
                 BeanUtil.copy(mktCampaignComplete, completeMktCampaign);
                 String beginTime = df.format(mktCampaignComplete.getBeginTime());
                 String endTime = df.format(mktCampaignComplete.getEndTime());
+                completeMktCampaign.setTacheCd(tacheCd);
+                if(tacheCd.equals("1400")) {
+                    completeMktCampaign.setTacheValueCd("10");
+                }else if (tacheCd.equals("1300") || tacheCd.equals("1200")){
+                    completeMktCampaign.setTacheValueCd("11");
+                }
+                completeMktCampaign.setStatusCd("1200");
                 completeMktCampaign.setBeginTime(beginTime);
                 completeMktCampaign.setEndTime(endTime);
                 completeMktCampaign.setDetaileTacheList(detaileTacheList.toString());
                 completeMktCampaign.setRegionCode("8330000");
                 completeMktCampaign.setMktCampaigns(openMktCampaignEntityList);
+                break;
             }
         }
 

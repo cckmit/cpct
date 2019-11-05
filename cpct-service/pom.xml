@@ -114,10 +114,10 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.zjhcsoft.bss</groupId>
-            <artifactId>cooperate-service-api</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zjhcsoft.bss</groupId>-->
+            <!--<artifactId>cooperate-service-api</artifactId>-->
+        <!--</dependency>-->
 
 
         <dependency>

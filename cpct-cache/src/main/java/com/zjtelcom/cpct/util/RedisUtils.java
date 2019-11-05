@@ -4,6 +4,7 @@ import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
 import com.ctg.itrdc.cache.pool.ProxyJedis;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
@@ -12,10 +13,7 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +26,9 @@ public class RedisUtils {
 
     @Autowired(required = false)
     private CtgJedisPool ctgJedisPool;
+
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     /**
      *
@@ -95,7 +96,7 @@ public class RedisUtils {
                 jedis = ctgJedisPool.getResource();
                 Map<String, String> resultMap = jedis.hgetAll(key);
                 for (Map.Entry<String, String> entry : resultMap.entrySet()) {
-                    fieldList.add(unserizlize(entry.getKey()).toString());
+                    fieldList.add(entry.getKey());
                 }
                 jedis.close();
             } catch (Throwable je) {
@@ -615,4 +616,28 @@ public class RedisUtils {
         }
         return newObj;
     }
+
+
+    public String getRedisOrSysParams(String key) {
+        String value = "";
+        Object status = get(key);
+        if (status != null) {
+            value = status.toString();
+        }else {
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey(key);
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                value = sysFilList.get(0).get("value");
+                set(key, value);
+            }
+        }
+        return value;
+    }
+
+    public List<String> getListRedisOrSysParams(String key) {
+        String value = getRedisOrSysParams(key);
+        String[] split = value.split(",");
+        List<String> list = Arrays.asList(split);
+        return list;
+    }
+
 }
