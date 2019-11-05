@@ -91,4 +91,14 @@
     where  INJECTION_LABEL_ID = #{labelId}
   </select>
 
+  <delete id="deleteByDisplayIdAndLabelList" parameterType="java.lang.Long">
+    delete from display_column_label
+    where DISPLAY_ID = #{displayId,jdbcType=BIGINT}
+    and INJECTION_LABEL_ID in
+    <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+      #{item}
+    </foreach>
+  </delete>
+
+
 </mapper>

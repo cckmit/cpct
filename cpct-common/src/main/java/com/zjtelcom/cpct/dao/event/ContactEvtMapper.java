@@ -45,4 +45,6 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> findEventsByKey(ContactEvt contactEvt);
 
+    List<ContactEvt> selectBatchByCode(@Param("contactEvtCodeList") List<String> contactEvtCodeList);
+
 }

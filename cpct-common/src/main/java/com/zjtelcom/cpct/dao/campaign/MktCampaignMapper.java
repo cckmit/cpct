@@ -26,6 +26,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
+    List<MktCampaignDO> selectBatch(@Param("mktCampaignIds") List<Long> mktCampaignIds);
+
     List<MktCampaignDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
@@ -47,6 +49,8 @@ public interface MktCampaignMapper {
     MktCampaignDO selectByRuleId(@Param("ruleId") Long ruleId);
 
     List<MktCamDisplayColumnRel> selectAllGroupByCamId();
+
+    MktCampaignDO selectCampaignByInitId(@Param("initId")Long initId);
 
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
