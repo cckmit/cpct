@@ -116,16 +116,7 @@ public class MqProducerServiceImpl implements MqProducerService, InitializingBea
         try {
             if (esLogConnect == 0 && msgBody != null) {
                 String prodFilter = "0";
-                Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
-                if (status != null) {
-                    prodFilter = status.toString();
-                }else {
-                    List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
-                    if (sysFilList != null && !sysFilList.isEmpty()) {
-                        prodFilter = sysFilList.get(0).get("value");
-                        redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
-                    }
-                }
+                prodFilter = redisUtils.getRedisOrSysParams("SYSYTEM_ESLOG_STATUS");
                 if (prodFilter.equals("1")) {
                     MQMessage message = new MQMessage(topic, key, tag, null);
                     message.setBody(JSON.toJSONString(msgBody).getBytes());

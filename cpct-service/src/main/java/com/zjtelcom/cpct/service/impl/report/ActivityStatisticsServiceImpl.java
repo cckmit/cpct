@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_ROLL;
 
 @Service
 @Transactional
@@ -996,4 +998,36 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 //        System.out.println(sdf.format(calendar.getTime()));//输出格式化的日期
         return sdf.format(calendar.getTime());
     }
+
+
+    /**
+     * 超过3个月的未试算或派单的活动下线
+     */
+    @Override
+    public void MoreThan3MonthsOffline() {
+        try {
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("tiggerType", "1000");
+            hashMap.put("createDate", "3000");
+            hashMap.put("page", 1);
+            hashMap.put("pageSize", 9999);
+            Map<String, Object> mktCampaignDetails = getMktCampaignDetails(hashMap);
+            List<MktCampaignDO> camList = mktCampaignDetails == null ?
+                    new ArrayList<MktCampaignDO>() : (List<MktCampaignDO>) mktCampaignDetails.get("resultMsg");
+            mktCampaignDetails = getMktCampaignDetails(hashMap);
+            StringBuilder sb = new StringBuilder();
+            for (MktCampaignDO mktCampaignDO : camList) {
+                try {
+                    mktCampaignMapper.changeMktCampaignStatus(mktCampaignDO.getMktCampaignId(), STATUS_CODE_ROLL.getStatusCode(), new Date(), 0L);
+                    sb.append(mktCampaignDO.getMktCampaignId());
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            redisUtils.set("OFFLINE_" + DateUtil.date2String(new Date()), sb);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
