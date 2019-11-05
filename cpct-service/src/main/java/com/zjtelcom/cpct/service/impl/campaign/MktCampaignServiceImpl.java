@@ -366,6 +366,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setTacheCd("1300");
                 mktCamComplete.setTacheValueCd("10");
                 mktCamComplete.setBeginTime(new Date());
+                mktCamComplete.setEndTime(new Date());
                 mktCamComplete.setSort(Long.valueOf("3"));
                 mktCamComplete.setStatusCd("1100");
                 mktCamComplete.setStatusDate(new Date());
@@ -816,6 +817,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setTacheCd("1200");
                     mktCamComplete.setTacheValueCd("10");
                     mktCamComplete.setBeginTime(new Date());
+                    mktCamComplete.setEndTime(new Date());
                     mktCamComplete.setSort(Long.valueOf("2"));
                     mktCamComplete.setStatusCd("1100");
                     mktCamComplete.setStatusDate(new Date());
@@ -1241,6 +1243,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
                     mktCamComplete.setTacheCd("1400");
                     mktCamComplete.setBeginTime(new Date());
+                    mktCamComplete.setEndTime(new Date());
                     mktCamComplete.setSort(Long.valueOf("4"));
                     mktCamComplete.setStatusCd("1100");
                     mktCamComplete.setStatusDate(new Date());
