@@ -2450,6 +2450,7 @@ public class EventApiServiceImpl implements EventApiService {
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
+                        mktCampaignCustMap.put("channelCode", channel);
                     } else {
                         mktCampaignMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignMap.put("levelConfig", act.get("levelConfig"));
