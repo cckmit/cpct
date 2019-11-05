@@ -289,8 +289,8 @@ public class EventApiServiceImpl implements EventApiService {
         public Map async() {
 
             //初始化返回结果
-            result = new EventTask().cpc(params);
             Map<String, Object> result = new HashMap();
+            result = new EventTask().cpc(params);
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
