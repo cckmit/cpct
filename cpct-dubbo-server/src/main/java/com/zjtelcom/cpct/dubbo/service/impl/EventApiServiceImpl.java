@@ -1056,18 +1056,25 @@ public class EventApiServiceImpl implements EventApiService {
                         if (future.get() != null && !future.get().isEmpty()) {
                             Map<String, Object> map1 = future.get();
                             for (String s : map1.keySet()) {
-                                if (s.contains("cam_") || s.contains("rule_")) {
+                                if (s.contains("cam_")) {
                                     flag = false;
+                                    nonPassedMsg.put(s, map1.get(s));
                                 }
+                            }
+                            if (map1.get("nonPassedMsg") != null) {
+                                Object nonPassedMsg1 = map1.get("nonPassedMsg");
+                                nonPassedMsg.putAll((Map<String, Object>)nonPassedMsg1);
+                                // flag = false;
                             }
                             if (flag) {
                                 // 命中活动
                                 activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                             }
-                        } else {
+                        }
+                        /*else {
                             // 翼支付未命中原因
                             nonPassedMsg.putAll(future.get());
-                        }
+                        }*/
                     }
                     result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
@@ -2516,7 +2523,26 @@ public class EventApiServiceImpl implements EventApiService {
             assParam.put("centerType", "00");
 
             //因子查询-----------------------------------------------------
-            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+            // Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+            Map<String, Object> dubboResult = new HashMap<>();
+            Map<String, Object> msgbody = new HashMap<>();
+//            msgbody.put("LATN_NAME", "杭州");
+//            msgbody.put("GENDER", "男");
+//            msgbody.put("CPCP_RECHARGE_TIME", "");
+
+//            msgbody.put("LATN_NAME", "杭州");
+//            msgbody.put("GENDER", "女");
+//            msgbody.put("CPCP_RECHARGE_TIME", "");
+
+            msgbody.put("ZK_FLG", "");
+            msgbody.put("CPCP_ACCS_NBR", "");
+            msgbody.put("GENDER", "男");
+            msgbody.put("AGE", "89");
+            msgbody.put("CPCP_MSG_TYPE", "");
+            msgbody.put("CPCP_RECHARGE_TIME", "");
+
+            dubboResult.put("result_code", "0");
+            dubboResult.put("msgbody", msgbody);
             if ("0".equals(dubboResult.get("result_code").toString())) {
                 JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                 //ES log 标签实例

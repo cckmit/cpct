@@ -480,7 +480,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     String productId = (String) ruleMap.get("productId");
                     String evtContactConfId = (String) ruleMap.get("evtContactConfId");
                     flagMap.put(ruleId.toString(), false);
-                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productId, evtContactConfId, ruleId, ruleName, context, lanId, nonPassedMsg));
+                    Future<Map<String, Object>> f = executorService.submit(new RuleTask(params, privateParams, strategyConfId, strategyConfName, tarGrpId, productId, evtContactConfId, ruleId, ruleName, context, lanId));
                     //将线程处理结果添加到结果集
                     threadList.add(f);
                 }
@@ -496,7 +496,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                         for (String key : futureMap.keySet()) {
                             if (key.contains("rule_")) {
                                 flag = false;
-                                break;
+                                nonPassedMsg.put(key, futureMap.get(key));
+                                // break;
                             }
                         }
                         if (flag) ruleList.add(futureMap);
@@ -568,6 +569,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                 }*/
                 activity.put("ruleList", ruleList);
+                activity.put("nonPassedMsg", nonPassedMsg);
                 Map<String, Object> itgTrigger;
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                 List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
@@ -772,9 +774,8 @@ public class CamCpcServiceImpl implements CamCpcService {
         private Map<String, String> privateParams;
         private DefaultContext<String, Object> context;
         private String lanId;
-        private Map<String, Object> nonPassedMsg;
 
-        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr, String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, DefaultContext<String, Object> context, String lanId, Map<String, Object> nonPassedMsg) {
+        public RuleTask(Map<String, String> params, Map<String, String> privateParams, Long strategyConfId, String strategyConfName, Long tarGrpId, String productStr, String evtContactConfIdStr, Long mktStrategyConfRuleId, String mktStrategyConfRuleName, DefaultContext<String, Object> context, String lanId) {
             this.strategyConfId = strategyConfId;
             this.strategyConfName = strategyConfName;
             this.tarGrpId = tarGrpId;
@@ -787,12 +788,11 @@ public class CamCpcServiceImpl implements CamCpcService {
             this.privateParams = privateParams;
             this.context = context;
             this.lanId = lanId;
-            this.nonPassedMsg = nonPassedMsg;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
-
+            Map<String, Object> nonPassedMsg = new HashMap<>();
             long begin = System.currentTimeMillis();
 
             //初始化es log   标签使用
@@ -1106,7 +1106,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
                         // return Collections.EMPTY_MAP;
-                        nonPassedMsg.put("rule_" + ruleId, "标签实例不足");
+                        nonPassedMsg.put("rule_" + ruleId, "标签实例不足：" + notEnoughLabel.toString());
                         return nonPassedMsg;
                     }
 

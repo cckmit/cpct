@@ -101,7 +101,7 @@ public class EsHitsServiceImpl implements EsHitsService {
         if (prodFilter.equals("0")) {
             String evtCode = jsonObject.get("eventCode") == null ? (jsonObject.get("eventId") == null ? "" : jsonObject.get("eventId").toString()) : jsonObject.get("eventCode").toString();
             // 查询特殊事件集合
-            if ("".equals(evtCode) || !redisUtils.getListRedisOrSysParams("").contains(evtCode)) {
+            if ("".equals(evtCode) || !redisUtils.getListRedisOrSysParams("SPECIAL_EVENT_FILTER").contains(evtCode)) {
                 return;
             }
         }
