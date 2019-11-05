@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ChannelMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
@@ -71,22 +72,30 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         StringBuilder initIdStr = new StringBuilder();
         if (mktCampaignIdList != null && mktCampaignIdList.size() > 0 ) {
-            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectBatch(mktCampaignIdList);
-            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
-                initIdStr.append(mktCampaignDO.getInitId() + ",");
+            if (Integer.valueOf(0).equals(mktCampaignIdList.get(0))) {
+                initIdStr.append(0);
+            } else {
+                List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectBatch(mktCampaignIdList);
+                for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                    initIdStr.append(mktCampaignDO.getInitId() + ",");
+                }
+                // 移除最后一个","
+                initIdStr.delete(initIdStr.length() - 1, initIdStr.length());
             }
-            // 移除最后一个","
-            initIdStr.delete(initIdStr.length() - 1, initIdStr.length());
         } else {
             initIdStr.append("all");
         }
         StringBuilder channelCodeStr = new StringBuilder();
         if (channelCodeList != null && channelCodeList.size() > 0) {
-            for (String channelCode : channelCodeList) {
-                channelCodeStr.append(channelCode + ",");
+            if ("0".equals(channelCodeList.get(0))) {
+                channelCodeStr.append(0);
+            } else {
+                for (String channelCode : channelCodeList) {
+                    channelCodeStr.append(channelCode + ",");
+                }
+                // 移除最后一个","
+                channelCodeStr.delete(channelCodeStr.length() - 1, channelCodeStr.length());
             }
-            // 移除最后一个","
-            channelCodeStr.delete(channelCodeStr.length() - 1, channelCodeStr.length());
         } else {
             channelCodeStr.append("all");
         }
@@ -94,11 +103,15 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         StringBuilder eventCodeStr = new StringBuilder();
         if (eventCodeList != null && eventCodeList.size() > 0) {
-            for (String eventCode : eventCodeList) {
-                eventCodeStr.append(eventCode + ",");
+            if ("0".equals(eventCodeList.get(0))) {
+                eventCodeStr.append(0);
+            } else {
+                for (String eventCode : eventCodeList) {
+                    eventCodeStr.append(eventCode + ",");
+                }
+                // 移除最后一个","
+                eventCodeStr.delete(eventCodeStr.length() - 1, eventCodeStr.length());
             }
-            // 移除最后一个","
-            eventCodeStr.delete(eventCodeStr.length() - 1, eventCodeStr.length());
         } else {
             eventCodeStr.append("all");
         }
@@ -116,11 +129,20 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
         logger.info("入参为paramMap：" + JSON.toJSONString(paramMap));
         // 调用协同中心的接口
-        Map<String, Object> returnMap = iReportService.queryRptEventInstList(paramMap);
+        Map<String, Object> returnMap = null;
+        try {
+            returnMap = iReportService.queryRptEventInstList(paramMap);
+        } catch (Exception e) {
+            return returnMap;
+        }
 
         logger.info("出参数为returnMap：" + JSON.toJSONString(returnMap));
 
-        resultMap.put("resultCode", returnMap.get("resultCode"));
+        if("1".equals(returnMap.get("resultCode"))){
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } else {
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         resultMap.put("resultMsg", returnMap.get("resultMsg"));
         resultMap.put("pageSize", returnMap.get("pageSize"));
         resultMap.put("currenPage", returnMap.get("currenPage"));
@@ -132,21 +154,28 @@ public class EventApiCountServiceImpl implements EventApiCountService {
 
             Map<String, Object> eventCountMap = new HashMap<>();
             Long initId = Long.valueOf(eventCount.get("mktCampaignId"));
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(initId);
-            eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
-            eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectCampaignByInitId(initId);
+            if (mktCampaignDO != null) {
+                eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
+                eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+            }
 
             ContactEvt eventCode = contactEvtMapper.getEventByEventNbr(eventCount.get("eventCode"));
-            eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
-            eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+            if (eventCode != null) {
+                eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
+                eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+            }
+
 
             Channel channel = contactChannelMapper.selectByCode(eventCount.get("channelCode"));
-            eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
-            eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+            if (channel != null) {
+                eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
+                eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+            }
             try {
                 eventCountMap.put("orderDate", strToDateFormat(eventCount.get("orderDate"))); // 统计日期
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("orderDate事件转换出错");
             }
 
             Integer instNum = Integer.valueOf(eventCount.get("instNum"));
