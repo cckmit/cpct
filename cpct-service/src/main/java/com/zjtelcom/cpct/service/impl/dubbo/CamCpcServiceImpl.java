@@ -502,6 +502,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         }
                         if (flag) ruleList.add(futureMap);
                     }
+                    activity.put("nonPassedMsg", nonPassedMsg);
                 } catch (InterruptedException e) {
                     esJson.put("hit", "false");
                     esJson.put("msg", "规则校验出错:" + e.getMessage());
@@ -569,7 +570,6 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                 }*/
                 activity.put("ruleList", ruleList);
-                activity.put("nonPassedMsg", nonPassedMsg);
                 Map<String, Object> itgTrigger;
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                 List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
@@ -1152,7 +1152,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                        ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? 0 : 1); // 是否随销规则标识
+                        ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? "0" : "1"); // 是否随销规则标识
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
@@ -1245,11 +1245,11 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 //将线程处理结果添加到结果集
                                 //threadList.add(f);
                                 Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
-                                if (channelMap.containsKey("rule_")){
-                                    nonPassedMsg.putAll(channelMap);
-                                } else {
-                                    taskChlList.add(channelMap);
+                                if (channelMap.containsKey("rule_" + ruleId)){
+                                    nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
                                 }
+                                taskChlList.add(channelMap);
+
                             } else {
                                 if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
                                     for (String str : evtContactConfIdArray) {
@@ -1261,11 +1261,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                                         //threadList.add(f);
                                         Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
                                         if (channelMap != null && !channelMap.isEmpty()) {
-                                            if (channelMap.containsKey("rule_")){
-                                                nonPassedMsg.putAll(channelMap);
-                                            } else {
-                                                taskChlList.add(channelMap);
+                                            if (channelMap.containsKey("rule_" + ruleId)){
+                                                nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
                                             }
+                                            taskChlList.add(channelMap);
                                         }
                                     }
                                 }
