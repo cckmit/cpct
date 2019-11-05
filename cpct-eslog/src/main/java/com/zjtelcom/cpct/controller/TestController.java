@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class TestController implements ApplicationRunner {
 
-    @Autowired
+    @Autowired(required = false)
     private MqEsLogService mqEsLogService;
 
     @Override

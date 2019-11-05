@@ -40,7 +40,7 @@ public class TarGrpApiServiceImpl implements TarGrpApiService {
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitsService esHitService;  //es存储
 
     @Autowired

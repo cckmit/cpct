@@ -87,6 +87,27 @@ public class RedisUtils {
         return result;
     }
 
+    public List<String> hgetAllField(final String key) {
+        List<String> fieldList = new ArrayList<>();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                Map<String, String> resultMap = jedis.hgetAll(key);
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    fieldList.add(entry.getKey());
+                }
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return fieldList;
+    }
+
     /**
      * 写入缓存
      *

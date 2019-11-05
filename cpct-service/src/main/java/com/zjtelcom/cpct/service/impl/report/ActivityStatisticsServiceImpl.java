@@ -396,7 +396,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {
@@ -554,6 +553,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            Object reqId = stringObjectMap.get("reqId");
+            Object total = stringObjectMap.get("total");
+            paramMap.put("pageSize",total);
+            paramMap.put("page","1");
+            if (reqId!=null && reqId!=""){
+                redisUtils.set(reqId.toString(),paramMap);
+            }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
@@ -633,7 +639,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("orderNum")) {
                                 msgMap.put("name", "派单数");
@@ -760,7 +766,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("contactNum")) {
                                 msgMap.put("name", "客户接触数");
@@ -831,6 +837,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         maps.put("total", stringObjectMap.get("total"));
         maps.put("resultMsg", hashMaps);
         maps.put("resultCode", CODE_SUCCESS);
+        maps.put("reqId",  stringObjectMap.get("reqId"));
         return maps;
     }
 

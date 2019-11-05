@@ -40,7 +40,7 @@ public class EsHitsController {
      */
     private String esType="external";
 
-    @Autowired
+    @Autowired(required = false)
     private EsHitsService esService;
 
 

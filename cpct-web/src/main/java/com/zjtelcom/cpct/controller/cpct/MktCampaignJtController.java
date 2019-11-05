@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class MktCampaignJtController {
     private static final Logger LOG = Logger.getLogger(CampaignController.class);
 
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignJTService mktCampaignJTService;
 
     @RequestMapping("/createMktCampaignJt")
