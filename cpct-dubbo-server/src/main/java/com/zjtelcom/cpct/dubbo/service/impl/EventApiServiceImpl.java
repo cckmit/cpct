@@ -59,7 +59,6 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
-import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -193,9 +192,6 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
-    /*@Autowired(required = false)
-    private CamCpcService camCpcService;*/
-
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
 
@@ -293,8 +289,8 @@ public class EventApiServiceImpl implements EventApiService {
         public Map async() {
 
             //初始化返回结果
-            Map<String, Object> result = new HashMap();
             result = new EventTask().cpc(params);
+            Map<String, Object> result = new HashMap();
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
@@ -758,7 +754,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                // 过滤事件采集项中的标签
+                // 过滤事件采集相中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
                 List<String> assetLabelList = new ArrayList<>();
@@ -1052,8 +1048,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-
-                //获取结果
+//获取结果
                 Boolean flag = true;
                 try {
                     Map<String, Object> nonPassedMsg = new HashMap<>();
@@ -1261,11 +1256,9 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
-                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
                 log.info("进入camApiService.ActivityTask");
-                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
@@ -2382,7 +2375,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     }
                                 } else {
                                     //适用地市获取异常 lanId
-    //                            log.info("适用渠道获取异常");
+                                    //                            log.info("适用渠道获取异常");
 
                                     esJson.put("hit", false);
                                     esJson.put("msg", "策略未命中");
@@ -2433,15 +2426,15 @@ public class EventApiServiceImpl implements EventApiService {
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
                             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                             String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-    //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
+                            //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
                             ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                             ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                             ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
                             ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
                             ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-    //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
+                            //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
                             ruleMapList.add(ruleMap);
-    //                    }
+                            //                    }
                         }
                     } catch (Exception e) {
                         log.error("预校验获取规则查询失败");
@@ -2475,7 +2468,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
-                   // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                        // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("initId", mktCampaign.getInitId());
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
