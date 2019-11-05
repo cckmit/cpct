@@ -1342,11 +1342,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectAttrEndDateByCampaignId(campaignId);
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 mktCamChlConfAttrDO.setAttrValue(String.valueOf(lastTime.getTime()));
+                redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfAttrDO.getEvtContactConfId());
             }
             mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
 
             campaignDO.setPlanEndTime(lastTime);
             mktCampaignMapper.updateByPrimaryKey(campaignDO);
+            redisUtils.del("MKT_CAMPAIGN_" + campaignId);
+
             maps.put("resultCode", CODE_SUCCESS);
             maps.put("resultMsg", "延期成功");
         } catch (Exception e) {
