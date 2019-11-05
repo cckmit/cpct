@@ -49,14 +49,14 @@ public class OpenMktCampaignController extends BaseController {
     /**
      * 查询营销活动详情
      *
-     * @param mktActivityNbr
+     * @param mktCampaignId
      * @return
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign/{mktActivityNbr}", method = RequestMethod.GET)
-    public String getMktCampaignDetail(@PathVariable String mktActivityNbr, HttpServletResponse response) {
+    @RequestMapping(value = "/mktCampaign/{mktCampaignId}", method = RequestMethod.GET)
+    public String getMktCampaignDetail(@PathVariable String mktCampaignId, HttpServletResponse response) {
         try {
-            Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktActivityNbr);
+            Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktCampaignId);
             return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue,SerializerFeature.DisableCircularReferenceDetect);
         } catch (SystemException e) {
             e.printStackTrace();
