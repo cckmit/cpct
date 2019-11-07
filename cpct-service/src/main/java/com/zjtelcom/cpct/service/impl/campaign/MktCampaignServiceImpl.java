@@ -3328,4 +3328,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+    /**
+     * 刷活动数据
+     * @return
+     */
+    @Override
+    public Map<String, Object> dataConfig() {
+        List<MktCampaignDO> campaignDOList = mktCampaignMapper.selectAll();
+        for (MktCampaignDO cam : campaignDOList){
+            
+        }
+
+
+
+
+        return null;
+    }
 }
