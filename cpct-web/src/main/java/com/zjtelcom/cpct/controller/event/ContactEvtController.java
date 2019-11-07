@@ -304,4 +304,22 @@ public class ContactEvtController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+
+    /**
+     * 批量查询事件
+     * @return
+     */
+    @RequestMapping("selectBatchByCode")
+    @CrossOrigin
+    public Map<String, Object> selectBatchByCode(@RequestBody Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        List<String> contactEvtCodeList = (List<String>) params.get("contactEvtCodeList");
+        try {
+            maps = contactEvtService.selectBatchByCode(contactEvtCodeList);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to selectBatchByCode", e);
+        }
+        return maps;
+    }
+
 }

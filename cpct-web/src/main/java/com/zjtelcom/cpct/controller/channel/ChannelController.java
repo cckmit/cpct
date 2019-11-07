@@ -301,4 +301,24 @@ public class ChannelController extends BaseController {
         return result;
     }
 
+
+    /**
+     * 通过渠道编码批量查询渠道
+     */
+    @PostMapping("selectBatchByCode")
+    @CrossOrigin
+    public Map<String,Object> selectBatchByCode(@RequestBody Map<String,Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<String> contactChlCodeList =  (List<String>) param.get("contactChlCodeList");
+            result = channelService.selectBatchByCode(contactChlCodeList);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to selectBatchByCode",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg", "通过渠道编码批量查询渠道失败");
+            return result;
+        }
+        return result;
+    }
+
 }
