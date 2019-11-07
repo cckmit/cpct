@@ -191,6 +191,9 @@
     <if test="interfaceType != null and interfaceType != ''">
       and INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR}
     </if>
+    <if test="accessChannelCode != null and accessChannelCode != ''">
+      and CALLER = #{accessChannelCode,jdbcType=VARCHAR}
+    </if>
     order by UPDATE_DATE desc
   </select>
 
