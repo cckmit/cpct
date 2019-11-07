@@ -59,6 +59,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -191,6 +192,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
+
+    /*@Autowired(required = false)
+    private CamCpcService camCpcService;*/
 
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
@@ -754,7 +758,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                // 过滤事件采集相中的标签
+                // 过滤事件采集项中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
                 List<String> assetLabelList = new ArrayList<>();
@@ -1050,12 +1054,40 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //获取结果
+                Boolean flag = true;
                 try {
+                    Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
-                        if (future.get() != null && !future.get().isEmpty()) {
+                        /*if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        }*/
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            Map<String, Object> map1 = future.get();
+                            for (String s : map1.keySet()) {
+                                if (s.contains("cam_")) {
+                                    flag = false;
+                                    nonPassedMsg.put(s, map1.get(s));
+                                }
+                            }
+                            if (map1.get("nonPassedMsg") != null) {
+                                Object nonPassedMsg1 = map1.get("nonPassedMsg");
+                                nonPassedMsg.putAll((Map<String, Object>)nonPassedMsg1);
+                                // flag = false;
+                            }
+                            if (flag) {
+                                // 命中活动
+                                if (future.get().get("ruleList") != null ) {
+                                    activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                }
+
+                            }
                         }
+                        /*else {
+                            // 翼支付未命中原因
+                            nonPassedMsg.putAll(future.get());
+                        }*/
                     }
+                    result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
@@ -1232,9 +1264,11 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
                 log.info("进入camApiService.ActivityTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
@@ -2351,7 +2385,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     }
                                 } else {
                                     //适用地市获取异常 lanId
-                                    //                            log.info("适用渠道获取异常");
+    //                            log.info("适用渠道获取异常");
 
                                     esJson.put("hit", false);
                                     esJson.put("msg", "策略未命中");
@@ -2402,15 +2436,15 @@ public class EventApiServiceImpl implements EventApiService {
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
                             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
                             String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
-                            //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
+    //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
                             ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                             ruleMap.put("ruleName", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
                             ruleMap.put("tarGrpId", mktStrategyConfRuleDO.getTarGrpId());
                             ruleMap.put("productId", mktStrategyConfRuleDO.getProductId());
                             ruleMap.put("evtContactConfId", mktStrategyConfRuleDO.getEvtContactConfId());
-                            //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
+    //                        ruleMap.put("evtContactConfMapList", evtContactConfMapList);
                             ruleMapList.add(ruleMap);
-                            //                    }
+    //                    }
                         }
                     } catch (Exception e) {
                         log.error("预校验获取规则查询失败");
@@ -2444,13 +2478,12 @@ public class EventApiServiceImpl implements EventApiService {
                 if (strategyMapList != null && strategyMapList.size() > 0) {
                     // 判断initId是否在清单列表里面
                     if (mktCamCodeList.contains(mktCampaign.getInitId().toString())) {
-                        // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
+                   // if (mktCamCodeList.contains(mktCampaign.getMktCampaignId().toString())) {
                         mktCampaignCustMap.put("initId", mktCampaign.getInitId());
                         mktCampaignCustMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
-                        mktCampaignCustMap.put("channelCode", channel);
                     } else {
                         mktCampaignMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignMap.put("levelConfig", act.get("levelConfig"));
@@ -2502,6 +2535,10 @@ public class EventApiServiceImpl implements EventApiService {
 
             //因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+//            Map<String, Object> dubboResult = new HashMap<>();
+//            Map<String, Object> msgbody = new HashMap<>();
+//            dubboResult.put("result_code", "0");
+//            dubboResult.put("msgbody", msgbody);
             if ("0".equals(dubboResult.get("result_code").toString())) {
                 JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                 //ES log 标签实例
