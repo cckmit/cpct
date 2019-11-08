@@ -1,9 +1,12 @@
 package com.zjtelcom.cpct.dao.campaign;
 
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +21,7 @@ public interface MktCampaignReportMapper {
 
     int countByStatus(@Param("map") Map<String, Object> map);
 
+    List<MktCampaignDO> selectByStatus(@Param("map") Map<String, Object> map);
 
+    List<MktCampaignDO> selectByTrial(@Param("map")Map<String, Object> map);
 }

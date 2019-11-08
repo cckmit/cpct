@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.campaign;
 
 
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -25,4 +26,8 @@ public interface MktCamChlConfMapper {
     List<MktCamChlConfDO> listByIdList(@Param("list")List<Long> idList);
 
     List<MktCamChlConfDO> selectByMktCamChlConf(MktCamChlConfDO mktCamChlConfDO);
+
+    List<MktCamChlConfDO> selectByContactChlId(Long contactChlId);
+
+    List<Long> countCamByChannel(Long contactChlId);
 }

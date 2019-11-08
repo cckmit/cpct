@@ -42,4 +42,40 @@ public class MktCampaingReportController extends BaseController {
         }
         return JSON.toJSONString(result);
     }
+
+
+    @PostMapping("/channelInfo")
+    @CrossOrigin
+    public String getChannelInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getChannelInfo(params);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","查询成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","查询失败");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    @PostMapping("/typeInfo")
+    @CrossOrigin
+    public String getTypeInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getTypeInfo(params);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","查询成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","查询失败");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
 }
