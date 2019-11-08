@@ -4,7 +4,6 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
