@@ -22,6 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**  2019/11/7
+ *  报表展示数据 老接口
+ */
+
+
 @RestController
 @RequestMapping("${adminPath}/report")
 public class ActivityStatisticsController extends BaseController {
