@@ -9,6 +9,8 @@ import com.zjtelcom.cpct.service.report.XinNewAactivityService;
 import com.zjtelcom.cpct.util.AcitvityParams;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
+@Service
+@Transactional
 public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(XinNewAactivityServiceImpl.class);
