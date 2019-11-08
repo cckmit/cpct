@@ -24,7 +24,7 @@ public class AcitvityParams {
             return paramMap;
         }
         //活动类型
-        Object mktCampaignType = paramMap.get("mktCampaignType");
+        Object mktCampaignType = params.get("mktCampaignType");
         if (mktCampaignType!=null && ""!=mktCampaignType){
             paramMap.put("mktCampaignType",mktCampaignType.toString());
         }else {
