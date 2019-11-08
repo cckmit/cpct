@@ -1052,8 +1052,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-
-                //获取结果
+//获取结果
                 Boolean flag = true;
                 try {
                     Map<String, Object> nonPassedMsg = new HashMap<>();
