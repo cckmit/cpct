@@ -25,4 +25,6 @@ public interface MktCamChlConfMapper {
     List<MktCamChlConfDO> listByIdList(@Param("list")List<Long> idList);
 
     List<MktCamChlConfDO> selectByMktCamChlConf(MktCamChlConfDO mktCamChlConfDO);
+
+    List<MktCamChlConfDO> selectByCampaignId(@Param("id")Long id);
 }
