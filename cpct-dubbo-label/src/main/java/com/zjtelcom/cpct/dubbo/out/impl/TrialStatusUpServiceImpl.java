@@ -113,6 +113,11 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
         return result;
     }
 
+    /**
+     * 批量excel定时清单导入
+     * @return
+     * @throws IOException
+     */
     @Override
     public Map<String, Object> importUserListByExcel() throws IOException {
         return trialOperationService.importUserListByExcel();
