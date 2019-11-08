@@ -20,4 +20,6 @@ public interface MktCampaingReportService {
 
     Map<String, Object> getTimeInfo(Map<String, Object> params);
 
+    Map<String, Object> getRegionInfo(Map<String, Object> params);
+
 }

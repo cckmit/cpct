@@ -21,7 +21,14 @@ public interface MktCampaignReportMapper {
 
     int countByStatus(@Param("map") Map<String, Object> map);
 
+    int countByTime(@Param("map") Map<String, Object> map);
+
     List<MktCampaignDO> selectByStatus(@Param("map") Map<String, Object> map);
 
     List<MktCampaignDO> selectByTrial(@Param("map")Map<String, Object> map);
+
+    List<Map<String, Object>> selectCamSumByArea(@Param("map") Map<String, Object> map);
+
+    Map<String, Object> selectCamSumByArea1(@Param("map") Map<String, Object> map);
+
 }

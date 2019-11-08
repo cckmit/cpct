@@ -47,13 +47,41 @@
         <result column="REGION_FLG" jdbcType="VARCHAR" property="regionFlg" />
     </resultMap>
 
+    <sql id="ssss">
+        AND STATUS_CD IN ('2002', '2006', '2007', '2008', '2010') AND MKT_CAMPAIGN_TYPE = #{map.campaignTye} AND PLAN_END_TIME BETWEEN #{map.startDate} AND #{map.endDate}
+    </sql>
+
+
     <select id="countByStatus" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT (1)
         from mkt_campaign
         where 1 = 1
-        <if test="map.startTime != null and map.endTime != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
+        <if test="map.startDate != null and map.endDate != null">
+            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
         </if>
+        <if test="map.statusCd != null and map.statusCd != ''">
+            AND STATUS_CD IN ${map.statusCd}
+        </if>
+        <if test="map.lanId != null and map.lanId != ''">
+            AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
+        </if>
+        <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
+            AND MKT_CAMPAIGN_TYPE IN ${map.mktCampaignType}
+        </if>
+        <if test="map.tiggerType != null and map.tiggerType != ''">
+            AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
+        </if>
+        <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
+            AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
+        </if>
+    </select>
+
+
+    <select id="countByTime" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT (1)
+        from mkt_campaign
+        where  #{map.endDate,jdbcType=TIMESTAMP} > PLAN_END_TIME
+        AND PLAN_END_TIME > #{map.startDate,jdbcType=TIMESTAMP}
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
         </if>
@@ -86,8 +114,8 @@
         t.THE_ME, t.REGION_FLG
         from mkt_campaign t
         where 1 = 1
-        <if test="map.startTime != null and map.endTime != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
+        <if test="map.startDate != null and map.endDate != null">
+            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
@@ -122,8 +150,8 @@
         t.THE_ME, t.REGION_FLG
         from mkt_campaign t
         where 1 = 1
-        <if test="map.startTime != null and map.endTime != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
+        <if test="map.startDate != null and map.endDate != null">
+            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND t.STATUS_CD IN ${map.statusCd}
@@ -155,8 +183,40 @@
             WHERE
             tril.CREATE_STAFF = 1000 )
         </if>
-
-
     </select>
+
+
+    <select id="selectCamSumByArea" resultType="java.util.Map" parameterType="map">
+        SELECT a.name,COUNT(t1.MKT_CAMPAIGN_ID) c3,COUNT(t2.MKT_CAMPAIGN_ID) c4c5
+        FROM sys_area a
+        LEFT JOIN (SELECT MKT_CAMPAIGN_ID, LAN_ID
+        FROM mkt_campaign
+        WHERE REGION_FLG = 'C3'
+        <include refid="ssss"/>
+        ) t1 ON a.area_id = t1.LAN_ID
+        LEFT JOIN (SELECT MKT_CAMPAIGN_ID, LAN_ID
+        FROM mkt_campaign
+        WHERE REGION_FLG IN ('C4','C5')
+        <include refid="ssss"/>
+        ) t2 ON a.area_id = t2.LAN_ID
+        WHERE a.area_level = '1'
+        GROUP BY a.name
+    </select>
+
+    <select id="selectCamSumByArea1" resultType="java.util.Map" parameterType="map">
+        SELECT
+        (SELECT COUNT(1)
+        FROM mkt_campaign
+        WHERE REGION_FLG = 'C2' <include refid="ssss"/>) C2,
+        (SELECT COUNT(1)
+        FROM mkt_campaign
+        WHERE REGION_FLG = 'C3' <include refid="ssss"/>) C3,
+        (SELECT COUNT(1)
+        FROM mkt_campaign
+        WHERE REGION_FLG IN ('C4','C5') <include refid="ssss"/>) C4,
+        COUNT(1) SUM
+        FROM mkt_campaign WHERE 1 = 1 <include refid="ssss"/>
+    </select>
+
 
 </mapper>
