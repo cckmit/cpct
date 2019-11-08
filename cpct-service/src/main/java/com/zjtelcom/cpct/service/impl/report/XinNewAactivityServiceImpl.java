@@ -91,6 +91,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         paramMap.put("rptType","1");
         //按客触数排序
         paramMap.put("sortColumn","contactNum");
+        logger.info("入参："+JSON.toJSONString(paramMap));
         //查询总数 解析
         Map<String,Object> resultMap = iReportService.queryRptOrder(paramMap);
 
