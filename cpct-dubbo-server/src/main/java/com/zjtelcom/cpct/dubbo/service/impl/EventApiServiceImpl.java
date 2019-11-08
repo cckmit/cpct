@@ -1076,7 +1076,10 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             if (flag) {
                                 // 命中活动
-                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                if (future.get().get("ruleList") != null ) {
+                                    activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                }
+
                             }
                         }
                         /*else {

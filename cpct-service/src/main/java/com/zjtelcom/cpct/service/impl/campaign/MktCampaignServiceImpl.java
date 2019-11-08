@@ -3328,4 +3328,40 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+    @Autowired
+    private MktCamChlConfMapper camChlConfMapper;
+    /**
+     * 刷活动数据
+     * @return
+     */
+    @Override
+    public Map<String, Object> dataConfig() {
+        List<MktCampaignDO> campaignDOList = mktCampaignMapper.selectAll();
+        for (MktCampaignDO cam : campaignDOList){
+            List<MktCamChlConfDO> list = camChlConfMapper.selectByCampaignId(cam.getMktCampaignId());
+            if (list.size()>1){
+                cam.setOneChannelFlg("false");
+            }else {
+                cam.setOneChannelFlg("true");
+            }
+            String creatChannel = cam.getCreateChannel()==null ? "" : cam.getCreateChannel();
+            String sysPostCode = "";
+            if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+            }else {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }
+            cam.setRegionFlg(sysPostCode);
+            mktCampaignMapper.updateByPrimaryKey(cam);
+        }
+        return null;
+    }
 }
