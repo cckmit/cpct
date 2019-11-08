@@ -32,12 +32,100 @@ public class MktCampaingReportController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         try {
             result = mktCampaingReportService.getHeadInfo(params);
-            result.put("resultCode",CODE_SUCCESS);
-            result.put("resultMsg","查询成功");
+            result.put("code","0000");
+            result.put("message","成功");
         } catch (Exception e) {
             logger.error("Exception: ", JSONArray.toJSON(params), e);
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg","查询失败");
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    @PostMapping("/channelInfo")
+    @CrossOrigin
+    public String getChannelInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getChannelInfo(params);
+            result.put("code","0000");
+            result.put("message","成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    @PostMapping("/typeInfo")
+    @CrossOrigin
+    public String getTypeInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getTypeInfo(params);
+            result.put("code","0000");
+            result.put("message","成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+
+    @PostMapping("/operationInfo")
+    @CrossOrigin
+    public String getOperationInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getOperationInfo(params);
+            result.put("code","0000");
+            result.put("message","成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+    @PostMapping("/timeInfo")
+    @CrossOrigin
+    public String getTimeInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getTimeInfo(params);
+            result.put("code","0000");
+            result.put("message","成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
+            return JSON.toJSONString(result);
+        }
+        return JSON.toJSONString(result);
+    }
+
+    @PostMapping("/regionInfo")
+    @CrossOrigin
+    public String getRegionInfo(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaingReportService.getRegionInfo(params);
+            result.put("code","0000");
+            result.put("message","成功");
+        } catch (Exception e) {
+            logger.error("Exception: ", JSONArray.toJSON(params), e);
+            result.put("code","0002");
+            result.put("message","服务逻辑异常");
             return JSON.toJSONString(result);
         }
         return JSON.toJSONString(result);

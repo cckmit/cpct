@@ -27,4 +27,8 @@ public interface MktCamChlConfMapper {
     List<MktCamChlConfDO> selectByMktCamChlConf(MktCamChlConfDO mktCamChlConfDO);
 
     List<MktCamChlConfDO> selectByCampaignId(@Param("id")Long id);
+
+    List<MktCamChlConfDO> selectByContactChlId(Long contactChlId);
+
+    List<Long> countCamByChannel(Long contactChlId);
 }

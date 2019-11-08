@@ -99,5 +99,33 @@
     group by  CONTACT_CHL_ID
   </select>
 
+  <select id="selectByContactChlId" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select EVT_CONTACT_CONF_ID, EVT_CONTACT_CONF_NAME, MKT_CAMPAIGN_ID, CONTACT_CHL_ID,
+    PUSH_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE,
+    REMARK
+    from mkt_cam_chl_conf
+    where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+  </select>
+
+  <select id="countCamByChannel" parameterType="java.lang.Long" resultType="java.lang.Long">
+    SELECT t.INIT_ID
+      FROM
+          mkt_campaign t
+      WHERE
+          t.STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+      AND
+        t.MKT_CAMPAIGN_TYPE IN (1000, 2000, 3000, 4000)
+      AND t.MKT_CAMPAIGN_ID IN (
+          SELECT
+              MKT_CAMPAIGN_ID
+          FROM
+              mkt_cam_chl_conf
+          WHERE
+              CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+      )
+      GROUP BY
+          t.INIT_ID
+  </select>
+
 
 </mapper>

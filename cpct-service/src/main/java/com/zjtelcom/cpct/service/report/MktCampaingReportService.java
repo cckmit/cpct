@@ -10,6 +10,16 @@ import java.util.Map;
  */
 public interface MktCampaingReportService {
 
-    Map<String, Object> getHeadInfo(Map<String, Object> paramMap);
+    Map<String, Object> getHeadInfo(Map<String, Object> params);
+
+    Map<String, Object> getOperationInfo(Map<String, Object> params);
+
+    Map<String, Object> getChannelInfo(Map<String, Object> params);
+
+    Map<String, Object> getTypeInfo(Map<String, Object> params);
+
+    Map<String, Object> getTimeInfo(Map<String, Object> params);
+
+    Map<String, Object> getRegionInfo(Map<String, Object> params);
 
 }
