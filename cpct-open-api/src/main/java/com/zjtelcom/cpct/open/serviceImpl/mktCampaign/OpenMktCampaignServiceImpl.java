@@ -806,21 +806,24 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //需求单信息
             RequestTemplateInst requestTemplateInst = createMktCampaignReq.getRequestTemplateInst();
-            MktCampaignComplete mktCampaignComplete = new MktCampaignComplete();
-            mktCampaignComplete.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
-            mktCampaignComplete.setMktCampaignId(mktCampaignDO.getInitId());
-            mktCampaignComplete.setOrderId(requestTemplateInst.getRequestTemplateInstId().toString());
-            mktCampaignComplete.setOrderName(requestTemplateInst.getName());
-            mktCampaignComplete.setTacheCd("1100");
-            mktCampaignComplete.setTacheValueCd("10");
-            mktCampaignComplete.setBeginTime(new Date());
-            mktCampaignComplete.setSort(Long.valueOf("1"));
-            mktCampaignComplete.setStatusCd("1100");
-            mktCampaignComplete.setStatusDate(new Date());
-            mktCampaignComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
-            mktCampaignComplete.setCreateDate(new Date());
-            mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
-            mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            if(requestTemplateInst != null) {
+                MktCampaignComplete mktCampaignComplete = new MktCampaignComplete();
+                mktCampaignComplete.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                mktCampaignComplete.setMktCampaignId(mktCampaignDO.getInitId());
+                mktCampaignComplete.setOrderId(requestTemplateInst.getRequestTemplateInstId().toString());
+                mktCampaignComplete.setOrderName(requestTemplateInst.getName());
+                mktCampaignComplete.setTacheCd("1100");
+                mktCampaignComplete.setTacheValueCd("10");
+                mktCampaignComplete.setBeginTime(new Date());
+                mktCampaignComplete.setEndTime(new Date());
+                mktCampaignComplete.setSort(Long.valueOf("1"));
+                mktCampaignComplete.setStatusCd("1100");
+                mktCampaignComplete.setStatusDate(new Date());
+                mktCampaignComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
+                mktCampaignComplete.setCreateDate(new Date());
+                mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
+                mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            }
         }
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");

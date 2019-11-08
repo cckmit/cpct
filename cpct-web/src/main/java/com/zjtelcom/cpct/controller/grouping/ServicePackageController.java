@@ -118,7 +118,7 @@ public class ServicePackageController extends BaseController {
             byte[] buffer = new byte[1024];
             FileInputStream fis = null;  //文件输入流
             BufferedInputStream bis = null;
-            fis = new FileInputStream("/app/ServicePackageTemplate.xlsx");
+            fis = new FileInputStream("/app/servicePackageTemplate.xlsx");
             bis = new BufferedInputStream(fis);
 
             //处理导出问题

@@ -42,6 +42,9 @@
         <result column="EXEC_INIT_TIME" jdbcType="VARCHAR" property="execInitTime" />
         <result column="LAN_ID_FOUR" jdbcType="BIGINT" property="lanIdFour"/>
         <result column="LAN_ID_FIVE" jdbcType="BIGINT" property="lanIdFive"/>
+        <result column="ONE_CHANNEL_FLG" jdbcType="VARCHAR" property="oneChannelFlg" />
+        <result column="THE_ME" jdbcType="VARCHAR" property="theMe" />
+        <result column="REGION_FLG" jdbcType="VARCHAR" property="regionFlg" />
     </resultMap>
 
     <resultMap id="countResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignCountDO">
@@ -72,6 +75,7 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </delete>
 
+
     <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" useGeneratedKeys="true"
             keyProperty="mktCampaignId">
         insert into mkt_campaign (MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME,
@@ -84,7 +88,8 @@
         CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
         REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
         CAM_LEVEL,IS_CHECK_RULE, SRC_TYPE, SRC_ID,
-        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID, EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE)
+        SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID, EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG
+        THE_ME,REGION_FLG)
         values (#{mktCampaignId,jdbcType=BIGINT}, #{initId,jdbcType=BIGINT}, #{tiggerType,jdbcType=VARCHAR}, #{mktCampaignName,jdbcType=VARCHAR},
         #{planBeginTime,jdbcType=DATE}, #{planEndTime,jdbcType=DATE}, #{beginTime,jdbcType=DATE},
         #{endTime,jdbcType=DATE}, #{mktCampaignType,jdbcType=VARCHAR}, #{mktCampaignCategory,jdbcType=VARCHAR},
@@ -96,7 +101,7 @@
         #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
         #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR},
         #{srcType,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{serviceCancleFlag,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT},
-        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=VARCHAR}, #{lanIdFour,jdbcType=BIGINT}, #{lanIdFive,jdbcType=BIGINT})
+        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=VARCHAR}, #{lanIdFour,jdbcType=BIGINT}, #{lanIdFive,jdbcType=BIGINT}, #{oneChannelFlg,jdbcType=VARCHAR}, #{theMe,jdbcType=VARCHAR}, #{regionFlg,jdbcType=VARCHAR},)
     </insert>
 
 
@@ -141,11 +146,12 @@
         <if test= "execInitTime!=null">EXEC_INIT_TIME = #{execInitTime,jdbcType=VARCHAR},</if>
         <if test= "lanIdFour!=null">LAN_ID_FOUR = #{lanIdFour,jdbcType=BIGINT},</if>
         <if test= "lanIdFive!=null">LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT},</if>
-        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        ONE_CHANNEL_FLG = #{oneChannelFlg,jdbcType=VARCHAR},
+        THE_ME = #{theMe,jdbcType=VARCHAR},
+        REGION_FLG = #{regionFlg,jdbcType=VARCHAR}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
-
-
 
     <!--    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
           update mkt_campaign
@@ -189,6 +195,16 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </select>
 
+    <select id="selectCampaignByInitId" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE
+        from mkt_campaign
+        where INIT_ID = #{initId,jdbcType=BIGINT}
+    </select>
+
     <select id="selectByInitId" resultMap="BaseResultMap">
         select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
@@ -206,7 +222,9 @@
         MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
         CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE
-        from mkt_campaign order by UPDATE_DATE desc
+        from mkt_campaign where STATUS_CD in (2006, 2007, 2010)
+         order by UPDATE_DATE desc
+
     </select>
 
 
@@ -794,6 +812,7 @@
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%test%'
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%演示%'
         AND t.MKT_CAMPAIGN_NAME NOT LIKE '%勿动%'
+        AND  #{createDate} > t.CREATE_DATE
         AND t.MKT_CAMPAIGN_ID NOT IN (
         SELECT
         p1.CAMPAIGN_ID
@@ -952,4 +971,20 @@
         </foreach>
         ORDER BY CREATE_DATE DESC
     </select>
+
+    <select id="selectBatch" parameterType="java.util.List" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE
+        from mkt_campaign
+        WHERE  MKT_CAMPAIGN_ID IN
+        <foreach collection="mktCampaignIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+
+
 </mapper>

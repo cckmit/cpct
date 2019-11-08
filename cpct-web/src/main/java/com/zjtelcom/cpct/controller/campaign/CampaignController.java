@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,6 +52,26 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private MktCampaignApiService mktCampaignApiService;
+
+
+
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     *
+     * @return
+     */
+    @PostMapping("/dataConfig")
+    @CrossOrigin
+    public Map<String, Object> dataConfig(){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.dataConfig();
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
 
 
 
@@ -539,6 +560,16 @@ public class CampaignController extends BaseController {
     public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
         Map<String, Object> result = new HashMap<>();
         result = mktCampaignService.mktCampaignJtRefuse(mktCampaignId);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/searchBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> searchBatch(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        List<Long> mktCampaignIdList = (List<Long>) params.get("mktCampaignIdList");
+        result = mktCampaignService.searchBatch(mktCampaignIdList);
         return result;
     }
 

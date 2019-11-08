@@ -95,34 +95,31 @@ public class EsHitsServiceImpl implements EsHitsService {
     }
 
     public void saveAll(JSONObject jsonObject, String indexName, String id) {
+        // 默认关闭：0
         String prodFilter = "0";
-        Object status = redisUtils.get("SYSYTEM_ESLOG_STATUS");
-        if (status != null) {
-            prodFilter = status.toString();
-        }else {
-            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("SYSYTEM_ESLOG_STATUS");
-            if (sysFilList != null && !sysFilList.isEmpty()) {
-                prodFilter = sysFilList.get(0).get("value");
-                redisUtils.set("SYSYTEM_ESLOG_STATUS", prodFilter);
+        prodFilter = redisUtils.getRedisOrSysParams("SYSYTEM_ESLOG_STATUS");
+        if (prodFilter.equals("0")) {
+            String evtCode = jsonObject.get("eventCode") == null ? (jsonObject.get("eventId") == null ? "" : jsonObject.get("eventId").toString()) : jsonObject.get("eventCode").toString();
+            // 查询特殊事件集合
+            if ("".equals(evtCode) || !redisUtils.getListRedisOrSysParams("SPECIAL_EVENT_FILTER").contains(evtCode)) {
+                return;
             }
         }
-        if (prodFilter.equals("1")) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (id == null) {
-                            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
-                        } else {
-                            String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("es日志存储失败");
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (id == null) {
+                        String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
+                    } else {
+                        String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("es日志存储失败");
                 }
-            });
-        }
+            }
+        });
     }
 
     /**

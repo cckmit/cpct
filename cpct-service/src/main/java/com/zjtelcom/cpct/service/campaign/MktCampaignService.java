@@ -4,6 +4,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,5 +72,9 @@ public interface MktCampaignService {
     void campaignDelayNotice();
 
     Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId);
+
+    Map<String,Object> searchBatch(List<Long> mktCampaignIdList);
+
+    Map<String,Object> dataConfig();
 
 }

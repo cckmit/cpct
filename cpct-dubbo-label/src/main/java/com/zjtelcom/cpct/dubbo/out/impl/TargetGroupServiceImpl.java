@@ -11,7 +11,7 @@ import java.util.Map;
 @Service
 public class TargetGroupServiceImpl implements TargetGroupService {
 
-    @Autowired
+    @Autowired(required = false)
     private TarGrpTemplateService tarGrpTemplateService;
 
     /**

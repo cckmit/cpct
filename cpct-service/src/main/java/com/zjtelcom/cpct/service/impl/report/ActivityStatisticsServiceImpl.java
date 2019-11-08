@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_ROLL;
 
 @Service
 @Transactional
@@ -396,7 +398,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("pageSize",total);
             paramMap.put("page","1");
             if (reqId!=null && reqId!=""){
-                stringObjectMap.put("reqId",reqId);
                 redisUtils.set(reqId.toString(),paramMap);
             }
         } else {
@@ -554,6 +555,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            Object reqId = stringObjectMap.get("reqId");
+            Object total = stringObjectMap.get("total");
+            paramMap.put("pageSize",total);
+            paramMap.put("page","1");
+            if (reqId!=null && reqId!=""){
+                redisUtils.set(reqId.toString(),paramMap);
+            }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
@@ -633,7 +641,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("orderNum")) {
                                 msgMap.put("name", "派单数");
@@ -760,7 +768,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             String key = iter.next();
                             Object o = map.get(key);
                             if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0;
+                                o = 0+"";
                             }
                             if (key.equals("contactNum")) {
                                 msgMap.put("name", "客户接触数");
@@ -831,6 +839,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         maps.put("total", stringObjectMap.get("total"));
         maps.put("resultMsg", hashMaps);
         maps.put("resultCode", CODE_SUCCESS);
+        maps.put("reqId",  stringObjectMap.get("reqId"));
         return maps;
     }
 
@@ -989,4 +998,36 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 //        System.out.println(sdf.format(calendar.getTime()));//输出格式化的日期
         return sdf.format(calendar.getTime());
     }
+
+
+    /**
+     * 超过3个月的未试算或派单的活动下线
+     */
+    @Override
+    public void MoreThan3MonthsOffline() {
+        try {
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("tiggerType", "1000");
+            hashMap.put("createDate", "3000");
+            hashMap.put("page", 1);
+            hashMap.put("pageSize", 9999);
+            Map<String, Object> mktCampaignDetails = getMktCampaignDetails(hashMap);
+            List<MktCampaignDO> camList = mktCampaignDetails == null ?
+                    new ArrayList<MktCampaignDO>() : (List<MktCampaignDO>) mktCampaignDetails.get("resultMsg");
+            mktCampaignDetails = getMktCampaignDetails(hashMap);
+            StringBuilder sb = new StringBuilder();
+            for (MktCampaignDO mktCampaignDO : camList) {
+                try {
+                    mktCampaignMapper.changeMktCampaignStatus(mktCampaignDO.getMktCampaignId(), STATUS_CODE_ROLL.getStatusCode(), new Date(), 0L);
+                    sb.append(mktCampaignDO.getMktCampaignId());
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            redisUtils.set("OFFLINE_" + DateUtil.date2String(new Date()), sb);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

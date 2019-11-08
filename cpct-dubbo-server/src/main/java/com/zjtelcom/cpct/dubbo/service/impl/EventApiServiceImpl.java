@@ -59,6 +59,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -192,8 +193,15 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
+    /*@Autowired(required = false)
+    private CamCpcService camCpcService;*/
+
     /*@Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;*/
+
+    private final static String USED_FLOW = "used_flow";
+
+    private final static String TOTAL_FLOW = "total_flow";
 
     @Override
     public Map<String, Object> CalculateCPC(Map<String, Object> map) {
@@ -453,7 +461,7 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                 Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
+                Object eventC =  redisUtils.get("EVENT_" + map.get("eventCode"));
                 ContactEvt event = null;
                 if (eventC!=null){
                     event = (ContactEvt)eventC;
@@ -656,6 +664,11 @@ public class EventApiServiceImpl implements EventApiService {
                     //  log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
                 }
 
+                // 计费短信合并功能 CPCP_JIFEI_CONTENT
+                if (evtParams != null) {
+                    cpcpJifeiContent(labelItems, evtParams);
+                }
+
                 //获取事件推荐活动数
                 int recCampaignAmount;
                 String recCampaignAmountStr = event.getRecCampaignAmount();
@@ -745,7 +758,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                // 过滤事件采集相中的标签
+                // 过滤事件采集项中的标签
                 Map<String, String> mktAllLabel = new HashMap<>();
                 Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
                 List<String> assetLabelList = new ArrayList<>();
@@ -1041,12 +1054,40 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //获取结果
+                Boolean flag = true;
                 try {
+                    Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
-                        if (future.get() != null && !future.get().isEmpty()) {
+                        /*if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                        }*/
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            Map<String, Object> map1 = future.get();
+                            for (String s : map1.keySet()) {
+                                if (s.contains("cam_")) {
+                                    flag = false;
+                                    nonPassedMsg.put(s, map1.get(s));
+                                }
+                            }
+                            if (map1.get("nonPassedMsg") != null) {
+                                Object nonPassedMsg1 = map1.get("nonPassedMsg");
+                                nonPassedMsg.putAll((Map<String, Object>)nonPassedMsg1);
+                                // flag = false;
+                            }
+                            if (flag) {
+                                // 命中活动
+                                if (future.get().get("ruleList") != null ) {
+                                    activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                }
+
+                            }
                         }
+                        /*else {
+                            // 翼支付未命中原因
+                            nonPassedMsg.putAll(future.get());
+                        }*/
                     }
+                    result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //发生异常关闭线程池
@@ -1223,9 +1264,11 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
                 log.info("进入camApiService.ActivityTask");
+                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
@@ -2492,6 +2535,10 @@ public class EventApiServiceImpl implements EventApiService {
 
             //因子查询-----------------------------------------------------
             Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(assParam));
+//            Map<String, Object> dubboResult = new HashMap<>();
+//            Map<String, Object> msgbody = new HashMap<>();
+//            dubboResult.put("result_code", "0");
+//            dubboResult.put("msgbody", msgbody);
             if ("0".equals(dubboResult.get("result_code").toString())) {
                 JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
                 //ES log 标签实例
@@ -2925,6 +2972,55 @@ public class EventApiServiceImpl implements EventApiService {
         }
         log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
+    }
+
+
+
+    /**
+     * 计费短信合并功能 CPCP_JIFEI_CONTENT
+     * @param labelItems
+     */
+    private void cpcpJifeiContent(Map<String, String> labelItems, JSONObject evtParams){
+        StringBuilder content = new StringBuilder();
+        String usedFlow = "";
+        String totalFlow = "";
+
+        usedFlow = (String) redisUtils.get(USED_FLOW);
+        if (usedFlow == null || "".equals(usedFlow)) {
+            List<SysParams> usedFlowList = sysParamsMapper.listParamsByKeyForCampaign(USED_FLOW);
+            if (usedFlowList != null && usedFlowList.size() > 0) {
+                SysParams usedFlowParams = usedFlowList.get(0);
+                if (usedFlowParams != null) {
+                    usedFlow = usedFlowParams.getParamValue();
+                    redisUtils.set(USED_FLOW, usedFlow);
+                }
+            }
+        }
+
+        totalFlow = (String) redisUtils.get(TOTAL_FLOW);
+        if (totalFlow == null || "".equals(totalFlow)) {
+            List<SysParams> totalFlowList = sysParamsMapper.listParamsByKeyForCampaign(TOTAL_FLOW);
+            if (totalFlowList != null && totalFlowList.size() > 0) {
+                SysParams totalFlowParams = totalFlowList.get(0);
+                if (totalFlowParams != null) {
+                    totalFlow = totalFlowParams.getParamValue();
+                    redisUtils.set(TOTAL_FLOW, totalFlow);
+                }
+            }
+        }
+
+        if (evtParams.get("CPCP_JIFEI_CONTENT") != null) {
+            List<Map<String, String>> contentMapList = (List<Map<String, String>>) evtParams.get("CPCP_JIFEI_CONTENT");
+            for (int i = 0; i < contentMapList.size(); i++) {
+                if (i > 0) {
+                    content.append("，");
+                }
+                content.append(contentMapList.get(i).get("message_name").toString());
+                content.append(usedFlow + contentMapList.get(i).get(USED_FLOW) + "，");
+                content.append(totalFlow + contentMapList.get(i).get(TOTAL_FLOW));
+            }
+        }
+        labelItems.put("CPCP_JIFEI_MESSAGE", content.toString());
     }
 
 }

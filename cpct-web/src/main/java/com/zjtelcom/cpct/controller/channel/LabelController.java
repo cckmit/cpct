@@ -24,7 +24,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 @RestController
 @RequestMapping("${adminPath}/label")
 public class LabelController extends BaseController {
-    @Autowired
+    @Autowired(required = false)
     private LabelService labelService;
     @Autowired
     private LabelCatalogService labelCatalogService;
