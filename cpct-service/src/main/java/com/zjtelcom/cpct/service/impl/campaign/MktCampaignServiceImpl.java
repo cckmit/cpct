@@ -803,7 +803,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1100");
             if(mktCampaignComplete != null && !mktCampaignComplete.getTacheValueCd().equals("11")) {
                 mktCampaignComplete.setEndTime(new Date());
-                mktCampaignComplete.setStatusCd("1300");
+                mktCampaignComplete.setStatusCd("1200");
                 mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
                 mktCampaignComplete.setUpdateDate(new Date());
                 mktCampaignCompleteMapper.update(mktCampaignComplete);
