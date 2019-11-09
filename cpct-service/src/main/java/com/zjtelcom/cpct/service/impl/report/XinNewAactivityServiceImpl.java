@@ -3,8 +3,12 @@ package com.zjtelcom.cpct.service.impl.report;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.service.report.XinNewAactivityService;
 import com.zjtelcom.cpct.util.AcitvityParams;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private ContactChannelMapper contactChannelMapper;
 
     /**
      *  新活动报表 主题活动
@@ -169,7 +177,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //top5
         paramMap.put("pageSize","5");
         //收入提高
-        paramMap.put("sortColumn","incomeU");
+        paramMap.put("sortColumn","incomeUp");
         //收入拉动top5
         Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
         logger.info("新活动报表 收入拉动 收入拉动top5:"+JSON.toJSONString(stringObjectMap1));
@@ -189,5 +197,89 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         return null;
     }
 
+
+    /**
+     * 活动主题分类和数量
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> activityThemeCount(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            ArrayList<Object> list = new ArrayList<>();
+            Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+            List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            String date = params.get("startDate").toString();
+            String type = paramMap.get("mktCampaignType").toString();
+            //总数
+            Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type);
+            if (campaignTheme.size()>0 && campaignTheme!=null){
+                for (Map<String, String> stringStringMap : campaignTheme) {
+                    String value = stringStringMap.get("value");
+                    String label = stringStringMap.get("label");
+                    //每个主题个数
+                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(value, date, type);
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("name",label);
+                    map.put("value",mktCampaignList.size());
+                    list.add(map);
+                }
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("name","全部");
+            map.put("value",count);
+            list.add(0,map);
+            resultMap.put("resultCode","200");
+            resultMap.put("resultMsg",list);
+        } catch (Exception e) {
+            resultMap.put("resultCode","500");
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> activityThemeLevelAndChannel(Map<String, Object> params) {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        //地市信息
+        List<Organization> organizations = organizationMapper.selectMenu();
+        if (organizations.size()>0 && organizations!=null){
+            for (int i = 0; i < organizations.size(); i++) {
+                String orgName = organizations.get(i).getOrgName();
+                if (orgName.length()>6){
+                    organizations.remove(i);
+                }
+                i--;
+            }
+            resultMap.put("orglevel2",organizations);
+        }else {
+            resultMap.put("resultCode","500");
+        }
+        //渠道信息
+        List<Channel> channelList = contactChannelMapper.getNewActivityChannel();
+        if (channelList.size()>0 &&channelList!=null){
+            resultMap.put("resultCode","200");
+            resultMap.put("channel",channelList);
+        }else {
+            resultMap.put("resultCode","500");
+        }
+        return resultMap;
+    }
+
+
+    /**
+     * 季度营销活动
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> quarterActivities(Map<String, Object> params) {
+        Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+        //按活动统计
+        paramMap.put("rptType","2");
+
+        return null;
+    }
 
 }

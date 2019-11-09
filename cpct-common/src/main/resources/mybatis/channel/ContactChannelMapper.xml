@@ -169,4 +169,10 @@
     REMARK from contact_channel where CREATE_STAFF in (4,5)
   </select>
 
+  <select id="getNewActivityChannel"  resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+        STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+        REMARK from contact_channel where CREATE_STAFF in (4,5,6)
+  </select>
+
 </mapper>
