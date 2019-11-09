@@ -129,9 +129,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         detailsParams.put("pageSize", 999);
         System.out.println("入参：" + JSON.toJSONString(detailsParams));
         Map<String, Object> mktCampaignDetails = activityStatisticsService.getMktCampaignDetails(detailsParams);
-        System.out.println("出参：" + JSON.toJSONString(mktCampaignDetails));
         List<MktCampaignDO> mktCampaignList = (List<MktCampaignDO>) mktCampaignDetails.get("resultMsg");
         Page pageInfo = (Page) mktCampaignDetails.get("pageInfo");
+        System.out.println("出参：pageInfo " + JSON.toJSONString(pageInfo) +  "     mktCampaignList" + JSON.toJSONString(mktCampaignList));
         // 不活跃活动数量
         int noOperCount = 0;
         if (pageInfo != null) {
