@@ -1020,10 +1020,10 @@
             from mkt_campaign WHERE
             <choose>
                 <when test="status != null and status!=''">
-                    AND STATUS_CD = #{statusCd}
+                     STATUS_CD = #{status}
                 </when>
                 <otherwise>
-                    AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+                     STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
                 </otherwise>
             </choose>
             <if test="type != null and type != ''">
@@ -1045,10 +1045,10 @@
         from mkt_campaign WHERE
         <choose>
             <when test="status != null and status!=''">
-                AND STATUS_CD = #{statusCd}
+                 STATUS_CD = #{status}
             </when>
             <otherwise>
-                AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+                STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
             </otherwise>
         </choose>
         <if test="type != null and type != ''">
