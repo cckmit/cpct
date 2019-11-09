@@ -105,7 +105,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
         //查询出来后按地市和渠道排序
         //地市(ALL表示所有,多个用逗号隔开) 添加11个地市的orgid
-        paramMap.put("orglevel2","800000000009,800000000010,800000000011,800000000012,800000000013,800000000014,800000000015,800000000016,800000000017,800000000018,800000000020");
+        paramMap.put("orglevel2","all");
         //查询地市排名
         Map<String,Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
         logger.info("新活动报表 客触数 查询地市排名:"+JSON.toJSONString(stringObjectMap));
@@ -239,6 +239,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         return resultMap;
     }
 
+    /**
+     * 地市查询和渠道查询
+     * @param params
+     * @return
+     */
     @Override
     public Map<String, Object> activityThemeLevelAndChannel(Map<String, Object> params) {
         HashMap<String, Object> resultMap = new HashMap<>();
@@ -278,7 +283,40 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
         //按活动统计
         paramMap.put("rptType","2");
-
+//        //商机成功数 排序 orderSuccessNum
+//        paramMap.put("sortColumn","orderSuccessNum");
+        StringBuilder stringBuilder = new StringBuilder();
+        //活动按主题 选 all或者主题
+        Object theMe = params.get("theMe");
+        String date = params.get("startDate").toString();
+        String type = paramMap.get("mktCampaignType").toString();
+        Object statusCd = params.get("statusCd");
+        String status = null;
+        if (statusCd!=null && ""!=statusCd){
+            status = statusCd.toString();
+        }
+        List<MktCampaignDO> mktCampaignList =null;
+        if (theMe!=null && theMe!=""){
+            if (theMe.toString().equals("all")){
+                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
+            }else {
+                //查询主题 value 参数 对应 theMe 1000 - 1800
+                mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), date, type,status);
+            }
+            if (mktCampaignList.size() > 0 && mktCampaignList != null) {
+                for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                    //活动级别所有的initId 根据活动维度分页查询所有 默认按成功数排序
+                    stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+                    //多个id  “，”拼接
+                    String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+                    paramMap.put("mktCampaignId", substring);
+                    //按全部或者按主题查询 活动级别 默认排序 清单列表参数 渲染页面
+                    logger.info("季度营销活动入参："+JSON.toJSONString(paramMap));
+                    Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
+                    logger.info("新活动报表 季度营销活动 按活动:"+JSON.toJSONString(stringObjectMap));
+                }
+            }
+        }
         return null;
     }
 
