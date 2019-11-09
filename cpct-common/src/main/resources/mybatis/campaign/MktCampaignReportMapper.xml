@@ -132,6 +132,7 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        GROUP BY t.INIT_ID
     </select>
 
 
