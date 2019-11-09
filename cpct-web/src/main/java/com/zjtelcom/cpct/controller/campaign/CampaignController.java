@@ -63,10 +63,10 @@ public class CampaignController extends BaseController {
      */
     @PostMapping("/dataConfig")
     @CrossOrigin
-    public Map<String, Object> dataConfig(){
+    public Map<String, Object> dataConfig(@RequestBody Map<String,String> param){
         Map<String,Object> result = new HashMap<>();
         try {
-            result = mktCampaignService.dataConfig();
+            result = mktCampaignService.dataConfig(param);
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
         }
