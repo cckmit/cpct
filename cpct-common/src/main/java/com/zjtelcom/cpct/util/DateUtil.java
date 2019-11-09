@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.util;
 
+import com.zjtelcom.cpct.enums.DateUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,8 +20,11 @@ public class DateUtil {
 
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd";
     private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+    private static DateFormat ldf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
+    public static String formatDate(Date date) {
+        return ldf.format(date);
+    }
     /**
      * 获取上一个月的月份
      *
@@ -822,6 +827,46 @@ public class DateUtil {
     }
 
 
+    /**
+     * 计算两个日期之间相差的天数
+     * @param targetDate
+     * @param compareDate
+     * @return
+     */
+    public static Integer daysBetween(Date targetDate,Date compareDate) {
+        try {
+            //设置转换的日期格式
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            //开始时间
+            Date startDate = sdf.parse(sdf.format(targetDate));
+            //结束时间
+            Date endDate = sdf.parse(sdf.format(compareDate));
+            //得到相差的天数 betweenDate
+            long between_days = (endDate.getTime() - startDate.getTime()) / (60 * 60 * 24 * 1000);
+            return Integer.parseInt(String.valueOf(between_days));
+        }catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
 
+    /**
+     * 计算某个日期增加一定时间后的日期
+     */
+    public static Date addDate(Date targetDate,int count,DateUnit unit) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(targetDate);
+        switch (unit){
+            case MONTH:
+                cal.add(Calendar.MONTH, count);
+                break;
+            case YEAR:
+                cal.add(Calendar.YEAR, count);
+                break;
+            default:
+                break;
+        }
+        return cal.getTime();
+    }
 
 }

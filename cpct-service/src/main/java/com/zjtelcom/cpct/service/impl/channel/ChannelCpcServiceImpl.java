@@ -467,5 +467,14 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
 
+    @Override
+    public  Map<String,Object> selectBatchByCode(List<String> contactChlCodeList) {
+        Map<String,Object> result = new HashMap<>();
+        List<Channel> channelList = channelMapper.selectBatchByCode(contactChlCodeList);
+        result.put("channelList", channelList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","查询成功");
+        return result;
+    }
 
 }

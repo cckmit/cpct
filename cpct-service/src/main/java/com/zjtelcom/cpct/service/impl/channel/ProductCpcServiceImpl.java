@@ -8,10 +8,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
-import com.zjtelcom.cpct.domain.channel.MktProductRule;
-import com.zjtelcom.cpct.domain.channel.MktResource;
-import com.zjtelcom.cpct.domain.channel.Offer;
-import com.zjtelcom.cpct.domain.channel.ServiceEntity;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
@@ -22,7 +19,6 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdRelMapper;
 import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,17 +52,33 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
 
     @Override
-    public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList) {
+    public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList, String itemType) {
 
         Map<String,Object> result = new HashMap<>();
         List<OfferDetail> nameList = new ArrayList<>();
-        for (Long productId : productIdList){
-            Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
-            if (product==null){
-                continue;
+        //销售品	1000
+        //主产品	2000
+        //子产品	3000
+        if (itemType==null || itemType.equals("1000") || "".equals(itemType)){
+            for (Long productId : productIdList){
+                Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
+                if (product==null){
+                    continue;
+                }
+                OfferDetail offerDetail = BeanUtil.create(product,new OfferDetail());
+                nameList.add(offerDetail);
             }
-            OfferDetail offerDetail = BeanUtil.create(product,new OfferDetail());
-            nameList.add(offerDetail);
+        }
+        if (itemType==null || itemType.equals("2000") || itemType.equals("3000")){
+            for (Long productId : productIdList){
+                Product product = productProdMapper.selectByPrimaryKey(Long.valueOf(productId.toString()));
+                if (product==null){
+                    continue;
+                }
+                OfferDetail offerDetail = new OfferDetail(Integer.parseInt(product.getProdId().toString()),product.getProdName());
+//                OfferDetail offerDetail = BeanUtil.create(product,new OfferDetail());
+                nameList.add(offerDetail);
+            }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",nameList);
@@ -92,6 +104,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         return result;
     }
 
+    // todo 修改 销售品原流程，主产品 4个类型， 子产品类型3000
     @Override
     public Map<String,Object> getProductListByName( Map<String,Object> params) {
         Map<String,Object> result = new HashMap<>();
@@ -103,8 +116,17 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         // 1000查所有；空查有效
         String statusCd = MapUtil.getString(params.get("statusCd") == null? "":params.get("statusCd"));
         List<Long> producetIdList = (List<Long>)params.get("productIdList");
-        PageHelper.startPage(page,pageSize);
-        productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
+        if ("1000".equals(produtType)){
+            //四个编码
+            PageHelper.startPage(page,pageSize);
+            productList =  offerProdMapper.selectByFourNum();
+        }else if ("2000".equals(produtType)){
+            PageHelper.startPage(page,pageSize);
+            productList = offerProdMapper.findProductByType(productName,statusCd, producetIdList);
+        }else {
+            PageHelper.startPage(page,pageSize);
+            productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
+        }
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);

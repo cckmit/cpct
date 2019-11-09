@@ -235,4 +235,5 @@
     from organization
     where ORG_NAME_C5 = #{orgNameC5}
   </select>
+
 </mapper>

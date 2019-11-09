@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyMapper;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
@@ -129,6 +130,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private MktCampaignMapper campaignMapper;
     @Autowired
     private OrganizationMapper organizationMapper;
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
 
     /**
      * 添加策略规则
@@ -345,7 +348,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
                 redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
                 redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
-                area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                area2RedisThread(mktStrategyConfRuleDO.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
             }
 
 
@@ -375,6 +378,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String evtContactConfIds = "";
         try {
             if(mktStrategyConfRule.getTarGrpId()!=null){
+
 /*
                 MktCamGrpRul camGrpRul = mktCamGrpRulMapper.selectByTarGrpId(mktStrategyConfRule.getTarGrpId());
                 if (camGrpRul == null) {
@@ -396,6 +400,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
                     mktCamGrpRulMapper.insert(mktCamGrpRul);
                 }
+
 */
                 // 更新客户分群名字为规则名称
                 TarGrp tarGrp = new TarGrp();
@@ -468,17 +473,17 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             //营销组织树
             if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
-                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())==null
-                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
-                    redisUtils.set("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
+                if (redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString())==null
+                        || !ChannelUtil.equalsList((List<Long>)redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString()),mktStrategyConfRule.getOrganizationList())){
+                    redisUtils.set("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),mktStrategyConfRule.getOrganizationList());
                     redisUtils.set("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString(),"false");
-                    area2RedisThread(mktStrategyConfRule.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
+                    area2RedisThread(mktStrategyConfRuleDO.getMktStrategyConfRuleId(),mktStrategyConfRule.getOrganizationList());
                 }
             }else {
-                if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString())!=null){
-                    redisUtils.remove("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                if (redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString())!=null){
+                    redisUtils.remove("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
                     redisUtils.remove("ORG_CHECK_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
-                    redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRule.getMktStrategyConfRuleId().toString());
+                    redisUtils.remove("AREA_RULE_ISSURE_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString());
                 }
             }
             String confs = "";
@@ -627,14 +632,18 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
     private void area2RedisThread(Long ruleId,List<Long> orgIdList) {
         //过滤 选择level 大于3 的
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
-        //添加所有选择的节点信息到缓存
-        redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
-        redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
-        new Thread(){
-            public void run(){
-                areaList2Redis(ruleId,orgs);
-            }
-        }.start();
+        if (orgs == null || orgs.isEmpty()){
+            redisUtils.set("ORG_CHECK_"+ruleId.toString(),"true");
+        }else {
+            //添加所有选择的节点信息到缓存
+            redisUtils.set("ORG_ID_"+ruleId.toString(),orgs);
+            redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
+            new Thread(){
+                public void run(){
+                    areaList2Redis(ruleId,orgs);
+                }
+            }.start();
+        }
     }
 
     public void areaList2Redis(Long ruleId,List<Long> areaIdList){
@@ -854,6 +863,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleRelMapper.deleteByMktStrategyConfRulId(mktStrategyConfRuleId);
             //删除活动与客户分群的关系
             MktStrategyConfRuleDO strategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
+            if (strategyConfRuleDO!=null){
+                List<String> confList = ChannelUtil.StringToList4LabelValue(strategyConfRuleDO.getEvtContactConfId());
+                for (String confId : confList){
+                   mktCamChlConfAttrMapper.deleteByEvtContactConfId(Long.valueOf(confId));
+                }
+            }
             if(strategyConfRuleDO!=null && strategyConfRuleDO.getTarGrpId()!=null){
                 mktCamGrpRulMapper.deleteByTarGrpId(strategyConfRuleDO.getTarGrpId());
             }
@@ -869,6 +884,8 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             //
             mktCamRecomCalcRelMapper.deleteByRuleId(mktStrategyConfRuleId);
+
+
 
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.GET_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
@@ -973,6 +990,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             chiledMktStrategyConfRuleDO.setUpdateDate(new Date());
             chiledMktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleMapper.insert(chiledMktStrategyConfRuleDO);
+            Long chiledMktStrategyConfRuleId = chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId();
+
+            // initId
+            chiledMktStrategyConfRuleDO.setInitId(chiledMktStrategyConfRuleId);
+            mktStrategyConfRuleMapper.updateByPrimaryKey(chiledMktStrategyConfRuleDO);
+
             mktStrategyConfRuleMap.put("mktStrategyConfRuleId", chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId());
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", "复制成功！");
@@ -1078,7 +1101,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                         mktCamChlConfDetail.setScriptDesc(mktCamChlConf.getScriptDesc());
                     }
                     //   redisUtils.set("MktCamChlConfDetail_" + mktCamChlConfDetail.getEvtContactConfId(), mktCamChlConfDetail);
-                    //   MktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new MktCamChlConf());
+                    //   mktCamChlConf camChlConf = BeanUtil.create(mktCamChlConfDO, new mktCamChlConf());
                     mktCamChlConfDetailNewList.add(mktCamChlConfDetail);
                 }
                 mktCamChlConfDetailMap.put("mktCamChlConfDetailList", mktCamChlConfDetailNewList);

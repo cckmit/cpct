@@ -139,6 +139,13 @@
             <artifactId>guava</artifactId>
         </dependency>
 
+        <!-- UCCP发送短信 -->
+        <dependency>
+            <groupId>com.ztesoft.uccp</groupId>
+            <artifactId>uccp_dubbo</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>

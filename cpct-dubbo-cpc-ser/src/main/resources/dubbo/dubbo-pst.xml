@@ -13,7 +13,7 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30811"/>
+    <dubbo:protocol name="dubbo" port="30808"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 订阅 -->
@@ -61,5 +61,12 @@
     <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
         <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
     </dubbo:reference>
+
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
+    </dubbo:reference>
+
+
 
 </beans>

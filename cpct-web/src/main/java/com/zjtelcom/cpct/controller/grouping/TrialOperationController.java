@@ -384,4 +384,55 @@ public class TrialOperationController extends BaseController {
         return result;
     }
 
+    /**
+     * 定时任务Excel清单导入
+     * @param
+     * @return
+     */
+    @PostMapping("importUserListByExcel")
+    @CrossOrigin
+    public Map<String,Object> importUserListByExcel (){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importUserListByExcel();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserListByExcel", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importUserListByExcel");
+            return result;
+        }
+        return result;
+    }
+
+    @PostMapping("insertMktCampaignByC4AndC5")
+    @CrossOrigin
+    public Map<String,Object> insertMktCampaignByC4AndC5 (){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.insertMktCampaignByC4AndC5();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserListByExcel", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importUserListByExcel");
+            return result;
+        }
+        return result;
+    }
+
+
+    @PostMapping("insertMktCampaignByC4OfSysArea")
+    @CrossOrigin
+    public Map<String,Object> insertMktCampaignByC4OfSysArea (){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.insertMktCampaignByC4OfSysArea();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to importUserListByExcel", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to importUserListByExcel");
+            return result;
+        }
+        return result;
+    }
+
 }

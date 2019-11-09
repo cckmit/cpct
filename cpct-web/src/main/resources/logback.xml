@@ -11,22 +11,23 @@
     </appender>
 
 
-    <appender name="logFile"  class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <Prudent>true</Prudent>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>
-                ${logPath}/${appName}-%d{yyyy-MM-dd}/${appName}-%d{yyyy-MM-dd}-%i.log
-            </FileNamePattern>
-            <MaxHistory>30</MaxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>400MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+    <appender name="logFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<file>${logPath}/${appName}/${appName}.%i.log</file>-->
+        <file>${logPath}/${appName}/test.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <!--<fileNamePattern>${logPath}/${appName}/${appName}.%i.log.zip</fileNamePattern>-->
+            <fileNamePattern>${logPath}/${appName}/tests.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
         </rollingPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </layout>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>1024MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!--level-->

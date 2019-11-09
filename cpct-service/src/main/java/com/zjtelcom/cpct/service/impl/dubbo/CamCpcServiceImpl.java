@@ -42,8 +42,10 @@ import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
+import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -146,6 +148,9 @@ public class CamCpcServiceImpl implements CamCpcService {
     @Autowired(required = false)
     private ICacheProdIndexQryService iCacheProdIndexQryService;
 
+    @Autowired
+    private SysParamsService sysParamsService;
+
     Map<String,Boolean> flagMap = new ConcurrentHashMap();
 
     /**
@@ -154,6 +159,9 @@ public class CamCpcServiceImpl implements CamCpcService {
     @Override
     public Map<String, Object> ActivityCpcTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> laubelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
         log.info("进入ActivityCpcTask...");
+
+        //
+        Map<String, Object> nonPassedMsg = new HashMap<>();
 
         Map<String, Object> activity = new ConcurrentHashMap<>();
         long begin = System.currentTimeMillis();
@@ -173,11 +181,20 @@ public class CamCpcServiceImpl implements CamCpcService {
         esJson.put("integrationId", params.get("integrationId"));
         esJson.put("accNbr", params.get("accNbr"));
         esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
+        esJson.put("eventCode", params.get("eventCode"));
 
         MktCampaignDO mktCampaign = null;
         try {
             //查询活动基本信息
-            mktCampaign = (MktCampaignDO) redisUtils.get("MKT_CAMPAIGN_" + activityId);
+            try {
+                Object campaign =  redisUtils.get("MKT_CAMPAIGN_" + activityId);
+                if (campaign!=null){
+                    mktCampaign = (MktCampaignDO) campaign;
+                }
+            } catch (Exception e) {
+                log.info("活动信息查询失败，缓存失败");
+                e.printStackTrace();
+            }
             if (mktCampaign == null) {
                 mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
                 if (mktCampaign == null) {
@@ -185,7 +202,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动信息查询失败，活动为null");
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                    return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+                    return nonPassedMsg;
                 } else {
                     redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
                 }
@@ -195,7 +213,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             esJson.put("hit", false);
             esJson.put("msg", "活动信息查询失败");
             esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            return Collections.EMPTY_MAP;
+            nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+            return nonPassedMsg;
         }
 
         if (mktCampaign == null) {
@@ -203,7 +222,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             esJson.put("hit", false);
             esJson.put("msg", "活动信息查询失败，活动为null");
             esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-            return Collections.EMPTY_MAP;
+            nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+            return nonPassedMsg;
         }
 
         privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动Id
@@ -238,7 +258,11 @@ public class CamCpcServiceImpl implements CamCpcService {
         //iSale展示列参数对象初始化
         List<Map<String, Object>> itgTriggers = new ArrayList<>();
         //验证过滤规则 活动级
-        List<Long> filterRuleIds = (List<Long>) redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
+        Object o = redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
+        List<Long> filterRuleIds = null;
+        if (o!=null){
+            filterRuleIds = (List<Long>)o;
+        }
         if (filterRuleIds == null) {
             filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
             if (filterRuleIds == null) {
@@ -246,7 +270,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                 esJson.put("hit", false);
                 esJson.put("msg", "过滤规则信息查询失败");
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                return Collections.EMPTY_MAP;
+                nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+                return nonPassedMsg;
             } else {
                 redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
             }
@@ -262,6 +287,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                         boolean productCheck = true; // 默认拦截
                         //获取需要过滤的销售品
                         String checkProduct = filterRule.getChooseProduct();
+                        String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                        if (s != null && s.equals("code")) {
+                            checkProduct = filterRule.getChooseProductCode();
+                        }
                         if (checkProduct != null && !"".equals(checkProduct)) {
                             String esMsg = "";
                             //获取用户已办理销售品
@@ -381,7 +410,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 esJson.put("hit", "false");
                                 esJson.put("msg", "销售品过滤验证未通过:" + esMsg);
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
-                                return Collections.EMPTY_MAP;
+                                nonPassedMsg.put("cam_" + activityId, "销售品过滤验证未通过:" + esMsg);
+                                return nonPassedMsg;
                             }
                         }
                     } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
@@ -398,7 +428,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
-                                return Collections.EMPTY_MAP;
+                                nonPassedMsg.put("cam_" + activityId, "过扰规则信息查询失败 byId: " + filterRuleId);
+                                return nonPassedMsg;
                             } else {
                                 redisUtils.set("FILTER_RULE_DISTURB_" + filterRuleId, labels);
                             }
@@ -458,10 +489,33 @@ public class CamCpcServiceImpl implements CamCpcService {
         //获取结果
         try {
             for (Future<Map<String, Object>> future : threadList) {
-                if (!future.get().isEmpty()) {
-                    ruleList.add(future.get());
+                try {
+                    Map<String,Object> futureMap =  future.get();
+                    if (!futureMap.isEmpty()) {
+                        Boolean flag = true;
+                        for (String key : futureMap.keySet()) {
+                            if (key.contains("rule_")) {
+                                flag = false;
+                                nonPassedMsg.put(key, futureMap.get(key));
+                                // break;
+                            }
+                        }
+                        if (flag) ruleList.add(futureMap);
+                    }
+                    activity.put("nonPassedMsg", nonPassedMsg);
+                } catch (InterruptedException e) {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "规则校验出错:" + e.getMessage());
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    esJson.put("hit", "false");
+                    esJson.put("msg", "规则校验出错:" + e.getMessage());
+                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+                    e.printStackTrace();
                 }
             }
+
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
                if(true == Boolean.valueOf(entry.getValue().toString())){
@@ -469,25 +523,52 @@ public class CamCpcServiceImpl implements CamCpcService {
                    break;
                }
             }
+
             if(isWithDefaultLabel) {
-                //判断是否有命中
+                // 判断是否有命中
                 if (ruleList.size() > 1) {
-                    // 从命中列表中移出默认固定规则
+                    List<String> ruleIdList = new ArrayList<>();
+                    for (Map<String,Object> map : ruleList) {
+                        Long ruleId2 = Long.valueOf(map.get("nowRuleId") == null ? "0" : map.get("nowRuleId").toString());
+                        ruleIdList.add(ruleId2.toString());
+                    }
+
+                    // 非固定规则有命中的情况下，从命中列表中移出默认固定规则
                     for (Map<String, Object> strategyMap : strategyMapList) {
                         Long strategyConfId = (Long) strategyMap.get("strategyConfId");
-                        String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
-                        if (ruleId != null && ruleId != "") {
-                            for (Map<String, Object> map : ruleList) {
-                                Long ruleId2 = Long.valueOf(map.get("ruleId").toString());
-                                if (ruleId.equals(ruleId2.toString())) {
-                                    ruleList.remove(map);
-                                    break;
+                        // String ruleId = redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId) == null? "":redisUtils.get("LEFT_PARAM_FLAG" + strategyConfId).toString();
+                        Object object = redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId) == null ? "" : redisUtils.hgetAllField("LEFT_PARAM_FLAG" + strategyConfId);
+                        if (object != null && object != "") {
+                            List<String> list = (List<String>) object;
+                            Iterator<Map<String, Object>> iterator = ruleList.iterator();
+                            while (iterator.hasNext()) {
+                                Map<String, Object> map = iterator.next();
+                                Long ruleId2 = Long.valueOf(map.get("nowRuleId") == null ? "0" : map.get("nowRuleId").toString());
+                                for (String field : list) {
+                                    if (field.equals(ruleId2.toString())) {
+                                        if (list.containsAll(ruleIdList)) {
+                                            ruleList.remove(map);
+                                        } else {
+                                            iterator.remove();
+                                        }
+                                        break;
+                                    }
                                 }
                             }
-                            break;
                         }
                     }
-                }
+                } /*else {
+                    // 非固定规则无命中的情况下，从命中列表中移出不匹配采集项配置的固定规则
+                    // 取采集项标签，按照采集项标签执行固定必中规则
+                    if (s == null || s.equals("")) {
+                        Object o1 = context.get(s);
+                        if (o1 != null && "".equals(o1.toString())) {
+                            String s1 = o1.toString();
+                        }
+                    }
+                    // 移出固定规则中不匹配采集项值的规则
+
+                }*/
                 activity.put("ruleList", ruleList);
                 Map<String, Object> itgTrigger;
                 //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
@@ -711,7 +792,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
         @Override
         public Map<String, Object> call() throws Exception {
-
+            Map<String, Object> nonPassedMsg = new HashMap<>();
             long begin = System.currentTimeMillis();
 
             //初始化es log   标签使用
@@ -719,40 +800,54 @@ public class CamCpcServiceImpl implements CamCpcService {
             //初始化es log   规则使用
             JSONObject jsonObject = new JSONObject();
 
-            // 获取 PROM_INTEG_ID标签
+            // 获取 ASSI_PROM_INTEG_ID标签
             String promIntegId = "";
-            if (context.get("PROM_INTEG_ID") != null) {
-                promIntegId = (String) context.get("PROM_INTEG_ID");
+            if (context.get("ASSI_PROM_INTEG_ID") != null) {
+                promIntegId = (String) context.get("ASSI_PROM_INTEG_ID");
             }
 
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(privateParams.get("activityId")));
-            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
-            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
+            MktCampaignDO mktCampaignDO = null;
+            MktStrategyConfDO mktStrategyConfDO = null;
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = null;
+            try {
+                mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(privateParams.get("activityId")));
+                mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(strategyConfId);
+                mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleId);
 
-            jsonObject.put("ruleId", mktStrategyConfRuleDO.getInitId());
-            jsonObject.put("ruleName", ruleName);
-            jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
-            jsonObject.put("reqId", reqId);
-            jsonObject.put("eventId", params.get("eventCode"));
-            jsonObject.put("activityId", mktCampaignDO.getInitId());
-            jsonObject.put("strategyConfId", mktStrategyConfDO.getInitId());
-            jsonObject.put("productStr", productStr);
-            jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
-            jsonObject.put("tarGrpId", tarGrpId);
-            jsonObject.put("promIntegId", promIntegId);
+                jsonObject.put("ruleId", mktStrategyConfRuleDO.getInitId());
+                jsonObject.put("ruleName", ruleName);
+                jsonObject.put("hitEntity", privateParams.get("accNbr")); //命中对象
+                jsonObject.put("reqId", reqId);
+                jsonObject.put("eventId", params.get("eventCode"));
+                jsonObject.put("activityId", mktCampaignDO.getMktCampaignId());
+                jsonObject.put("strategyConfId", mktStrategyConfDO.getMktStrategyConfId());
+                jsonObject.put("productStr", productStr);
+                jsonObject.put("evtContactConfIdStr", evtContactConfIdStr);
+                jsonObject.put("tarGrpId", tarGrpId);
+                jsonObject.put("promIntegId", promIntegId);
 
-            //ES log 标签实例
-            esJson.put("reqId", reqId);
-            esJson.put("eventId", params.get("eventCode"));
-            esJson.put("activityId", mktCampaignDO.getInitId());
-            esJson.put("ruleId", mktStrategyConfRuleDO.getInitId());
-            esJson.put("ruleName", ruleName);
-            esJson.put("integrationId", params.get("integrationId"));
-            esJson.put("accNbr", params.get("accNbr"));
-            esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
-            esJson.put("tarGrpId", tarGrpId);
-            esJson.put("promIntegId", promIntegId);
-            esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
+
+                //ES log 标签实例
+                esJson.put("reqId", reqId);
+                esJson.put("eventId", params.get("eventCode"));
+                esJson.put("activityId",  mktCampaignDO.getMktCampaignId());
+                esJson.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                esJson.put("ruleName", ruleName);
+                esJson.put("integrationId", params.get("integrationId"));
+                esJson.put("accNbr", params.get("accNbr"));
+                esJson.put("strategyConfId", mktStrategyConfDO.getInitId());
+                esJson.put("tarGrpId", tarGrpId);
+                esJson.put("promIntegId", promIntegId);
+                esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
+            } catch (NumberFormatException e) {
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "类型转换异常"+e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
+                e.printStackTrace();
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "类型转换异常");
+                return nonPassedMsg;
+            }
 
             Map<String, Object> ruleMap = new ConcurrentHashMap<>();
             //初始化返回结果中的推荐信息列表
@@ -769,7 +864,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 jsonObject.put("hit", "false");
                 jsonObject.put("msg", "分群ID异常");
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                return Collections.EMPTY_MAP;
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "分群ID异常");
+                return nonPassedMsg;
             }
 
             //记录实例不足的标签
@@ -785,48 +882,56 @@ public class CamCpcServiceImpl implements CamCpcService {
                     redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
                 }
             }
-
-
-            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
-            if (realProdFilter == null) {
-                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
-                if (sysParamsList != null && sysParamsList.size() > 0) {
-                    realProdFilter = sysParamsList.get(0).getParamValue();
-                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+            String realProdFilter = null;
+            try {
+                realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
+                if (realProdFilter == null) {
+                    List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
+                    if (sysParamsList != null && sysParamsList.size() > 0) {
+                        realProdFilter = sysParamsList.get(0).getParamValue();
+                        redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+                    }
                 }
-            }
-            if (realProdFilter != null && "1".equals(realProdFilter)) {
-                List<String> prodList = new ArrayList<>();
-                log.info("111------accNbr --->" + privateParams.get("accNbr"));
-                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
-                if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
-                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-                    for (String prodInstId : prodInstIds) {
-                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                                // 查询销售品产品实例关系缓存实体
-                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
-                                    // 查询销售品实例缓存实体
-                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                                    if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
-                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                        prodList.add(offerInst.getOfferId().toString());
+                if (realProdFilter != null && "1".equals(realProdFilter) && context.get("PROM_LIST")!=null) {
+                    List<String> prodList = new ArrayList<>();
+                    log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                    CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
+                    if(prodInstIdsObject!=null &&  prodInstIdsObject.getResultObject() !=null ){
+                        Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                        for (String prodInstId : prodInstIds) {
+                            // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                            CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                            if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                                Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                                for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                    // 查询销售品产品实例关系缓存实体
+                                    CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                    if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                        OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                        // 查询销售品实例缓存实体
+                                        CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                        if(offerInstCacheEntity!=null && offerInstCacheEntity.getResultObject()!=null){
+                                            OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                            prodList.add(offerInst.getOfferId().toString());
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    String productString = ChannelUtil.StringList2String(prodList);
+                    log.info("999------productStr --->" + JSON.toJSONString(productStr));
+                    context.put("PROM_LIST" , productString);
                 }
-                String productString = ChannelUtil.StringList2String(prodList);
-                log.info("999------productStr --->" + JSON.toJSONString(productStr));
-                context.put("PROM_LIST" , productString);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "销售品过滤查询异常"+e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
+                // return Collections.EMPTY_MAP;
+                nonPassedMsg.put("rule_" + ruleId, "销售品过滤查询异常");
+                return nonPassedMsg;
             }
-
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
@@ -840,7 +945,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                             jsonObject.put("hit", "false");
                             jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                            return Collections.EMPTY_MAP;
+                            // return Collections.EMPTY_MAP;
+                            nonPassedMsg.put("rule_" + ruleId, "规则下标签查询失败");
+                            return nonPassedMsg;
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
@@ -850,7 +957,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "未查询到分群标签");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "未查询到分群标签");
+                        return nonPassedMsg;
                     }
 
                     //将规则拼装为表达式
@@ -859,11 +968,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
-                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(),"1");
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
-                            continue;
+                            // continue;
                         }
                         String type = labelMap.get("operType");
                         //保存标签的es log
@@ -871,8 +981,13 @@ public class CamCpcServiceImpl implements CamCpcService {
                         if ("PROM_LIST".equals(labelMap.get("code")) && "1".equals(realProdFilter)) {
                             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
                             if (filterRule != null) {
-                                lr.setRightOperand(filterRule.getChooseProduct());
-                                labelMap.put("rightParam", filterRule.getChooseProduct());
+                                String checkProduct = filterRule.getChooseProduct();
+                                String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                                if (s != null && s.equals("code")) {
+                                    checkProduct = filterRule.getChooseProductCode();
+                                }
+                                lr.setRightOperand(checkProduct);
+                                labelMap.put("rightParam", checkProduct);
                             } else {
                                 jsonObject.put("hit", "false");
                                 jsonObject.put("msg", "未查询销售品过滤规则");
@@ -921,7 +1036,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "表达式拼接异常");
+                    return nonPassedMsg;
                 }
                 //表达式存入redis
                 redisUtils.set("EXPRESS_" + tarGrpId, express);
@@ -939,7 +1056,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                             jsonObject.put("hit", "false");
                             jsonObject.put("msg", "规则下标签查询失败");
                             esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                            return Collections.EMPTY_MAP;
+                            // return Collections.EMPTY_MAP;
+                            nonPassedMsg.put("rule_" + ruleId, "规则下标签查询失败");
+                            return nonPassedMsg;
                         }
                         redisUtils.set("RULE_ALL_LABEL_" + tarGrpId, labelMapList);
                     }
@@ -947,7 +1066,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //遍历所有规则
                     for (Map<String, String> labelMap : labelMapList) {
                         if(defaultInfallibleTable.equals(labelMap.get("code"))){
-                            redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            // redisUtils.set("LEFT_PARAM_FLAG" + strategyConfId, ruleId);
+                            redisUtils.hset("LEFT_PARAM_FLAG" + strategyConfId, ruleId.toString(), "1");
                             flagMap.put(ruleId.toString(), true);
                             log.info("flag = true进入...");
                             continue;
@@ -967,7 +1087,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", "false");
                     jsonObject.put("msg", "表达式拼接异常");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "表达式拼接异常");
+                    return nonPassedMsg;
                 }
             }
 
@@ -976,14 +1098,16 @@ public class CamCpcServiceImpl implements CamCpcService {
                 RuleResult ruleResult = new RuleResult();
                 //初始化返回结果中的销售品条目
                 List<Map<String, String>> productList = new ArrayList<>();
-                if(flagMap.get(ruleId.toString()) == false) {
+                // if(flagMap.get(ruleId.toString()) == false) {
                     //验证是否标签实例不足
                     if (notEnoughLabel.length() > 0) {
                         // log.info("notEnoughLabel.length() > 0->标签实例不足");
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "标签实例不足：" + notEnoughLabel.toString());
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "标签实例不足：" + notEnoughLabel.toString());
+                        return nonPassedMsg;
                     }
 
                     //规则引擎计算
@@ -991,6 +1115,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
                     runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                     runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));
+                    // 固定必中默认值设置为1
+                    context.put("CPCP_CAM_DEFAULT", "1");
 
                     try {
                         ruleResult = runnerQ.executeRule(express, context, true, true);
@@ -999,7 +1125,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎计算失败");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "规则引擎计算失败");
+                        return nonPassedMsg;
                     }
 
                     jsonObject.put("express", express);
@@ -1021,8 +1149,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                         ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                         ruleMap.put("policyName", strategyConfName); //策略名称
                         ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
+                        ruleMap.put("nowRuleId", ruleId); //新规则编码
                         ruleMap.put("ruleName", ruleName); //规则名称
                         ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
+                        ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? "0" : "1"); // 是否随销规则标识
                         if (context.get("AREA_ID") != null) {
                             ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                         }
@@ -1114,8 +1244,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                 //将线程处理结果添加到结果集
                                 //threadList.add(f);
-                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                                Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
+                                if (channelMap.containsKey("rule_" + ruleId)){
+                                    nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                }
                                 taskChlList.add(channelMap);
+
                             } else {
                                 if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
                                     for (String str : evtContactConfIdArray) {
@@ -1125,8 +1259,11 @@ public class CamCpcServiceImpl implements CamCpcService {
                                         //Future<Map<String, Object>> f = executorService.submit(new ChannelTask(evtContactConfId, productList, context, reqId));
                                         //将线程处理结果添加到结果集
                                         //threadList.add(f);
-                                        Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId);
+                                        Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
                                         if (channelMap != null && !channelMap.isEmpty()) {
+                                            if (channelMap.containsKey("rule_" + ruleId)){
+                                                nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                            }
                                             taskChlList.add(channelMap);
                                         }
                                     }
@@ -1145,9 +1282,11 @@ public class CamCpcServiceImpl implements CamCpcService {
                         jsonObject.put("hit", "false");
                         jsonObject.put("msg", "规则引擎匹配未通过");
                         esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "规则引擎匹配未通过");
+                        return nonPassedMsg;
                     }
-                } else {
+                /*} else {
                     jsonObject.put("hit", true);
 
                     //拼接返回结果
@@ -1164,8 +1303,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("policyId", mktStrategyConfDO.getInitId().toString()); //策略编码
                     ruleMap.put("policyName", strategyConfName); //策略名称
                     ruleMap.put("ruleId",  mktStrategyConfRuleDO.getInitId().toString()); //规则编码
+                    ruleMap.put("nowRuleId", ruleId); //新规则编码
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
+                    ruleMap.put("isMarketRule", flagMap.get(ruleId) == true ? 0 : 1); // 是否随销标志
                     if (context.get("AREA_ID") != null) {
                         ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                     }
@@ -1283,7 +1424,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         //关闭线程池
                         executorService.shutdownNow();
                     }
-                }
+                }*/
                 ruleMap.put("taskChlList", taskChlList);
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
@@ -1291,7 +1432,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("hit", false);
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    return nonPassedMsg;
                 }
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
@@ -1305,7 +1448,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         }
     }
 
-    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId) {
+    private Map<String, Object> ChannelTask(Long evtContactConfId, List<Map<String, String>> productList, DefaultContext<String, Object> context, String reqId, Map<String, Object> nonPassedMsg, Long ruleId) {
 
         Date now = new Date();
 
@@ -1383,7 +1526,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                         channelMap.put("contactAccount", context.get(mktCamChlConfAttr.getAttrValue()));
                     } else {
                         //未查询到推送账号 就不命中
-                        return Collections.EMPTY_MAP;
+                        // return Collections.EMPTY_MAP;
+                        nonPassedMsg.put("rule_" + ruleId, "未查询到渠道推送账号");
+                        return nonPassedMsg;
                     }
                 }
             } else {
@@ -1398,7 +1543,9 @@ public class CamCpcServiceImpl implements CamCpcService {
         channelMap.put("taskChlAttrList", taskChlAttrList);
 
         if (!checkTime) {
-            return Collections.EMPTY_MAP;
+            // return Collections.EMPTY_MAP;
+            nonPassedMsg.put("rule_" + ruleId, "渠道生失效时间错误");
+            return nonPassedMsg;
         }
 
         //渠道信息
@@ -1440,7 +1587,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             }
         } else {
             //未查询到话术 不命中
-            return Collections.EMPTY_MAP;
+            // return Collections.EMPTY_MAP;
+            nonPassedMsg.put("rule_" + ruleId, "未查询到推送话术");
+            return nonPassedMsg;
         }
 
         //查询指引
@@ -1501,7 +1650,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             if (contactScript != null) {
                 if (subScript(contactScript).size() > 0) {
 //                    System.out.println("推荐话术标签替换含有无值的标签");
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "推荐话术标签替换含有无值的标签");
+                    return nonPassedMsg;
                 }
             }
 
@@ -1509,7 +1660,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             if (mktVerbalStr != null) {
                 if (subScript(mktVerbalStr).size() > 0) {
 //                    System.out.println("推荐指引标签替换含有无值的标签");
-                    return Collections.EMPTY_MAP;
+                    // return Collections.EMPTY_MAP;
+                    nonPassedMsg.put("rule_" + ruleId, "推荐指引标签替换含有无值的标签");
+                    return nonPassedMsg;
                 }
             }
         }            //返回结果中添加脚本信息
@@ -1907,7 +2060,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                 lr.setLabelName(labelMap.get("name"));
                 if ("PROM_LIST".equals(labelMap.get("code"))) {
                     FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
-                    lr.setRightOperand(filterRule.getChooseProduct());
+                    String checkProduct = filterRule.getChooseProduct();
+                    String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
+                    if (s != null && s.equals("code")) {
+                        checkProduct = filterRule.getChooseProductCode();
+                    }
+                    lr.setRightOperand(checkProduct);
                 } else {
                     lr.setRightOperand(labelMap.get("rightParam"));
                 }

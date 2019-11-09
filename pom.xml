@@ -41,7 +41,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <pagehelper.version>1.2.5</pagehelper.version>
         <QLExpress.version>3.2.0</QLExpress.version>
-        <dubbo-eagle-service.version>3.0.0</dubbo-eagle-service.version>
+        <dubbo-eagle-service.version>5.0.1</dubbo-eagle-service.version>
         <ehcache.version>2.9.1</ehcache.version>
         <groovy.version>2.4.7</groovy.version>
         <freemarker.version>2.3.23</freemarker.version>
@@ -54,7 +54,7 @@
         <json-lib.version>2.4</json-lib.version>
         <jna.version>3.0.9</jna.version>
         <elasticsearch.version>6.3.1</elasticsearch.version>
-        <bss-cooperate.version>1.0.8</bss-cooperate.version>
+        <bss-cooperate.version>1.3.0</bss-cooperate.version>
         <ctg-cache.version>2.3.1_P1</ctg-cache.version>
         <spring-session.verson>1.3</spring-session.verson>
         <fastjson.verson>1.2.36</fastjson.verson>
@@ -67,9 +67,10 @@
         <ctg-mq.version>2.4.0</ctg-mq.version>
         <cpct-trial.version>1.0.1</cpct-trial.version>
         <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
-        <smt-bss-cpc-model.version>1.0.1</smt-bss-cpc-model.version>
+        <smt-bss-cpc-model.version>1.0.2</smt-bss-cpc-model.version>
         <cooperate-service-api.version>1.1</cooperate-service-api.version>
         <cpct-dubbo-log.version>1.0.0</cpct-dubbo-log.version>
+        <open-complete.version>1.0.0</open-complete.version>
     </properties>
 
     <parent>
@@ -534,16 +535,22 @@
                 <version>${smt-bss-cpc-model.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.zjhcsoft.bss</groupId>
-                <artifactId>cooperate-service-api</artifactId>
-                <version>${cooperate-service-api.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.bss</groupId>-->
+                <!--<artifactId>cooperate-service-api</artifactId>-->
+                <!--<version>${cooperate-service-api.version}</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>com.zjtelcom.cpct.dubbo</groupId>
                 <artifactId>cpct-dubbo-log</artifactId>
                 <version>${cpct-dubbo-log.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>open-complete</artifactId>
+                <version>${open-complete.version}</version>
             </dependency>
 
         </dependencies>

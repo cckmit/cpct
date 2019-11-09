@@ -18,4 +18,7 @@ public interface ActivityStatisticsService {
 
     Map<String,Object> getMktCampaignDetails(Map<String, Object> params);
 
+    Map<String,Object> getActivityStatisticsByName(Map<String, Object> params);
+
+    void MoreThan3MonthsOffline();
 }

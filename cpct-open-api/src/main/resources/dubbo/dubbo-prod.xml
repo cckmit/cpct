@@ -32,5 +32,10 @@
         <dubbo:method name="queryTaskDetail4openApi" servicecode="00.1079.queryTaskDetail4openApi"/>
     </dubbo:reference>
 
+    <!--协同通过号码查活动-->
+    <dubbo:reference registry="esb4" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IReportService" id="reportServiceImpl"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="queryCampaignByNum" servicecode="00.1079.queryValidCampaignByAccNum"/>
+    </dubbo:reference>
 
 </beans>

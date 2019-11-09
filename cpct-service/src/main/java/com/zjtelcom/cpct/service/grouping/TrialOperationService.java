@@ -40,7 +40,12 @@ public interface TrialOperationService  {
 
     Map<String,Object> showCalculationLog(Long id);
 
-    Map<String,Object> importUserList4File(MultipartFile multipartFile);
+    //xyl excel文件清单批量导入
+    Map<String,Object> importUserListByExcel() throws IOException;
 
+    // xyl 补全mkt_campaign c4 c5 地市编码
+    Map<String,Object> insertMktCampaignByC4AndC5();
 
+    //xyl 修改补全C4 地市编码改为sys_area 对应参数
+    Map<String,Object> insertMktCampaignByC4OfSysArea();
 }

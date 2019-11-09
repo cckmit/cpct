@@ -113,6 +113,14 @@
     </if>
   </select>
 
+  <select id="findChildListByTriggerType" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
+    REMARK
+    from contact_channel channel
+    where CREATE_STAFF between 4 and 9
+  </select>
+
   <select id="selectChannel4AllChannel" resultMap="BaseResultMap">
     select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
@@ -147,6 +155,16 @@
     </foreach>
   </select>
 
+  <select id="selectBatchByCode" parameterType="list" resultMap="BaseResultMap">
+    select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE, REMARK
+    from contact_channel t
+    where CONTACT_CHL_CODE IN
+    <foreach collection="contactChlCodeList" item="item" index="i" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
   <select id="getRealTimeChannel" resultMap="BaseResultMap">
     select CONTACT_CHL_ID, CONTACT_CHL_CODE, CONTACT_CHL_NAME, CONTACT_CHL_TYPE, CONTACT_CHL_DESC, PARENT_ID, CHANNEL_TYPE,
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
@@ -158,5 +176,6 @@
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
     REMARK from contact_channel where CREATE_STAFF in (4,5)
   </select>
+
 
 </mapper>

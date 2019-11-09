@@ -6,10 +6,14 @@
  */
 package com.zjtelcom.cpct.service.grouping;
 
+import com.zjtelcom.cpct.dto.grouping.OrgGridRel;
 import com.zjtelcom.cpct.dto.grouping.TarGrpTemplateDetail;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +24,7 @@ import java.util.Map;
  */
 public interface TarGrpTemplateService {
 
-    Map<String, Object> saveTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail);
+    Map<String, Object> saveTarGrpTemplate(TarGrpTemplateDetail tarGrpTemplateDetail, HttpServletRequest request, HttpServletResponse response );
 
     Map<String, Object> getTarGrpTemplate(Long tarGrpTemplateId);
 
@@ -39,4 +43,12 @@ public interface TarGrpTemplateService {
     Map<String, Object> importUserList4TarTemp(MultipartFile file,String tempName)throws IOException ;
 
     Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType);
+
+    Map<String, Object> tarGrpTemplateScheduledBatchIssue();
+
+    Map<String, Object> tarGrpTemplateCountByExpressions(Map<String, Object> params);
+
+    List<OrgGridRel> fuzzyQueryOrgGrid(String gridName, Integer page, Integer pageSize);
+
+    List<OrgGridRel> queryOrgGridByCode(List<String> codeList);
 }

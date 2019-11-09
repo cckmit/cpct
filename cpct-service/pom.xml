@@ -114,10 +114,10 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.zjhcsoft.bss</groupId>
-            <artifactId>cooperate-service-api</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zjhcsoft.bss</groupId>-->
+            <!--<artifactId>cooperate-service-api</artifactId>-->
+        <!--</dependency>-->
 
 
         <dependency>
@@ -168,6 +168,29 @@
         <dependency>
             <groupId>com.zjtelcom.cpct.dubbo</groupId>
             <artifactId>cpct-dubbo-log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.1.6.RELEASE</version>
+        </dependency>
+
+        <!-- UCCP发送短信 -->
+        <dependency>
+            <groupId>com.ztesoft.uccp</groupId>
+            <artifactId>uccp_dubbo</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjhcsoft</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <!--集团活动反馈接口-->
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>open-complete</artifactId>
         </dependency>
 
     </dependencies>

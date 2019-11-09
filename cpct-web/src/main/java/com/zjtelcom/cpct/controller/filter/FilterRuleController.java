@@ -407,4 +407,36 @@ public class FilterRuleController extends BaseController {
         return initSuccRespInfo("导出成功");
     }
 
+    /**
+     * 过滤规则列表（分页），排除红黑名单过滤类型
+     */
+    @RequestMapping("/qryFilterRuleExcludeType")
+    @CrossOrigin
+    public String qryFilterRuleExcludeType(@RequestBody FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = filterRuleService.qryFilterRuleExcludeType(filterRuleReq);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRuleReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+    /**
+     * 过滤规则列表（分页），创建人权限控制
+     */
+    @RequestMapping("/qryFilterRuleByUser")
+    @CrossOrigin
+    public String qryFilterRuleByUser(@RequestBody FilterRuleReq filterRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = filterRuleService.qryFilterRuleByUser(filterRuleReq);
+        } catch (Exception e) {
+            logger.error("[op:FilterRuleController] fail to listEvents for filterRule = {}! Exception: ", JSONArray.toJSON(filterRuleReq), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
 }

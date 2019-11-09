@@ -1,9 +1,10 @@
 package com.zjtelcom.cpct.open.serviceImpl.mktCampaign;
 
 import com.alibaba.fastjson.JSON;
-import com.zjtelcom.cpct.constants.CommonConstant;
+import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -18,6 +19,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -25,9 +27,8 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategy;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.open.base.common.CommonUtil;
 import com.zjtelcom.cpct.open.base.service.BaseService;
-import com.zjtelcom.cpct.open.entity.event.OpenEvent;
+import com.zjtelcom.cpct.open.entity.RequestTemplateInst;
 import com.zjtelcom.cpct.open.entity.event.OpenEvtTrigCamRulEntity;
 import com.zjtelcom.cpct.open.entity.mktAlgorithms.OpenMktAlgorithmsEntity;
 import com.zjtelcom.cpct.open.entity.mktCamChlConf.OpenMktCamChlConfAttrEntity;
@@ -40,6 +41,7 @@ import com.zjtelcom.cpct.open.entity.mktCpcAlgorithmsRule.OpenMktCpcAlgorithmsRu
 import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategy;
 import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategyEntity;
 import com.zjtelcom.cpct.open.entity.script.OpenScript;
+import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrp;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpEntity;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
@@ -117,163 +119,243 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     @Autowired
     private SysAreaMapper sysAreaMapper;
     @Autowired
+    private ContactEvtMapper contactEvtMapper;
+    @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private MktCampaignCompleteMapper mktCampaignCompleteMapper;
+    @Autowired(required = false)
+    private IReportService iReportService;
 
 
     /**
-     * 查询营销活动信息
+     * 查询营销活动详情
      *
-     * @param id
+     * @param mktActivityNbr
      * @return
      */
     @Override
-    public Map<String, Object> queryById(String id) {
+    public Map<String, Object> getMktCampaignDetail(String mktActivityNbr) {
+        logger.info("活动详情查询");
+        logger.info("活动编码：" + mktActivityNbr);
         Map<String, Object> resultMap = new HashMap<>();
-        long queryId = CommonUtil.stringToLong(id);
-        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(queryId);
-        if (null == mktCampaignDO) {
-            JSONObject json=new JSONObject();
-            json.put("message","对应营销活动信息不存在!");
+        MktCampaignDO mktCampaign = new MktCampaignDO();
+        mktCampaign.setMktActivityNbr(mktActivityNbr);
+        List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByCondition(mktCampaign);
+        if (null == mktCampaignDOList ||  mktCampaignDOList.size() == 0) {
+            JSONObject json = new JSONObject();
+            json.put("message","对应的营销活动不存在!");
             resultMap.put("params", json);
             return resultMap;
         }
-        //将活动信息转换为openapi返回格式
-        OpenMktCampaign campaign=getOpenCampaign(mktCampaignDO);
-        //活动推荐条目列表  活动脚本列表  维挽策略列表
-        List<OpenMktCamItem> mktCamItemList=new ArrayList<>();
-        List<OpenScript> mktScriptList=new ArrayList<>();
-        List<OpenMktStrategy> mktStrategyList=new ArrayList<>();
+        for(MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+            if(!mktCampaignDO.getStatusCd().equals("2002") && !mktCampaignDO.getStatusCd().equals("2008")) {
+                continue;
+            }
+            //将活动信息转换为openapi返回格式
+            OpenMktCampaign campaign = getOpenCampaign(mktCampaignDO);
+            //活动推荐条目列表  活动脚本列表  维挽策略列表
+            List<OpenMktCamItem> mktCamItemList = new ArrayList<>();
+            List<OpenScript> mktScriptList = new ArrayList<>();
+            List<OpenMktStrategy> mktStrategyList = new ArrayList<>();
 
-        //1.查询营销推荐维挽策略
-        List<MktCamStrategyRel> mktCamStrategyRels = mktCamStrategyRelMapper.selectByMktCampaignId(queryId);
-        if (!mktCamStrategyRels.isEmpty()){
-            for (MktCamStrategyRel rel:mktCamStrategyRels){
-                MktStrategy mktStrategy = mktStrategyMapper.selectByPrimaryKey(rel.getStrategyId());
-                if(null!=mktStrategy){
-                    OpenMktStrategy openMktStrategy = BeanUtil.create(mktStrategy, new OpenMktStrategy());
-                    if(null!=mktStrategy.getStatusDate()){
-                        openMktStrategy.setStatusDate(DateUtil.getDatetime(mktStrategy.getStatusDate()));
+            //1.查询营销推荐维挽策略
+            List<MktCamStrategyRel> mktCamStrategyRels = mktCamStrategyRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
+            if (!mktCamStrategyRels.isEmpty()){
+                for (MktCamStrategyRel rel : mktCamStrategyRels){
+                    MktStrategy mktStrategy = mktStrategyMapper.selectByPrimaryKey(rel.getStrategyId());
+                    if(null != mktStrategy){
+                        OpenMktStrategy openMktStrategy = BeanUtil.create(mktStrategy, new OpenMktStrategy());
+                        openMktStrategy.setStrategyId(Integer.parseInt(mktStrategy.getStrategyId().toString()));
+                        if(null != mktStrategy.getStatusDate()){
+                            openMktStrategy.setStatusDate(DateUtil.getDatetime(mktStrategy.getStatusDate()));
+                        }
+                        mktStrategyList.add(openMktStrategy);
                     }
-                    mktStrategyList.add(openMktStrategy);
                 }
+                campaign.setMktStrategys(mktStrategyList);
             }
-            campaign.setMktStrategy(mktStrategyList);
-        }
 
-        //2. 查询营销活动推荐脚本
-        List<CamScript> camScripts = mktCamScriptMapper.selectByCampaignId(queryId);
-        if(!camScripts.isEmpty()){
-            for (CamScript script:camScripts){
-                if(null!=script){
-                    OpenScript openScript = BeanUtil.create(script, new OpenScript());
-                    openScript.setId(script.getMktCampaignScptId());
-                    openScript.setHref("/mktScript/"+script.getMktCampaignScptId().toString());
-                    openScript.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
-                    mktScriptList.add(openScript);
-                }
-            }
-            campaign.setMktCamScript(mktScriptList);
-        }
+            //查出活动下的策略
+            List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
+            if (!mktCamStrategyConfRelDOS.isEmpty()) {
+                //查出策略下的规则
+                for (MktCamStrategyConfRelDO m : mktCamStrategyConfRelDOS) {
+                    List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(m.getStrategyConfId());
+                    if (!mktStrategyConfRuleRelDOS.isEmpty()) {
+                        //通过规则id查出规则
+                        for (MktStrategyConfRuleRelDO ruleRelDo : mktStrategyConfRuleRelDOS) {
+                            MktStrategyConfRuleDO rule = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleRelDo.getMktStrategyConfRuleId());
+                            // 规则信息中可以得到 1分群id  2推送条目id集合  3协同渠道配置id集合  4二次协同渠道配置结果id集合
+                            if (rule != null) {
+                                //2. 查询营销活动推荐脚本
+                                if (StringUtils.isNotBlank(rule.getEvtContactConfId())) {
+                                    String[] splits = rule.getEvtContactConfId().split("/");
+                                    for(int i = 0; i < splits.length; i++) {
+                                        CamScript camScript = mktCamScriptMapper.selectByConfId(Long.valueOf(splits[i]));
+                                        if(camScript != null) {
+                                            MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(camScript.getEvtContactConfId());
+                                            Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                                            OpenScript openScript = new OpenScript();
+                                            openScript.setScriptId(Integer.parseInt(camScript.getMktCampaignScptId().toString()));
+                                            openScript.setScriptName(mktCamChlConfDO.getEvtContactConfName() + "脚本");
+                                            openScript.setScriptDesc(camScript.getScriptDesc());
+                                            openScript.setScriptType("1000");
+                                            openScript.setSuitChannelType("100000");
+                                            openScript.setExecChannel(channel.getContactChlCode());
+                                            openScript.setStatusCd(camScript.getStatusCd());
+                                            if(camScript.getStatusDate() != null) {
+                                                openScript.setStatusDate(DateUtil.getDatetime(camScript.getStatusDate()));
+                                            }
+                                            openScript.setRemark(camScript.getRemark());
+                                            mktScriptList.add(openScript);
+                                        }
+                                    }
+                                }
 
-
-        //查询相关营销活动推荐条目列表(属于规则) 活动id  471比较多   468比较少
-        //2.查出活动下的策略   500
-        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOS = mktCamStrategyConfRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
-        if (mktCamStrategyConfRelDOS.isEmpty()){
-            resultMap.put("params", campaign);
-            return resultMap;
-        }
-
-        //3.查出策略下的规则
-        for (MktCamStrategyConfRelDO m:mktCamStrategyConfRelDOS){
-            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(m.getStrategyConfId());
-
-            if(mktStrategyConfRuleRelDOS.isEmpty()){
-                resultMap.put("params", campaign);
-                return resultMap;
-            }
-            //3.1 通过规则id查出规则
-            for (MktStrategyConfRuleRelDO ruleRelDo:mktStrategyConfRuleRelDOS){
-                MktStrategyConfRuleDO rule = mktStrategyConfRuleMapper.selectByPrimaryKey(ruleRelDo.getMktStrategyConfRuleId());
-                // 规则信息中可以得到 1分群id  2推送条目id集合  3协同渠道配置id集合  4二次协同渠道配置结果id集合
-                if(rule!=null){
-                      //3.2 获取推荐条目信息   997/998/999/1000格式
-                    if(StringUtils.isNotBlank(rule.getProductId())){
-                        String[] split = rule.getProductId().split("/");
-                        for (int i = 0; i <split.length ; i++) {
-                            //得到活动推荐条目
-                            MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(split[i]));
-                            if(null!=mktCamItem){
-                                OpenMktCamItem openMktCamItem = BeanUtil.create(mktCamItem, new OpenMktCamItem());
-                                openMktCamItem.setId(mktCamItem.getItemId());
-                                openMktCamItem.setHref("/mktCamItem/"+mktCamItem.getItemId().toString());
-                                openMktCamItem.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
-                                mktCamItemList.add(openMktCamItem);
+                                //3. 获取客户分群
+                                List<OpenTarGrp> tarGrpList = new ArrayList<>();
+                                if (rule.getTarGrpId() != null) {
+                                    TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(rule.getTarGrpId());
+                                    OpenTarGrp openTarGrp = BeanUtil.create(tarGrp, new OpenTarGrp());
+                                    openTarGrp.setTarGrpId(Integer.parseInt(tarGrp.getTarGrpId().toString()));
+                                    if (tarGrp.getStatusDate() != null) {
+                                        openTarGrp.setStatusDate(DateUtil.date2StringDate(tarGrp.getStatusDate()));
+                                    }
+                                    tarGrpList.add(openTarGrp);
+                                }
+                                //4. 获取推荐条目信息
+                                if (StringUtils.isNotBlank(rule.getProductId())) {
+                                    String[] split = rule.getProductId().split("/");
+                                    for (int i = 0; i < split.length; i++) {
+                                        //得到活动推荐条目
+                                        MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(split[i]));
+                                        if (null != mktCamItem) {
+                                            OpenMktCamItem openMktCamItem = BeanUtil.create(mktCamItem, new OpenMktCamItem());
+                                            openMktCamItem.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                                            if (mktCamItem.getItemType().equals("1000")) {
+                                                Offer offer = offerMapper.selectByPrimaryKey(Integer.parseInt(mktCamItem.getItemId().toString()));
+                                                if (offer != null) {
+                                                    openMktCamItem.setItemNbr(offer.getOfferNbr());
+                                                }
+                                            } else if (mktCamItem.getItemType().equals("3000")) {
+                                                MktResource mktResource = mktResourceMapper.selectByPrimaryKey(mktCamItem.getItemId());
+                                                if (mktResource != null) {
+                                                    openMktCamItem.setItemNbr(mktResource.getMktResNbr());
+                                                }
+                                            }
+                                            if(mktCamItem.getStatusDate() != null) {
+                                                openMktCamItem.setStatusDate(DateUtil.date2StringDate(mktCamItem.getStatusDate()));
+                                            }
+                                            openMktCamItem.setTarGrps(tarGrpList);
+                                            mktCamItemList.add(openMktCamItem);
+                                        }
+                                    }
+                                }
                             }
                         }
-
                     }
                 }
-
+                campaign.setMktScripts(mktScriptList);
+                //返回活动推荐条目列表
+                campaign.setMktCamItems(mktCamItemList);
             }
-            //返回活动推荐条目列表
-            campaign.setMktCamItem(mktCamItemList);
+            resultMap.put("params", campaign);
         }
-
-        //设置id  和href  转换时间为对应格式
-        campaign.setId(Long.valueOf(id));
-        campaign.setHref("/mktCampaign/" + id);
-
-        resultMap.put("params", campaign);
+        if(resultMap.isEmpty()) {
+            JSONObject json = new JSONObject();
+            json.put("message","对应的营销活动未发布!");
+            resultMap.put("params", json);
+        }
         return resultMap;
     }
 
-
-    /**
-     * 通过活动id获取策略列表
-     * @param campaignId
-     */
-    public static List<MktCamStrategyConfRelDO> getStrategyList(Long campaignId){
-        List<MktCamStrategyConfRelDO> list=new ArrayList<>();
-
-
-        return list;
+    @Override
+    public Map<String,Object> getMktCampaignList(String mktActivityNbr, String accNum) {
+        logger.info("活动列表查询");
+        logger.info("活动编码：" + mktActivityNbr);
+        logger.info("用户号码：" + accNum);
+        Map<String, Object> resultMap = new HashMap<>();
+        List<OpenMktCampaign> mktCampaignDOList = new ArrayList<>();
+        if(accNum != null) {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("accNum", accNum);
+            //通过协同接口查活动id
+            Map<String, Object> map = iReportService.queryCampaignByNum(paramMap);
+            logger.info("用户号码协同查询结果：" + JSON.toJSONString(map));
+            List<String> campaignIdList = new ArrayList<>();
+            if(map != null) {
+                Object mktCampaignIds = map.get("mktCampaignIds");
+                if (mktCampaignIds != null) {
+                    campaignIdList = (List<String>) mktCampaignIds;
+                }
+            }
+            if(!campaignIdList.isEmpty()) {
+                for(String campaignId : campaignIdList) {
+                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(campaignId));
+                    if(mktCampaignDO != null) {
+                        if(mktActivityNbr != null && !mktCampaignDO.getMktActivityNbr().equals(mktActivityNbr)) {
+                            continue;
+                        }
+                        OpenMktCampaign campaign = getOpenCampaign(mktCampaignDO);
+                        mktCampaignDOList.add(campaign);
+                    }
+                }
+            }
+        }else {
+            if (mktActivityNbr != null) {
+                MktCampaignDO mktCampaign = new MktCampaignDO();
+                mktCampaign.setMktActivityNbr(mktActivityNbr);
+                List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.qryMktCampaignListByCondition(mktCampaign);
+                for(MktCampaignDO mktCampaignDO : mktCampaignDOS) {
+                    if(mktCampaignDO.getStatusCd().equals("2002") || mktCampaignDO.getStatusCd().equals("2008")) {
+                        OpenMktCampaign campaign = getOpenCampaign(mktCampaignDO);
+                        mktCampaignDOList.add(campaign);
+                    }
+                }
+            }
+        }
+        if (mktCampaignDOList.isEmpty()) {
+            JSONObject json = new JSONObject();
+            json.put("message","营销活动不存在!");
+            resultMap.put("params", json);
+        }else {
+            resultMap.put("params", mktCampaignDOList);
+        }
+        return resultMap;
     }
 
-
     /**
-     * 通过策略id获取规则列表
-     * @param strategyId
-     * @return
+     * 活动格式转换
      */
-    public static List<MktStrategyConfRuleDO> getRuleList(Long strategyId){
-        List<MktStrategyConfRuleDO> list=new ArrayList<>();
-
-
-        return list;
+    public OpenMktCampaign getOpenCampaign(MktCampaignDO mktCampaignDO){
+        OpenMktCampaign openMktCampaign = BeanUtil.create(mktCampaignDO, new OpenMktCampaign());
+        openMktCampaign.setMktCampaignId(Integer.parseInt(mktCampaignDO.getInitId().toString()));
+        if (null != mktCampaignDO.getBeginTime()) {
+            openMktCampaign.setBeginTime(DateUtil.getDatetime(mktCampaignDO.getBeginTime()));
+        }
+        if (null != mktCampaignDO.getEndTime()) {
+            openMktCampaign.setEndTime(DateUtil.getDatetime(mktCampaignDO.getEndTime()));
+        }
+        if (null != mktCampaignDO.getPlanBeginTime()) {
+            openMktCampaign.setPlanBeginTime(DateUtil.getDatetime(mktCampaignDO.getPlanBeginTime()));
+        }
+        if (null != mktCampaignDO.getPlanEndTime()) {
+            openMktCampaign.setPlanEndTime(DateUtil.getDatetime(mktCampaignDO.getPlanEndTime()));
+        }
+        if (null != mktCampaignDO.getMktCampaignCategory()) {
+            openMktCampaign.setManageType(mktCampaignDO.getMktCampaignCategory());
+        }
+        if (null != mktCampaignDO.getLanId()) {
+            openMktCampaign.setLanId(Integer.parseInt(mktCampaignDO.getLanId().toString()));
+        }
+        return openMktCampaign;
     }
 
-
-    /**
-     * 通过规则获取活动推荐条目列表
-     * @param ruleId
-     * @return
-     */
-    public static List<MktCamItem> getMktCamItemList(Long ruleId){
-        List<MktCamItem> list=new ArrayList<>();
-
-        return list;
+    @Override
+    public Map<String, Object> queryById(String id) {
+        return null;
     }
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public Map<String, Object> updateByParams(String id, Object object) {
@@ -290,40 +372,6 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         return null;
     }
 
-    /**
-     * 转换为openapi格式
-     * @param mktCampaignDO
-     * @return
-     */
-    public OpenMktCampaign getOpenCampaign(MktCampaignDO mktCampaignDO){
-        OpenMktCampaign campaign=BeanUtil.create(mktCampaignDO,new OpenMktCampaign());
-        //转换时间格式  beginTime endTime  planBeginTime  planEndTime statusDate
-        if(null!=mktCampaignDO.getBeginTime()){
-            campaign.setBeginTime(DateUtil.getDatetime(mktCampaignDO.getBeginTime()));
-        }
-        if(null!=mktCampaignDO.getEndTime()){
-            campaign.setEndTime(DateUtil.getDatetime(mktCampaignDO.getEndTime()));
-        }
-        if(null!=mktCampaignDO.getPlanBeginTime()){
-            campaign.setPlanBeginTime(DateUtil.getDatetime(mktCampaignDO.getPlanBeginTime()));
-        }
-        if(null!=mktCampaignDO.getPlanEndTime()){
-            campaign.setPlanEndTime(DateUtil.getDatetime(mktCampaignDO.getPlanEndTime()));
-        }
-
-        return campaign;
-    }
-
-
-    public static void main(String[] args) {
-        String s="997/998/999/1000";
-        String[] split = s.split("/");
-        for (int i = 0; i <split.length ; i++) {
-            System.out.println(split[i]);
-        }
-        
-    }
-
     @Override
     public Map<String, Object> addByObject(Object object) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -332,6 +380,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         List<Map<String, Object>> mktCampaigns = new ArrayList<>();
 
         CreateMktCampaignReq createMktCampaignReq = (CreateMktCampaignReq)object;
+        //营服活动信息
         List<OpenMktCampaignEntity> openMktCampaignEntityList = createMktCampaignReq.getMktCampaignDetails();
         for(OpenMktCampaignEntity openMktCampaignEntity : openMktCampaignEntityList) {
             singleMktCampaign.put("mktActivityNbr",openMktCampaignEntity.getMktActivityNbr());
@@ -348,7 +397,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             //新增营服活动
             MktCampaignDO mktCampaignDO = BeanUtil.create(openMktCampaignEntity, new MktCampaignDO());
             mktCampaignDO.setMktCampaignId(null);
-            mktCampaignDO.setMktCampaignCategory(openMktCampaignEntity.getManageType());
+            mktCampaignDO.setMktCampaignCategory("3000");
+            mktCampaignDO.setExecType("1000");
             if(openMktCampaignEntity.getMktCampaignType() == null) {
                 mktCampaignDO.setMktCampaignType(StatusCode.FRAMEWORK_CAMPAIGN.getStatusCode());
             }
@@ -361,29 +411,27 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             if(openMktCampaignEntity.getExecInvl() == null) {
                 mktCampaignDO.setExecInvl("-");
             }
-            mktCampaignDO.setRemark(openMktCampaignEntity.getRegionId().toString());
+            if(openMktCampaignEntity.getRemark() == null) {
+                mktCampaignDO.setRemark(openMktCampaignEntity.getRegionId().toString());
+            }
             mktCampaignDO.setRegionId(AreaCodeEnum.ZHEJIAGN.getRegionId());
             mktCampaignDO.setLanId(AreaCodeEnum.ZHEJIAGN.getLanId());
             mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             mktCampaignDO.setServiceType("1000");
             mktCampaignDO.setIsCheckRule("不校验");
+            if(openMktCampaignEntity.getCreateStaff() == null) {
+                mktCampaignDO.setCreateStaff(1L);
+            }
+            if(openMktCampaignEntity.getUpdateStaff() == null) {
+                mktCampaignDO.setUpdateStaff(1L);
+            }
             mktCampaignMapper.insert(mktCampaignDO);
             mktCampaignDO.setInitId(mktCampaignDO.getMktCampaignId());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
 
-            //新增下发地市
-            List<String> cityList = new ArrayList<>(Arrays.asList("570", "571", "572", "573", "574", "575", "576", "577", "578", "579", "580"));
-            for(String city : cityList) {
-                MktCamCityRelDO mktCamCityRelDO = new MktCamCityRelDO();
-                mktCamCityRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                mktCamCityRelDO.setCityId(Long.valueOf(city));
-                mktCamCityRelDO.setCreateDate(mktCampaignDO.getCreateDate());
-                mktCamCityRelDO.setUpdateDate(mktCampaignDO.getUpdateDate());
-                mktCamCityRelMapper.insert(mktCamCityRelDO);
-            }
-
             //规则
             MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
+            List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = new ArrayList<>();
             int ruleNumber = 1;
             String productList = "";
             String channelList = "";
@@ -405,6 +453,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     OpenTarGrpEntity openTarGrpEntity = openMktCamGrpRulEntity.getTarGrp();
                     if(openTarGrpEntity != null) {
                         TarGrp tarGrp = BeanUtil.create(openTarGrpEntity, new TarGrp());
+                        tarGrp.setRemark("0");
                         tarGrpMapper.createTarGrp(tarGrp);
                         mktCamGrpRul.setTarGrpId(tarGrp.getTarGrpId());
                         mktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
@@ -452,6 +501,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }
                     MktCamItem mktCamItem = BeanUtil.create(openMktCamItemEntity, new MktCamItem());
                     mktCamItem.setMktCamItemId(null);
+                    mktCamItem.setOfferCode(openMktCamItemEntity.getItemNbr());
                     if(openMktCamItemEntity.getItemType().equals("1000")) {
                         List<Offer> offerList = offerMapper.selectByCode(openMktCamItemEntity.getItemNbr());
                         if(offerList.size() > 0) {
@@ -493,8 +543,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     mktCamChlConfDO.setEvtContactConfId(null);
                     mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                     Channel channel = contactChannelMapper.selectByCode(mktCamChlConfDO.getContactChlId().toString());
-                    mktCamChlConfDO.setContactChlId(channel.getContactChlId());
-                    mktCamChlConfDO.setEvtContactConfName(channel.getContactChlName());
+                    if(channel != null) {
+                        mktCamChlConfDO.setContactChlId(channel.getContactChlId());
+                        mktCamChlConfDO.setEvtContactConfName(channel.getContactChlName());
+                    }
                     mktCamChlConfDO.setPushType("1000");
                     mktCamChlConfMapper.insert(mktCamChlConfDO);
                     if(i == 0) {
@@ -529,7 +581,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                             MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(openMktCamChlConfAttrEntity, new MktCamChlConfAttrDO());
                             mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
                             mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
-                            mktCamChlConfAttrDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                            mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
                             mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
                         }
                     }
@@ -582,50 +634,28 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             }
 
             //新增营服活动关联事件
-            List<OpenEvent> mktCampaignEvts = openMktCampaignEntity.getMktCampaignEvts();
-            if(mktCampaignEvts != null && mktCampaignEvts.size() > 0) {
-                for (OpenEvent openEvent : mktCampaignEvts) {
-                    MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
+            List<OpenMktCamEvtRelEntity> mktCamEvtRels = openMktCampaignEntity.getMktCamEvtRels();
+            if(mktCamEvtRels != null && mktCamEvtRels.size() > 0) {
+                for (OpenMktCamEvtRelEntity openMktCamEvtRelEntity : mktCamEvtRels) {
+                    MktCamEvtRelDO mktCamEvtRelDO = BeanUtil.create(openMktCamEvtRelEntity, new MktCamEvtRelDO());
+                    mktCamEvtRelDO.setMktCampEvtRelId(null);
                     mktCamEvtRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                    mktCamEvtRelDO.setEventId(openEvent.getEventId());
+                    try {
+                        mktCamEvtRelDO.setEventId(Long.valueOf(openMktCamEvtRelEntity.getEventNbr()));
+                    }catch (Exception e) {
+                        logger.info("事件编码: " + openMktCamEvtRelEntity.getEventNbr());
+                        e.printStackTrace();
+                    }
+                    ContactEvt contactEvt = new ContactEvt();
+                    if(openMktCamEvtRelEntity.getEventNbr() != null) {
+                        contactEvt = contactEvtMapper.getEventByEventNbr(openMktCamEvtRelEntity.getEventNbr());
+                    }
+                    if(contactEvt != null) {
+                        mktCamEvtRelDO.setEventId(contactEvt.getContactEvtId());
+                    }
                     mktCamEvtRelDO.setCampaignSeq(0);
                     mktCamEvtRelDO.setLevelConfig(0);
-                    mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                    mktCamEvtRelDO.setStatusDate(mktCampaignDO.getCreateDate());
-                    mktCamEvtRelDO.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamEvtRelDO.setCreateDate(mktCampaignDO.getCreateDate());
-                    mktCamEvtRelDO.setUpdateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamEvtRelDO.setUpdateDate(mktCampaignDO.getCreateDate());
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);
-                }
-            }
-
-            //新增营服活动渠道执行策略
-            List<OpenMktCamStrategyRelEntity> mktCamStrategyRels = openMktCampaignEntity.getMktCamStrategyRels();
-            if(mktCamStrategyRels != null && mktCamStrategyRels.size() > 0) {
-                for(OpenMktCamStrategyRelEntity openMktCamStrategyRelEntity : mktCamStrategyRels) {
-                    //新增营销服务策略
-                    OpenMktStrategyEntity openMktStrategyEntity = openMktCamStrategyRelEntity.getMktStrategy();
-                    MktStrategy mktStrategy = BeanUtil.create(openMktStrategyEntity, new MktStrategy());
-                    mktStrategy.setStrategyId(null);
-                    mktStrategy.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                    mktStrategy.setStatusDate(mktCampaignDO.getCreateDate());
-                    mktStrategy.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    mktStrategy.setCreateDate(mktCampaignDO.getCreateDate());
-                    mktStrategy.setUpdateStaff(mktCampaignDO.getCreateStaff());
-                    mktStrategy.setUpdateDate(mktCampaignDO.getCreateDate());
-                    mktStrategyMapper.insert(mktStrategy);
-                    MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
-                    mktCamStrategyRel.setCampStrRelId(null);
-                    mktCamStrategyRel.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                    mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
-                    mktCamStrategyRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                    mktCamStrategyRel.setStatusDate(mktCampaignDO.getCreateDate());
-                    mktCamStrategyRel.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamStrategyRel.setCreateDate(mktCampaignDO.getCreateDate());
-                    mktCamStrategyRel.setUpdateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamStrategyRel.setUpdateDate(mktCampaignDO.getCreateDate());
-                    mktCamStrategyRelMapper.insert(mktCamStrategyRel);
                 }
             }
 
@@ -666,6 +696,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
                 mktStrategyConfRuleDO.setInitId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                 mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
+                mktStrategyConfRuleDOList.add(mktStrategyConfRuleDO);
                 //新增策略与规则的关联
                 MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
                 mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
@@ -706,12 +737,93 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 }
             }
 
+            //新增营服活动渠道执行策略
+            List<OpenMktCamStrategyRelEntity> mktCamStrategyRels = openMktCampaignEntity.getMktCamStrategyRels();
+            if(mktCamStrategyRels != null && mktCamStrategyRels.size() > 0) {
+                for(OpenMktCamStrategyRelEntity openMktCamStrategyRelEntity : mktCamStrategyRels) {
+                    //新增营销服务策略
+                    OpenMktStrategyEntity openMktStrategyEntity = openMktCamStrategyRelEntity.getMktStrategy();
+                    MktStrategy mktStrategy = BeanUtil.create(openMktStrategyEntity, new MktStrategy());
+                    mktStrategy.setStrategyId(null);
+                    mktStrategy.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktStrategy.setStatusDate(mktCampaignDO.getStatusDate());
+                    mktStrategy.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    mktStrategy.setCreateDate(mktCampaignDO.getCreateDate());
+                    mktStrategy.setUpdateStaff(mktCampaignDO.getUpdateStaff());
+                    mktStrategy.setUpdateDate(mktCampaignDO.getUpdateDate());
+                    mktStrategyMapper.insert(mktStrategy);
+                    MktCamStrategyRel mktCamStrategyRel = new MktCamStrategyRel();
+                    mktCamStrategyRel.setCampStrRelId(null);
+                    mktCamStrategyRel.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+                    mktCamStrategyRel.setStrategyId(mktStrategy.getStrategyId());
+                    mktCamStrategyRel.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamStrategyRel.setStatusDate(mktCampaignDO.getStatusDate());
+                    mktCamStrategyRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    mktCamStrategyRel.setCreateDate(mktCampaignDO.getCreateDate());
+                    mktCamStrategyRel.setUpdateStaff(mktCampaignDO.getUpdateStaff());
+                    mktCamStrategyRel.setUpdateDate(mktCampaignDO.getUpdateDate());
+                    mktCamStrategyRelMapper.insert(mktCamStrategyRel);
+                }
+            } else {
+                for(MktStrategyConfRuleDO mktStrategyConfRule: mktStrategyConfRuleDOList) {
+                    MktStrategy mktStrategy = new MktStrategy();
+                    mktStrategy.setStrategyId(mktStrategyConfRule.getMktStrategyConfRuleId());
+                    mktStrategy.setStrategyName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                    if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(mktCampaignDO.getMktCampaignType())){
+                        mktStrategy.setStrategyType(StatusCode.CARE_STRATEGY.getStatusCode());
+                    } else{
+                        mktStrategy.setStrategyType(StatusCode.SALES_STRATEGY.getStatusCode());
+                    }
+                    mktStrategy.setStrategyDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+
+                    String confs = "";
+                    String resultConfs = "";
+                    if(mktStrategyConfRule.getEvtContactConfId() != null) {
+                        String[] confList = mktStrategyConfRule.getEvtContactConfId().split("/");
+                        if (confList.length > 0) {
+                            confs = confList[0];
+                            for (int i = 1; i < confList.length; i++) {
+                                confs = confs + "||" + confList[i];
+                            }
+                        }
+                    }
+                    mktStrategy.setRuleExpression("("+ confs + ")&&(" + resultConfs + ")");
+                    mktStrategy.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktStrategy.setStatusDate(mktCampaignDO.getStatusDate());
+                    mktStrategy.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    mktStrategy.setCreateDate(mktCampaignDO.getCreateDate());
+                    mktStrategy.setUpdateStaff(mktCampaignDO.getCreateStaff());
+                    mktStrategy.setUpdateDate(mktCampaignDO.getUpdateDate());
+                    mktStrategyMapper.insert(mktStrategy);
+                }
+            }
+
             //新增营服活动关系
             List<OpenMktCampaignRelEntity> mktCampaignRels = openMktCampaignEntity.getMktCampaignRels();
 
             //新增事件触发活动规则
             List<OpenEvtTrigCamRulEntity> evtTrigCamRuls = openMktCampaignEntity.getEvtTrigCamRuls();
 
+            //需求单信息
+            RequestTemplateInst requestTemplateInst = createMktCampaignReq.getRequestTemplateInst();
+            if(requestTemplateInst != null) {
+                MktCampaignComplete mktCampaignComplete = new MktCampaignComplete();
+                mktCampaignComplete.setMktActivityNbr(mktCampaignDO.getMktActivityNbr());
+                mktCampaignComplete.setMktCampaignId(mktCampaignDO.getInitId());
+                mktCampaignComplete.setOrderId(requestTemplateInst.getRequestTemplateInstId().toString());
+                mktCampaignComplete.setOrderName(requestTemplateInst.getName());
+                mktCampaignComplete.setTacheCd("1100");
+                mktCampaignComplete.setTacheValueCd("10");
+                mktCampaignComplete.setBeginTime(new Date());
+                mktCampaignComplete.setEndTime(new Date());
+                mktCampaignComplete.setSort(Long.valueOf("1"));
+                mktCampaignComplete.setStatusCd("1100");
+                mktCampaignComplete.setStatusDate(new Date());
+                mktCampaignComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
+                mktCampaignComplete.setCreateDate(new Date());
+                mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
+                mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            }
         }
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
@@ -978,30 +1090,30 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 //            }
 
             //修改营服活动关联事件
-            List<OpenEvent> mktCampaignEvts = openMktCampaignEntity.getMktCampaignEvts();
-            if(mktCampaignEvts.size() > 0) {
-                for(OpenEvent openEvent : mktCampaignEvts) {
-                    if(openEvent.getActType().equals("ADD")) {
-                        MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
-                        mktCamEvtRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                        mktCamEvtRelDO.setEventId(openEvent.getEventId());
-                        mktCamEvtRelDO.setCampaignSeq(0);
-                        mktCamEvtRelDO.setLevelConfig(0);
-                        mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-                        mktCamEvtRelDO.setStatusDate(mktCampaignDO.getCreateDate());
-                        mktCamEvtRelDO.setCreateStaff(mktCampaignDO.getCreateStaff());
-                        mktCamEvtRelDO.setCreateDate(mktCampaignDO.getCreateDate());
-                        mktCamEvtRelDO.setUpdateStaff(mktCampaignDO.getCreateStaff());
-                        mktCamEvtRelDO.setUpdateDate(mktCampaignDO.getCreateDate());
-                        mktCamEvtRelMapper.insert(mktCamEvtRelDO);
-                    }else if(openEvent.getActType().equals("DEL")) {
-                        MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.findByCampaignIdAndEvtId(mktCampaignDO.getMktCampaignId(),openEvent.getEventId());
-                        if(mktCamEvtRelDO != null) {
-                            mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
-                        }
-                    }
-                }
-            }
+//            List<OpenEvent> mktCampaignEvts = openMktCampaignEntity.getMktCampaignEvts();
+//            if(mktCampaignEvts.size() > 0) {
+//                for(OpenEvent openEvent : mktCampaignEvts) {
+//                    if(openEvent.getActType().equals("ADD")) {
+//                        MktCamEvtRelDO mktCamEvtRelDO = new MktCamEvtRelDO();
+//                        mktCamEvtRelDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+//                        mktCamEvtRelDO.setEventId(openEvent.getEventId());
+//                        mktCamEvtRelDO.setCampaignSeq(0);
+//                        mktCamEvtRelDO.setLevelConfig(0);
+//                        mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+//                        mktCamEvtRelDO.setStatusDate(mktCampaignDO.getCreateDate());
+//                        mktCamEvtRelDO.setCreateStaff(mktCampaignDO.getCreateStaff());
+//                        mktCamEvtRelDO.setCreateDate(mktCampaignDO.getCreateDate());
+//                        mktCamEvtRelDO.setUpdateStaff(mktCampaignDO.getCreateStaff());
+//                        mktCamEvtRelDO.setUpdateDate(mktCampaignDO.getCreateDate());
+//                        mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+//                    }else if(openEvent.getActType().equals("DEL")) {
+//                        MktCamEvtRelDO mktCamEvtRelDO = mktCamEvtRelMapper.findByCampaignIdAndEvtId(mktCampaignDO.getMktCampaignId(),openEvent.getEventId());
+//                        if(mktCamEvtRelDO != null) {
+//                            mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
+//                        }
+//                    }
+//                }
+//            }
 
             //修改营服活动渠道执行策略
 //            List<OpenMktStrategyEntity> mktCampaignStrategyDetails = openMktCampaignEntity.getMktCampaignStrategyDetails();

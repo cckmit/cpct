@@ -42,4 +42,5 @@ public interface OrganizationMapper {
     List<Organization> getByOrgNameC4(@Param("orgNameC4")String orgNameC4);
 
     List<Organization> getByOrgNameC5(@Param("orgNameC5")String orgNameC5);
+
 }

@@ -28,7 +28,9 @@
                    version="2.0">
         <!--<dubbo:method name="updateOperationStatus" servicecode="33.1083.updateOperationStatus" timeout="10000"/>-->
         <dubbo:method name="campaignIndexTask" servicecode="33.1083.campaignIndexTask" timeout="10000"/>
+        <dubbo:method name="importUserListByExcel" servicecode="33.1083.importUserListByExcel" timeout="10000"/>
         <dubbo:method name="dueMktCampaign" servicecode="33.1083.dueMktCampaign" timeout="10000"/>
+        <dubbo:method name="sendMsgByOfferOver" servicecode="33.1083.sendMsgByOfferOver" timeout="10000"/>
     </dubbo:service>
 
     <!-- 更新试算日志 -->
@@ -61,5 +63,24 @@
                      <!--version="1.0" retries="0" check="false">-->
         <!--<dubbo:method name="CalculateCPCSync" servicecode="00.1083.CalculateCPCSync" timeout="5000"/>-->
     <!--</dubbo:reference>-->
+
+    <!-- 分群定时批量下发 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="2.0" >
+        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- 活动延期短信通知 -->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.CampaignService" ref="campaignServiceImpl" version="2.0" >
+        <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
+    </dubbo:service>
+
+    <!-- UCCP短信发送 -->
+    <dubbo:reference registry="esb3" interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" check="false">
+        <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
+    </dubbo:reference>
+
+    <dubbo:reference interface="com.zjtelcom.es.es.service.EsTarGrpTemplate" id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
+        <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
+    </dubbo:reference>
 
 </beans>

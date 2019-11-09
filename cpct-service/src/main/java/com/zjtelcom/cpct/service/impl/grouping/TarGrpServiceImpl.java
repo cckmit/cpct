@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
@@ -22,10 +23,7 @@ import com.zjtelcom.cpct.dto.channel.LabelValueVO;
 import com.zjtelcom.cpct.dto.channel.OperatorDetail;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.grouping.SysAreaVO;
-import com.zjtelcom.cpct.dto.grouping.TarGrp;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
@@ -39,10 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,7 +89,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private CloseRuleServiceImpl closeRuleServiceImpl;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
-
+    @Autowired
+    private OrgGridRelMapper orgGridRelMapper;
 
     @Override
     public Map<String, Object> conditionSwitch(Long conditionId, String type, String value) {
@@ -392,6 +388,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail, boolean isCopy) {
         Map<String, Object> maps = new HashMap<>();
         try {
+            tarGrpDetail = finalWillBeIn(tarGrpDetail);
             //插入客户分群记录
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
@@ -547,6 +544,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 // NoteFive字段对应的是express表达式
                 closeRule.setNoteFive(express);
                 closeRuleMapper.updateByPrimaryKey(closeRule);
+
             }
         }
         return delTarGrpConditions(conditionId);
@@ -630,6 +628,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
         try {
+            tarGrpDetail = finalWillBeIn(tarGrpDetail);
             TarGrp tarGrp = new TarGrp();
             tarGrp = tarGrpDetail;
             tarGrp.setUpdateDate(DateUtil.getCurrentTime());
@@ -789,6 +788,15 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                     }
                 }
                 tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
+            }else if (label.getInjectionLabelCode().equals("GIS_CLUSTER_ID")){
+                List<String> rightParam = new ArrayList<>();
+                String[] paramList = tarGrpConditionVO.getRightParam().split(",");
+                List<String> stringList = Arrays.asList(paramList);
+                List<OrgGridRel> orgGridRels = orgGridRelMapper.selectOrgGridByCode(stringList);
+                for (OrgGridRel valueVO : orgGridRels) {
+                    rightParam.add(valueVO.getxAttribName());
+                }
+                tarGrpConditionVO.setRightParamName(ChannelUtil.list2String(rightParam,","));
             }else {
                 tarGrpConditionVO.setRightParamName(tarGrpCondition.getRightParam());
             }
@@ -861,5 +869,16 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return null;
     }
 
+
+    public TarGrpDetail finalWillBeIn(TarGrpDetail tarGrpDetail) {
+        for (TarGrpCondition tarGrpCondition : tarGrpDetail.getTarGrpConditions()) {
+            // 固定必中标签特殊处理
+            if (Integer.valueOf(tarGrpCondition.getLeftParam()) == 801842) {
+                tarGrpCondition.setRightParam("1");
+                tarGrpCondition.setOperType("3000");
+            }
+        }
+        return tarGrpDetail;
+    }
 
 }

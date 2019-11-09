@@ -1,11 +1,15 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.dao.channel.OfferMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -13,9 +17,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -29,18 +31,21 @@ import com.zjtelcom.cpct.service.MktCampaignResp;
 import com.zjtelcom.cpct.service.MktStrConfRuleResp;
 import com.zjtelcom.cpct.service.MktStrategyConfResp;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct_prd.dao.campaign.MktCamItemPrdMapper;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 /**
  * @Description:
@@ -103,6 +108,18 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
 
+    @Autowired
+    private OfferMapper offerMapper;
+
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+
+    @Autowired(required = false)
+    private UCCPService uccpService;
+
+    @Autowired
+    private MktCamItemPrdMapper mktCamItemPrdMapper;
+
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
         // 获取活动基本信息
@@ -141,6 +158,46 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
             maps.put("resultMsg", "failed");
         }
         return maps;
+    }
+
+    @Override
+    public Map<String, Object> salesOffShelf(Map<String, Object> map) {
+        HashMap<String,Object> resuleMap = new HashMap<>();
+        Date date = new Date();
+        String preDay = DateUtil.getPreDay(1);
+        Date preDate = DateUtil.string2DateTime4Day(preDay);
+        List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
+//        offerList.get(0).setOfferId(290508);
+//        offerList.get(1).setOfferId(290936);
+        if (!offerList.isEmpty()){
+            List<MktCamItem> mktCamItems = mktCamItemPrdMapper.getMktCampaignById(offerList);
+            if (!mktCamItems.isEmpty()){
+                for (MktCamItem mktCamItem : mktCamItems) {
+                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());
+                    if (mktCampaignDO==null) continue;
+                    if (mktCampaignDO.getCreateStaff()!=null){
+                        try {
+                            if (mktCampaignDO.getCreateStaff()!=null){
+                                SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignDO.getCreateStaff(), new ArrayList<Long>());
+                                if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                                    String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                                    System.out.println("11111+sysUserCode:"+sysUserCode+"123444324 lanId:"+mktCampaignDO.getLanId());
+                                    String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                                    try {
+                                        uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return resuleMap;
     }
 
     /**

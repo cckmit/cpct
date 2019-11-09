@@ -113,20 +113,36 @@
     AND (p1.ATTR_ID = 500600010007)
   </select>
 
+  <select id="selectAttrStartDateByCampaignId" resultMap="BaseResultMap">
+    select p1.CONTACT_CHL_ATTR_RSTR_ID, p1.EVT_CONTACT_CONF_ID, p1.ATTR_ID, p1.ATTR_VALUE_ID, p1.ATTR_VALUE,
+    p1.STATUS_CD, p1.CREATE_STAFF, p1.UPDATE_STAFF, p1.CREATE_DATE, p1.UPDATE_DATE, p1.STATUS_DATE, p1.REMARK
+    from mkt_cam_chl_conf_attr p1 LEFT JOIN mkt_cam_chl_conf p2 on p1.EVT_CONTACT_CONF_ID = p2.EVT_CONTACT_CONF_ID
+    WHERE p2.MKT_CAMPAIGN_ID = #{campaignId}
+    AND (p1.ATTR_ID = 500600010006)
+  </select>
+
+
   <update id="updateByPrimaryKeyBatch" parameterType="java.util.ArrayList">
     update mkt_cam_chl_conf_attr
     <trim prefix="set" suffixOverrides=",">
+      <trim prefix="EVT_CONTACT_CONF_ID = case" suffix="end," >
+        <foreach collection="list" item="item">
+          <if test="item.evtContactConfId !=null">
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.evtContactConfId}
+          </if>
+        </foreach>
+      </trim>
       <trim prefix="ATTR_ID = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.attrId !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrId}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.attrId}
           </if>
         </foreach>
       </trim>
       <trim prefix="ATTR_VALUE_ID = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.attrValueId !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrValueId}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.attrValueId}
           </if>
         </foreach>
       </trim>
@@ -134,7 +150,7 @@
       <trim prefix="ATTR_VALUE = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.attrValue !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.attrValue}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.attrValue}
           </if>
         </foreach>
       </trim>
@@ -142,7 +158,7 @@
       <trim prefix="STATUS_CD = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.statusCd !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.statusCd}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.statusCd}
           </if>
         </foreach>
       </trim>
@@ -150,7 +166,7 @@
       <trim prefix="CREATE_STAFF = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.createStaff !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.createStaff}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.createStaff}
           </if>
         </foreach>
       </trim>
@@ -158,7 +174,7 @@
       <trim prefix="UPDATE_STAFF = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.updateStaff !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.updateStaff}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.updateStaff}
           </if>
         </foreach>
       </trim>
@@ -166,7 +182,7 @@
       <trim prefix="CREATE_DATE = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.createDate !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.createDate}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.createDate}
           </if>
         </foreach>
       </trim>
@@ -174,7 +190,7 @@
       <trim prefix="UPDATE_DATE = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.updateDate !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.updateDate}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.updateDate}
           </if>
         </foreach>
       </trim>
@@ -182,7 +198,7 @@
       <trim prefix="STATUS_DATE = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.statusDate !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.statusDate}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.statusDate}
           </if>
         </foreach>
       </trim>
@@ -190,7 +206,7 @@
       <trim prefix="REMARK = case" suffix="end," >
         <foreach collection="list" item="item">
           <if test="item.remark !=null">
-            WHEN  EVT_CONTACT_CONF_ID = #{item.evtContactConfId} THEN #{item.remark}
+            WHEN CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId} THEN #{item.remark}
           </if>
         </foreach>
       </trim>
@@ -198,7 +214,7 @@
 
     <where>
       <foreach collection="list" separator="or" item="item">
-        EVT_CONTACT_CONF_ID = #{item.evtContactConfId}
+        CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId}
       </foreach>
     </where>
   </update>

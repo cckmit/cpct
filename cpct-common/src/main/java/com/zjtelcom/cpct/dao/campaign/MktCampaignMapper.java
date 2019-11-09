@@ -26,6 +26,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByPrimaryKey(Long mktCampaignId);
 
+    List<MktCampaignDO> selectBatch(@Param("mktCampaignIds") List<Long> mktCampaignIds);
+
     List<MktCampaignDO> selectAll();
 
     int updateByPrimaryKey(MktCampaignDO mktCampaignDO);
@@ -48,6 +50,8 @@ public interface MktCampaignMapper {
 
     List<MktCamDisplayColumnRel> selectAllGroupByCamId();
 
+    MktCampaignDO selectCampaignByInitId(@Param("initId")Long initId);
+
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
@@ -56,6 +60,8 @@ public interface MktCampaignMapper {
 
     int countByStatus(@Param("map")Map<String, Object> map);
 
+    int countBylanIdFour(@Param("map")Map<String, Object> map);
+
     int countByTrial(@Param("map")Map<String, Object> map);
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaign(HashMap<String, Object> paramMap);
@@ -63,4 +69,25 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> getMktCampaignDetails(HashMap<String, Object> hashMap);
 
     List<MktCampaignDO> getMktCampaignDetailsForDate(@Param("mktCampaignId")List<String> s);
+
+    List<MktCampaignDO> selectAllMktCampaignDetailsByStatus(@Param("status")List<String> status, @Param("staff")Long createStaffId);
+
+    List<Long> getUserListTempMktCamCodeList();
+
+    List<Long> getCreateStaffList();
+
+    void updateByStaffToC4AndC5(@Param("map")Map<String, Object> map);
+
+    void updateMktCampaignByC4OfSysArea(@Param("map")HashMap<String, Object> map);
+
+    List<Long> getByOrgNameC4IsNotNull();
+
+    List<MktCampaignDO> getActivityStatisticsByName(@Param("name")String s);
+
+    List<MktCampaignDO> queryRptBatchOrderForMktCampaignFromDate(HashMap<String, Object> paramMap);
+
+    List<MktCampaignDO> selectCampaignTheme(@Param("value") String value, @Param("date") String date,@Param("type") String type);
+
+    Integer getCountFromActivityTheme(@Param("date") String date,@Param("type") String type);
+
 }

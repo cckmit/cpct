@@ -38,6 +38,36 @@ public class MktCampaignDO extends BaseEntity{
     private String execInitTime;
     private String strBeginTime;
     private String strEndTime;
+    private Long lanIdFour;
+    private Long lanIdFive;
+    private String oneChannelFlg;//是否单渠道活动
+    private String theMe;//活动主题
+    private String regionFlg;//活动创建地市
+
+
+    public String getOneChannelFlg() {
+        return oneChannelFlg;
+    }
+
+    public void setOneChannelFlg(String oneChannelFlg) {
+        this.oneChannelFlg = oneChannelFlg;
+    }
+
+    public String getTheMe() {
+        return theMe;
+    }
+
+    public void setTheMe(String theMe) {
+        this.theMe = theMe;
+    }
+
+    public String getRegionFlg() {
+        return regionFlg;
+    }
+
+    public void setRegionFlg(String regionFlg) {
+        this.regionFlg = regionFlg;
+    }
 
     public String getStrBeginTime() {
         return strBeginTime;
@@ -294,5 +324,21 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setExecInitTime(String execInitTime) {
         this.execInitTime = execInitTime;
+    }
+
+    public Long getLanIdFour() {
+        return lanIdFour;
+    }
+
+    public void setLanIdFour(Long lanIdFour) {
+        this.lanIdFour = lanIdFour;
+    }
+
+    public Long getLanIdFive() {
+        return lanIdFive;
+    }
+
+    public void setLanIdFive(Long lanIdFive) {
+        this.lanIdFive = lanIdFive;
     }
 }

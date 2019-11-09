@@ -1,70 +1,39 @@
 package com.zjtelcom.cpct.open.entity.mktCamItem;
 
-import com.zjtelcom.cpct.open.base.entity.BaseEntity;
-import lombok.Data;
+import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrp;
 
+import java.util.List;
 
 public class OpenMktCamItem{
 
-    private String href;
-    private Long id;
-    private Long itemGroup;
-    private Long itemId;
-    private String itemType;
-    private Long lanId;
+    private Integer mktCamItemId;
+    private Integer mktCampaignId;
     private String mktActivityNbr;
-    private Long mktCampaignId;
-    private Long priority;
-    private String remark;
+    private String itemType;
+    private Integer itemId;
+    private String itemNbr;
+    private Integer priority;
+    private Integer itemGroup;
     private String statusCd;
+    private String statusDate;
+    private String remark;
+    private Integer lanId;
+    private List<OpenTarGrp> tarGrps;
 
-
-    public String getHref() {
-        return href;
+    public Integer getMktCamItemId() {
+        return mktCamItemId;
     }
 
-    public void setHref(String href) {
-        this.href = href;
+    public void setMktCamItemId(Integer mktCamItemId) {
+        this.mktCamItemId = mktCamItemId;
     }
 
-    public Long getId() {
-        return id;
+    public Integer getMktCampaignId() {
+        return mktCampaignId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getItemGroup() {
-        return itemGroup;
-    }
-
-    public void setItemGroup(Long itemGroup) {
-        this.itemGroup = itemGroup;
-    }
-
-    public Long getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getItemType() {
-        return itemType;
-    }
-
-    public void setItemType(String itemType) {
-        this.itemType = itemType;
-    }
-
-    public Long getLanId() {
-        return lanId;
-    }
-
-    public void setLanId(Long lanId) {
-        this.lanId = lanId;
+    public void setMktCampaignId(Integer mktCampaignId) {
+        this.mktCampaignId = mktCampaignId;
     }
 
     public String getMktActivityNbr() {
@@ -75,20 +44,60 @@ public class OpenMktCamItem{
         this.mktActivityNbr = mktActivityNbr;
     }
 
-    public Long getMktCampaignId() {
-        return mktCampaignId;
+    public String getItemType() {
+        return itemType;
     }
 
-    public void setMktCampaignId(Long mktCampaignId) {
-        this.mktCampaignId = mktCampaignId;
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
     }
 
-    public Long getPriority() {
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getItemNbr() {
+        return itemNbr;
+    }
+
+    public void setItemNbr(String itemNbr) {
+        this.itemNbr = itemNbr;
+    }
+
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setPriority(Long priority) {
+    public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public Integer getItemGroup() {
+        return itemGroup;
+    }
+
+    public void setItemGroup(Integer itemGroup) {
+        this.itemGroup = itemGroup;
+    }
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
+
+    public String getStatusDate() {
+        return statusDate;
+    }
+
+    public void setStatusDate(String statusDate) {
+        this.statusDate = statusDate;
     }
 
     public String getRemark() {
@@ -99,11 +108,19 @@ public class OpenMktCamItem{
         this.remark = remark;
     }
 
-    public String getStatusCd() {
-        return statusCd;
+    public Integer getLanId() {
+        return lanId;
     }
 
-    public void setStatusCd(String statusCd) {
-        this.statusCd = statusCd;
+    public void setLanId(Integer lanId) {
+        this.lanId = lanId;
+    }
+
+    public List<OpenTarGrp> getTarGrps() {
+        return tarGrps;
+    }
+
+    public void setTarGrps(List<OpenTarGrp> tarGrps) {
+        this.tarGrps = tarGrps;
     }
 }

@@ -4,19 +4,15 @@ import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zjhcsoft.eagle.main.dubbo.model.policy.RecordModel;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.grouping.TrialOperation;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
-import com.zjtelcom.cpct.dto.pojo.Result;
-import com.zjtelcom.cpct.enums.*;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.enums.LabelCondition;
+import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
@@ -27,11 +23,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -1001,6 +995,13 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 if(landIdByRegionId != null) {
                     list = labelMapper.selectDistributeLabelByType(labelType, landIdByRegionId.toString());
                     fixedList.addAll(list);
+                }else {
+                    String region = regionId.toString().substring(0, 5) + "00";
+                    landIdByRegionId = AreaCodeEnum.getLandIdByRegionId(Long.valueOf(region));
+                    if(landIdByRegionId != null) {
+                        list = labelMapper.selectDistributeLabelByType(labelType, landIdByRegionId.toString());
+                        fixedList.addAll(list);
+                    }
                 }
             }
             //return ResultUtil.responseSuccessResult(labelMapper.selectByCode(Integer.valueOf(labelType)));

@@ -12,6 +12,7 @@ import com.zjhcsoft.eagle.main.dubbo.model.policy.*;
 import com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
@@ -23,6 +24,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -83,6 +85,9 @@ public class SyncActivityServiceImpl implements SyncActivityService {
     @Autowired
     private ContactChannelMapper contactChannelMapper;
 
+    @Autowired
+    private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
+
     @Override
     public ResponseHeaderModel syncActivity(Long mktCampaignId) {
         // 获取活动基本信息
@@ -112,6 +117,36 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         //账期
         SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
         activityModel.setMonthId(Integer.parseInt(df.format(DateUtil.getCurrentTime())));
+        //展示列标签集合
+        List<LabelDTO> labelDTOS = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(mktCampaignId);
+        List<String> displayLabelList = new ArrayList<>();
+        for (LabelDTO labelDTO : labelDTOS) {
+            displayLabelList.add(labelDTO.getLabelCode());
+        }
+        activityModel.setDisplayLabelList(displayLabelList);
+
+        //话术标签集合
+        List<CamScript> camScriptList = mktCamScriptMapper.selectByCampaignId(mktCampaignId);
+        List<String> scriptLabelList = new ArrayList<>();
+        for (CamScript camScript : camScriptList) {
+            String desc = camScript.getScriptDesc();
+            if(desc!=null){
+                while (desc.indexOf("${")>0){
+                    while(desc.indexOf("}$")>0){
+                        int start = desc.indexOf("${");
+                        int end = desc.indexOf("}$");
+                        String label = desc.substring(start+2, end);
+                        if(!scriptLabelList.contains(label)){
+                            scriptLabelList.add(label);
+                        }
+                        desc = desc.substring(end+2, desc.length());
+                        break;
+                    }
+                }
+            }
+        }
+        activityModel.setScriptLabelList(scriptLabelList);
+
         List<PolicyModel> policyList = new ArrayList<>();
         //获取活动下策略信息
         List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);

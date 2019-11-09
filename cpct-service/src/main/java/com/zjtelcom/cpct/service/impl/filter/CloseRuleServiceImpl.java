@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.service.impl.filter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -26,6 +28,7 @@ import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
+import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -73,6 +76,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private TarGrpConditionMapper tarGrpConditionMapper;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -174,6 +179,14 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         //受理关单规则 欠费关单规则  拆机关单规则
         Map<String, Object> maps = new HashMap<>();
         final CloseRule closeRule = BeanUtil.create(addVO,new CloseRule());
+        //关单规则名称 去除重复
+        String closeName = closeRule.getCloseName();
+        Integer count = closeRuleMapper.getCloseNameCount(closeName);
+        if (count>0){
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "关单规则名称重复！");
+            return maps;
+        }
         closeRule.setCreateDate(DateUtil.getCurrentTime());
         closeRule.setUpdateDate(DateUtil.getCurrentTime());
         closeRule.setStatusDate(DateUtil.getCurrentTime());
@@ -184,12 +197,23 @@ public class CloseRuleServiceImpl implements CloseRuleService {
 
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
             if (addVO.getChooseProduct()!= null && !addVO.getChooseProduct().isEmpty()){
-                for (Long offerId : addVO.getChooseProduct()){
+                if (addVO.getProductType().equals("1000")){
+                    for (Long offerId : addVO.getChooseProduct()){
                     Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
                     if (offer==null){
                         continue;
                     }
                     codeList.add(offer.getOfferNbr());
+                    }
+                }else {
+                    for (Long offerId : addVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product==null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
+
+                    }
                 }
                 closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
@@ -231,6 +255,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("4000")){
             addVO.setExpression("CR004");
         }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
+            addVO.setExpression("CR002");
+        }
+        if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("5000")){
+            addVO.setExpression("CR005");
+        }
         //自动步枪6位数 前面补零
         String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
         closeRuleMapper.updateExpression(closeRule.getRuleId().toString(),addVO.getExpression()+expression);
@@ -263,17 +293,41 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             maps.put("resultMsg", StringUtils.EMPTY);
             return maps;
         }
+        //过滤名称重复
+        String closeName = editVO.getCloseName();
+        Integer count = closeRuleMapper.getCloseNameCount(closeName);
+        if (count>1){
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "修改过滤规则 关单规则名称重复！");
+            return maps;
+        }
         BeanUtil.copy(editVO,closeRule);
         closeRule.setUpdateDate(DateUtil.getCurrentTime());
         closeRule.setUpdateStaff(UserUtil.loginId());
 
         List<String> codeList = new ArrayList<>();
-        for (Long offerId : editVO.getChooseProduct()){
-            Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
-            if (offer==null){
-                continue;
+        if (StringUtils.isNotBlank(editVO.getCloseType()) && editVO.getCloseType().equals("2000")){
+            if (editVO.getChooseProduct()!= null && !editVO.getChooseProduct().isEmpty()){
+                if (editVO.getProductType().equals("1000")){
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(offerId.toString()));
+                        if (offer==null){
+                            continue;
+                        }
+                        codeList.add(offer.getOfferNbr());
+                    }
+                }else {
+                    for (Long offerId : editVO.getChooseProduct()){
+                        Product product = productMapper.selectByPrimaryKey(offerId);
+                        if (product==null){
+                            continue;
+                        }
+                        codeList.add(product.getProdNbr());
+
+                    }
+                }
+                closeRule.setChooseProduct(ChannelUtil.StringList2String(codeList));
             }
-            codeList.add(offer.getOfferNbr());
         }
         if(editVO.getCloseType().equals("5000")){
             String express = saveExpressions2Redis(closeRule.getRuleId(), Long.valueOf(closeRule.getLabelCode()));
@@ -327,13 +381,26 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         if (closeRuleT.getChooseProduct()!=null && !closeRuleT.getChooseProduct().equals("")){
             List<String> codeList = ChannelUtil.StringToList(closeRuleT.getChooseProduct());
             List<OfferDetail> productList = new ArrayList<>();
-            for (String code : codeList){
-                List<Offer> offer = offerMapper.selectByCode(code);
-                if (offer!=null && !offer.isEmpty()){
-                    OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
-                    productList.add(offerDetail);
+            if (closeRuleT.getProductType().equals("1000")){
+                for (String code : codeList){
+                    List<Offer> offer = offerMapper.selectByCode(code);
+                    if (offer!=null && !offer.isEmpty()){
+                        OfferDetail offerDetail = BeanUtil.create(offer.get(0),new OfferDetail());
+                        productList.add(offerDetail);
+                    }
+                }
+            }else {
+                for (String code : codeList){
+                    List<Product> product = productMapper.selectByCode(code);
+                    if (product!=null && !product.isEmpty()){
+                        OfferDetail offerDetail = new OfferDetail();
+                        offerDetail.setOfferId(Integer.valueOf(product.get(0).getProdId().toString()));
+                        offerDetail.setOfferName(product.get(0).getProdName());
+                        productList.add(offerDetail);
+                    }
                 }
             }
+
             vo.setProductList(productList);
         }
         if (closeRuleT.getConditionId()!=null){
@@ -478,6 +545,13 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         }
         CloseRule closeRule = new CloseRule();
         if(ruleId == null) {
+            //新增 出现同名的情况
+            Integer count = closeRuleMapper.getCloseNameCount(closeName);
+            if (count>=1){
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "导入销售品！关单规则名称重复！");
+                return maps;
+            }
             closeRule.setCloseName(closeName);
             closeRule.setCloseType(closeType);
             closeRule.setOfferInfo(offerInfo);
@@ -492,6 +566,12 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             closeRuleMapper.createFilterRule(closeRule);
         }else {
+            Integer count = closeRuleMapper.getCloseNameCount(closeName);
+            if (count>1){
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "导入销售品！关单规则名称重复！");
+                return maps;
+            }
             closeRule = closeRuleMapper.selectByPrimaryKey(ruleId);
             if (closeRule==null){
                 maps.put("resultCode", CODE_FAIL);
@@ -510,6 +590,63 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", "导入成功，文件导入" + sheet.getLastRowNum() + "个，共计" + total + "个");
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> qryCloseRuleForUser(CloseRuleReq closeRuleReq) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>();
+        //获取用户信息
+        SystemUserDto user = BssSessionHelp.getSystemUserDto();
+        Long sysUserId = user.getSysUserId();
+//        Long sysUserId = 1000033L;
+        if (sysUserId == null){
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", "sysUserId为空 无创建人信息");
+            maps.put("closeRules", new ArrayList<Object>());
+            return maps;
+        }
+        //过滤参数设置
+        map.put("staffId",sysUserId);
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseName())){
+            map.put("closeName",closeRuleReq.getCloseRule().getCloseName());
+        }
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseType())){
+            map.put("closeType",closeRuleReq.getCloseRule().getCloseType());
+        }
+        //分页参数设置
+        Page pageInfo = closeRuleReq.getPageInfo();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<CloseRule> closeRules = closeRuleMapper.qryCloseRuleForUser(map);
+        Page page = new Page(new PageInfo(closeRules));
+
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("closeRules", closeRules);
+        maps.put("pageInfo",page);
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> getCloseRuleOut(CloseRuleReq closeRuleReq) {
+        Map<String, Object> maps = new HashMap<>();
+        Page pageInfo = closeRuleReq.getPageInfo();
+        if (StringUtils.isNotBlank(closeRuleReq.getCloseRule().getCloseType())
+                && (closeRuleReq.getCloseRule().getCloseType().equals("1000")
+                || closeRuleReq.getCloseRule().getCloseType().equals("3000"))){
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", " 不接受~~欠费关单规则和拆机关单规则");
+            maps.put("closeRules", new ArrayList<Object>());
+            return maps;
+        }
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRuleReq.getCloseRule());
+        Page page = new Page(new PageInfo(closeRules));
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("closeRules", closeRules);
+        maps.put("pageInfo",page);
         return maps;
     }
 }

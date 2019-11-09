@@ -12,10 +12,7 @@ import com.jcraft.jsch.SftpException;
 import com.mysql.jdbc.StringUtils;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamCustMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
@@ -25,7 +22,9 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
@@ -50,8 +49,6 @@ import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-
-import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.enums.TrialCreateType;
@@ -60,7 +57,6 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.channel.ProductService;
-import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
@@ -75,22 +71,17 @@ import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
-import org.apache.logging.log4j.core.util.FileUtils;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -167,6 +158,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Value("${ctg.cpctTopic}")
     private String importTopic;
 
+//    private String ftpAddress = "134.108.3.130";
+    private String ftpAddress = "134.108.0.93";
+    private int ftpPort = 22;
+    private String ftpName= "ftp";
+    private String ftpPassword="V1p9*2_9%3#";
+    private String excelIssurepath="/app/ftp/msc/userlist/fees";
+    private String uploadExcelPath="/app/ftp/msc/userlist/fees/";
+
+    private String downloadFilePath = "/app";
+
     /**
      * 销售品service
      */
@@ -198,141 +199,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private ContactChannelMapper channelMapper;
     @Autowired
-    private EsHitsService esHitService;
-
-
-    @Override
-    public Map<String, Object> importUserList4File(MultipartFile multipartFile) {
-        XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
-        Map<String,Object> result = new HashMap<>();
-        try {
-            TransDetailDataVO dataVO;
-            List<Map<String, Object>> labelList = new ArrayList<>();
-            dataVO = xlsxProcess.processAllSheet(multipartFile);
-
-            List<String> idList = new ArrayList<>();
-            int i =0;
-            int j = dataVO.contentList.size();
-            for (String content : dataVO.getContentList()){
-                Map<String,Object> flg = new HashMap<>();
-                String[] codeList = content.split("\\|@\\|");
-                idList.add(codeList[1]);
-                j--;
-                if (i==100000 || j ==0){
-                    System.out.println("第几次："+j);
-                    final List<String> list1 = idList;
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            List<Map<String,Object>> list = esHitService.search(list1);
-                            write(ChannelUtil.getRandomStr(5),list);
-                            System.out.println("写文件成功");
-                        }
-                    }.start();
-                    idList = new ArrayList<>();
-                    i = 0;
-                }
-                i++;
-            }
-            result.put("re","成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-//        try {
-//            SftpUtils sftpUtils = new SftpUtils();
-//            String file = "list.dat";
-////            File userListTempFile = new File(file);
-//            try {
-//                createFileAndWrite(file, userListSt.toString());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        return result;
-    }
-
-    public static  void write(String fileName ,List<Map<String,Object>> list){
-//创建excel工作簿
-        HSSFWorkbook workbook=new HSSFWorkbook();
-//创建工作表sheet
-        HSSFSheet sheet=workbook.createSheet();
-        HSSFRow row=sheet.createRow(0);
-        int index = 0;//记录额外创建的sheet数量
-        for (int i = 0; i < list.size(); i++) {
-            if ((i + 1) % 65535 == 0) {
-                sheet = workbook.createSheet("stud"+i);
-                row = sheet.createRow(0);
-                row.createCell(0).setCellValue("身份");
-                row.createCell(1).setCellValue("信用");
-                index++;
-            }
-            row = sheet.createRow((i + 1) - (index * 65535));
-// 第四步，创建单元格，并设置值
-            row.createCell((short) 0).setCellValue(list.get(i).get("ASSET_INTEG_ID").toString());
-            row.createCell((short) 1).setCellValue(list.get(i).get("AREA_ID").toString());
-        }
-//写入数据
-//        for (int i=0;i<list.size();i++){
-//            if (list.get(i).isEmpty()){
-//                continue;
-//            }
-//            HSSFRow nrow=sheet.createRow(i);
-//            HSSFCell ncell=nrow.createCell(0);
-//            ncell.setCellValue(list.get(i).get("ASSET_INTEG_ID").toString());
-//            ncell=nrow.createCell(1);
-//            ncell.setCellValue(list.get(i).get("AREA_ID").toString());
-//        }
-//创建excel文件
-        File file=new File("D://"+fileName+".xls");
-        try {
-            file.createNewFile();
-            //将excel写入
-            FileOutputStream stream= new FileOutputStream(file);
-            workbook.write(stream);
-            stream.flush();
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public void createFileAndWrite(String fileName, String fileContent) {
-        File taskTempFile = new File(fileName);
-        if (!taskTempFile.exists()) {
-            // 如果文件不存在，则创建新的文件
-            try {
-                taskTempFile.createNewFile();
-            } catch (Exception e) {
-                logger.error("创建文件失败!");
-                e.printStackTrace();
-            }
-        }
-        try {
-            writeFileContent(fileName, fileContent);
-        } catch (IOException e) {
-            logger.error("写入文件失败!");
-            e.printStackTrace();
-        }
-    }
-    public boolean writeFileContent(String filepath, String newstr) throws IOException {
-        File file = new File(filepath);
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try {
-            fw = new FileWriter(file, true);
-            bw = new BufferedWriter(fw);
-            bw.write(newstr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            bw.close();
-            fw.close();
-        }
-        return true;
-    }
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
 
     //抽样展示全量试算记录
     @Override
@@ -340,6 +209,86 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
         return esServiceInfo.showCalculationLog(trialOperation.getBatchNum().toString());
 
+    }
+
+    //xyl 补全mkt_campaign c4 c5 地市编码
+    @Override
+    public Map<String, Object> insertMktCampaignByC4AndC5() {
+        List<Long> staffList = campaignMapper.getCreateStaffList();
+        Long orgId = null;
+        for (Long aLong : staffList) {
+            SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(aLong, new ArrayList<Long>());
+            if (systemUserDtoSysmgrResultObject != null) {
+                if (systemUserDtoSysmgrResultObject.getResultObject()==null || systemUserDtoSysmgrResultObject.getResultObject().getStaffId()==null){
+                    continue;
+                }
+                Long staffId = systemUserDtoSysmgrResultObject.getResultObject().getStaffId();
+                List<Map<String, Object>> staffOrgId = organizationMapper.getStaffOrgId(staffId);
+                if (!staffOrgId.isEmpty() && staffOrgId.size() > 0){
+                    for (Map<String, Object> map : staffOrgId) {
+                        Object orgDivision = map.get("orgDivision");
+                        Object orgId1 = map.get("orgId");
+                        if (orgDivision!=null){
+                            if (orgDivision.toString().equals("30")) {
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }else if (orgDivision.toString().equals("20")){
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }else if (orgDivision.toString().equals("10")){
+                                orgId = Long.valueOf(orgId1.toString());
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (orgId==null) return null;
+                Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+                if (organization!=null){
+                    String orgNameC4 = organization.getOrgNameC4();
+                    String orgNameC5 = organization.getOrgNameC5();
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC4) || org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC5)){
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("orgNameC4",orgNameC4);
+                        map.put("orgNameC5",orgNameC5);
+                        map.put("aLong",aLong);
+                        campaignMapper.updateByStaffToC4AndC5(map);
+                    }
+                }
+            }
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code","200");
+        result.put("msg","补全mkt_campaign c4 c5 地市编码");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> insertMktCampaignByC4OfSysArea() {
+        List<Long> lists =  campaignMapper.getByOrgNameC4IsNotNull();
+        for (Long orgId : lists) {
+            Organization organization = organizationMapper.selectByPrimaryKey(orgId);
+            if (organization!=null){
+                String orgNameC4 = organization.getOrgNameC4();
+                Organization organizationC4 = organizationMapper.selectByPrimaryKey(Long.valueOf(orgNameC4));
+                if (organizationC4!=null){
+                    Long regionId = organizationC4.getRegionId();
+                    if (regionId!=null){
+                        SysArea sysArea =sysAreaMapper.getByCityFour(regionId.toString());
+                        if (sysArea!=null && sysArea.getCityFour()!=null){
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("orgId",orgId);
+                            map.put("areaId",sysArea.getAreaId());
+                            campaignMapper.updateMktCampaignByC4OfSysArea(map);
+                        }
+                    }
+                }
+            }
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code","200");
+        result.put("msg","修改补全mkt_campaign c4 地市编码");
+        return result;
     }
 
 
@@ -350,10 +299,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(createStaff, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null) {
                 if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
-                    /*codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
+                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getStaffCode();
                     codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
-                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();*/
-                    codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                    codeNumber = codeNumber + "&&" + systemUserDtoSysmgrResultObject.getResultObject().getStaffName();
+                    // codeNumber = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                 }
             }
         }catch (Exception e){
@@ -868,6 +817,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("code",labelDTOList.get(i).getLabelCode());
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             labelList.add(label);
         }
         return labelList;
@@ -960,6 +910,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String, Object> label = new HashMap<>();
                     label.put("code", code);
                     label.put("name", name);
+                    label.put("displayType", display.get("displayType"));
                     labelList.add(label);
                     fields.add(code);
                     labelEngNameList.add(code);
@@ -1030,6 +981,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         ruleMap.put("closeName",closeR.getCloseName());
                         ruleMap.put("closeCode",closeR.getCloseCode());
                         ruleMap.put("closeNbr",closeR.getExpression());
+                        ruleMap.put("closeType",closeR.getCloseType());
                         closeRule.add(ruleMap);
                     }
                 }
@@ -1188,10 +1140,295 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+    @Transactional(readOnly = false)
+    public Map<String, Object> importExcelUserList(MultipartFile multipartFile) throws IOException {
+        // 接单人标签索引
+        int index = 0;
+        Map<String, Object> result = new HashMap<>();
+        String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
+        XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
+
+        String fileName = multipartFile.getName();
+        String[] split = fileName.split("_");
+        List<Map<String, String>> list = sysParamsMapper.listParamsByKey(split[0]);  // 静态参数表EVT001
+        if (list == null || list.isEmpty())
+            return null;
+        Map<String, String> stringStringMap = list.get(0);
+        String value = stringStringMap.get("value");
+        List<MktStrategyConfDO> mktStrategyConfDOS = strategyMapper.selectByCampaignId(Long.valueOf(value));
+        if (mktStrategyConfDOS == null)
+            return null;
+        Long mktStrategyConfId = mktStrategyConfDOS.get(0).getMktStrategyConfId();
+        List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = ruleRelMapper.selectByMktStrategyConfId(mktStrategyConfId);
+        if (mktStrategyConfRuleRelDOS == null)
+            return null;
+        Long mktStrategyConfRuleId = mktStrategyConfRuleRelDOS.get(0).getMktStrategyConfRuleId();
+
+        Long camId = Long.valueOf(value);
+        Long strId = Long.valueOf(mktStrategyConfId);
+        Long ruleId = Long.valueOf(mktStrategyConfRuleId);
+        TrialOperationVO operation = new TrialOperationVO();
+        MktCampaignDO campaign = campaignMapper.selectByPrimaryKey(camId);
+        MktStrategyConfDO strategy = strategyMapper.selectByPrimaryKey(strId);
+        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
+        operation.setCampaignId(camId);
+        operation.setStrategyId(strId);
+        if (campaign == null || strategy == null || confRule == null) {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未找到有效的活动策略或规则");
+            return result;
+        }
+        TrialOperation op = null;
+        try {
+            //添加红黑名单列表
+            blackList2Redis(campaign);
+            List<String> labelNameList = new ArrayList<>();
+            List<String> labelEngNameList = new ArrayList<>();
+            TransDetailDataVO dataVO;
+            List<Map<String, Object>> labelList = new ArrayList<>();
+            dataVO = xlsxProcess.processAllSheet(multipartFile);
+            String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
+            String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
+            if (nameList.length != codeList.length) {
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
+                return result;
+            }
+            for (int i = 0; i < nameList.length; i++) {
+                if (labelNameList.contains(nameList[i])) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "标签中文名称不能重复:" + "\"" + nameList[i] + "\"");
+                    return result;
+                }
+                if (labelEngNameList.contains(codeList[i])) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "标签英文名称不能重复:" + "\"" + codeList[i] + "\"");
+                    return result;
+                }
+                if (nameList[i].equals("接单人号码") || codeList[i].equals("SALE_EMP_NBR")) {
+                    if(!(nameList[i].equals("接单人号码") && codeList[i].equals("SALE_EMP_NBR"))){
+                        result.put("resultCode", CODE_FAIL);
+                        result.put("resultMsg", "接单人号码标签名称错误");
+                        return result;
+                    }
+                    index = i;
+                }
+                Map<String, Object> label = new HashMap<>();
+                label.put("code", codeList[i]);
+                label.put("name", nameList[i]);
+                labelList.add(label);
+                labelNameList.add(nameList[i]);
+                labelEngNameList.add(codeList[i]);
+            }
+            List<String> fields = new ArrayList<>();
+
+            List<Map<String, Object>> displayList = displayLabel(campaign);
+            for (Map<String, Object> display : displayList) {
+                String code = display.get("code") == null ? null : display.get("code").toString();
+                String name = display.get("name") == null ? null : display.get("name").toString();
+                if (code != null && !labelEngNameList.contains(code) && name != null && !labelNameList.contains(name)) {
+                    Map<String, Object> label = new HashMap<>();
+                    label.put("code", code);
+                    label.put("name", name);
+                    label.put("displayType", display.get("displayType"));
+                    labelList.add(label);
+                    fields.add(code);
+                    labelEngNameList.add(code);
+                    labelNameList.add(name);
+                }
+            }
+            //查询活动下面所有渠道属性id是21和22的value
+            List<String> attrValue = mktCamChlConfAttrMapper.selectAttrLabelValueByCampaignId(campaign.getMktCampaignId());
+            if (attrValue != null && attrValue.size() > 0) {
+                for (String attr : attrValue){
+                    if (!fields.contains(attr)) {
+                        fields.add(attr);
+                    }
+                }
+            }
+            // 服务包添加查询字段
+            List<String> labels = mktCamChlConfAttrMapper.selectAttrLabelRemarkByCampaignId(campaign.getMktCampaignId());
+            if(labels != null && labels.size() > 0){
+                for (String s : labels) {
+                    if (s != null && !labelEngNameList.contains(s)) {
+                        Label label1= injectionLabelMapper.selectByLabelCode(s);
+                        Map<String, Object> label = new HashMap<>();
+                        label.put("code", s);
+                        label.put("name", label1 == null? "":label1.getInjectionLabelName());
+                        labelList.add(label);
+                        fields.add(s);
+                        labelEngNameList.add(s);
+                    }
+                }
+            }
+            if (!fields.isEmpty()) {
+                redisUtils_es.set("DISPLAY_LABEL_" + campaign.getMktCampaignId(), fields);
+            }
+            List<Long> attrList = mktCamChlConfAttrMapper.selectByCampaignId(campaign.getMktCampaignId());
+            if (attrList.contains(ISEE_CUSTOMER.getArrId()) || attrList.contains(ISEE_LABEL_CUSTOMER.getArrId()) || attrList.contains(SERVICE_PACKAGE.getArrId())){
+                if (!labelEngNameList.contains("SALE_EMP_NBR")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","SALE_EMP_NBR");
+                    label.put("name","接单人号码");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
+            }
+            if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
+                if (!labelEngNameList.contains("AREA")){
+                    Map<String,Object> label = new HashMap<>();
+                    label.put("code","AREA");
+                    label.put("name","派单区域");
+                    label.put("labelType","1200");
+                    labelList.add(label);
+                }
+            }
+            redisUtils.set("LABEL_DETAIL_"+batchNumSt,labelList);
+
+            if (labelList.size() > 87) {
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "扩展字段不能超过87个");
+                return result;
+            }
+            List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaign.getMktCampaignId());
+            //todo 关单规则配置信息
+            if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
+                List<Map<String,Object>> closeRule = new ArrayList<>();
+                for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                    CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                    if (closeR!=null){
+                        Map<String,Object> ruleMap = new HashMap<>();
+                        ruleMap.put("closeName",closeR.getCloseName());
+                        ruleMap.put("closeCode",closeR.getCloseCode());
+                        ruleMap.put("closeNbr",closeR.getExpression());
+                        ruleMap.put("closeType",closeR.getCloseType());
+                        closeRule.add(ruleMap);
+                    }
+                }
+                redisUtils_es.set("CLOSE_RULE_"+campaign.getMktCampaignId(),closeRule);
+            }
+            TrialOperation trialOp = BeanUtil.create(operation, new TrialOperation());
+            trialOp.setCampaignName(campaign.getMktCampaignName());
+            //当清单导入时 strategyId name 存储规则信息
+            trialOp.setStrategyId(confRule.getMktStrategyConfRuleId());
+            trialOp.setStrategyName(confRule.getMktStrategyConfRuleName());
+            trialOp.setBatchNum(Long.valueOf(batchNumSt));
+            trialOp.setStatusCd(TrialStatus.IMPORT_GOING.getValue());
+            trialOp.setStatusDate(new Date());
+            trialOp.setCreateStaff(TrialCreateType.ADVANCE_USER_LIST.getValue());
+            trialOperationMapper.insert(trialOp);
+            Long insertId = trialOp.getId();
+            op = trialOp;
+            int size = dataVO.contentList.size() - 3;
+            /*Long landId = orgTreeService.getLandIdBySession();*/
+            new MyThread(index) {
+                public void run() {
+                    try {
+                        List<FilterRule> productFilter = new ArrayList<>();
+                        final TrialOperationVOES request = getTrialOperationVOES(operation, ruleId, batchNumSt, labelList);
+                        List<Map<String, Object>> customerList = new ArrayList<>();
+                        //红黑名单过滤
+                        List<String> typeList = new ArrayList<>();
+                        typeList.add("3000");
+                        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaign.getMktCampaignId(), typeList);
+                        if (filterRuleList != null && !filterRuleList.isEmpty()) {
+                            productFilter = filterRuleList;
+                        }
+                        // 查看当前规则协同渠道是否为沙盘，是否配置接单人派单
+                        boolean flag = false;
+                        String evtContactConfId = confRule.getEvtContactConfId();
+                        Map<String, Object> mktCamChlConf = mktCamChlConfService.getMktCamChlConf(Long.valueOf(confRule.getEvtContactConfId()));
+                        MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConf.get("mktCamChlConfDetail");
+                        List<MktCamChlConfAttr> mktCamChlConfAttrList = mktCamChlConfDetail.getMktCamChlConfAttrList();
+                        for (MktCamChlConfAttr attr : mktCamChlConfAttrList) {
+                            if (attr.getAttrId().equals(ISEE_CUSTOMER.getArrId()) && (attr.getAttrValue() == null || attr.getAttrValue().equals(""))) {
+                                flag = true;
+                            }
+                        }
+                        boolean flag2 = false;
+                        if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
+                            flag2 = true;
+                        }
+                        for (int j = 3; j < dataVO.contentList.size(); j++) {
+                            List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
+                            Object[] objects = data.toArray();
+                            if (flag) {
+                                if (flag2 && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
+                                    // 记录日志，退出线程
+                                    addLog2Es(batchNumSt, "导入清单存在接单人无数据");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单第" + (j + 1) + "行接单人无数据");
+                                }
+                                if (!flag2) {
+                                    addLog2Es(batchNumSt, "导入清单缺少接单人必填列");
+                                    TrialOperation record = new TrialOperation();
+                                    record.setId(Long.valueOf(insertId));
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setRemark("清单导入数据错误");
+                                    int i = trialOperationMapper.updateByPrimaryKey(record);
+                                    throw new RuntimeException("导入清单缺少渠道必填列");
+                                }
+                            }
+                            Map<String, Object> customers = new HashMap<>();
+                            boolean check = true;
+                            for (int x = 0; x < codeList.length; x++) {
+                                if (codeList[x] == null) {
+                                    break;
+                                }
+                                String value = "";
+                                if (x >= data.size()) {
+                                    value = "null";
+                                } else {
+                                    value = data.get(x);
+                                }
+                                if (value.contains("\r") || value.contains("\n")) {
+                                    // 过滤换行符
+                                    value = value.replace("\r", "").replace("\n", "");
+                                }
+                                if (codeList[x].equals("ASSET_NUMBER") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                if (codeList[x].equals("LATN_ID") && (value.contains("null") || value.equals(""))) {
+                                    check = false;
+                                    break;
+                                }
+                                customers.put(codeList[x], value);
+                            }
+                            if (!check || customers.isEmpty()) {
+                                continue;
+                            }
+                            customerList.add(customers);
+                        }
+                        importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (op != null) {
+                op.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                trialOperationMapper.updateByPrimaryKey(op);
+            }
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "导入失败");
+            return result;
+        }
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        result.put("resultMsg", "导入成功,请稍后查看结果");
+        redisUtils_es.set("YOUR_SO_BEAUTIFUL_" + batchNumSt, batchNumSt);
+        return result;
+    }
+
     public void importListMQ2EsService(TrialOperationVOES request, List<Map<String, Object>> customerList, List<FilterRule> productFilter, String batchNumSt, String ruleId, TrialOperation operation){
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
-        boolean flag = true;
         int x = customerList.size() / 1000;
         for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
@@ -1209,7 +1446,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 // 判断是否发送成功
                 if (!mqService.msg2Producer(msgBody,importTopic, batchNumSt, ruleId).equals("SEND_OK")) {
                     // 发送失败自动重发2次，如果还是失败，记录
-                    flag = false;
                     logger.error("CTGMQ消息生产失败,batchNumSt:" + batchNumSt, msgBody);
                 }
                 mqSum++;
@@ -1220,12 +1456,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             newSublist.clear();
         }
         redisUtils_es.set("MQ_SUM_" + batchNumSt, mqSum);
-        /*if (flag){
-            operation.setStatusCd(TrialStatus.IMPORT_SUCCESS.getValue());
-        }else{
-            operation.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
-        }
-        trialOperationMapper.updateByPrimaryKey(operation);*/
     }
 
     private void blackList2Redis(MktCampaignDO campaign) {
@@ -1236,8 +1466,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         if (filterRuleList!=null && !filterRuleList.isEmpty()){
             List<String> userList = new ArrayList<>();
             for (FilterRule filterRule : filterRuleList){
-                String[] users = filterRule.getUserList().split(",");
-                userList.addAll(Arrays.asList(users));
+                if (filterRule.getUserList()!=null && !"".equals(filterRule.getUserList())){
+                    String[] users = filterRule.getUserList().split(",");
+                    userList.addAll(Arrays.asList(users));
+                }
             }
             int num = userList.size()/100 + 1;
             List<List<String>> list = ChannelUtil.averageAssign(userList,num);
@@ -1683,6 +1915,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     ruleMap.put("closeName",closeR.getCloseName());
                     ruleMap.put("closeCode",closeR.getCloseCode());
                     ruleMap.put("closeNbr",closeR.getExpression());
+                    ruleMap.put("closeType",closeR.getCloseType());
                     closeRule.add(ruleMap);
                 }
             }
@@ -1706,6 +1939,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("code",labelDTOList.get(i).getLabelCode());
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             labelList.add(label);
         }
 
@@ -2018,6 +2252,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 tarGrpConditionDOs = conditions;
                 tarGrpId = -1L;
             }
+            //过滤规则
+            String prodFilter = "0";
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey("CUST_PRODUCT_FILTER");
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                prodFilter = sysFilList.get(0).get("value");
+            }
+            if ("1".equals(prodFilter)){
+                targrpCondition(mktCampaignId,tarGrpConditionDOs);
+            }
             System.out.println(JSON.toJSONString(tarGrpConditionDOs));
             List<LabelResult> labelResultList = new ArrayList<>();
             List<String> codeList = new ArrayList<>();
@@ -2119,4 +2362,163 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         }
 
     }
+
+    private void  targrpCondition(Long campaignId, List<TarGrpCondition> tarGrpConditionDOs){
+        List<String> typeList = new ArrayList<>();
+        typeList.add("3000");
+        List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(campaignId,typeList);
+        List<String> stringList = new ArrayList<>();
+        Label label = labelMapper.selectByLabelCode("PROM_LIST");
+        for (FilterRule filterRule : filterRuleList){
+            if (filterRule!=null && filterRule.getChooseProduct()!=null){
+                TarGrpCondition condition = new TarGrpCondition();
+                condition.setLeftParam(label.getInjectionLabelId().toString());
+//                List<String> list = ChannelUtil.StringToList(filterRule.getChooseProduct());
+//                for (String id : list){
+//                    Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(id));
+//                    if (offer!=null){
+//                        stringList.add(offer.getOfferNbr());
+//                    }
+//                }
+//                String rightParam =  ChannelUtil.list2String(stringList,",");
+                condition.setRightParam(filterRule.getRuleId().toString());
+                condition.setOperType(filterRule.getOperator().equals("1000")? "7000" : "7100");
+                tarGrpConditionDOs.add(condition);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> importUserListByExcel() throws IOException {
+        logger.info("定时任务importUserListByExcel启动");
+        SftpUtils sftpUtils = new SftpUtils();
+        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        logger.info("sftp已获得连接");
+        String path = sftpUtils.cd(uploadExcelPath, sftp);
+        String tempFilePath = downloadFilePath + "/";
+        List<String> files = new ArrayList<>();
+        List<String> excelFiles = new ArrayList<>();
+        try {
+            List<String> allFile = sftpUtils.listFiles(path, sftp);
+            for (String fileName : allFile) {
+                if (".".equals(fileName) || "..".equals(fileName)) {
+                    continue;
+                }
+//                if (fileName.contains("xlsx")){
+//                    files.add(fileName);
+//                }
+                if (fileName.contains("EVT")){
+                    logger.info("excel批量清单文件目录夹名称："+fileName);
+                    files.add(fileName);
+                }
+            }
+            logger.info("批量excel已选择文件夹数量 "+ files.size());
+        } catch (Exception e) {
+            logger.error("批量excel文件读取失败", e);
+        }
+        //修改遍历文件夹下的文件
+        for (String file : files) {
+            try {
+                List<String> allExcelFile = sftpUtils.listFiles(uploadExcelPath+file, sftp);
+                for (String fileName : allExcelFile) {
+                    if (".".equals(fileName) || "..".equals(fileName)) {
+                        continue;
+                    }
+                    if (fileName.contains("xlsx")){
+                        excelFiles.add(fileName);
+                    }
+                }
+            } catch (SftpException e) {
+                e.printStackTrace();
+            }
+        }
+        logger.info("批量excel已选择文件数量 "+ excelFiles.size());
+        List<String> uploadList = new ArrayList<>();
+        try {
+            for (String fileName : excelFiles) {
+                // 下载文件到本地
+                File file = new File(fileName);
+                if (!file.exists()) {
+                    logger.info("开始下载文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    String pathxx = sftpUtils.cd(uploadExcelPath+"/"+fileName.split("_")[0], sftp);
+                    boolean download = sftpUtils.download(sftp, pathxx+"/", fileName, tempFilePath);
+                    if (!download) {
+                        logger.info("文件下载失败","文件名：" + fileName);
+                    }
+                    logger.info("结束下载文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    //                sftpUtils.delete(path + "/", fileName, sftp);
+                    //                logger.info("删除校验文件--->>>" + fileName + " --->>> 时间：" + DateUtil.formatDate(new Date()));
+                    uploadList.add(fileName);
+                }
+            }
+        } catch (Exception e) {
+            logger.info("批量excel下载文件失败");
+            e.printStackTrace();
+        }
+//        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+//        String format = fmt.format(new Date());
+        //判断文件是否存在 不存在则创建新文件夹
+//        File newFile = new File("/app/ftp/msc/userlist/feesExcelPreserve");
+//        if(!newFile .exists()) {
+//            newFile.setWritable(true, false);
+//            newFile.mkdirs();
+//            System.out.println("文件不存在创建文件夹名称"+newFile);
+//        }
+        sftpUtils.cd("/app/ftp/msc/userlist/feesExcelPreserve/", sftp);
+        try {
+            for (String s : uploadList) {
+                logger.info("准备上传文件名称:" + s);
+                File file = new File(tempFilePath+s);
+//                File file = new File("D:/idea/cpc/CPCT/app/"+s);
+                System.out.println("文件是否存在："+file.exists());
+                if (file.exists()) {
+                    boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);
+                    if (uploadResult) {
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
+                                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
+                        importExcelUserList(multipartFile);
+                        logger.info("解析成功，开始删除本地文件！");
+                        boolean b1 = delFile(tempFilePath+s);
+                        if (b1) {
+                            logger.info("删除本地文件成功！");
+                        }
+                    }
+                }
+            }
+            quitSftp(sftp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("resultCode","200");
+        map.put("resultMsg","成功");
+        return map;
+    }
+
+    public static boolean delFile(String path) {
+        Boolean bool = false;
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                file.delete();
+                bool = true;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return bool;
+    }
+
+    private boolean quitSftp(ChannelSftp sftp) throws JSchException {
+        if (sftp.isConnected()) {
+            sftp.disconnect();
+        }
+        if (sftp.getSession().isConnected()) {
+            sftp.getSession().disconnect();
+        }
+        sftp.quit();
+        return true;
+    }
+
 }

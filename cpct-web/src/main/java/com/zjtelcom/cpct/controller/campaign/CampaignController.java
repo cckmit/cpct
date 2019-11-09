@@ -7,23 +7,29 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
+import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/campaign")
@@ -43,6 +49,52 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private MktCampaignApiService mktCampaignApiService;
+
+
+
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     *
+     * @return
+     */
+    @PostMapping("/dataConfig")
+    @CrossOrigin
+    public Map<String, Object> dataConfig(@RequestBody Map<String,String> param){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.dataConfig(param);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
+
+
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     *
+     * @return
+     */
+    @PostMapping("/channelEffectDateCheck")
+    @CrossOrigin
+    public Map<String, Object> channelEffectDateCheck(@RequestBody Map<String,Object> params){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.channelEffectDateCheck(params);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+            result.put("resultCode",CODE_SUCCESS);
+            result.put("resultMsg","");
+            result.put("data","true");
+            return result;
+        }
+        return result;
+    }
 
 
     /**
@@ -119,6 +171,24 @@ public class CampaignController extends BaseController {
         Map<String, Object> map = mktCampaignService.qryMktCampaignList4Sync(params, page, pageSize);
         return JSON.toJSONString(map);
     }
+
+    /**
+     * 延期活动列表（只显示创建人为当前登录人的活动）
+     */
+    @PostMapping("/queryDelayCampaignList")
+    @CrossOrigin
+    public String queryDelayCampaignList() {
+        Result result = new Result();
+        try{
+            result = mktCampaignService.queryDelayCampaignList();
+        }catch(Exception e){
+            result.setResultCode("500");
+            result.setResultMessage(e.toString());
+            logger.error("[op:CampaignController] fail to queryDelayCampaignList",e);
+        }
+        return JSON.toJSONString(result);
+    }
+
 
     /**
      * 查询活动列表(分页，活动总览)
@@ -223,6 +293,7 @@ public class CampaignController extends BaseController {
         logger.info("[op:createMktCampaign] mktCampaignVO = " + JSON.toJSONString(mktCampaignVO));
         // 存活动
         Map<String, Object> mktCampaignMap = mktCampaignService.createMktCampaign(mktCampaignVO);
+        if (mktCampaignMap.get("mktCampaignId")==null) return JSON.toJSONString(mktCampaignMap);
         Long mktCampaignId = Long.valueOf(mktCampaignMap.get("mktCampaignId").toString());
         if (mktCampaignVO.getMktStrategyConfDetailList().size() > 0) {
             for (MktStrategyConfDetail mktStrategyConfDetail : mktCampaignVO.getMktStrategyConfDetailList()) {
@@ -472,6 +543,34 @@ public class CampaignController extends BaseController {
             logger.error("[op:CampaignController] failed to dueMktCampaign, Exception = ", e);
         }
         return JSON.toJSONString(mktCampaignMap);
+    }
+
+    @PostMapping("salesOffShelf")
+    @CrossOrigin
+    public Map<String,Object> salesOffShelf(){
+        Map<String, Object> stringObjectMap = mktCampaignApiService.salesOffShelf(new HashMap<String, Object>());
+        return stringObjectMap;
+    }
+
+    /**
+     * 集团活动不承接反馈接口
+     */
+    @RequestMapping(value = "/mktCampaignJtRefuse", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> mktCampaignJtRefuse(Long mktCampaignId) {
+        Map<String, Object> result = new HashMap<>();
+        result = mktCampaignService.mktCampaignJtRefuse(mktCampaignId);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/searchBatch", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String, Object> searchBatch(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        List<Long> mktCampaignIdList = (List<Long>) params.get("mktCampaignIdList");
+        result = mktCampaignService.searchBatch(mktCampaignIdList);
+        return result;
     }
 
 }
