@@ -166,8 +166,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         paramMap.put("rptType","1");
         //按客触数排序
         paramMap.put("sortColumn","contactNum");
+        log.info("客触数查询总数入参："+JSON.toJSONString(paramMap));
         //查询总数 解析
         Map<String,Object> stringOMap = iReportService.queryRptOrder(paramMap);
+        log.info("客触数查询总数 解析:"+JSON.toJSONString(stringOMap));
         List<Map<String,String>> rptList = (List<Map<String,String>>) stringOMap.get("rptOrderList");
         if (rptList.size()!=1 ){
             result.put("code","0001");
@@ -219,7 +221,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //统计维度(0:按渠道，1按地市) 不用就不传
         paramMap.put("rptType","2");
         paramMap.put("pageSize","5");
+        log.info("新活动报表 转换率入参:"+JSON.toJSONString(params));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
+        log.info("新活动报表 转换率:"+JSON.toJSONString(stringObjectMap));
         List<Map<String, String>> data = new ArrayList<>();
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             Object rptOrderList = stringObjectMap.get("rptOrderList");
