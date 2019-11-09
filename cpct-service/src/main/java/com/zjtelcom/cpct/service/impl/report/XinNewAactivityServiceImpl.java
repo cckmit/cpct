@@ -310,7 +310,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         dataMap.put("highIncome",list.get(0).get("incomeUp"));
         dataMap.put("lowIncomeNum",list.get(0).get("downCount"));
         dataMap.put("highIncomeNum",list.get(0).get("upCount"));
-        dataMap.put("totalIncome",Long.valueOf(dataMap.get("highIncome").toString()) + Long.valueOf(dataMap.get("lowIncome").toString()));
+        dataMap.put("totalIncome",Double.valueOf(dataMap.get("highIncome").toString()) + Double.valueOf(dataMap.get("lowIncome").toString()));
         dataMap.put("avgIncome","0.00");
         dataMap.put("avgIncomeNum",count - (Integer.valueOf(dataMap.get("highIncomeNum").toString()) + Integer.valueOf(dataMap.get("lowIncomeNum").toString())) );
         dataMap.put("lowPercent",Integer.valueOf(dataMap.get("lowIncomeNum").toString())/count);
@@ -489,172 +489,90 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     @Override
     public Map<String, Object> quarterActivities(Map<String, Object> params) {
         HashMap<String, Object> resultMap = new HashMap<>();
-        Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
-        List<HashMap<String, Object>> hashMaps = new ArrayList<>();
-        //按活动统计
-        paramMap.put("rptType","2");
+        try {
+            Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+            //按活动统计
+            paramMap.put("rptType","2");
 //        //商机成功数 排序 orderSuccessNum
 //        paramMap.put("sortColumn","orderSuccessNum");
-        StringBuilder stringBuilder = new StringBuilder();
-        //活动按主题 选 all或者主题
-        Object theMe = params.get("theMe");
-        String date = params.get("startDate").toString();
-        String type = paramMap.get("mktCampaignType").toString();
-        Object statusCd = params.get("statusCd");
-        String status = null;
-        if (statusCd!=null && ""!=statusCd){
-            status = statusCd.toString();
-        }
-        List<MktCampaignDO> mktCampaignList =null;
-        if (theMe!=null && theMe!=""){
-            if (theMe.toString().equals("all")){
-                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
-            }else {
-                //查询主题 value 参数 对应 theMe 1000 - 1800
-                mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), date, type,status);
+            StringBuilder stringBuilder = new StringBuilder();
+            //活动按主题 选 all或者主题
+            Object theMe = params.get("theMe");
+            String date = params.get("startDate").toString();
+            String type = paramMap.get("mktCampaignType").toString();
+            Object statusCd = params.get("statusCd");
+            String status = null;
+            if (statusCd!=null && ""!=statusCd){
+                status = statusCd.toString();
             }
-        }else {
-            mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
-        }
-        List<Map<String, Object>> data = new ArrayList<>();
-        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
-            for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                //活动级别所有的initId 根据活动维度分页查询所有 默认按成功数排序
-                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
-                //多个id  “，”拼接
-                String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-                paramMap.put("mktCampaignId", substring);
-            }
-            //按全部或者按主题查询 活动级别 默认排序 清单列表参数 渲染页面
-            log.info("季度营销活动入参："+JSON.toJSONString(paramMap));
-            Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
-            log.info("新活动报表 季度营销活动 按活动:"+JSON.toJSONString(stringObjectMap));
-            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-            if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-                Object rptOrderList = stringObjectMap.get("rptOrderList");
-                data = (List<Map<String, Object>>) stringObjectMap.get("rptOrderList");
-                HashMap<String, Object> camMap = new HashMap<>();
-                for (Map<String, Object> datum : data) {
-                    List<HashMap<String, Object>> list = new ArrayList<>();
-                    String mktCampaignId1 = datum.get("mktCampaignId").toString();
-                    MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
-//                    MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(datum.get("mktCampaignId").toString()));
-                    if (campaignDO == null){
-                        // 如果有为空 跳过
-                        continue;
-                    }
-                    camMap.put("mktCampaignName", campaignDO == null ? "" : campaignDO.getMktCampaignName());
-                    camMap.put("area", getArea(campaignDO));
-                    //成功数
-                    camMap.put("orderSuccessNum", datum.get("orderSuccessNum"));
-                    //开始和结束时间
-                    camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
-                    camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
-                    Iterator<String> iter = camMap.keySet().iterator();
-                    List<Map<String, Object>> statistics = statistics(camMap);
-                    camMap.put("statistics",statistics);
+            List<MktCampaignDO> mktCampaignList =null;
+            if (theMe!=null && theMe!=""){
+                if (theMe.toString().equals("all")){
+                    mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
+                }else {
+                    //查询主题 value 参数 对应 theMe 1000 - 1800
+                    mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), date, type,status);
                 }
-                hashMaps.add(camMap);
+            }else {
+                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
             }
+            List<Map<String, Object>> data = new ArrayList<>();
+            if (mktCampaignList.size() > 0 && mktCampaignList != null) {
+                for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                    //活动级别所有的initId 根据活动维度分页查询所有 默认按成功数排序
+                    stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+                    //多个id  “，”拼接
+                    String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+                    paramMap.put("mktCampaignId", substring);
+                }
+                //按全部或者按主题查询 活动级别 默认排序 清单列表参数 渲染页面
+                log.info("季度营销活动入参："+JSON.toJSONString(paramMap));
+                Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
+                log.info("新活动报表 季度营销活动 按活动:"+JSON.toJSONString(stringObjectMap));
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                List<HashMap<String, Object>> list = new ArrayList<>();
+                if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
+                    Object rptOrderList = stringObjectMap.get("rptOrderList");
+                    data = (List<Map<String, Object>>) stringObjectMap.get("rptOrderList");
+                    for (Map<String, Object> datum : data) {
+                        HashMap<String, Object> camMap = new HashMap<>();
+                        String mktCampaignId1 = datum.get("mktCampaignId").toString();
+                        MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+    //                    MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(datum.get("mktCampaignId").toString()));
+                        if (campaignDO == null){
+                            // 如果有为空 跳过
+                            continue;
+                        }
+                        camMap.put("mktCampaignName", campaignDO == null ? "" : campaignDO.getMktCampaignName());
+                        camMap.put("area", getArea(campaignDO));
+                        //成功数
+                        camMap.put("orderSuccessNum", datum.get("orderSuccessNum"));
+                        //开始和结束时间
+                        camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
+                        camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
+                        camMap.put("contactNum",datum.get("contactNum")); //客户接触数
+                        camMap.put("orderNum",datum.get("orderNum")); //商机推荐数
+                        camMap.put("orderSuccessNum",datum.get("orderSuccessNum")); //商机成功数
+                        camMap.put("contactRate",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2)); //转化率
+                        camMap.put("orgChannelRate",getPercentFormat(Double.valueOf(datum.get("orgChannelRate").toString()), 2, 2));//门店有销率
+                        camMap.put("incomeUp",datum.get("incomeUp"));//收入提升
+                        camMap.put("incomeDown",datum.get("incomeDown")); // 收入低迁
+                        camMap.put("upCount",datum.get("upCount"));//收入提升活动数
+                        camMap.put("downCount",datum.get("downCount"));//收入低迁活动数
+                        //收入拉动
+                        camMap.put("income",Double.valueOf(datum.get("incomeUp").toString())+ Double.valueOf(datum.get("incomeDown").toString()));
+                        list.add(camMap);
+                    }
+                    resultMap.put("data",list);
+                    resultMap.put("msg","成功");
+                    resultMap.put("code","0000");
+                }
+            }
+        } catch (NumberFormatException e) {
+            resultMap.put("code","0001");
+            resultMap.put("msg","失败");
+            e.printStackTrace();
         }
-        resultMap.put("code","0000");
-        resultMap.put("msg",hashMaps);
         return resultMap;
-    }
-
-
-
-    private  List<Map<String,Object>> statistics(Map<String,Object> rptMap){
-        List<Map<String, Object>> statisicts = new ArrayList<>();
-        //添加框架活动是否字活动
-        rptMap.put("yesOrNo", "1");
-        Iterator<String> iter = rptMap.keySet().iterator();
-        while (iter.hasNext()) {
-            HashMap<String, Object> msgMap = new HashMap<>();
-            String key = iter.next();
-            Object o = rptMap.get(key);
-            if ("".equals(o) || "null".equals(o) || null == o){
-                o = 0+"";
-            }
-            if (key.equals("orderNum")) {
-                msgMap.put("name", "派单数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("acceptOrderNum")) {
-                msgMap.put("name", "接单数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("outBoundNum")) {
-                msgMap.put("name", "外呼数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("orderSuccessNum")) {
-                msgMap.put("name", "成功数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("acceptOrderRate")) {
-                //转换成百分比 保留二位小数位
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("name", "接单率");
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("outBoundRate")) {
-                msgMap.put("name", "外呼率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("orderSuccessRate")) {
-                msgMap.put("name", "转化率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("revenueReduceNum")) {
-                msgMap.put("name", "收入低迁数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("revenueReduceRate")) {
-                msgMap.put("name", "收入低迁率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("orgChannelRate")) {
-                msgMap.put("name", "门店有销率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("incomeUp")) {
-                msgMap.put("name", "收入提升");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("incomeDown")) {
-                msgMap.put("name", "收入低迁");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("upCount")) {
-                msgMap.put("name", "收入提升活动数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("downCount")) {
-                msgMap.put("name", "收入低迁活动数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-        }
-        return statisicts;
     }
 }

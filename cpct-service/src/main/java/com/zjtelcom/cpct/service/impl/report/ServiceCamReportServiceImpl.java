@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.util.AcitvityParams;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +93,8 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         log.info("【服务活动返回】queryRptOrder："+JSON.toJSONString(stringObjectMap1));
         List<Map<String,Object>> taskNumList = (List<Map<String,Object>>) taskNum.get("rptServCampaignList");
         List<Map<String,Object>> rptList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
+
+
         for (Map<String, Object> pre : preNet) {
 
             for (Map<String, Object> stringMap : taskNumList) {
@@ -102,7 +105,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())) {
-                    pre.put("statistics", statistics(rptMap));
+                    pre.put("statistics", rptMap);
                     break;
                 }
             }
@@ -116,7 +119,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())) {
-                    pre.put("statistics", statistics(rptMap));
+                    pre.put("statistics", rptMap);
                     break;
                 }
             }
@@ -130,46 +133,65 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())){
-                    pre.put("statistics",statistics(rptMap));
+                    pre.put("statistics",rptMap);
                     break;
                 }
             }
         }
         Map<String,Object> resultData = new HashMap<>();
-        resultData.put("preNet",preNet);
-        resultData.put("inNet",inNet);
-        resultData.put("outNet",outNet);
-        resultData.put("preNetSize",preNet.size());
-        resultData.put("inNetSize",inNet.size());
-        resultData.put("outNetSize",outNet.size());
+        List<Map<String,Object>> list = new ArrayList<>();
+        Map<String,Object> preMap = new HashMap<>();
+        preMap.put("name","入网期");
+        preMap.put("size",preNet.size());
+        preMap.put("list",preNet);
+        list.add(preMap);
+        Map<String,Object> inMap = new HashMap<>();
+        inMap.put("name","在网期");
+        inMap.put("size",inNet.size());
+        inMap.put("list",inNet);
+        list.add(inMap);
+        Map<String,Object> outMap = new HashMap<>();
+        outMap.put("name","离网期");
+        outMap.put("size",outNet.size());
+        outMap.put("list",outNet);
+        list.add(outMap);
         result.put("code","0000");
         result.put("message","成功");
-        result.put("data",resultData);
+        result.put("data",list);
         return result;
     }
 
 
 
+    /**
+     * 活动匹配地市
+     * @param campaignDO
+     * @return
+     */
     private String getArea(MktCampaignDO campaignDO){
         String result = "";
-        String sysArea = AreaCodeEnum.getSysAreaNameBySysArea(campaignDO.getRegionFlg());
-        if (sysArea.equals("C2")){
-            result = sysArea;
-        }
-        if (sysArea.equals("C3")){
-            String name = AreaNameEnum.getNameByLandId(campaignDO.getLanId());
-            result = sysArea+"-"+name;
-        }
-        if (sysArea.equals("C4")){
-            Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFour());
-            String name = organization==null ? "" : organization.getOrgName();
-            result = sysArea+"-"+name;
-        }
+        String regionFlg = campaignDO.getRegionFlg();
+        if (StringUtils.isNotBlank(regionFlg)) {
+            String sysArea = AreaCodeEnum.getSysAreaNameBySysArea(campaignDO.getRegionFlg());
+            if (sysArea.equals("C2")) {
+                result = sysArea;
+            }
+            if (sysArea.equals("C3")) {
+                String name = AreaNameEnum.getNameByLandId(campaignDO.getLanId());
+                result = sysArea + "-" + name;
+            }
+            if (sysArea.equals("C4")) {
+                Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFour());
+                String name = organization == null ? "" : organization.getOrgName();
+                result = sysArea + "-" + name;
+            }
 
-        if (sysArea.equals("C5")){
-            Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFive());
-            String name = organization==null ? "" : organization.getOrgName();
-            result = sysArea+"-"+name;
+            if (sysArea.equals("C5")) {
+                Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFive());
+                String name = organization == null ? "" : organization.getOrgName();
+                result = sysArea + "-" + name;
+            }
+            return result;
         }
         return result;
     }
@@ -221,6 +243,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                     for (MktCampaignDO campaignDO : mktCampaignList) {
                         if (campaignDO.getInitId().toString().equals(stringMap.get("mktCampaignId").toString())){
                             stringMap.put("mktCampaignName",campaignDO.getMktCampaignName());
+                            log.info("【活动region】:"+JSON.toJSONString(campaignDO));
                             stringMap.put("area", getArea(campaignDO));
                         }
                     }
@@ -454,10 +477,10 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                 data = (List<Map<String, Object>>) map.get("rptOrderList");
                 for (Map<String, Object> datum : data) {
                     Map<String,Object> camMap = new HashMap<>();
-                    MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(datum.get("mktCampaignId").toString()));
+                    MktCampaignDO campaignDO = mktCampaignMapper.selectCampaignByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
                     camMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
                     camMap.put("income",datum.get("incomeUp"));
-                    camMap.put("area",getArea(campaignDO));
+                    camMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
                     log.info("活动报表查询接口:orderSuccessRate"+stringObjectMap);
                     //按地市
                     paramMap.put("rptType","1");
@@ -557,7 +580,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                 msgMap.put("nub", percentFormat);
                 statisicts.add(msgMap);
             }
-            if (key.equals("orderSuccessRate")) {
+            if (key.equals("contactRate")) {
                 msgMap.put("name", "转化率");
                 String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
                 msgMap.put("nub", percentFormat);
@@ -580,6 +603,34 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                 msgMap.put("nub", percentFormat);
                 statisicts.add(msgMap);
             }
+            if (key.equals("incomeUp")) {
+                msgMap.put("name", "收入提升");
+                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                msgMap.put("nub", percentFormat);
+                statisicts.add(msgMap);
+            }
+            if (key.equals("incomeDown")) {
+                msgMap.put("name", "收入高迁数");
+                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                msgMap.put("nub", percentFormat);
+                statisicts.add(msgMap);
+            }
+            if (key.equals("upCount")) {
+                msgMap.put("name", "收入提升活动数");
+                msgMap.put("nub", o);
+                statisicts.add(msgMap);
+            }
+            if (key.equals("downCount")) {
+                msgMap.put("name", "收入低迁活动数");
+                msgMap.put("nub", o);
+                statisicts.add(msgMap);
+            }
+            if (key.equals("contactNum")) {
+                msgMap.put("name", "客触数");
+                msgMap.put("nub", o);
+                statisicts.add(msgMap);
+            }
+
         }
         return statisicts;
     }
