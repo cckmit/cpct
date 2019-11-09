@@ -14,7 +14,7 @@ import java.util.Map;
 public class XinNewAactivityController  extends BaseController {
 
 
-    @Autowired
+    @Autowired(required = false)
     private XinNewAactivityService xinNewAactivityService;
 
     //主题活动
