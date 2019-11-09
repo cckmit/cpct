@@ -24,7 +24,7 @@ public class AcitvityParams {
             return paramMap;
         }
         //活动类型
-        Object mktCampaignType = paramMap.get("mktCampaignType");
+        Object mktCampaignType = params.get("mktCampaignType");
         if (mktCampaignType!=null && ""!=mktCampaignType){
             paramMap.put("mktCampaignType",mktCampaignType.toString());
         }else {
@@ -58,7 +58,7 @@ public class AcitvityParams {
         if (isHis!=null && isHis!=""){
             paramMap.put("isHis",isHis);
         }else {
-            paramMap.put("rptType","0");
+            paramMap.put("isHis","0");
         }
         //排序字段 contactRate 转化率默认
         Object sortColumn = params.get("sortColumn");

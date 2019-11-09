@@ -31,4 +31,13 @@ public interface MktCampaignReportMapper {
 
     Map<String, Object> selectCamSumByArea1(@Param("map") Map<String, Object> map);
 
+    List<Map<String,Object>> selectServiceCamList(@Param("map") Map<String,Object> map);
+
+    List<Long> selectCamListByCampaignType(@Param("map") Map<String,Object> map);
+
+
+
+
+
+
 }
