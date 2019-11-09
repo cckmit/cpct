@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.report;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -125,7 +126,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         detailsParams.put("createDate", "3000");
         detailsParams.put("page", 1);
         detailsParams.put("pageSize", 999);
+        System.out.println("入参：" + JSON.toJSONString(detailsParams));
         Map<String, Object> mktCampaignDetails = activityStatisticsService.getMktCampaignDetails(detailsParams);
+        System.out.println("出参：" + JSON.toJSONString(mktCampaignDetails));
         List<MktCampaignDO> mktCampaignList = (List<MktCampaignDO>) mktCampaignDetails.get("resultMsg");
         List<Map<String, Object>> noOperMapList = new ArrayList<>();
         for (SysArea sysArea : sysAreaList) {
