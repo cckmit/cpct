@@ -341,7 +341,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("name", sysArea.getName());
             int count = 0;
             for (MktCampaignDO mktCampaignDO : labelList) {
-                if (sysArea.getAreaId().equals(mktCampaignDO.getLanId())) {
+                if (sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 }
             }
