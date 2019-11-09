@@ -210,13 +210,13 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         operMap.put("name", "有运营活动");
         operMap.put("count", operCount);
         operMap.put("percent", df.format(operCount * 100.0 / totalCount) + "%");
-        operMap.put("ciyt", operMapList);
+        operMap.put("city", operMapList);
 
         Map<String, Object> noOperMap = new HashMap<>();
         noOperMap.put("name", "无运营活动");
         noOperMap.put("count", noOperCount);
         noOperMap.put("percent", df.format( noOperCount * 100.0 / totalCount) + "%");
-        noOperMap.put("ciyt", noOperMapList);
+        noOperMap.put("city", noOperMapList);
         List<Map<String, Object>> operationMapList = new ArrayList<>();
         operationMapList.add(operMap);
         operationMapList.add(noOperMap);
@@ -489,7 +489,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
                 first = mktCampaignReportMapper.countByTime(params);
                 total += first;
                 firstMap.put("name", "一季度");
-                firstMap.put("cont", first);
+                firstMap.put("count", first);
             } else  if (i == 2) {
                 params.put("startDate", "2019-04-01");
                 params.put("endDate", "2019-06-30");
@@ -499,7 +499,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
                 second = mktCampaignReportMapper.countByTime(params);
                 total += second;
                 secondMap.put("name", "二季度");
-                secondMap.put("cont", second);
+                secondMap.put("count", second);
             } else if (i == 3) {
                 params.put("startDate", "2019-07-01");
                 params.put("endDate", "2019-09-30");
@@ -509,7 +509,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
                 third = mktCampaignReportMapper.countByTime(params);
                 total += third;
                 thirdMap.put("name", "三季度");
-                thirdMap.put("cont", third);
+                thirdMap.put("count", third);
             } else if (i == 4) {
                 params.put("startDate", "2019-010-01");
                 params.put("endDate", "2019-12-31");
@@ -519,7 +519,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
                 fouth = mktCampaignReportMapper.countByTime(params);
                 total += fouth;
                 fouthMap.put("name", "四季度");
-                fouthMap.put("cont", fouth);
+                fouthMap.put("count", fouth);
             }
         }
 
