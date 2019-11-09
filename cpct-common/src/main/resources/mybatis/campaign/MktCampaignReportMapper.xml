@@ -132,6 +132,7 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        GROUP BY t.INIT_ID
     </select>
 
 
@@ -224,7 +225,7 @@
 
 
     <select id="selectServiceCamList" parameterType="java.util.Map" resultType="Map">
-        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName
+        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,INIT_ID initId
         from mkt_campaign
         where SERVICE_TYPE = #{map.serviceType}
         and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
@@ -233,7 +234,7 @@
     </select>
 
     <select id="selectCamListByCampaignType" parameterType="java.util.Map" resultType="java.lang.Long">
-        select MKT_CAMPAIGN_ID
+        select INIT_ID
         from mkt_campaign
         where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
