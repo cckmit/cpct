@@ -446,15 +446,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     public Map<String, Object> activityThemeLevelAndChannel(Map<String, Object> params) {
         HashMap<String, Object> resultMap = new HashMap<>();
         //地市信息
-        List<Organization> organizations = organizationMapper.selectMenu();
+        List<Organization> organizations = organizationMapper.selectMenuByEleven();
         if (organizations.size()>0 && organizations!=null){
-            for (int i = 0; i < organizations.size(); i++) {
-                String orgName = organizations.get(i).getOrgName();
-                if (orgName.length()>6){
-                    organizations.remove(i);
-                }
-                i--;
-            }
             resultMap.put("orglevel2",organizations);
         }else {
             resultMap.put("resultCode","500");
