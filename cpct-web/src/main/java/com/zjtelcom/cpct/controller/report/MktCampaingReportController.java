@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
-
 /**
  * @Description:
  * @author: linchao
@@ -62,6 +59,12 @@ public class MktCampaingReportController extends BaseController {
     }
 
 
+    /**
+     * 类型
+     *
+     * @param params
+     * @return
+     */
     @PostMapping("/typeInfo")
     @CrossOrigin
     public String getTypeInfo(@RequestBody Map<String, Object> params) {
