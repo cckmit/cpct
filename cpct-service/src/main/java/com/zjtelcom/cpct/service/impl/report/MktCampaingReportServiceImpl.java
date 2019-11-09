@@ -148,7 +148,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             int count = 0;
             for (MktCampaignDO mktCampaignDO : mktCampaignDOInList) {
                 // "不活跃活动"活动判断地市
-                if (sysArea.getAreaId().equals(mktCampaignDO.getLanId())) {
+                if (sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 }
             }
