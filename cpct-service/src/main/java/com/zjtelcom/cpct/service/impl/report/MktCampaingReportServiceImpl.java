@@ -127,11 +127,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         detailsParams.put("createDate", "3000");
         detailsParams.put("page", 1);
         detailsParams.put("pageSize", 999);
-        System.out.println("入参：" + JSON.toJSONString(detailsParams));
         Map<String, Object> mktCampaignDetails = activityStatisticsService.getMktCampaignDetails(detailsParams);
         List<MktCampaignDO> mktCampaignList = (List<MktCampaignDO>) mktCampaignDetails.get("resultMsg");
         Page pageInfo = (Page) mktCampaignDetails.get("pageInfo");
-        System.out.println("出参：pageInfo " + JSON.toJSONString(pageInfo) +  "     mktCampaignList" + JSON.toJSONString(mktCampaignList));
         // 不活跃活动数量
         int noOperCount = 0;
         if (pageInfo != null) {
@@ -144,7 +142,6 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         List<Map<String, Object>> noOperMapList = new ArrayList<>();
         // 查询所有不活跃报表信息
         List<MktCampaignDO> mktCampaignDOInList = mktCampaignMapper.selectBatch(noOperationIdList);
-        System.out.println("mktCampaignDOInList：" + JSON.toJSONString(mktCampaignDOInList));
         for (SysArea sysArea : sysAreaList) {
             Map<String, Object> cityMap = new HashMap<>();
             cityMap.put("name", sysArea.getName());
@@ -218,8 +215,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Map<String, Object> noOperMap = new HashMap<>();
         noOperMap.put("name", "无运营活动");
         noOperMap.put("count", noOperCount);
-        noOperMap.put("percent", df.format(mktCampaignDOList.size() * 100.0 / totalCount) + "%");
-       // noOperMap.put("ciyt", noOperMapList);
+        noOperMap.put("percent", df.format( noOperCount * 100.0 / totalCount) + "%");
+        noOperMap.put("ciyt", noOperMapList);
         List<Map<String, Object>> operationMapList = new ArrayList<>();
         operationMapList.add(operMap);
         operationMapList.add(noOperMap);

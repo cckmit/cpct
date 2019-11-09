@@ -184,7 +184,6 @@
             WHERE
             tril.CREATE_STAFF = 1000 )
         </if>
-        GROUP BY t.INIT_ID
     </select>
 
 
