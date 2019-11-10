@@ -225,7 +225,7 @@
 
 
     <select id="selectServiceCamList" parameterType="java.util.Map" resultType="Map">
-        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,INIT_ID initId
+        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,INIT_ID initId,PLAN_BEGIN_TIME startTime,PLAN_END_TIME endTime
         from mkt_campaign
         where SERVICE_TYPE = #{map.serviceType}
         and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}

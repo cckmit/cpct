@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.enums.OrgEnum;
 import com.zjtelcom.cpct.service.report.ServiceCamReportService;
 import com.zjtelcom.cpct.util.AcitvityParams;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +48,12 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
     @Autowired
     private ContactChannelMapper channelMapper;
 
+
+
+    public String fun2(double f) {
+        String s = String.format("%.2f", f);
+        return s;
+    }
     /**
      * 服务活动/服务随销活动报表
      * @param param
@@ -96,7 +103,8 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
 
 
         for (Map<String, Object> pre : preNet) {
-
+            pre.put("startTime",DateUtil.date2StringDateForDay((Date) pre.get("startTime")));
+            pre.put("endTime",DateUtil.date2StringDateForDay((Date) pre.get("endTime")));
             for (Map<String, Object> stringMap : taskNumList) {
                 if (pre.get("initId").toString().equals(stringMap.get("mktCampaignId").toString())) {
                     pre.put("contactNumber", stringMap.get("taskNum"));
@@ -105,12 +113,17 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())) {
+                    rptMap.put("contactRate",getPercentFormat(Double.valueOf(rptMap.get("contactRate").toString()),2,2)); //转化率
+                    double v = Double.valueOf(rptMap.get("incomeUp").toString()) + Double.valueOf(rptMap.get("incomeDown").toString());
+                    rptMap.put("income",fun2(v));
                     pre.put("statistics", rptMap);
                     break;
                 }
             }
         }
         for (Map<String, Object> pre : inNet) {
+            pre.put("startTime",DateUtil.date2StringDateForDay((Date) pre.get("startTime")));
+            pre.put("endTime",DateUtil.date2StringDateForDay((Date) pre.get("endTime")));
             for (Map<String, Object> stringMap : taskNumList) {
                 if (pre.get("initId").toString().equals(stringMap.get("mktCampaignId").toString())) {
                     pre.put("contactNumber", stringMap.get("taskNum"));
@@ -119,12 +132,17 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())) {
+                    rptMap.put("contactRate",getPercentFormat(Double.valueOf(rptMap.get("contactRate").toString()),2,2)); //转化率
+                    double v = Double.valueOf(rptMap.get("incomeUp").toString()) + Double.valueOf(rptMap.get("incomeDown").toString());
+                    rptMap.put("income",fun2(v));
                     pre.put("statistics", rptMap);
                     break;
                 }
             }
         }
         for (Map<String, Object> pre : outNet) {
+            pre.put("startTime",DateUtil.date2StringDateForDay((Date) pre.get("startTime")));
+            pre.put("endTime",DateUtil.date2StringDateForDay((Date) pre.get("endTime")));
             for (Map<String, Object> stringMap : taskNumList) {
                 if (pre.get("initId").toString().equals(stringMap.get("mktCampaignId").toString())){
                     pre.put("contactNumber",stringMap.get("taskNum"));
@@ -133,6 +151,9 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
             }
             for (Map<String, Object> rptMap : rptList) {
                 if (pre.get("initId").toString().equals(rptMap.get("mktCampaignId").toString())){
+                    rptMap.put("contactRate",getPercentFormat(Double.valueOf(rptMap.get("contactRate").toString()),2,2)); //转化率
+                    double v = Double.valueOf(rptMap.get("incomeUp").toString()) + Double.valueOf(rptMap.get("incomeDown").toString());
+                    rptMap.put("income",fun2(v));
                     pre.put("statistics",rptMap);
                     break;
                 }
@@ -173,20 +194,20 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         String regionFlg = campaignDO.getRegionFlg();
         if (StringUtils.isNotBlank(regionFlg)) {
             String sysArea = AreaCodeEnum.getSysAreaNameBySysArea(campaignDO.getRegionFlg());
-            if (sysArea.equals("C2")) {
+            if (regionFlg.equals("C2")) {
                 result = sysArea;
             }
-            if (sysArea.equals("C3")) {
+            if (regionFlg.equals("C3")) {
                 String name = AreaNameEnum.getNameByLandId(campaignDO.getLanId());
                 result = sysArea + "-" + name;
             }
-            if (sysArea.equals("C4")) {
+            if (regionFlg.equals("C4")) {
                 Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFour());
                 String name = organization == null ? "" : organization.getOrgName();
                 result = sysArea + "-" + name;
             }
 
-            if (sysArea.equals("C5")) {
+            if (regionFlg.equals("C5")) {
                 Organization organization = organizationMapper.selectByPrimaryKey(campaignDO.getLanIdFive());
                 String name = organization == null ? "" : organization.getOrgName();
                 result = sysArea + "-" + name;
@@ -331,7 +352,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         List<Map<String,Object>> channelList = (List<Map<String,Object>>) channelMapRes.get("rptOrderList");
         for (Map<String, Object> channelMap : channelList) {
             Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
-            channelMap.put("name",channel==null ? "" : channel.getChannelName());
+            channelMap.put("name",channel==null ? "" : channel.getContactChlName());
         }
         dataMap.put("areaList",orgList);
         dataMap.put("channelList",channelList);
@@ -357,6 +378,11 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         log.info("【入参】新活动报表 转换率  top5："+JSON.toJSONString(paramMap));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 转换率  top5："+JSON.toJSONString(stringObjectMap));
+        if (stringObjectMap.get("resultCode").equals("1000")){
+            result.put("code","0001");
+            result.put("message","报表查询失败");
+            return result;
+        }
         List<Map<String, Object>> data = new ArrayList<>();
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
             Object rptOrderList = stringObjectMap.get("rptOrderList");
@@ -374,10 +400,13 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                     paramMap.put("rptType","1");
                     paramMap.put("orglevel2","all");
                     paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
-                    paramMap.remove("pageSize");
+                    paramMap.put("pageSize","20");
                     log.info("【入参】新活动报表 转换率  按地市："+JSON.toJSONString(paramMap));
                     Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
                     log.info("【出参】新活动报表 转换率 按地市:"+JSON.toJSONString(stringObjectMap1));
+                    if (stringObjectMap1.get("resultCode").equals("1000")){
+                     continue;
+                    }
                     List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
                     for (Map<String, Object> orgMap : orgList) {
                         orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
@@ -390,6 +419,9 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                     log.info("【入参】新活动报表 转换率  按渠道："+JSON.toJSONString(paramMap));
                     Map<String, Object> stringObjectMap2 = iReportService.queryRptOrder(paramMap);
                     log.info("【出参】新活动报表 转换率 按渠道:"+JSON.toJSONString(stringObjectMap2));
+                    if (stringObjectMap2.get("resultCode").equals("1000")){
+                        continue;
+                    }
                     List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
                     for (Map<String, Object> channelMap : channelList) {
                         Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
@@ -408,7 +440,7 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         result.put("code","0000");
         result.put("message","成功");
         result.put("data",dataList);
-        return null;
+        return result;
     }
 
 
@@ -446,6 +478,11 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         log.info("【入参】新活动报表 收入拉动  查询一条数据 ："+JSON.toJSONString(paramMap));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 收入拉动 查询一条数据 返回总数:"+JSON.toJSONString(stringObjectMap));
+        if (stringObjectMap.get("resultCode").equals("1000")){
+            result.put("code","0001");
+            result.put("message","报表查询失败");
+            return result;
+        }
         List<Map<String,Object>> list = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
 
         dataMap.put("target","76%");
@@ -486,13 +523,16 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                     paramMap.put("rptType","1");
                     paramMap.put("orglevel2","all");
                     paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
-                    paramMap.remove("pageSize");
+                    paramMap.put("pageSize",20);
                     Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
                     log.info("新活动报表 转换率 按地市:"+JSON.toJSONString(stringObjectMap1));
+                    if (stringObjectMap1.get("resultCode").equals("1000")){
+                       continue;
+                    }
                     List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
                     for (Map<String, Object> orgMap : orgList) {
                         orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
-                        Long totalIncome = Long.valueOf(orgMap.get("incomeUp").toString())+ Long.valueOf(orgMap.get("incomeUp").toString());
+                        Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeUp").toString());
                         orgMap.put("totalIncome",totalIncome.toString());
                     }
                     Map<String,Object> areaList = new HashMap<>();
@@ -507,11 +547,14 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
                     paramMap.remove("orglevel2");
                     Map<String, Object> stringObjectMap2 = iReportService.queryRptOrder(paramMap);
                     log.info("新活动报表 转换率 按渠道:"+JSON.toJSONString(stringObjectMap2));
+                    if (stringObjectMap2.get("resultCode").equals("1000")){
+                       continue;
+                    }
                     List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
                     for (Map<String, Object> channelMap : channelList) {
                         Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
-                        channelMap.put("name",channel==null ? "" : channel.getChannelName());
-                        Long totalIncome = Long.valueOf(channelMap.get("incomeUp").toString())+ Long.valueOf(channelMap.get("incomeUp").toString());
+                        channelMap.put("name",channel==null ? "" : channel.getContactChlName());
+                        Double totalIncome = Double.valueOf(channelMap.get("incomeUp").toString())+ Double.valueOf(channelMap.get("incomeUp").toString());
                         channelMap.put("totalIncome",totalIncome.toString());
                     }
 
@@ -534,104 +577,4 @@ public class ServiceCamReportServiceImpl implements ServiceCamReportService {
         return result;
     }
 
-
-    private  List<Map<String,Object>> statistics(Map<String,Object> rptMap){
-        List<Map<String, Object>> statisicts = new ArrayList<>();
-        //添加框架活动是否字活动
-        rptMap.put("yesOrNo", "1");
-        Iterator<String> iter = rptMap.keySet().iterator();
-        while (iter.hasNext()) {
-            HashMap<String, Object> msgMap = new HashMap<>();
-            String key = iter.next();
-            Object o = rptMap.get(key);
-            if ("".equals(o) || "null".equals(o) || null == o){
-                o = 0+"";
-            }
-            if (key.equals("orderNum")) {
-                msgMap.put("name", "派单数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("acceptOrderNum")) {
-                msgMap.put("name", "接单数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("outBoundNum")) {
-                msgMap.put("name", "外呼数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("orderSuccessNum")) {
-                msgMap.put("name", "成功数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("acceptOrderRate")) {
-                //转换成百分比 保留二位小数位
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("name", "接单率");
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("outBoundRate")) {
-                msgMap.put("name", "外呼率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("contactRate")) {
-                msgMap.put("name", "转化率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("revenueReduceNum")) {
-                msgMap.put("name", "收入低迁数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("revenueReduceRate")) {
-                msgMap.put("name", "收入低迁率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("orgChannelRate")) {
-                msgMap.put("name", "门店有销率");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("incomeUp")) {
-                msgMap.put("name", "收入提升");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("incomeDown")) {
-                msgMap.put("name", "收入高迁数");
-                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
-                msgMap.put("nub", percentFormat);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("upCount")) {
-                msgMap.put("name", "收入提升活动数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("downCount")) {
-                msgMap.put("name", "收入低迁活动数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-            if (key.equals("contactNum")) {
-                msgMap.put("name", "客触数");
-                msgMap.put("nub", o);
-                statisicts.add(msgMap);
-            }
-
-        }
-        return statisicts;
-    }
 }
