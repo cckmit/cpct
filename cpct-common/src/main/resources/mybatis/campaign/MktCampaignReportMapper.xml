@@ -228,6 +228,26 @@
         FROM mkt_campaign WHERE 1 = 1 <include refid="ssss"/>
     </select>
 
+    <select id="selectServiceCamList" resultType="Map">
+        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,
+        from mkt_campaign
+        where SRC_TYPE = #{map.serviceType}
+        and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
+        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+        group by INIT_ID
+    </select>
+
+    <select id="selectCamListByCampaignType" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID
+        from mkt_campaign
+        where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
+        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+        group by INIT_ID
+    </select>
+
+
+
+
 
 
     <select id="selectServiceCamList" parameterType="java.util.Map" resultType="Map">
