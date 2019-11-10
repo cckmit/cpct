@@ -40,7 +40,7 @@ public enum OrgEnum {
      */
     public static String getNameByOrgId(){
         List<Long> stringList = new ArrayList<>();
-        for (OrgEnum areaNameEnum:OrgEnum.values()){
+        for (OrgEnum areaNameEnum: OrgEnum.values()){
             stringList.add(areaNameEnum.orgId);
         }
         String list = ChannelUtil.idList2String(stringList);
@@ -55,7 +55,7 @@ public enum OrgEnum {
      * @return
      */
     public static String getNameByOrgId(Long orgId){
-        for (OrgEnum areaNameEnum:OrgEnum.values()){
+        for (OrgEnum areaNameEnum: OrgEnum.values()){
             if(orgId.equals(areaNameEnum.orgId)){
                 return areaNameEnum.name;
             }
@@ -70,7 +70,7 @@ public enum OrgEnum {
      * @return
      */
     public static Long getLanIdByName(String name){
-        for (OrgEnum areaNameEnum:OrgEnum.values()){
+        for (OrgEnum areaNameEnum: OrgEnum.values()){
              if(name.equals(areaNameEnum.name)){
                  return areaNameEnum.orgId;
              }
