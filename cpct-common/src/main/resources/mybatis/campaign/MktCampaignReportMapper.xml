@@ -48,7 +48,10 @@
     </resultMap>
 
     <sql id="ssss">
-        AND STATUS_CD IN ('2002', '2006', '2008', '2010') AND MKT_CAMPAIGN_TYPE = #{map.campaignType} AND PLAN_END_TIME BETWEEN #{map.startDate} AND #{map.endDate}
+        AND STATUS_CD IN ('2002', '2006', '2008', '2010')
+        AND MKT_CAMPAIGN_TYPE = #{map.campaignType}
+        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
     </sql>
 
 
@@ -224,6 +227,11 @@
         (SELECT COUNT(1)
         FROM mkt_campaign
         WHERE REGION_FLG IN ('C4','C5') <include refid="ssss"/>) C4,
+        (SELECT COUNT(1)
+        FROM mkt_campaign
+        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="ssss"/>) C1,
+
+
         COUNT(1) SUM
         FROM mkt_campaign WHERE 1 = 1 <include refid="ssss"/>
     </select>
@@ -239,28 +247,6 @@
 
     <select id="selectCamListByCampaignType" resultMap="BaseResultMap">
         select MKT_CAMPAIGN_ID
-        from mkt_campaign
-        where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
-        group by INIT_ID
-    </select>
-
-
-
-
-
-
-    <select id="selectServiceCamList" parameterType="java.util.Map" resultType="Map">
-        select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,INIT_ID initId,PLAN_BEGIN_TIME startTime,PLAN_END_TIME endTime
-        from mkt_campaign
-        where SERVICE_TYPE = #{map.serviceType}
-        and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
-        group by INIT_ID
-    </select>
-
-    <select id="selectCamListByCampaignType" parameterType="java.util.Map" resultType="java.lang.Long">
-        select INIT_ID
         from mkt_campaign
         where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)

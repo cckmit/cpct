@@ -579,12 +579,12 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 饼图
         List<Map> localList = new ArrayList<>();
         Map<String, Object> map = mktCampaignReportMapper.selectCamSumByArea1(params);
-        Integer sum = ((Long) map.get("SUM")).intValue();
+        Integer group = ((Long) map.get("C1")).intValue();
         Integer province = ((Long) map.get("C2")).intValue();
         Integer city =  ((Long) map.get("C3")).intValue();
         Integer district = ((Long) map.get("C4")).intValue();
 
-        Integer group = sum - province - city - district;
+        Integer sum = group + province + city + district;
 
         localList.add(putParam(new HashMap<>(), "省级", province, sum));
         localList.add(putParam(new HashMap<>(), "地市级", city, sum));
