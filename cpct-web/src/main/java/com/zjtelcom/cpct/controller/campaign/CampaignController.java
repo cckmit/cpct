@@ -55,6 +55,26 @@ public class CampaignController extends BaseController {
 
 
 
+
+    /**
+     * 校验协同渠道时间是否在活动时间范围之内
+     *
+     * @return
+     */
+    @PostMapping("/dataConfig")
+    @CrossOrigin
+    public Map<String, Object> dataConfig(@RequestBody Map<String,String> param){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.dataConfig(param);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
+
+
+
     /**
      * 校验协同渠道时间是否在活动时间范围之内
      *

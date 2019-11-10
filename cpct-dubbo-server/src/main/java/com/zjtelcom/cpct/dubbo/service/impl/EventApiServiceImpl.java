@@ -1076,7 +1076,10 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             if (flag) {
                                 // 命中活动
-                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                if (future.get().get("ruleList") != null ) {
+                                    activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                }
+
                             }
                         }
                         /*else {
@@ -2481,6 +2484,7 @@ public class EventApiServiceImpl implements EventApiService {
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
+                        mktCampaignCustMap.put("channelCode", channel);
                     } else {
                         mktCampaignMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignMap.put("levelConfig", act.get("levelConfig"));

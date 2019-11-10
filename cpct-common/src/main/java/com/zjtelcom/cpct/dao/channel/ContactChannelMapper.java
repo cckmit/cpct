@@ -45,4 +45,6 @@ public interface ContactChannelMapper {
 
     List<Channel> getNewActivityChannel();
 
+    List<Channel> findChildListByTriggerType();
+
 }
