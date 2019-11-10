@@ -560,67 +560,54 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
     @Override
     public Map<String, Object> getRegionInfo(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        Date startDate = null;
-        Date endDate = null;
-        if (params.get("startDate") != null && !"".equals(params.get("startDate"))) {
-            String startTime = params.get("startDate").toString();
-            String[] timeArr = startTime.split("-");
-            startDate = string2DateTime4Day(getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
-            params.put("startDate", startDate);
-        }
-        if (params.get("endDate") != null && !"".equals(params.get("endTime"))) {
-            String endTime = params.get("endDate").toString();
-            String[] timeArr = endTime.split("-");
-            endDate = string2DateTime4Day(getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
-            params.put("endDate", endDate);
+        params.put("startDate", DateUtil.string2DateTime4Day(params.get("startDate").toString()));
+        if( params.containsKey("endDate")){
+            params.remove("endDate");
         }
         Map<String, Object> resultData = new HashMap<>();
 
         // 饼图
         List<Map> localList = new ArrayList<>();
-        Map<String, Object> map = mktCampaignReportMapper.selectCamSumByArea1(params);
-        Integer group = ((Long) map.get("C1")).intValue();
-        Integer province = ((Long) map.get("C2")).intValue();
-        Integer city =  ((Long) map.get("C3")).intValue();
-        Integer district = ((Long) map.get("C4")).intValue();
-
-        Integer sum = group + province + city + district;
-
-        localList.add(putParam(new HashMap<>(), "省级", province, sum));
-        localList.add(putParam(new HashMap<>(), "地市级", city, sum));
-        localList.add(putParam(new HashMap<>(), "区县级", district, sum));
-        localList.add(putParam(new HashMap<>(), "集团级", group, sum));
 
         resultData.put("local", localList);
 
         // 柱状图
-        List<Map<String, Object>> cityListMap = mktCampaignReportMapper.selectCamSumByArea(params);
-        Map<String, Object> cityCountMap = new HashMap();
+        Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(1);
+        List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
+        // 总量
         List<Map<String, Object>> totalMapList = new ArrayList<>();
+        // 地市
         List<Map<String, Object>> cityMapList = new ArrayList<>();
+        // 区县
         List<Map<String, Object>> countyMapList = new ArrayList<>();
-        for (Map<String, Object> cityMap : cityListMap) {
-            String name = cityMap.get("name").toString();
-            Integer c3 = Integer.valueOf(cityMap.get("c3")== null? "0":cityMap.get("c3").toString());
-            Integer c4c5 = Integer.valueOf(cityMap.get("c4c5")== null? "0":cityMap.get("c4c5").toString());
-            Map<String, Object> totalMap = new HashMap();
-            totalMap.put("name", name);
-            totalMap.put("orgid", OrgEnum.getLanIdByName(name));
-            totalMap.put("count", c3 + c4c5);
-            totalMapList.add(totalMap);
-
+        for (SysArea sysArea : sysAreaList) {
+            params.put("statusCd", "(2002, 2006, 2008, 2010)");
+            params.put("lanId", sysArea.getAreaId());
+            params.put("regionFlg", "('C3')");
+            int c3 = mktCampaignReportMapper.countByStatus(params);
             Map<String, Object> citysMap = new HashMap();
-            citysMap.put("name", name);
-            citysMap.put("orgid", OrgEnum.getLanIdByName(name));
+            citysMap.put("name", sysArea.getName());
+            citysMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             citysMap.put("count", c3);
             cityMapList.add(citysMap);
 
+            params.put("regionFlg", "('C4', 'C5')");
+            int c4c5 = mktCampaignReportMapper.countByStatus(params);
             Map<String, Object> countyMap = new HashMap();
-            countyMap.put("name", name);
-            countyMap.put("orgid", OrgEnum.getLanIdByName(name));
+            countyMap.put("name", sysArea.getName());
+            countyMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             countyMap.put("count", c4c5);
             countyMapList.add(countyMap);
+
+            Map<String, Object> totalMap = new HashMap();
+            totalMap.put("name", sysArea.getName());
+            totalMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
+            totalMap.put("count", c3 + c4c5);
+            totalMapList.add(totalMap);
         }
+
+        Map<String, Object> cityCountMap = new HashMap();
+
         Collections.sort(totalMapList, new Comparator<Map<String, Object>>() {
             @Override
             public int compare(Map<String, Object> o1, Map<String, Object> o2) {
@@ -652,7 +639,6 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         resultMap.put("data", resultData);
         return resultMap;
     }
-
 
 
     public Map putParam(Map param, String level, Integer num1, Integer num2) {

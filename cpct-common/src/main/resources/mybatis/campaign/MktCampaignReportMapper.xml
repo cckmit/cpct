@@ -80,6 +80,9 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        <if test="map.regionFlg != null and map.regionFlg != ''">
+            AND REGION_FLG IN ${map.regionFlg}
+        </if>
     </select>
 
 
