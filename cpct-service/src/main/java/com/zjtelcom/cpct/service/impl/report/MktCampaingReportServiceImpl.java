@@ -573,13 +573,13 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Integer province = ((Long) map.get("C2")).intValue();
         Integer city =  ((Long) map.get("C3")).intValue();
         Integer district = ((Long) map.get("C4")).intValue();
-
         Integer sum = group + province + city + district;
 
         localList.add(putParam(new HashMap<>(), "省级", province, sum));
         localList.add(putParam(new HashMap<>(), "地市级", city, sum));
         localList.add(putParam(new HashMap<>(), "区县级", district, sum));
         localList.add(putParam(new HashMap<>(), "集团级", group, sum));
+        resultData.put("local", localList);
 
         // 柱状图
         Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(1);
