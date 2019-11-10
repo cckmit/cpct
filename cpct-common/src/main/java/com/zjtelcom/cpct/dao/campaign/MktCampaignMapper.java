@@ -90,4 +90,9 @@ public interface MktCampaignMapper {
 
     Integer getCountFromActivityTheme(@Param("date") String date,@Param("type") String type);
 
+    List<MktCampaignDO> getMktCampaignFromInitId(@Param("date") String date,@Param("type") String type);
+
+    List<MktCampaignDO> getMktCampaignFromInitIdFromStatus(@Param("date") String date,@Param("type") String type,@Param("status") String status);
+
+    List<MktCampaignDO> selectCampaignThemeFromStatus(@Param("value") String value, @Param("date") String date,@Param("type") String type,@Param("status") String status);
 }

@@ -35,9 +35,4 @@ public interface MktCampaignReportMapper {
 
     List<Long> selectCamListByCampaignType(@Param("map") Map<String,Object> map);
 
-
-
-
-
-
 }
