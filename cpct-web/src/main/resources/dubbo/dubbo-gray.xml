@@ -94,6 +94,12 @@
         <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
         <dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>
         <!--<dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>-->
+        <dubbo:method name="serviceTaskNum" servicecode="00.1079.serviceTaskNum" timeout="12000"/>
+        <dubbo:method name="queryRptOrder" servicecode="00.1079.queryRptOrder" timeout="12000"/>
+        <!--<dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>-->
+        <dubbo:method name="serviceTaskNum" servicecode="00.1079.serviceTaskNum" timeout="12000"/>
+        <dubbo:method name="queryRptOrder" servicecode="00.1079.queryRptOrder" timeout="12000"/>
+        <!--<dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>-->
     </dubbo:reference>
 
     <!-- eslog -->
