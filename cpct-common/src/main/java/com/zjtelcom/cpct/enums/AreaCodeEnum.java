@@ -79,14 +79,24 @@ public enum AreaCodeEnum {
     }
 
     public enum sysAreaCode{
-        CHAOGUAN("cpcp0001","C1"),
-        SHENGJI("cpcpch0001","C2"),
-        FENGONGSI("cpcpch0002","C3"),
-        FENGJU("cpcpch0003","C4"),
-        ZHIJU("cpcpch0004","C5");
+        CHAOGUAN("cpcp0001","C1","集团"),
+        SHENGJI("cpcpch0001","C2","省级"),
+        FENGONGSI("cpcpch0002","C3","市级"),
+        FENGJU("cpcpch0003","C4","区县"),
+        ZHIJU("cpcpch0004","C5","区县");
 
         private String sysPostCode;
         private String sysArea;
+        private String sysAreaName;
+
+
+        public String getSysAreaName() {
+            return sysAreaName;
+        }
+
+        public void setSysAreaName(String sysAreaName) {
+            this.sysAreaName = sysAreaName;
+        }
 
         public String getSysPostCode() {
             return sysPostCode;
@@ -104,9 +114,10 @@ public enum AreaCodeEnum {
             this.sysArea = sysArea;
         }
 
-        sysAreaCode(String sysPostCode, String sysArea) {
+        sysAreaCode(String sysPostCode, String sysArea,String sysAreaName) {
             this.sysPostCode = sysPostCode;
             this.sysArea = sysArea;
+            this.sysAreaName = getSysAreaName();
         }
 
     }
@@ -114,6 +125,15 @@ public enum AreaCodeEnum {
         for (sysAreaCode sysAreaCode : sysAreaCode.values()) {
             if (sysPostCode.equals(sysAreaCode.sysPostCode)){
                 return sysAreaCode.sysArea;
+            }
+        }
+        return null;
+    }
+
+    public static String getSysAreaNameBySysArea(String sysArea) {
+        for (sysAreaCode sysAreaCode : sysAreaCode.values()) {
+            if (sysArea.equals(sysAreaCode.sysArea)){
+                return sysAreaCode.sysAreaName;
             }
         }
         return null;

@@ -39,10 +39,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.domain.system.SysStaff;
-import com.zjtelcom.cpct.dto.campaign.CampaignVO;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
+import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.EventDTO;
@@ -3326,6 +3323,57 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         resultMap.put("resultMsg","查询成功");
         return resultMap;
     }
+
+
+    @Autowired
+    private MktCamChlConfMapper camChlConfMapper;
+    /**
+     * 刷活动数据
+     * @return
+     */
+    @Override
+    public Map<String, Object> dataConfig(Map<String,String> map ) {
+//        List<MktCampaignDO> campaignDOList = mktCampaignMapper.selectAll();
+//        for (MktCampaignDO cam : campaignDOList){
+//            List<MktCamChlConfDO> list = camChlConfMapper.selectByCampaignId(cam.getMktCampaignId());
+//            if (list.size()>1){
+//                cam.setOneChannelFlg("false");
+//            }else {
+//                cam.setOneChannelFlg("true");
+//            }
+//            String creatChannel = cam.getCreateChannel()==null ? "" : cam.getCreateChannel();
+//            String sysPostCode = "";
+//            if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+//                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+//                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+//                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+//                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+//                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+//            }else {
+//                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+//            }
+//            cam.setRegionFlg(sysPostCode);
+//            mktCampaignMapper.updateByPrimaryKey(cam);
+//        }
+        List<String> list = ChannelUtil.StringToList(map.get("String"));
+        for (String id : list){
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(id));
+            if (campaignDO!=null){
+                campaignDO.setTheMe(map.get("theme"));
+                mktCampaignMapper.updateByPrimaryKey(campaignDO);
+            }
+        }
+        return null;
+    }
+
+
+
+
+
 
 
 }

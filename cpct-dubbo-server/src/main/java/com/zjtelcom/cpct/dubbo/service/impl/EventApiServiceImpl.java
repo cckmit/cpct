@@ -452,6 +452,33 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓l
+
+
+                // 事件验证接入渠道（原活动适用渠道，现配置事件接口参数）
+                String channelCode = map.get("channelCode");
+                if (channelCode == null && channelCode.isEmpty()) {
+                    esJson.put("hit", false);
+                    esJson.put("success", true);
+                    esJson.put("msg", "事件接入渠道获取异常");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    log.error("事件接入渠道不匹配:" + map.get("reqId"));
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "事件接入渠道获取异常");
+                    return result;
+                } else {
+                    List<String> list = contactEvtMapper.selectAccessChannelCode(Long.valueOf(map.get("evtId")));
+                    if (list == null || list.isEmpty() || !list.contains(channelCode)) {
+                        esJson.put("hit", false);
+                        esJson.put("success", true);
+                        esJson.put("msg", "事件接入渠道不匹配");
+                        esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                        log.error("事件接入渠道不匹配:" + map.get("reqId"));
+                        result.put("CPCResultCode", "1000");
+                        result.put("CPCResultMsg", "事件接入渠道不匹配");
+                        return result;
+                    }
+                }
+
                 //解析事件采集项
                 JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
                 //获取C4的数据用于过滤
@@ -1076,7 +1103,9 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             if (flag) {
                                 // 命中活动
-                                activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                if (future.get().get("ruleList") != null ) {
+                                    activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
+                                }
                             }
                         }
                         /*else {
@@ -2362,8 +2391,8 @@ public class EventApiServiceImpl implements EventApiService {
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
                     }
-                    //判断适用渠道
-                    if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
+                    //判断适用渠道 —— 提升至事件级别校验
+                    /*if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                         String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
                         List<Long> channelsIdList = new ArrayList<>();
                         if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
@@ -2425,7 +2454,7 @@ public class EventApiServiceImpl implements EventApiService {
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
                     }
-                    log.info("预校验还没出错1");
+                    log.info("预校验还没出错1");*/
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
@@ -2481,6 +2510,7 @@ public class EventApiServiceImpl implements EventApiService {
                         mktCampaignCustMap.put("levelConfig", act.get("levelConfig"));
                         mktCampaignCustMap.put("campaignSeq", act.get("campaignSeq"));
                         mktCampaignCustMap.put("strategyMapList", strategyMapList);
+                        mktCampaignCustMap.put("channelCode", channel);
                     } else {
                         mktCampaignMap.put("mktCampaginId", mktCampaginId);
                         mktCampaignMap.put("levelConfig", act.get("levelConfig"));

@@ -75,4 +75,6 @@ public interface MktCampaignService {
 
     Map<String,Object> searchBatch(List<Long> mktCampaignIdList);
 
+    Map<String,Object> dataConfig(Map<String,String> map );
+
 }
