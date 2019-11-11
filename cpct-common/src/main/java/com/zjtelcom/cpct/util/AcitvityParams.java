@@ -54,7 +54,8 @@ public class AcitvityParams {
             paramMap.put("rptType","");
         }
         //是否返回历史活动(0:否,1:是)
-        Object isHis = params.get("isHis");
+        //Object isHis = params.get("isHis");
+        Object isHis = "1";
         if (isHis!=null && isHis!=""){
             paramMap.put("isHis",isHis);
         }else {
