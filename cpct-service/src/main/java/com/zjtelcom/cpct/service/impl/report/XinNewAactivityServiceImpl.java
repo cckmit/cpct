@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.OrgEnum;
 import com.zjtelcom.cpct.service.report.XinNewAactivityService;
 import com.zjtelcom.cpct.util.AcitvityParams;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -414,6 +415,47 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     String label = stringStringMap.get("label");
                     //每个主题个数
                     List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(value, date, type);
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("name",label);
+                    map.put("value",mktCampaignList.size());
+                    list.add(map);
+                }
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("name","全部");
+            map.put("value",count);
+            list.add(0,map);
+            resultMap.put("resultCode","200");
+            resultMap.put("resultMsg",list);
+        } catch (Exception e) {
+            resultMap.put("resultCode","500");
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> activityThemeCountByC3(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+
+            ArrayList<Object> list = new ArrayList<>();
+            Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+            List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            String date = params.get("startDate").toString();
+            String type = paramMap.get("mktCampaignType").toString();
+            String lanId = "";
+            if (params.get("c3") != null && !params.get("c3").equals("")) {
+                lanId = ChannelUtil.getAreaByOrg(params.get("c3").toString());
+            }
+            //总数
+            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(date,type,lanId);
+            if (campaignTheme.size()>0 && campaignTheme!=null){
+                for (Map<String, String> stringStringMap : campaignTheme) {
+                    String value = stringStringMap.get("value");
+                    String label = stringStringMap.get("label");
+                    //每个主题个数
+                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, date, type, lanId);
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("name",label);
                     map.put("value",mktCampaignList.size());

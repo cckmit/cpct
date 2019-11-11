@@ -445,4 +445,11 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectAccessChannelCode" resultType="java.lang.String">
+        select i.CALLER
+        from event e
+        right join interface_cfg i on e.INTERFACE_CFG_ID = i.INTERFACE_CFG_ID
+        where e.EVENT_ID = #{contactEvtId}
+    </select>
 </mapper>
