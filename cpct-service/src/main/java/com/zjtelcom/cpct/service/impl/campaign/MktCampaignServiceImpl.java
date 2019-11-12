@@ -3333,32 +3333,36 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> dataConfig(Map<String,String> map ) {
-//        List<MktCampaignDO> campaignDOList = mktCampaignMapper.selectAll();
-//        for (MktCampaignDO cam : campaignDOList){
-//            List<MktCamChlConfDO> list = camChlConfMapper.selectByCampaignId(cam.getMktCampaignId());
-//            if (list.size()>1){
-//                cam.setOneChannelFlg("false");
-//            }else {
-//                cam.setOneChannelFlg("true");
-//            }
-//            String creatChannel = cam.getCreateChannel()==null ? "" : cam.getCreateChannel();
-//            String sysPostCode = "";
-//            if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
-//                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
-//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
-//                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
-//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
-//                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
-//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
-//                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
-//            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
-//                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
-//            }else {
-//                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
-//            }
-//            cam.setRegionFlg(sysPostCode);
-//            mktCampaignMapper.updateByPrimaryKey(cam);
-//        }
+        List<MktCampaignDO> campaignDOList = mktCampaignMapper.selectAll();
+        System.out.println("【campaignDOList】:"+campaignDOList.size());
+        if (map.get("all")!=null){
+            for (MktCampaignDO cam : campaignDOList){
+                List<MktCamChlConfDO> list = camChlConfMapper.selectByCampaignId(cam.getMktCampaignId());
+                if (list.size()>1){
+                    cam.setOneChannelFlg("false");
+                }else {
+                    cam.setOneChannelFlg("true");
+                }
+                String creatChannel = cam.getCreateChannel()==null ? "" : cam.getCreateChannel();
+                String sysPostCode = "";
+                if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+                    sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+                }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+                    sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+                }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+                    sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+                }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+                    sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+                }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+                    sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+                }else {
+                    sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+                }
+                cam.setRegionFlg(sysPostCode);
+                mktCampaignMapper.updateByPrimaryKey(cam);
+            }
+        }
+
         List<String> list = ChannelUtil.StringToList(map.get("String"));
         for (String id : list){
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(id));
@@ -3367,7 +3371,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignMapper.updateByPrimaryKey(campaignDO);
             }
         }
-        return null;
+        Map<String,Object> RES = new HashMap<>();
+        RES.put("success","success");
+        return RES;
     }
 
 

@@ -151,7 +151,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     public Map<String, Object> listInterfaceCfg(Long evtSrcId,String interfaceName,String interfaceType,Integer page,Integer pageSize){
         Map<String,Object> result = new HashMap<>();
         PageHelper.startPage(page,pageSize);
-        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType, null);
+        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType);
         Page info = new Page(new PageInfo(cfgList));
         List<InterfaceCfgVO> voList = new ArrayList<>();
         getVOList(cfgList, voList);
@@ -219,16 +219,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",vo);
-        return result;
-    }
-
-    // 活动配置页面事件树
-    @Override
-    public Map<String, Object> getEventTree(String channelCode) {
-        Map<String,Object> result = new HashMap<>();
-        List<InterfaceCfg> interfaceCfgList = interfaceCfgMapper.findInterfaceCfgListByParam(null, null, null, channelCode);
-        result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",interfaceCfgList);
         return result;
     }
 }
