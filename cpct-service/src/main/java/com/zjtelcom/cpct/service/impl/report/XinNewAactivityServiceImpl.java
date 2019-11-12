@@ -320,7 +320,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
                     for (Map<String, Object> orgMap : orgList) {
                         orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
-                        if (orgMap.get("contactRate")!=null ||  orgMap.get("contactRate").toString().equals("")){
+                        if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("")){
                             orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
                         }else {
                             orgMap.put("contactRate","0%");
@@ -340,8 +340,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
                     for (Map<String, Object> channelMap : channelList) {
                         Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
-                        channelMap.put("name",channel==null ? "" : channel.getContactChlName());
-                        if (channelMap.get("contactRate")!=null || channelMap.get("contactRate").toString().equals("")){
+                        channelMap.put("name",channel==null ? "" : channel.getChannelName());
+                        if (channelMap.get("contactRate")!=null &&  channelMap.get("contactRate").toString().equals("")){
                             channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
                         }else {
                             channelMap.put("contactRate","0%");
@@ -396,6 +396,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         Map<String,Object> dataMap = new HashMap<>();
         List<Map<String,Object>>  dateMapList = new ArrayList<>();
         List<Map<String,Object>>  dataList = new ArrayList<>();
+        List<Map<String,Object>>  mapsList = new ArrayList<>();
         //按地市
         params.put("rptType","1");
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
@@ -419,18 +420,18 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //高迁收入
         dataMap.put("高迁收入",list.get(0).get("incomeUp"));
         //收入底迁活动数
-        dataMap.put("收入底迁活动数",list.get(0).get("downCount"));
+        dataMap.put("收入低迁活动数",list.get(0).get("downCount"));
         //收入高签活跃数
-        dataMap.put("收入高签活跃数",list.get(0).get("upCount"));
+        dataMap.put("收入高迁活跃数",list.get(0).get("upCount"));
         double v = Double.valueOf(dataMap.get("高迁收入").toString()).doubleValue() + Double.valueOf(dataMap.get("收入低迁金额").toString()).doubleValue();
         dataMap.put("总收入",fun2(v)); //总收入
         dataMap.put("收入平迁金额","0.00"); //收入平迁金额
         //收入平迁活动数
-        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高签活跃数").toString()) + Integer.valueOf(dataMap.get("收入底迁活动数").toString())) );
+        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活跃数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
         //低迁率
-        dataMap.put("低迁率",getPercentFormat(Double.valueOf(dataMap.get("收入底迁活动数").toString()).doubleValue()/(double) count,2,2));
+        dataMap.put("低迁率",getPercentFormat(Double.valueOf(dataMap.get("收入低迁活动数").toString()).doubleValue()/(double) count,2,2));
         //高迁率
-        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高签活跃数").toString()).doubleValue()/(double)count,2,2));
+        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活跃数").toString()).doubleValue()/(double)count,2,2));
         //平迁率
         dataMap.put("平迁率",getPercentFormat(Double.valueOf(dataMap.get("收入平迁活动数").toString()).doubleValue()/(double)count,2,2));
         Iterator<String> iterator = dataMap.keySet().iterator();
@@ -442,7 +443,34 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             map.put("value",o);
             dateMapList.add(map);
         }
-        dataMap.put("dateMapList",dateMapList);
+        HashMap<String, Object> map2 = new HashMap<>();
+        HashMap<String, Object> map3 = new HashMap<>();
+        HashMap<String, Object> map4 = new HashMap<>();
+        HashMap<String, Object> map5 = new HashMap<>();
+        map2.put("name","收入低迁活动");
+        map2.put("value",dataMap.get("收入低迁活动数"));
+        map2.put("rate",dataMap.get("低迁率"));
+        map2.put("num",dataMap.get("收入低迁金额"));
+
+        map3.put("name","收入高迁活跃");
+        map3.put("value",dataMap.get("收入高迁活跃数"));
+        map3.put("rate",dataMap.get("平迁率"));
+        map3.put("num",dataMap.get("高迁收入"));
+
+        map4.put("name","收入平迁活动");
+        map4.put("value",dataMap.get("收入平迁活动数"));
+        map4.put("rate",dataMap.get("高迁率"));
+        map4.put("num",dataMap.get("收入平迁金额"));
+
+        map5.put("name","总收入");
+        map5.put("num",dataMap.get("总收入"));
+
+        mapsList.add(map2);
+        mapsList.add(map3);
+        mapsList.add(map4);
+        mapsList.add(map5);
+        dataMap.put("dateMapList",mapsList);
+        dataMap.put("dateMapList2",dateMapList);
         //返回多条 按活动查询
         paramMap.put("rptType","2");
         //top5
