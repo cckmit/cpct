@@ -43,4 +43,6 @@ public interface OrganizationMapper {
 
     List<Organization> getByOrgNameC5(@Param("orgNameC5")String orgNameC5);
 
+    List<Organization> selectMenuByEleven();
+
 }

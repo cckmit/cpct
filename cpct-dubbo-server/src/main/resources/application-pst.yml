@@ -46,11 +46,6 @@ spring:
       min-idle: 0
     timeout: 30000
 
-redisConfig:
-   ip: 134.96.231.228
-   port: 40201
-   database: 4970
-   password: bss_cpct_common_user#bss_cpct_common_user123
 
 ctg:
   namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892

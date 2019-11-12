@@ -15,5 +15,8 @@ public interface XinNewAactivityService {
 
     Map<String,Object> activityThemeCount(Map<String, Object> params);
 
+    Map<String,Object> activityThemeCountByC3(Map<String, Object> params);
+
     Map<String,Object> activityThemeLevelAndChannel(Map<String, Object> params);
+
 }
