@@ -117,7 +117,7 @@ public enum AreaCodeEnum {
         sysAreaCode(String sysPostCode, String sysArea,String sysAreaName) {
             this.sysPostCode = sysPostCode;
             this.sysArea = sysArea;
-            this.sysAreaName = getSysAreaName();
+            this.sysAreaName = sysAreaName;
         }
 
     }
