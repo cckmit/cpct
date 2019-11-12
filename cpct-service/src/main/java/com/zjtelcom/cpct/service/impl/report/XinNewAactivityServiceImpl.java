@@ -592,8 +592,14 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 Long orgId = organization.getOrgId();
                 map.put("name",nameByOrgId);
                 map.put("type",orgId);
+                map.put("orglevel2","C3");
                 areaList.add(map);
             }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("name","浙江省");
+            map.put("type","800000000004");
+            map.put("orglevel1","C2");
+            areaList.add(0,map);
             resultMap.put("orglevel2",areaList);
         }else {
             resultMap.put("code","0001");
