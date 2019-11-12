@@ -47,6 +47,4 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> selectBatchByCode(@Param("contactEvtCodeList") List<String> contactEvtCodeList);
 
-    List<String> selectAccessChannelCode(Long contactEvtId);
-
 }
