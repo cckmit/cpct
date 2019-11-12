@@ -100,7 +100,7 @@
         #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{createChannel,jdbcType=VARCHAR},
         #{directoryId,jdbcType=BIGINT},#{camLevel,jdbcType=BIGINT}, #{isCheckRule,jdbcType=VARCHAR},
         #{srcType,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{serviceCancleFlag,jdbcType=BIGINT}, #{regionId,jdbcType=BIGINT},
-        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=VARCHAR}, #{lanIdFour,jdbcType=BIGINT}, #{lanIdFive,jdbcType=BIGINT}, #{oneChannelFlg,jdbcType=VARCHAR}, #{theMe,jdbcType=VARCHAR}, #{regionFlg,jdbcType=VARCHAR},)
+        #{lifeStage,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, #{extMktCampaignId,jdbcType=VARCHAR}, #{execInitTime,jdbcType=VARCHAR}, #{lanIdFour,jdbcType=BIGINT}, #{lanIdFive,jdbcType=BIGINT}, #{oneChannelFlg,jdbcType=VARCHAR}, #{theMe,jdbcType=VARCHAR}, #{regionFlg,jdbcType=VARCHAR})
     </insert>
 
 
