@@ -580,6 +580,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         localList.add(putParam(new HashMap<>(), "地市级", city, sum));
         localList.add(putParam(new HashMap<>(), "区县级", district, sum));
         localList.add(putParam(new HashMap<>(), "集团级", group, sum));
+        resultData.put("local", localList);
 
         // 柱状图
         Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(1);

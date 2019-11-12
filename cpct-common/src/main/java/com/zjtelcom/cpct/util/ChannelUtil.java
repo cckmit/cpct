@@ -81,10 +81,9 @@ public class ChannelUtil  {
         return sysArea;
     }
 
-
     public static String getOrgByArea(String area) {
         if (area.contains("571")){
-            return "800000000037";
+           return "800000000037";
         }
         if (area.contains("570")){
             return "800000000040";

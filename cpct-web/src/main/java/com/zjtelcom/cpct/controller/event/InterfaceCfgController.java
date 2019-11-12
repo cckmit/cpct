@@ -123,19 +123,6 @@ public class InterfaceCfgController extends BaseController {
         return result;
     }
 
-    @PostMapping("getEventTree")
-    @CrossOrigin
-    public Map<String, Object> getEventTree(@RequestBody HashMap<String,Object> param) {
-        Map<String,Object> result = new HashMap<>();
-        try {
-            result = interfaceCfgService.getEventTree(param.get("channelCode") == null ? "" : param.get("channelCode").toString());
-        } catch (Exception e) {
-            logger.error("[op:ScriptController] fail to getEventTree",e);
-            result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg"," fail to getEventTree");
-            return result;
-        }
-        return result;
-    }
+
 
 }
