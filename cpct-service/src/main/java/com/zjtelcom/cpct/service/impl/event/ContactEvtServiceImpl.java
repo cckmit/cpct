@@ -182,6 +182,21 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     }
 
     /**
+     * 通过渠道编码查询事件列表
+     * @param params：key[chlCode,evtName]
+     * @return result：key[evtId,evtCode,evtName]
+     */
+    @Override
+    public Map<String, Object> selectContactEvtByChlCode(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        List<ContactEvt> contactEvtByChlCode = contactEvtMapper.getContactEvtByChlCode(params);
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("contactEvtList", contactEvtByChlCode);
+        return map;
+    }
+
+    /**
      * 新增事件(集团调用)
      */
     @Transactional(readOnly = false)
