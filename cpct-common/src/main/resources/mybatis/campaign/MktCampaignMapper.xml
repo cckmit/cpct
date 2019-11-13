@@ -1039,7 +1039,7 @@
             AND LAN_ID = #{c3}
         </if>
         <if test="regionFlg != null and regionFlg != ''">
-            AND REGION_FLG = 'C3'
+            AND REGION_FLG = #{regionFlg}
         </if>
     </select>
 
