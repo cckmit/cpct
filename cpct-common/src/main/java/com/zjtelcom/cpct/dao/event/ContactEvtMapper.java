@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 事件mapper
@@ -18,6 +19,8 @@ import java.util.List;
 public interface ContactEvtMapper {
 
     List<ContactEvt> listEvents(ContactEvt contactEvt);
+
+    List<ContactEvt> getContactEvtByChlCode(@Param("map")Map<String, Object> params);
 
     int insert(ContactEvt contactEvt);
 

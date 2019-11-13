@@ -58,6 +58,16 @@
         ORDER BY e.UPDATE_DATE DESC
     </select>
 
+    <select id="getContactEvtByChlCode" resultMap="resultMapper" parameterType="map">
+      select r.EVENT_ID, e.EVENT_NBR, e.EVENT_NAME
+      from mkt_evt_interface_rel r
+      left join event e on e.EVENT_ID = r.EVENT_ID
+      where r.CHANNEL_CODE = #{map.chlCode}
+      <if test="map.evtName != null and map.evtName != ''" >
+        and e.EVENT_NAME like #{map.evtName}
+      </if>
+    </select>
+
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
         select * from event

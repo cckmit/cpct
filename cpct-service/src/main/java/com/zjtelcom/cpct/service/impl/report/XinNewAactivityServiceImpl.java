@@ -645,7 +645,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 lanId = ChannelUtil.getAreaByOrg(params.get("c3").toString());
             }
             //总数
-            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(date,type,lanId);
+            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(date,type,date,lanId);
             if (campaignTheme.size()>0 && campaignTheme!=null){
                 for (Map<String, String> stringStringMap : campaignTheme) {
                     String value = stringStringMap.get("value");

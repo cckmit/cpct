@@ -109,6 +109,19 @@ public class ContactEvtController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    @RequestMapping("selectContactEvtByChlCode")
+    @CrossOrigin
+    public String selectContactEvtByChlCode(@RequestBody Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.selectContactEvtByChlCode(params);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to selectContactEvtByChlCode Exception: ", e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
     /**
      * 删除事件
      */
