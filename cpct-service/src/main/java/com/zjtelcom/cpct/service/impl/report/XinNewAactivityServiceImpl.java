@@ -17,7 +17,6 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.OrgEnum;
 import com.zjtelcom.cpct.service.report.XinNewAactivityService;
 import com.zjtelcom.cpct.util.AcitvityParams;
-import com.zjtelcom.cpct.util.ChannelUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,11 +101,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         HashMap<String, Object> result = new HashMap<>();
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
         List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
-        String date = params.get("startDate").toString();
-        String startDate = params.get("startDate").toString();
+        String date = params.get("endDate").toString();
         String type = paramMap.get("mktCampaignType").toString();
         //总数
-        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type);
         log.info("【count】："+JSON.toJSONString(count));
         List<Map<String,Object>> dataMap = new ArrayList<>();
         if (campaignTheme.size()>0 && campaignTheme!=null){
@@ -116,18 +114,14 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 String value = stringStringMap.get("value");
                 //每个主题个数
                 List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(value, date, type);
-                String substring = null;
                 StringBuilder stringBuilder = new StringBuilder();
                 if (mktCampaignList!=null && mktCampaignList.size()>0){
                     for (MktCampaignDO mktCampaignDO : mktCampaignList) {
                         stringBuilder.append(mktCampaignDO.getInitId()).append(",");
                     }
-                    //多个id  “，”拼接 去除最后的一个 ，
-                    substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
                 }
-                if (substring == null){
-                    continue;
-                }
+                //多个id  “，”拼接 去除最后的一个 ，
+                String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
                 paramMap.put("mktCampaignId", substring);
                 //维度 按活动
                 paramMap.put("rptType", 2);
@@ -148,21 +142,13 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     //转换率百分比
                     Object contactRate = stringMap.get("contactRate");
                     if (contactRate!=null && contactRate!=""){
-                        if (contactRate.toString().contains("%")){
-                            stringMap.put("contactRate",contactRate);
-                        }else {
-                            stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
-                        }
+                        stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
                     }else {
                         stringMap.put("contactRate","0%");
                     }
                     Object revenueReduceRate = stringMap.get("revenueReduceRate");
                     if (revenueReduceRate!=null && revenueReduceRate!=""){
-                        if (revenueReduceRate.toString().contains("%")){
-                            stringMap.put("revenueReduceRate",revenueReduceRate);
-                        }else {
-                            stringMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(revenueReduceRate.toString()),2,2));
-                        }
+                        stringMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(revenueReduceRate.toString()),2,2));
                     }else {
                         stringMap.put("revenueReduceRate","0%");
                     }
@@ -184,25 +170,13 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     //转换率百分比
                     Object contactRate = stringMap.get("contactRate");
                     if (contactRate!=null && contactRate!=""){
-                        if (contactRate.toString().contains("%")){
-                            stringMap.put("contactRate",contactRate);
-                        }else {
-                            String string = contactRate.toString();
-                            log.info("转换率百分比数值："+string);
-                            Double aDouble = Double.valueOf(contactRate.toString());
-                            log.info("转换率百分比异常查看："+aDouble);
-                            stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
-                        }
+                        stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
                     }else {
                         stringMap.put("contactRate","0%");
                     }
                     Object revenueReduceRate = stringMap.get("revenueReduceRate");
                     if (revenueReduceRate!=null && revenueReduceRate!=""){
-                        if (revenueReduceRate.toString().contains("%")){
-                            stringMap.put("revenueReduceRate",revenueReduceRate);
-                        }else {
-                            stringMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(revenueReduceRate.toString()),2,2));
-                        }
+                        stringMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(revenueReduceRate.toString()),2,2));
                     }else {
                         stringMap.put("revenueReduceRate","0%");
                     }
@@ -346,7 +320,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
                     for (Map<String, Object> orgMap : orgList) {
                         orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
-                        if (orgMap.get("contactRate")!=null ||  orgMap.get("contactRate").toString().equals("")){
+                        if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("")){
                             orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
                         }else {
                             orgMap.put("contactRate","0%");
@@ -366,8 +340,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
                     for (Map<String, Object> channelMap : channelList) {
                         Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
-                        channelMap.put("name",channel==null ? "" : channel.getContactChlName());
-                        if (channelMap.get("contactRate")!=null || channelMap.get("contactRate").toString().equals("")){
+                        channelMap.put("name",channel==null ? "" : channel.getChannelName());
+                        if (channelMap.get("contactRate")!=null &&  channelMap.get("contactRate").toString().equals("")){
                             channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
                         }else {
                             channelMap.put("contactRate","0%");
@@ -426,17 +400,16 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //按地市
         params.put("rptType","1");
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
-        String date = params.get("endDate").toString();
-        String startDate = params.get("startDate").toString();
+        String date = params.get("startDate").toString();
         String type = paramMap.get("mktCampaignType").toString();
         //总数
-        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type);
         //查询一条数据 返回总数
 
         log.info("【入参】新活动报表 收入拉动  查询一条数据 ："+JSON.toJSONString(paramMap));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 收入拉动 查询一条数据 返回总数:"+JSON.toJSONString(stringObjectMap));
-        if (stringObjectMap.get("resultCode").equals("1000")|| ((List<Map<String,Object>>) stringObjectMap.get("rptOrderList")).size()<1){
+        if (stringObjectMap.get("resultCode").equals("1000")){
             result.put("code","0001");
             result.put("message","报表查询失败");
             return result;
@@ -515,7 +488,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 data = (List<Map<String, Object>>) map.get("rptOrderList");
                 for (Map<String, Object> datum : data) {
                     Map<String,Object> camMap = new HashMap<>();
-                    MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
+                    MktCampaignDO campaignDO = mktCampaignMapper.selectCampaignByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
                     camMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
                     camMap.put("income",datum.get("incomeUp"));
                     camMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
@@ -597,11 +570,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
             List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
             String date = params.get("startDate").toString();
-            String startDate = params.get("startDate").toString();
-
             String type = paramMap.get("mktCampaignType").toString();
             //总数
-            Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+            Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type);
             if (campaignTheme.size()>0 && campaignTheme!=null){
                 for (Map<String, String> stringStringMap : campaignTheme) {
                     String value = stringStringMap.get("value");
@@ -625,47 +596,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             resultMap.put("data",list);
         } catch (Exception e) {
             resultMap.put("code","0001");
-            e.printStackTrace();
-        }
-        return resultMap;
-    }
-
-    @Override
-    public Map<String, Object> activityThemeCountByC3(Map<String, Object> params) {
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-
-            ArrayList<Object> list = new ArrayList<>();
-            Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
-            List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
-            String date = params.get("startDate").toString();
-            String type = paramMap.get("mktCampaignType").toString();
-            String lanId = "";
-            if (params.get("c3") != null && !params.get("c3").equals("")) {
-                lanId = ChannelUtil.getAreaByOrg(params.get("c3").toString());
-            }
-            //总数
-            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(date,type,lanId);
-            if (campaignTheme.size()>0 && campaignTheme!=null){
-                for (Map<String, String> stringStringMap : campaignTheme) {
-                    String value = stringStringMap.get("value");
-                    String label = stringStringMap.get("label");
-                    //每个主题个数
-                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, date, type, lanId);
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("name",label);
-                    map.put("value",mktCampaignList.size());
-                    list.add(map);
-                }
-            }
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("name","全部");
-            map.put("value",count);
-            list.add(0,map);
-            resultMap.put("resultCode","200");
-            resultMap.put("resultMsg",list);
-        } catch (Exception e) {
-            resultMap.put("resultCode","500");
             e.printStackTrace();
         }
         return resultMap;
@@ -793,7 +723,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         }
                         camMap.put("statusCd",paramsByValue.getParamName());
                         camMap.put("mktCampaignName", campaignDO == null ? "" : campaignDO.getMktCampaignName());
-                        camMap.put("mktCampaignId", campaignDO.getMktCampaignId());
                         camMap.put("area", getArea(campaignDO));
                         //成功数
                         camMap.put("orderSuccessNum", datum.get("orderSuccessNum"));
@@ -811,20 +740,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         camMap.put("downCount",datum.get("downCount"));//收入低迁活动数
                         //收入拉动
                         camMap.put("income",Double.valueOf(datum.get("incomeUp").toString())+ Double.valueOf(datum.get("incomeDown").toString()));
-                        //收入低迁率
-                        if (datum.get("revenueReduceRate")!=null &&datum.get("revenueReduceRate")!=""){
-                            camMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(datum.get("revenueReduceRate").toString()), 2, 2));
-                        }else {
-                            camMap.put("revenueReduceRate","0%");
-                        }
-                        //收入低迁数
-                        if (datum.get("revenueReduceNum")!=null && datum.get("revenueReduceNum")!=""){
-                            camMap.put("revenueReduceNum",datum.get("revenueReduceNum"));
-                        }else {
-                            camMap.put("revenueReduceNum","0");
-                        }
-
-
                         list.add(camMap);
                     }
                     resultMap.put("data",list);
