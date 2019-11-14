@@ -105,6 +105,20 @@ public class XinNewAactivityController  extends BaseController {
         return map;
     }
 
+    //主题活动分类和数量
+    @PostMapping("/activityThemeCountByC3")
+    @CrossOrigin
+    public Map<String,Object> activityThemeCountByC3(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.activityThemeCountByC3(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 主题活动分类和数量  activityThemeCount] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
 
     //季度营销活动
     @PostMapping("/quarterActivities")

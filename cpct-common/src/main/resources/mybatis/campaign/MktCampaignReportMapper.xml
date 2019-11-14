@@ -48,7 +48,16 @@
     </resultMap>
 
     <sql id="ssss">
-        AND STATUS_CD IN ('2002', '2006', '2007', '2008', '2010') AND MKT_CAMPAIGN_TYPE = #{map.campaignType} AND PLAN_END_TIME BETWEEN #{map.startDate} AND #{map.endDate}
+        AND STATUS_CD IN ('2002', '2006', '2008', '2010')
+        AND MKT_CAMPAIGN_TYPE = #{map.campaignType}
+        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
+    </sql>
+
+    <sql id="reg">
+        AND STATUS_CD IN ('2002', '2006', '2008', '2010')
+        AND MKT_CAMPAIGN_TYPE = #{map.campaignType}
+        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
     </sql>
 
 
@@ -56,8 +65,11 @@
         SELECT COUNT (1)
         from mkt_campaign
         where 1 = 1
-        <if test="map.startDate != null and map.endDate != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
+        <if test="map.startDate != null">
+            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="map.endDate != null">
+            AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
@@ -66,13 +78,16 @@
             AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE IN ${map.mktCampaignType}
+            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
         </if>
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
+        </if>
+        <if test="map.regionFlg != null and map.regionFlg != ''">
+            AND REGION_FLG IN ${map.regionFlg}
         </if>
     </select>
 
@@ -81,6 +96,7 @@
         SELECT COUNT (1)
         from mkt_campaign
         where  #{map.endDate,jdbcType=TIMESTAMP} > PLAN_END_TIME
+        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
         AND PLAN_END_TIME > #{map.startDate,jdbcType=TIMESTAMP}
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
@@ -89,7 +105,7 @@
             AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE IN ${map.mktCampaignType}
+            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -114,8 +130,11 @@
         t.THE_ME, t.REGION_FLG
         from mkt_campaign t
         where 1 = 1
-        <if test="map.startDate != null and map.endDate != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
+        <if test="map.startDate != null">
+            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="map.endDate != null">
+            AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
@@ -124,7 +143,7 @@
             AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE IN ${map.mktCampaignType}
+            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -132,7 +151,6 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
-        GROUP BY t.INIT_ID
     </select>
 
 
@@ -152,7 +170,7 @@
         from mkt_campaign t
         where 1 = 1
         <if test="map.startDate != null and map.endDate != null">
-            AND PLAN_END_TIME BETWEEN  #{map.startDate,jdbcType=TIMESTAMP} AND #{map.endDate,jdbcType=TIMESTAMP}
+            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP} AND  PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
         </if>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND t.STATUS_CD IN ${map.statusCd}
@@ -161,7 +179,7 @@
             AND t.LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
         <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND t.MKT_CAMPAIGN_TYPE IN ${map.mktCampaignType}
+            AND t.MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND t.TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -191,17 +209,17 @@
         SELECT a.name,t1.c3, t2.c4c5
         FROM sys_area a
         LEFT JOIN (SELECT COUNT(1) c3, LAN_ID
-					FROM mkt_campaign
-					WHERE REGION_FLG = 'C3'
-                  <include refid="ssss"/>
-					GROUP BY LAN_ID
-					) t1 ON a.area_id = t1.LAN_ID
-                LEFT JOIN (SELECT COUNT(1) c4c5, LAN_ID
-					FROM mkt_campaign
-					WHERE REGION_FLG IN ('C4','C5')
-                    <include refid="ssss"/>
-					GROUP BY LAN_ID
-					) t2 ON a.area_id = t2.LAN_ID
+        FROM mkt_campaign
+        WHERE REGION_FLG = 'C3'
+        <include refid="ssss"/>
+        GROUP BY LAN_ID
+        ) t1 ON a.area_id = t1.LAN_ID
+        LEFT JOIN (SELECT COUNT(1) c4c5, LAN_ID
+        FROM mkt_campaign
+        WHERE REGION_FLG IN ('C4','C5')
+        <include refid="ssss"/>
+        GROUP BY LAN_ID
+        ) t2 ON a.area_id = t2.LAN_ID
         WHERE a.area_level = '1'
         GROUP BY a.name
     </select>
@@ -211,15 +229,20 @@
         SELECT
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C2' <include refid="ssss"/>) C2,
+        WHERE REGION_FLG = 'C2' <include refid="reg"/>) C2,
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C3' <include refid="ssss"/>) C3,
+        WHERE REGION_FLG = 'C3' <include refid="reg"/>) C3,
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG IN ('C4','C5') <include refid="ssss"/>) C4,
+        WHERE REGION_FLG IN ('C4','C5') <include refid="reg"/>) C4,
+        (SELECT COUNT(1)
+        FROM mkt_campaign
+        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="reg"/>) C1,
+
+
         COUNT(1) SUM
-        FROM mkt_campaign WHERE 1 = 1 <include refid="ssss"/>
+        FROM mkt_campaign WHERE 1 = 1 <include refid="reg"/>
     </select>
 
 
@@ -229,7 +252,7 @@
         from mkt_campaign
         where SERVICE_TYPE = #{map.serviceType}
         and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+        AND STATUS_CD IN (2002,2008)
         group by INIT_ID
     </select>
 
@@ -237,7 +260,7 @@
         select INIT_ID
         from mkt_campaign
         where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+        AND STATUS_CD IN (2002,2008)
         group by INIT_ID
     </select>
 

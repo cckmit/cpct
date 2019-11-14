@@ -118,6 +118,42 @@ public class ChannelUtil  {
         return null;
     }
 
+    public static String getAreaByOrg(String Org) {
+        if (Org.contains("800000000037")){
+            return "571";
+        }
+        if (Org.contains("800000000040")){
+            return "570";
+        }
+        if (Org.contains("800000000021")){
+            return "572";
+        }
+        if (Org.contains("800000000022")){
+            return "573";
+        }
+        if (Org.contains("800000000023")){
+            return "574";
+        }
+        if (Org.contains("800000000024")){
+            return "575";
+        }
+        if (Org.contains("800000000041")){
+            return "576";
+        }
+        if (Org.contains("800000000025")){
+            return "577";
+        }
+        if (Org.contains("800000000039")){
+            return "578";
+        }
+        if (Org.contains("800000000038")){
+            return "579";
+        }
+        if (Org.contains("800000000026")){
+            return "580";
+        }
+        return null;
+    }
 
     /**
      * 实体类转Map
