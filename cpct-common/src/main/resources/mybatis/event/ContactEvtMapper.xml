@@ -455,4 +455,24 @@
             #{item}
         </foreach>
     </select>
+
+    <sql id="ss">
+        EVENT_ID,INTERFACE_ID,CHANNEL_CODE,STATUS_CD,STATUS_DATE,CREATE_STAFF,UPDATE_STAFF,REMARK,CREATE_DATE,UPDATE_DATE
+    </sql>
+
+    <insert id="createEvtInterfaceRel" parameterType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
+        insert into mkt_evt_interface_rel (<include refid="ss"/>)
+        values ()
+    </insert>
+
+    <delete id="delEvtInterfaceRel">
+        delete from mkt_evt_interface_rel
+        where EVENT_ID = #{evtId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectEvtInterfaceRelByEvtId" resultType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
+        select EVT_INTERFACE_REL_ID evtInterfaceRelId, EVENT_ID evtId, INTERFACE_ID interfaceId, CHANNEL_CODE channelCode
+        from mkt_evt_interface_rel
+        where EVENT_ID = #{evtId,jdbcType=BIGINT}
+    </select>
 </mapper>

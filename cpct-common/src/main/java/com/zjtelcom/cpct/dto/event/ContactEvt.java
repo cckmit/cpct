@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dto.event;
 import com.zjtelcom.cpct.BaseEntity;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description 事件实体类
@@ -14,7 +15,7 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private static final long serialVersionUID = -6351197926116704813L;
     private String actType;//  KIP=保持/ADD=新增/MOD=修改/DEL=删除
     private Long contactEvtId; //事件主键标识
-    private Long interfaceCfgId;//接口配置标识，主键标识
+    private List<Long> interfaceCfgId;//接口配置标识，主键标识
     private String contactEvtCode;//记录事件的编码信息
     private String contactEvtName;//记录事件的名称
     private String evtMappedAddr;//记录事件的映射地址，事件识别时可通过这个映身地址来适配触点事件，可以是URL地址，APP的类包名或其它识别编码
@@ -58,11 +59,11 @@ public class ContactEvt extends BaseEntity implements Serializable {
         this.contactEvtId = contactEvtId;
     }
 
-    public Long getInterfaceCfgId() {
+    public List<Long> getInterfaceCfgId() {
         return interfaceCfgId;
     }
 
-    public void setInterfaceCfgId(Long interfaceCfgId) {
+    public void setInterfaceCfgId(List<Long> interfaceCfgId) {
         this.interfaceCfgId = interfaceCfgId;
     }
 

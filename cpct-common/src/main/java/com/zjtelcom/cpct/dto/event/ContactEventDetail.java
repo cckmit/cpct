@@ -1,8 +1,10 @@
 package com.zjtelcom.cpct.dto.event;
 
 import com.zjtelcom.cpct.domain.channel.EventItem;
+import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import lombok.Data;
 
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  * @Author pengy
  * @Date 2018/6/22 9:31
  */
+@Data
 public class ContactEventDetail extends ContactEvt{
 
     private List<EventItem> contactEvtItems;
@@ -24,6 +27,7 @@ public class ContactEventDetail extends ContactEvt{
     private String eventTypeName;
     private String interfaceName;
     private EventMatchRulDetail eventMatchRulDetail;
+    private List<InterfaceCfg> interfaceCfgs;
 
     public List<EventItem> getContactEvtItems() {
         return contactEvtItems;
@@ -55,14 +59,6 @@ public class ContactEventDetail extends ContactEvt{
 
     public void setEvtSceneCamRels(List<EvtSceneCamRel> evtSceneCamRels) {
         this.evtSceneCamRels = evtSceneCamRels;
-    }
-
-    public InterfaceCfgDetail getInterfaceCfgDetail() {
-        return interfaceCfgDetail;
-    }
-
-    public void setInterfaceCfgDetail(InterfaceCfgDetail interfaceCfgDetail) {
-        this.interfaceCfgDetail = interfaceCfgDetail;
     }
 
     public List<FilterRule> getFilterRules() {

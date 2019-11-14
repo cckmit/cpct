@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.EventDO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
+import com.zjtelcom.cpct.dto.event.EventInterfaceRel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -50,4 +51,9 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> selectBatchByCode(@Param("contactEvtCodeList") List<String> contactEvtCodeList);
 
+    int createEvtInterfaceRel(EventInterfaceRel eventInterfaceRel);
+
+    int delEvtInterfaceRel (Long evtId);
+
+    List<EventInterfaceRel> selectEvtInterfaceRelByEvtId(Long evtId);
 }
