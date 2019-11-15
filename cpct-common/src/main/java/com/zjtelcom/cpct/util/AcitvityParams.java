@@ -32,6 +32,24 @@ public class AcitvityParams {
             paramMap.put("resultMsg", "活动类型是必须的");
             return paramMap;
         }
+
+        //省公司(必填)  800000000004
+        Object orglevel1 = params.get("orglevel1");
+        if (orglevel1!=null && orglevel1!=""){
+            if (orglevel1.toString().equals("800000000004")){
+                paramMap.put("orglevel1",orglevel1);
+//                paramMap.put("orglevel2","all");
+            }else {
+                paramMap.put("orglevel1","800000000004");
+                paramMap.put("orglevel2",orglevel1);
+//                paramMap.put("orglevel3","all");
+            }
+        }else {
+            paramMap.put("resultCode", CODE_FAIL);
+            paramMap.put("resultMsg", "地市信息是必须的");
+            return paramMap;
+        }
+
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
         Object channelCode = params.get("channelCode");
         if (channelCode!=null && channelCode!=""){
@@ -89,13 +107,7 @@ public class AcitvityParams {
         }else {
             paramMap.put("currenPage","1");
         }
-        //省公司(必填)  800000000004 固定
-        Object orglevel1 = params.get("orglevel1");
-        if (orglevel1!=null && orglevel1!=""){
-            paramMap.put("orglevel1",orglevel1);
-        }else {
-            paramMap.put("orglevel1","800000000004");
-        }
+
         return paramMap;
     }
 }
