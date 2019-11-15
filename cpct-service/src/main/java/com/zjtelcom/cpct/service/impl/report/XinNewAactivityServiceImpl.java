@@ -278,7 +278,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             for (Map<String, Object> c3Map : orgC3List) {
                 Organization orgId = organizationMapper.selectByPrimaryKey(Long.valueOf(c3Map.get("orgId").toString()));
                 //C3 地区名称
-                c3Map.put("name",orgId.getOrgName().substring(0,2));
+                c3Map.put("name",orgId.getOrgName());
             }
             orgMap.put("orgC3List",orgC3List);
         }
