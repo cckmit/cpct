@@ -431,6 +431,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
             datum.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
+            if (campaignDO ==null){
+                datum.put("area","");
+            }
             datum.put("area",getArea(campaignDO));
         }
         //转换率TOP5
@@ -463,7 +466,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             for (Map<String, Object> c3Map : orgC3List) {
                 Organization orgId = organizationMapper.selectByPrimaryKey(Long.valueOf(c3Map.get("orgId").toString()));
                 //C3 地区名称
-                c3Map.put("name",orgId.getOrgName().substring(0,2));
+                c3Map.put("name",orgId.getOrgName());
             }
             orgMap.put("orgC3List",orgC3List);
         }
