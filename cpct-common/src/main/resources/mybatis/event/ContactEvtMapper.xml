@@ -457,12 +457,21 @@
     </select>
 
     <sql id="ss">
-        EVENT_ID,INTERFACE_ID,CHANNEL_CODE,STATUS_CD,STATUS_DATE,CREATE_STAFF,UPDATE_STAFF,REMARK,CREATE_DATE,UPDATE_DATE
+        EVENT_ID,INTERFACE_ID,CHANNEL_CODE,STATUS_CD,CREATE_STAFF,UPDATE_STAFF,CREATE_DATE,STATUS_DATE,UPDATE_DATE,REMARK
     </sql>
 
     <insert id="createEvtInterfaceRel" parameterType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
         insert into mkt_evt_interface_rel (<include refid="ss"/>)
-        values ()
+        values (#{evtId,jdbcType=BIGINT},
+        #{interfaceId,jdbcType=BIGINT},
+        #{channelCode,jdbcType=VARCHAR},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}))
     </insert>
 
     <delete id="delEvtInterfaceRel">

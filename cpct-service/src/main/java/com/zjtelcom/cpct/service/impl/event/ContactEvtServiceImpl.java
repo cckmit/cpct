@@ -189,10 +189,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Override
     public Map<String, Object> selectContactEvtByChlCode(Map<String, Object> params) {
         Map<String, Object> map = new HashMap<>();
+        PageHelper.startPage((int)params.get("page"), (int)params.get("pageSize"));
         List<ContactEvt> contactEvtByChlCode = contactEvtMapper.getContactEvtByChlCode(params);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         map.put("contactEvtList", contactEvtByChlCode);
+        map.put("pageInfo", new Page(new PageInfo(contactEvtByChlCode)));
         return map;
     }
 
