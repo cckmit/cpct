@@ -72,42 +72,39 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
     @Override
     public Map<String, Object> getHeadInfo(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        Date startDate = null;
-        Date endDate = null;
         Map<String, Object> headParam = new HashMap<>();
+        Date endDate = DateUtil.string2DateTime4Day(params.get("endDate").toString());
         // 获取起止时间
-        Map<String, Object> dateMap = getDate(params);
-        headParam.put("startDate", dateMap.get("startDate"));
+        headParam.put("startDate", DateUtil.string2DateTime4Day(params.get("startDate").toString()));
         // 总活动量
         List<Map> headList = new ArrayList<>();
-
         // 总量
         Map<String, Object> totalCountMap = new HashMap<>();
-        List<Map<String, Object>> totalList = countHeadInfo(headParam);
+        List<Map<String, Object>> totalList = countHeadInfo(headParam, endDate);
         totalCountMap.put("name", "总活动数");
         totalCountMap.put("count", totalList);
         headList.add(totalCountMap);
 
         //营销活动
         Map<String, Object> marketCountMap = new HashMap<>();
-        headParam.put("mktCampaignType", "1000");
-        List<Map<String, Object>> marketList = countHeadInfo(headParam);
+        headParam.put("campaignType", "(1000, 2000, 3000, 4000)");
+        List<Map<String, Object>> marketList = countHeadInfo(headParam, endDate);
         marketCountMap.put("name", "营销活动");
         marketCountMap.put("count", marketList);
         headList.add(marketCountMap);
 
         // 服务活动
         Map<String, Object> serviceCountMap = new HashMap<>();
-        headParam.put("mktCampaignType", "5000");
-        List<Map<String, Object>> serviceList = countHeadInfo(headParam);
+        headParam.put("campaignType", "(5000)");
+        List<Map<String, Object>> serviceList = countHeadInfo(headParam, endDate);
         serviceCountMap.put("name", "服务活动");
         serviceCountMap.put("count", serviceList);
         headList.add(serviceCountMap);
 
         // 服务随销活动
         Map<String, Object> serMarkCountMap = new HashMap<>();
-        headParam.put("mktCampaignType", "6000");
-        List<Map<String, Object>> serMarkList = countHeadInfo(headParam);
+        headParam.put("campaignType", "(6000)");
+        List<Map<String, Object>> serMarkList = countHeadInfo(headParam, endDate);
         serMarkCountMap.put("name", "服务随销活动");
         serMarkCountMap.put("count", serMarkList);
         headList.add(serMarkCountMap);
@@ -174,17 +171,12 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
         Map<String, Object> marketParam = new HashMap<>();
         // 获取起止时间
-        Map<String, Object> dateMap = getDate(params);
-        marketParam.put("startDate", dateMap.get("startDate"));
-        marketParam.put("endDate", dateMap.get("endDate"));
+        marketParam.putAll(params);
         //营销活动
-        Map<String, Object> marketCountMap = new HashMap<>();
-        marketParam.put("mktCampaignType", "1000");
-        marketParam.put("statusCd", "(2002, 2006, 2007, 2008, 2010)"); // 总量
         List<MktCampaignDO> mktCampaignDOList = mktCampaignReportMapper.selectByStatus(marketParam);
         List<Map<String, Object>> operMapList = new ArrayList<>();
         // 活跃活动的总量
-        int operCount = 0;
+        int operCount = mktCampaignDOList.size();
         for (SysArea sysArea : sysAreaList) {
             Map<String, Object> cityMap = new HashMap<>();
             cityMap.put("name", sysArea.getName());
@@ -195,7 +187,6 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
                 if (!noOperationIdList.contains(mktCampaignDO.getMktCampaignId())
                         && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
-                    operCount++;
                 }
             }
             cityMap.put("count", count);
@@ -242,10 +233,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
     public Map<String, Object> getChannelInfo(Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> resultMap = new HashMap<>();
-        //  List<Channel> channelList = contactChannelMapper.findChildListByTriggerType();
-        List<Map<String, Object>> channelList = new ArrayList<>();
         Map<String, Object> channelListMap = xinNewAactivityService.activityThemeLevelAndChannel(params);
-        channelList = (List<Map<String, Object>>) channelListMap.get("channel");
+        List<Map<String, Object>> channelList = (List<Map<String, Object>>) channelListMap.get("channel");
         List<Map<String, Object>> channelMapList = new ArrayList<>();
         for (Map<String, Object> channel : channelList) {
             Map<String, Object> channelMap =new HashMap<>();
@@ -267,10 +256,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         });
 
         // 查询是否单渠道活动
-        Map<String, Object> dateMap = getDate(params);
+        getDate(params);
         Map<String, Object> channelParam = new HashMap<>();
-        channelParam.put("startDate", dateMap.get("startDate"));
-        channelParam.put("statusCd", "(2002, 2006, 2008, 2010)"); // 总量
+        channelParam.putAll(params);
         //查询单渠道协同活动
         channelParam.put("oneChannelFlg", "true");
         int oneChannelCount = mktCampaignReportMapper.countByStatus(channelParam);
@@ -308,12 +296,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
     public Map<String, Object> getTypeInfo(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
         // 获取起止时间
-        Map<String, Object> dateMap = getDate(params);
-        params.put("startDate", dateMap.get("startDate"));
-        params.put("endDate", dateMap.get("endDate"));
+        getDate(params);
         Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(1);
         List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
-
         DecimalFormat df = new DecimalFormat("0.00");
         // 随销活动（实时营销活动）
         params.put("tiggerType", StatusCode.REAL_TIME_CAMPAIGN.getStatusCode());
@@ -573,7 +558,6 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Integer province = ((Long) map.get("C2")).intValue();
         Integer city =  ((Long) map.get("C3")).intValue();
         Integer district = ((Long) map.get("C4")).intValue();
-
         Integer sum = group + province + city + district;
 
         localList.add(putParam(new HashMap<>(), "省级", province, sum));
@@ -674,10 +658,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
 
     //统计头部信息
-    private List<Map<String, Object>> countHeadInfo(Map<String, Object> headParam) {
-        if(headParam.containsKey("endDate")){
-            headParam.remove("endDate");
-        }
+    private List<Map<String, Object>> countHeadInfo(Map<String, Object> headParam, Date endDate) {
         headParam.put("statusCd", "(2002, 2006, 2008, 2010)"); // 总量
         int totalCount = mktCampaignReportMapper.countByStatus(headParam);
         List<Map<String, Object>> countList = new ArrayList<>();
@@ -685,9 +666,11 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         countMapTotal.put("type", "总量");
         countMapTotal.put("num", totalCount);
         Map<String, Object> countMapOn = new HashMap<>();
-        headParam.put("statusCd", "(2002， 2008)"); // 在线的
-        headParam.put("endDate", new Date());
-        int onCount = mktCampaignReportMapper.countByStatus(headParam);
+        Map<String, Object> onLineParam = new HashMap<>();
+        onLineParam.putAll(headParam);
+        onLineParam.put("endDate", endDate);
+        onLineParam.put("statusCd", "(2002, 2008)"); // 在线的
+        int onCount = mktCampaignReportMapper.countByStatus(onLineParam);
         countMapOn.put("type", "在线");
         countMapOn.put("num", onCount);
         Map<String, Object> countMapOff = new HashMap<>();
@@ -702,21 +685,14 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
     // 获取起止时间
     private Map<String, Object> getDate(Map<String, Object> params) {
-        Map<String, Object> dateMap = new HashMap<>();
-        Date startDate = null;
-        Date endDate = null;
-        if (params.get("startDate") != null && !"".equals(params.get("startDate"))) {
-            String startTime = params.get("startDate").toString();
-            String[] timeArr = startTime.split("-");
-            startDate = string2DateTime4Day(getFisrtDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
-            dateMap.put("startDate", startDate);
+        params.put("startDate", DateUtil.string2DateTime4Day(params.get("startDate").toString()));
+        if (params.containsKey("endDate")) {
+            params.remove("endDate");
         }
-        if (params.get("endDate") != null && !"".equals(params.get("endTime"))) {
-            String endTime = params.get("endDate").toString();
-            String[] timeArr = endTime.split("-");
-            endDate = string2DateTime4Day(getLastDayOfMonth(Integer.valueOf(timeArr[0]), Integer.valueOf(timeArr[1])));
-            dateMap.put("endDate", endDate);
+        params.put("statusCd", "(2002, 2006, 2008, 2010)");   // 发布，暂停，调整中，过期
+        if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(params.get("campaignType"))) {
+            params.put("campaignType", "(1000, 2000, 3000, 4000)");
         }
-        return dateMap;
+        return params;
     }
 }
