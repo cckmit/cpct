@@ -486,7 +486,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
 
     /**
-     * 转换率修改后
+     * 11/15 修改后的 转换率
      * @param params
      * @return
      */
@@ -500,6 +500,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         paramMap.put("rptType","2");
         //top5
         paramMap.put("pageSize","5");
+
         //查询总数 解析
         log.info("【入参】新活动报表 转换率修改后 ："+JSON.toJSONString(paramMap));
         Map<String,Object> stringOMap = iReportService.queryRptOrder(paramMap);
@@ -509,17 +510,19 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
             datum.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
-            if (campaignDO ==null){
+            if (campaignDO == null){
                 datum.put("area","");
             }
             datum.put("area",getArea(campaignDO));
         }
-        //转换率TOP5
-        dataMap.put("contactRateTop5","rptList");
-
         //地市(ALL表示所有,多个用逗号隔开) 添加11个地市的orgid
         paramMap.put("rptType","1");
-        paramMap.put("orglevel2",OrgEnum.getNameByOrgId());
+        //权限控制C2 / C3
+        if (params.get("orglevel1").toString().equals("800000000004")) {
+            paramMap.put("orglevel2","all");
+        }else {
+            paramMap.put("orglevel3","all");
+        }
         paramMap.put("pageSize","20");
         //查询地市排名
         log.info("【入参】新活动报表 转换率修改后  查询地市排名："+JSON.toJSONString(paramMap));
@@ -533,20 +536,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             }else {
                 orgMap.put("contactRate","0%");
             }
-            //没一个C2下的C3地市数据
-            paramMap.put("orglevel2",orgMap.get("orgId").toString());
-            paramMap.put("orglevel3","all");
-            //查询地市排名
-            log.info("【入参】新活动报表 客触数  C3查询地市排名："+JSON.toJSONString(paramMap));
-            Map<String,Object> orglevel3List = iReportService.queryRptOrder(paramMap);
-            log.info("【出参】新活动报表 客触数 C3查询地市排名:"+JSON.toJSONString(orglevel3List));
-            List<Map<String,Object>> orgC3List = (List<Map<String,Object>>) orglevel3List.get("rptOrderList");
-            for (Map<String, Object> c3Map : orgC3List) {
-                Organization orgId = organizationMapper.selectByPrimaryKey(Long.valueOf(c3Map.get("orgId").toString()));
-                //C3 地区名称
-                c3Map.put("name",orgId.getOrgName());
-            }
-            orgMap.put("orgC3List",orgC3List);
         }
         //按渠道排序
         paramMap.put("rptType","0");
@@ -570,6 +559,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 channelMap.put("contactRate","0%");
             }
         }
+        //转换率TOP5
+        dataMap.put("contactRateTop5",rptList);
         dataMap.put("areaList",orgList);
         dataMap.put("channelList",channelList);
         result.put("code","0000");
@@ -594,8 +585,182 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         return s;
     }
 
+//    /**
+//     * 收入拉动
+//     * @param params
+//     * @return
+//     */
+//    @Override
+//    public Map<String, Object> incomePull(Map<String, Object> params) {
+//        Map<String,Object> result = new HashMap<>();
+//        Map<String,Object> dataMap = new HashMap<>();
+//        List<Map<String,Object>>  dateMapList = new ArrayList<>();
+//        List<Map<String,Object>>  dataList = new ArrayList<>();
+//        List<Map<String,Object>>  mapsList = new ArrayList<>();
+//        //按地市
+//        params.put("rptType","1");
+//        Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+//        String date = params.get("endDate").toString();
+//        String startDate = params.get("startDate").toString();
+//        String type = paramMap.get("mktCampaignType").toString();
+//        //总数
+//        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+//        //查询一条数据 返回总数
+//
+//        log.info("【入参】新活动报表 收入拉动  查询一条数据 ："+JSON.toJSONString(paramMap));
+//        Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
+//        log.info("【出参】新活动报表 收入拉动 查询一条数据 返回总数:"+JSON.toJSONString(stringObjectMap));
+//        if (stringObjectMap.get("resultCode").equals("1000")|| ((List<Map<String,Object>>) stringObjectMap.get("rptOrderList")).size()<1){
+//            result.put("code","0001");
+//            result.put("message","报表查询失败");
+//            return result;
+//        }
+//        List<Map<String,Object>> list = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
+//        //收入低迁金额
+//        dataMap.put("收入低迁金额",list.get(0).get("incomeDown"));
+//        //高迁收入
+//        dataMap.put("高迁收入",list.get(0).get("incomeUp"));
+//        //收入底迁活动数
+//        dataMap.put("收入低迁活动数",list.get(0).get("downCount"));
+//        //收入高签活跃数
+//        dataMap.put("收入高迁活跃数",list.get(0).get("upCount"));
+//        double v = Double.valueOf(dataMap.get("高迁收入").toString()).doubleValue() + Double.valueOf(dataMap.get("收入低迁金额").toString()).doubleValue();
+//        dataMap.put("总收入",fun2(v)); //总收入
+//        dataMap.put("收入平迁金额","0.00"); //收入平迁金额
+//        //收入平迁活动数
+//        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活跃数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
+//        //低迁率
+//        dataMap.put("低迁率",getPercentFormat(Double.valueOf(dataMap.get("收入低迁活动数").toString()).doubleValue()/(double) count,2,2));
+//        //高迁率
+//        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活跃数").toString()).doubleValue()/(double)count,2,2));
+//        //平迁率
+//        dataMap.put("平迁率",getPercentFormat(Double.valueOf(dataMap.get("收入平迁活动数").toString()).doubleValue()/(double)count,2,2));
+//        Iterator<String> iterator = dataMap.keySet().iterator();
+//        while (iterator.hasNext()){
+//            String next = iterator.next();
+//            HashMap<String, Object> map = new HashMap<>();
+//            Object o = dataMap.get(next);
+//            map.put("name",next);
+//            map.put("value",o);
+//            dateMapList.add(map);
+//        }
+//        HashMap<String, Object> map2 = new HashMap<>();
+//        HashMap<String, Object> map3 = new HashMap<>();
+//        HashMap<String, Object> map4 = new HashMap<>();
+//        HashMap<String, Object> map5 = new HashMap<>();
+//        map2.put("name","收入低迁活动");
+//        map2.put("value",dataMap.get("收入低迁活动数"));
+//        map2.put("rate",dataMap.get("低迁率"));
+//        map2.put("num",dataMap.get("收入低迁金额"));
+//
+//        map3.put("name","收入高迁活跃");
+//        map3.put("value",dataMap.get("收入高迁活跃数"));
+//        map3.put("rate",dataMap.get("平迁率"));
+//        map3.put("num",dataMap.get("高迁收入"));
+//
+//        map4.put("name","收入平迁活动");
+//        map4.put("value",dataMap.get("收入平迁活动数"));
+//        map4.put("rate",dataMap.get("高迁率"));
+//        map4.put("num",dataMap.get("收入平迁金额"));
+//
+//        map5.put("name","总收入");
+//        map5.put("num",dataMap.get("总收入"));
+//
+//        mapsList.add(map2);
+//        mapsList.add(map3);
+//        mapsList.add(map4);
+//        mapsList.add(map5);
+//        dataMap.put("dateMapList",mapsList);
+//        dataMap.put("dateMapList2",dateMapList);
+//        //返回多条 按活动查询
+//        paramMap.put("rptType","2");
+//        //top5
+//        paramMap.put("pageSize","5");
+//        //收入提高
+//        paramMap.put("sortColumn","incomeUp");
+//        //收入拉动top5
+//        Map<String, Object> map = iReportService.queryRptOrder(paramMap);
+//        log.info("新活动报表 收入拉动 收入拉动top5:"+JSON.toJSONString(map));
+//        //每个活动需要按地市和渠道排序 取活动id查询地市信息 和渠道信息
+//        List<Map<String, Object>> data = new ArrayList<>();
+//        if (map.get("resultCode") != null && "1".equals(map.get("resultCode").toString())) {
+//            Object rptOrderList = map.get("rptOrderList");
+//            if (rptOrderList!=null && ""!=rptOrderList){
+//                data = (List<Map<String, Object>>) map.get("rptOrderList");
+//                for (Map<String, Object> datum : data) {
+//                    Map<String,Object> camMap = new HashMap<>();
+//                    MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
+//                    camMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
+//                    camMap.put("income",datum.get("incomeUp"));
+//                    camMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
+//                    log.info("活动报表查询接口:orderSuccessRate"+stringObjectMap);
+//                    //按地市
+//                    paramMap.put("rptType","1");
+//                    paramMap.put("orglevel2","all");
+//                    paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
+//                    paramMap.put("pageSize",20);
+//                    Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
+//                    log.info("新活动报表 收入拉动 按地市:"+JSON.toJSONString(stringObjectMap1));
+//                    if (stringObjectMap1.get("resultCode").equals("1000")){
+//                        continue;
+//                    }
+//                    List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
+//                    for (Map<String, Object> orgMap : orgList) {
+//                        orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+//                        Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
+//                        orgMap.put("totalIncome",totalIncome.toString());
+//                    }
+//                    Map<String,Object> areaList = new HashMap<>();
+//                    areaList.put("incomeSum",mapSort(orgList,"totalIncome"));
+//                    areaList.put("lowIncome",mapSort(orgList,"incomeDown"));
+//                    camMap.put("areaList",areaList);
+//
+//                    //按渠道
+//                    paramMap.put("rptType","0");
+//                    paramMap.put("channelCode","all");
+//                    paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
+//                    paramMap.remove("orglevel2");
+//                    Map<String, Object> stringObjectMap2 = iReportService.queryRptOrder(paramMap);
+//                    log.info("新活动报表 收入拉动 按渠道:"+JSON.toJSONString(stringObjectMap2));
+//                    if (stringObjectMap2.get("resultCode").equals("1000")){
+//                        continue;
+//                    }
+//                    List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
+//                    for (Map<String, Object> channelMap : channelList) {
+//                        Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
+//                        channelMap.put("name",channel==null ? "" : channel.getContactChlName());
+//                        Double totalIncome = Double.valueOf(channelMap.get("incomeUp").toString())+ Double.valueOf(channelMap.get("incomeDown").toString());
+//                        channelMap.put("totalIncome",totalIncome.toString());
+//                    }
+//
+//                    Map<String,Object> channels = new HashMap<>();
+//                    channels.put("incomeSum",mapSort(channelList,"totalIncome"));
+//                    channels.put("lowIncome",mapSort(channelList,"incomeDown"));
+//
+//                    camMap.put("channelList",channels);
+//                    dataList.add(camMap);
+//                }
+//            }
+//        } else {
+//            Object reqId = stringObjectMap.get("reqId");
+//            stringObjectMap.put("resultCode", CODE_FAIL);
+//            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + reqId.toString());
+//        }
+//        dataMap.put("dataList",dataList);
+//        result.put("code","0000");
+//        result.put("message","成功");
+//        result.put("data",dataMap);
+//        Map<String, Object> map1 = activityThemeLevelAndChannel(params);
+//        if (map1.get("code").equals("0000")){
+//            result.put("orglevel2",map1.get("orglevel2"));
+//            result.put("channel",map1.get("channel"));
+//        }
+//        return result;
+//    }
+
+
     /**
-     * 收入拉动
+     * 11/15 修改后的 收入拉动
      * @param params
      * @return
      */
@@ -603,7 +768,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     public Map<String, Object> incomePull(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
         Map<String,Object> dataMap = new HashMap<>();
-        List<Map<String,Object>>  dateMapList = new ArrayList<>();
         List<Map<String,Object>>  dataList = new ArrayList<>();
         List<Map<String,Object>>  mapsList = new ArrayList<>();
         //按地市
@@ -615,7 +779,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //总数
         Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
         //查询一条数据 返回总数
-
         log.info("【入参】新活动报表 收入拉动  查询一条数据 ："+JSON.toJSONString(paramMap));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 收入拉动 查询一条数据 返回总数:"+JSON.toJSONString(stringObjectMap));
@@ -644,15 +807,15 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活跃数").toString()).doubleValue()/(double)count,2,2));
         //平迁率
         dataMap.put("平迁率",getPercentFormat(Double.valueOf(dataMap.get("收入平迁活动数").toString()).doubleValue()/(double)count,2,2));
-        Iterator<String> iterator = dataMap.keySet().iterator();
-        while (iterator.hasNext()){
-            String next = iterator.next();
-            HashMap<String, Object> map = new HashMap<>();
-            Object o = dataMap.get(next);
-            map.put("name",next);
-            map.put("value",o);
-            dateMapList.add(map);
-        }
+//        Iterator<String> iterator = dataMap.keySet().iterator();
+//        while (iterator.hasNext()){
+//            String next = iterator.next();
+//            HashMap<String, Object> map = new HashMap<>();
+//            Object o = dataMap.get(next);
+//            map.put("name",next);
+//            map.put("value",o);
+//            dateMapList.add(map);
+//        }
         HashMap<String, Object> map2 = new HashMap<>();
         HashMap<String, Object> map3 = new HashMap<>();
         HashMap<String, Object> map4 = new HashMap<>();
@@ -679,8 +842,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         mapsList.add(map3);
         mapsList.add(map4);
         mapsList.add(map5);
-        dataMap.put("dateMapList",mapsList);
-        dataMap.put("dateMapList2",dateMapList);
+
+//        dataMap.put("dateMapList2",dateMapList);
         //返回多条 按活动查询
         paramMap.put("rptType","2");
         //top5
@@ -690,82 +853,71 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //收入拉动top5
         Map<String, Object> map = iReportService.queryRptOrder(paramMap);
         log.info("新活动报表 收入拉动 收入拉动top5:"+JSON.toJSONString(map));
-        //每个活动需要按地市和渠道排序 取活动id查询地市信息 和渠道信息
-        List<Map<String, Object>> data = new ArrayList<>();
-        if (map.get("resultCode") != null && "1".equals(map.get("resultCode").toString())) {
-            Object rptOrderList = map.get("rptOrderList");
-            if (rptOrderList!=null && ""!=rptOrderList){
-                data = (List<Map<String, Object>>) map.get("rptOrderList");
-                for (Map<String, Object> datum : data) {
-                    Map<String,Object> camMap = new HashMap<>();
-                    MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
-                    camMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
-                    camMap.put("income",datum.get("incomeUp"));
-                    camMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
-                    log.info("活动报表查询接口:orderSuccessRate"+stringObjectMap);
-                    //按地市
-                    paramMap.put("rptType","1");
-                    paramMap.put("orglevel2","all");
-                    paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
-                    paramMap.put("pageSize",20);
-                    Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
-                    log.info("新活动报表 收入拉动 按地市:"+JSON.toJSONString(stringObjectMap1));
-                    if (stringObjectMap1.get("resultCode").equals("1000")){
-                        continue;
-                    }
-                    List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
-                    for (Map<String, Object> orgMap : orgList) {
-                        orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
-                        Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
-                        orgMap.put("totalIncome",totalIncome.toString());
-                    }
-                    Map<String,Object> areaList = new HashMap<>();
-                    areaList.put("incomeSum",mapSort(orgList,"totalIncome"));
-                    areaList.put("lowIncome",mapSort(orgList,"incomeDown"));
-                    camMap.put("areaList",areaList);
-
-                    //按渠道
-                    paramMap.put("rptType","0");
-                    paramMap.put("channelCode","all");
-                    paramMap.put("mktCampaignId",datum.get("mktCampaignId"));
-                    paramMap.remove("orglevel2");
-                    Map<String, Object> stringObjectMap2 = iReportService.queryRptOrder(paramMap);
-                    log.info("新活动报表 收入拉动 按渠道:"+JSON.toJSONString(stringObjectMap2));
-                    if (stringObjectMap2.get("resultCode").equals("1000")){
-                        continue;
-                    }
-                    List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
-                    for (Map<String, Object> channelMap : channelList) {
-                        Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
-                        channelMap.put("name",channel==null ? "" : channel.getContactChlName());
-                        Double totalIncome = Double.valueOf(channelMap.get("incomeUp").toString())+ Double.valueOf(channelMap.get("incomeDown").toString());
-                        channelMap.put("totalIncome",totalIncome.toString());
-                    }
-
-                    Map<String,Object> channels = new HashMap<>();
-                    channels.put("incomeSum",mapSort(channelList,"totalIncome"));
-                    channels.put("lowIncome",mapSort(channelList,"incomeDown"));
-
-                    camMap.put("channelList",channels);
-                    dataList.add(camMap);
-                }
-            }
-        } else {
-            Object reqId = stringObjectMap.get("reqId");
-            stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + reqId.toString());
+        List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) map.get("rptOrderList");
+        for (Map<String, Object> orgMap : incomeTop5List) {
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
+            orgMap.put("income",orgMap.get("incomeUp"));
+            orgMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
+            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
         }
+
+        //权限控制C2 / C3
+        if (params.get("orglevel1").toString().equals("800000000004")) {
+            paramMap.put("orglevel2","all");
+        }else {
+            paramMap.put("orglevel3","all");
+        }
+        paramMap.put("rptType","1");
+        paramMap.put("pageSize",20);
+        //按地市查询
+        Map<String,Object> camMap = new HashMap<>();
+        Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
+        log.info("新活动报表 收入拉动 按地市:"+JSON.toJSONString(stringObjectMap1));
+        List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
+        for (Map<String, Object> orgMap : orgList) {
+            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
+            orgMap.put("totalIncome",totalIncome.toString());
+        }
+        Map<String,Object> areaList = new HashMap<>();
+        areaList.put("incomeSum",mapSort(orgList,"totalIncome"));
+        areaList.put("lowIncome",mapSort(orgList,"incomeDown"));
+        camMap.put("areaList",areaList);
+        dataList.add(camMap);
+
+        //按渠道
+        paramMap.put("rptType","0");
+        paramMap.put("channelCode","all");
+        Map<String, Object> stringObjectMap2 = iReportService.queryRptOrder(paramMap);
+        log.info("新活动报表 收入拉动 按渠道:"+JSON.toJSONString(stringObjectMap2));
+        List<Map<String,Object>> channelList = (List<Map<String,Object>>) stringObjectMap2.get("rptOrderList");
+        for (Map<String, Object> channelMap : channelList) {
+            Channel channel = channelMapper.selectByCode(channelMap.get("channel").toString());
+            channelMap.put("name",channel==null ? "" : channel.getContactChlName());
+            Double totalIncome = Double.valueOf(channelMap.get("incomeUp").toString())+ Double.valueOf(channelMap.get("incomeDown").toString());
+            channelMap.put("totalIncome",totalIncome.toString());
+        }
+        Map<String,Object> channels = new HashMap<>();
+        channels.put("incomeSum",mapSort(channelList,"totalIncome"));
+        channels.put("lowIncome",mapSort(channelList,"incomeDown"));
+        camMap.put("channelList",channels);
+        dataList.add(camMap);
+
+        dataMap.put("dateMapList",mapsList);
+        dataMap.put("incomeTop5List",incomeTop5List);
         dataMap.put("dataList",dataList);
         result.put("code","0000");
         result.put("message","成功");
         result.put("data",dataMap);
-        Map<String, Object> map1 = activityThemeLevelAndChannel(params);
-        if (map1.get("code").equals("0000")){
-            result.put("orglevel2",map1.get("orglevel2"));
-            result.put("channel",map1.get("channel"));
-        }
+//        Map<String, Object> map1 = activityThemeLevelAndChannel(params);
+//        if (map1.get("code").equals("0000")){
+//            result.put("orglevel2",map1.get("orglevel2"));
+//            result.put("channel",map1.get("channel"));
+//        }
         return result;
     }
+
 
     /**
      * 活动主题分类和数量
