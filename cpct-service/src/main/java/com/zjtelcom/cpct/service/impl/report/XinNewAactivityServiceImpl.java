@@ -353,7 +353,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 客触数 查询地市排名:"+JSON.toJSONString(orgMapRes));
         List<Map<String,Object>> orgList = (List<Map<String,Object>>) orgMapRes.get("rptOrderList");
         for (Map<String, Object> orgMap : orgList) {
-            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            if (params.get("orglevel1").toString().equals("800000000004")) {
+                orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            }else {
+                SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
+                orgMap.put("name",sysArea.getName());
+            }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
@@ -512,8 +517,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
             if (campaignDO == null){
                 datum.put("area","");
+            }else {
+                datum.put("area",getArea(campaignDO));
             }
-            datum.put("area",getArea(campaignDO));
         }
         //地市(ALL表示所有,多个用逗号隔开) 添加11个地市的orgid
         paramMap.put("rptType","1");
@@ -530,7 +536,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 转换率修改后 查询地市排名:"+JSON.toJSONString(orgMapRes));
         List<Map<String,Object>> orgList = (List<Map<String,Object>>) orgMapRes.get("rptOrderList");
         for (Map<String, Object> orgMap : orgList) {
-            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            if (params.get("orglevel1").toString().equals("800000000004")) {
+                orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            }else {
+                SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
+                orgMap.put("name",sysArea.getName());
+            }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
@@ -876,7 +887,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("新活动报表 收入拉动 按地市:"+JSON.toJSONString(stringObjectMap1));
         List<Map<String,Object>> orgList = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
         for (Map<String, Object> orgMap : orgList) {
-            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            if (params.get("orglevel1").toString().equals("800000000004")) {
+                orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            }else {
+                SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
+                orgMap.put("name",sysArea.getName());
+            }
             Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
             orgMap.put("totalIncome",totalIncome.toString());
         }
@@ -920,7 +936,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
 
     /**
-     * 活动主题分类和数量
+     * 活动主题分类和数量  看下面这个
      * @param params
      * @return
      */
@@ -1024,19 +1040,35 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         ArrayList<HashMap<String, Object>> areaList = new ArrayList<>();
         ArrayList<HashMap<String, Object>> channelLists = new ArrayList<>();
         //地市信息
-        List<Organization> organizations = organizationMapper.selectMenuByEleven();
-        if (organizations.size()>0 && organizations!=null){
-            for (Organization organization : organizations) {
-                HashMap<String, Object> map = new HashMap<>();
-                String nameByOrgId = OrgEnum.getNameByOrgId(organization.getOrgId());
-                Long orgId = organization.getOrgId();
-                map.put("name",nameByOrgId);
-                map.put("type",orgId);
-                areaList.add(map);
+        if (params.get("orglevel1").toString().equals("800000000004")) {
+            List<Organization> organizations = organizationMapper.selectMenuByEleven();
+            if (organizations.size()>0 && organizations!=null){
+                for (Organization organization : organizations) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    String nameByOrgId = OrgEnum.getNameByOrgId(organization.getOrgId());
+                    Long orgId = organization.getOrgId();
+                    map.put("name",nameByOrgId);
+                    map.put("type",orgId);
+                    areaList.add(map);
+                }
+                resultMap.put("orglevel2",areaList);
+            }else {
+                resultMap.put("code","0001");
             }
-            resultMap.put("orglevel2",areaList);
         }else {
-            resultMap.put("code","0001");
+            SysArea sysArea = sysAreaMapper.getNameByOrgId(params.get("orglevel1").toString());
+            if (sysArea == null){
+                resultMap.put("code","0001");
+            }else {
+                List<SysArea> sysAreas = sysAreaMapper.selectByParnetArea(sysArea.getAreaId());
+                for (SysArea area : sysAreas) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("name",area.getName());
+                    map.put("type",area.getOrgId());
+                    areaList.add(map);
+                }
+                resultMap.put("orglevel2",areaList);
+            }
         }
         //渠道信息
         List<Channel> channelList = contactChannelMapper.getNewActivityChannel();
@@ -1081,9 +1113,17 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             String date = params.get("startDate").toString();
             String type = paramMap.get("mktCampaignType").toString();
             Object statusCd = params.get("statusCd");
+
+
             //地区过滤
-            if (params.get("orglevel2")!=null && params.get("orglevel2")!=""){
-                paramMap.put("orglevel2",params.get("orglevel2"));
+//            if (params.get("orglevel2")!=null && params.get("orglevel2")!=""){
+//                paramMap.put("orglevel2",params.get("orglevel2"));
+//            }
+            //权限控制 todo
+            if (params.get("orglevel1").toString().equals("800000000004")) {
+                paramMap.put("orglevel2","all");
+            }else {
+                paramMap.put("orglevel3","all");
             }
             //主题过滤
             String status = null;
