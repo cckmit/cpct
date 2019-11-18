@@ -70,6 +70,26 @@
     </resultMap>
 
 
+    <sql id="mkt">
+        AND (
+                (
+                    (
+                        PLAN_BEGIN_TIME >= #{startDate}
+                        AND PLAN_BEGIN_TIME lte #{endDate}
+                    )
+                    OR (
+                        PLAN_BEGIN_TIME >= #{startDate}
+                        AND #{endDate} >= PLAN_BEGIN_TIME
+                        AND PLAN_END_TIME > #{endDate}
+                       )
+                )
+                OR (
+                    PLAN_END_TIME >= #{startDate}
+                    AND PLAN_BEGIN_TIME lt #{startDate}
+                    )
+            )
+    </sql>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from mkt_campaign
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -1008,12 +1028,9 @@
         MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,THE_ME,
         CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
-        from mkt_campaign WHERE STATUS_CD IN (2002, 2006,2008, 2010)
+        from mkt_campaign WHERE STATUS_CD IN (2002, 2006,2008, 2010)  <include refid="mkt"/>
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
-        </if>
-        <if test="date != null and date != ''">
-            AND PLAN_BEGIN_TIME > #{date}
         </if>
         <if test="value != null and value != ''">
             AND THE_ME = #{value}
@@ -1022,7 +1039,7 @@
             AND LAN_ID = #{c3}
         </if>
         <if test="regionFlg != null and regionFlg != ''">
-            AND REGION_FLG = 'C3'
+            AND REGION_FLG = #{regionFlg}
         </if>
         GROUP BY INIT_ID
     </select>
@@ -1034,7 +1051,7 @@
 
     <select id="getCountFromActivityThemeByC3" resultType="java.lang.Integer">
         select COUNT(0) FROM mkt_campaign WHERE  STATUS_CD IN (2002, 2006, 2008, 2010)
-        AND MKT_CAMPAIGN_TYPE = #{type} and PLAN_BEGIN_TIME > #{start}
+        AND MKT_CAMPAIGN_TYPE = #{type} <include refid="mkt"/>
         <if test="c3 != null and c3 != ''">
             AND LAN_ID = #{c3}
         </if>
@@ -1065,15 +1082,13 @@
                     STATUS_CD = #{status}
                 </when>
                 <otherwise>
-                    STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+                    STATUS_CD IN (2002, 2006, 2008, 2010)
                 </otherwise>
             </choose>
             <if test="type != null and type != ''">
                 AND MKT_CAMPAIGN_TYPE = #{type}
             </if>
-            <if test="date != null and date != ''">
-                AND PLAN_END_TIME > #{date}
-            </if>
+            <include refid="mkt"/>
             GROUP BY INIT_ID
     </select>
 

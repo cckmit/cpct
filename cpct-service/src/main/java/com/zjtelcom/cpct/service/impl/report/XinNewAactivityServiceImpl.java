@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.service.impl.report.ActivityStatisticsServiceImpl.getPercentFormat;
 
 @Service
@@ -102,11 +101,21 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         HashMap<String, Object> result = new HashMap<>();
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
         List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
-        String date = params.get("startDate").toString();
         String startDate = params.get("startDate").toString();
+        String endDate = params.get("endDate").toString();
         String type = paramMap.get("mktCampaignType").toString();
+        String lanId = "";
+        String regionFlg = "";
+        if (params.get("C3") != null && !params.get("C3").equals("")) {
+            lanId = ChannelUtil.getAreaByOrg(params.get("C3").toString());
+            regionFlg = "C3";
+        }
+        if (params.get("C2") != null && !params.get("C2").equals("")) {
+            lanId = "";
+            regionFlg = "C2";
+        }
         //总数
-        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+        Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
         log.info("【count】："+JSON.toJSONString(count));
         List<Map<String,Object>> dataMap = new ArrayList<>();
         if (campaignTheme.size()>0 && campaignTheme!=null){
@@ -115,7 +124,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 Map<String,Object> themeMap = new HashMap<>();
                 String value = stringStringMap.get("value");
                 //每个主题个数
-                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(value, date, type);
+                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, startDate,endDate ,type, lanId,regionFlg);
                 String substring = null;
                 StringBuilder stringBuilder = new StringBuilder();
                 if (mktCampaignList!=null && mktCampaignList.size()>0){
@@ -985,12 +994,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     public Map<String, Object> activityThemeCountByC3(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
         try {
-
             ArrayList<Object> list = new ArrayList<>();
             Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
             List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
-            String date = params.get("startDate").toString();
             String startDate = params.get("startDate").toString();
+            String endDate = params.get("endDate").toString();
             String type = paramMap.get("mktCampaignType").toString();
             String lanId = "";
             String regionFlg = "";
@@ -1003,13 +1011,13 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 regionFlg = "C2";
             }
             //总数
-            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(date,type,startDate,lanId,regionFlg);
+            Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
             if (campaignTheme.size()>0 && campaignTheme!=null){
                 for (Map<String, String> stringStringMap : campaignTheme) {
                     String value = stringStringMap.get("value");
                     String label = stringStringMap.get("label");
                     //每个主题个数
-                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, date, type, lanId,regionFlg);
+                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, startDate,endDate ,type, lanId,regionFlg);
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("name",label);
                     map.put("value",mktCampaignList.size());
@@ -1110,7 +1118,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             StringBuilder stringBuilder = new StringBuilder();
             //活动按主题 选 all或者主题
             Object theMe = params.get("theMe");
-            String date = params.get("startDate").toString();
+            String startDate = params.get("startDate").toString();
+            String endDate = params.get("endDate").toString();
             String type = paramMap.get("mktCampaignType").toString();
             Object statusCd = params.get("statusCd");
 
@@ -1133,13 +1142,13 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             List<MktCampaignDO> mktCampaignList =null;
             if (theMe!=null && theMe!=""){
                 if (theMe.toString().equals("all")){
-                    mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
+                    mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
                 }else {
-                    //查询主题 value 参数 对应 theMe 1000 - 1800
-                    mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), date, type,status);
+                    //查询主题  theMe = value 参数 对应 表字段theMe 1000 - 1800
+                    mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), startDate,endDate, type,status);
                 }
             }else {
-                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(date,type,status);
+                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
             }
             List<Map<String, Object>> data = new ArrayList<>();
             if (mktCampaignList.size() > 0 && mktCampaignList != null) {
@@ -1163,7 +1172,6 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         HashMap<String, Object> camMap = new HashMap<>();
                         String mktCampaignId1 = datum.get("mktCampaignId").toString();
                         MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
-                        //                    MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(datum.get("mktCampaignId").toString()));
                         if (campaignDO == null){
                             // 如果有为空 跳过
                             continue;
