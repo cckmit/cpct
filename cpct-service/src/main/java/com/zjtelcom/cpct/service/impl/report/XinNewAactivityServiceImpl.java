@@ -1002,14 +1002,25 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             String type = paramMap.get("mktCampaignType").toString();
             String lanId = "";
             String regionFlg = "";
-            if (params.get("C3") != null && !params.get("C3").equals("")) {
-                lanId = ChannelUtil.getAreaByOrg(params.get("C3").toString());
-                regionFlg = "C3";
-            }
-            if (params.get("C2") != null && !params.get("C2").equals("")) {
+//            if (params.get("C3") != null && !params.get("C3").equals("")) {
+//                lanId = ChannelUtil.getAreaByOrg(params.get("C3").toString());
+//                regionFlg = "C3";
+//            }
+//            if (params.get("C2") != null && !params.get("C2").equals("")) {
+//                lanId = "";
+//                regionFlg = "C2";
+//            }
+
+            if (params.get("orglevel1").toString().equals("800000000004")){
+
+            }else if (params.get("orglevel1").toString().equals("1")){
                 lanId = "";
                 regionFlg = "C2";
+            }else {
+                lanId = ChannelUtil.getAreaByOrg(params.get("orglevel1").toString());
+                regionFlg = "C3";
             }
+
             //总数
             Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
             if (campaignTheme.size()>0 && campaignTheme!=null){
@@ -1059,6 +1070,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",orgId);
                     areaList.add(map);
                 }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("name","省级");
+                map.put("type","1");
+                areaList.add(0,map);
                 resultMap.put("orglevel2",areaList);
             }else {
                 resultMap.put("code","0001");
@@ -1123,33 +1138,50 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             String type = paramMap.get("mktCampaignType").toString();
             Object statusCd = params.get("statusCd");
 
-
-            //地区过滤
-//            if (params.get("orglevel2")!=null && params.get("orglevel2")!=""){
-//                paramMap.put("orglevel2",params.get("orglevel2"));
-//            }
+            String lanId = "";
+            String regionFlg = "";
             //权限控制 todo
+            // 全省数据
             if (params.get("orglevel1").toString().equals("800000000004")) {
                 paramMap.put("orglevel2","all");
+            }else if (params.get("orglevel1").toString().equals("1")){
+                //省级数据 不是指全省 只是省级数据
+                paramMap.put("orglevel2","all");
+                regionFlg = "C2";
             }else {
-                paramMap.put("orglevel3","all");
+                //11个地市的数据
+                lanId = ChannelUtil.getAreaByOrg(params.get("orglevel1").toString());
+                regionFlg = "C3";
             }
-            //主题过滤
+
             String status = null;
             if (statusCd!=null && ""!=statusCd){
                 status = statusCd.toString();
             }
-            List<MktCampaignDO> mktCampaignList =null;
-            if (theMe!=null && theMe!=""){
-                if (theMe.toString().equals("all")){
-                    mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
-                }else {
-                    //查询主题  theMe = value 参数 对应 表字段theMe 1000 - 1800
-                    mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), startDate,endDate, type,status);
+            String value = null;
+            if (theMe!=null && ""!=theMe){
+                if (!theMe.toString().equals("all")) {
+                    value = theMe.toString();
                 }
-            }else {
-                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
             }
+//            List<MktCampaignDO> mktCampaignList =null;
+//            //主题过滤
+//            if (theMe!=null && theMe!=""){
+//                if (theMe.toString().equals("all")){
+//                    mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
+//                }else {
+//                    //查询主题  theMe = value 参数 对应 表字段theMe 1000 - 1800
+//                    mktCampaignList = mktCampaignMapper.selectCampaignThemeFromStatus(theMe.toString(), startDate,endDate, type,status);
+//                }
+//            }else {
+//                mktCampaignList = mktCampaignMapper.getMktCampaignFromInitIdFromStatus(startDate,endDate,type,status);
+//            }
+//            if (theMe!=null && theMe!="" && theMe.toString().equals("all")) {
+//
+//            }else {
+//                mktCampaignList = mktCampaignMapper.getQuarterActivities(theMe.toString(),status,startDate,endDate,type,lanId,regionFlg);
+//            }
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getQuarterActivities(value,status,startDate,endDate,type,lanId,regionFlg);
             List<Map<String, Object>> data = new ArrayList<>();
             if (mktCampaignList.size() > 0 && mktCampaignList != null) {
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
