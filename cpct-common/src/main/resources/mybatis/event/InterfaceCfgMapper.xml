@@ -191,6 +191,12 @@
     <if test="interfaceType != null and interfaceType != ''">
       and INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR}
     </if>
+    <if test="interfaceIdList != null">
+      and INTERFACE_CFG_ID in
+      <foreach collection="interfaceIdList" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
     order by UPDATE_DATE desc
   </select>
 

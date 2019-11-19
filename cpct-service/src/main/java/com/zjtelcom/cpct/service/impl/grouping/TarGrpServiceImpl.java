@@ -138,6 +138,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return result;
     }
 
+
+
     @Override
     public Map<String, Object> labelListByEventId(Long eventId) {
         List<Map<String,Object>> campaignDOS = evtRelMapper.listActivityByEventId(eventId);
@@ -879,6 +881,11 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
         }
         return tarGrpDetail;
+    }
+
+    @Override
+    public Integer modTarGrpOther(TarGrp tarGrp) {
+        return tarGrpMapper.modTarGrpOther(tarGrp);
     }
 
 }

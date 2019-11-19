@@ -21,7 +21,9 @@ public interface ContactEvtMapper {
 
     List<ContactEvt> listEvents(ContactEvt contactEvt);
 
-    List<ContactEvt> getContactEvtByChlCode(@Param("map")Map<String, Object> params);
+    List<Map<String, Object>> getContactEvtByChlCode(@Param("map")Map<String, Object> params);
+
+    List<Map<String, Object>> getContactEvtByChlCode2(@Param("map")Map<String, Object> params);
 
     int insert(ContactEvt contactEvt);
 
