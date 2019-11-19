@@ -946,6 +946,41 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
 
     /**
+     * 收入底迁率 top5
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> incomeDown(Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        Map<String,Object> dataMap = new HashMap<>();
+        params.put("rptType","2");
+        Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
+        //收入低迁率 排序
+        paramMap.put("sortColumn","revenueReduceRate");
+        paramMap.put("pageSize","5");
+        log.info("【入参】新活动报表 收入底迁率 top5  ："+JSON.toJSONString(paramMap));
+        Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
+        log.info("【出参】新活动报表 收入底迁率 top5 返回总数:"+JSON.toJSONString(stringObjectMap));
+        List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
+        for (Map<String, Object> orgMap : incomeTop5List) {
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
+            if (orgMap.get("revenueReduceRate")!=null &&orgMap.get("revenueReduceRate")!=""){
+                orgMap.put("revenueReduceRate", getPercentFormat(Double.valueOf(orgMap.get("revenueReduceRate").toString()), 2, 2));
+            }else {
+                orgMap.put("revenueReduceRate","0%");
+            }
+        }
+        dataMap.put("incomeTop5List",incomeTop5List);
+        result.put("code","0000");
+        result.put("message","成功");
+        result.put("data",dataMap);
+        return result;
+    }
+
+
+    /**
      * 活动主题分类和数量  看下面这个
      * @param params
      * @return
@@ -1033,6 +1068,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("name",label);
                     map.put("value",mktCampaignList.size());
+                    map.put("type",value);
                     list.add(map);
                 }
             }
@@ -1114,6 +1150,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         }
         return resultMap;
     }
+
 
 
 
