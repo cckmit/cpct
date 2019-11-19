@@ -1050,6 +1050,7 @@
     </select>
 
     <select id="getCountFromActivityThemeByC3" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM (
         select COUNT(0) FROM mkt_campaign WHERE  STATUS_CD IN (2002, 2006, 2008, 2010)
         AND MKT_CAMPAIGN_TYPE = #{type} <include refid="mkt"/>
         <if test="lanId != null and lanId != ''">
@@ -1058,6 +1059,7 @@
         <if test="regionFlg != null and regionFlg != ''">
             AND REGION_FLG = #{regionFlg}
         </if>
+        GROUP BY INIT_ID) S
     </select>
 
 

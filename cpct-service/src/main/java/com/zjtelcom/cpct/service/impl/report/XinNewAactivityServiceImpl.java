@@ -106,13 +106,14 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         String type = paramMap.get("mktCampaignType").toString();
         String lanId = "";
         String regionFlg = "";
-        if (params.get("C3") != null && !params.get("C3").equals("")) {
-            lanId = ChannelUtil.getAreaByOrg(params.get("C3").toString());
-            regionFlg = "C3";
-        }
-        if (params.get("C2") != null && !params.get("C2").equals("")) {
+        if (params.get("orglevel1").toString().equals("800000000004")){
+
+        }else if (params.get("orglevel1").toString().equals("1")){
             lanId = "";
             regionFlg = "C2";
+        }else {
+            lanId = ChannelUtil.getAreaByOrg(params.get("orglevel1").toString());
+            regionFlg = "C3";
         }
         //总数
         Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
