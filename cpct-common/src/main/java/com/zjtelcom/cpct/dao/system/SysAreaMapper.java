@@ -27,4 +27,5 @@ public interface SysAreaMapper {
 
     SysArea getCityByName(String parentArea);
 
+    SysArea getNameByOrgId(String orgId);
 }

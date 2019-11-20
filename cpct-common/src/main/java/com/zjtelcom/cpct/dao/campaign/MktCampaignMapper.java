@@ -88,15 +88,18 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> selectCampaignTheme(@Param("value") String value, @Param("date") String date,@Param("type") String type);
 
-    List<MktCampaignDO> selectCampaignThemeByC3(@Param("value") String value, @Param("date") String date,@Param("type") String type,@Param("c3") String c3);
+    List<MktCampaignDO> selectCampaignThemeByC3(@Param("value") String value, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
 
     Integer getCountFromActivityTheme(@Param("date") String date,@Param("type") String type,@Param("start")String start);
 
-    Integer getCountFromActivityThemeByC3(@Param("date") String date,@Param("type") String type,@Param("start")String start,@Param("c3") String c3);
+    Integer getCountFromActivityThemeByC3(@Param("startDate") String startDate,@Param("type") String type,@Param("endDate")String endDate,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
     List<MktCampaignDO> getMktCampaignFromInitId(@Param("date") String date,@Param("type") String type);
 
-    List<MktCampaignDO> getMktCampaignFromInitIdFromStatus(@Param("date") String date,@Param("type") String type,@Param("status") String status);
+    List<MktCampaignDO> getMktCampaignFromInitIdFromStatus(@Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("status") String status);
 
-    List<MktCampaignDO> selectCampaignThemeFromStatus(@Param("value") String value, @Param("date") String date,@Param("type") String type,@Param("status") String status);
+    List<MktCampaignDO> selectCampaignThemeFromStatus(@Param("value") String value, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("status") String status);
+
+    List<MktCampaignDO> getQuarterActivities(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
+
 }
