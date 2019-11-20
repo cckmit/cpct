@@ -1282,7 +1282,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         camMap.put("upCount",datum.get("upCount"));//收入提升活动数
                         camMap.put("downCount",datum.get("downCount"));//收入低迁活动数
                         //收入拉动
-                        camMap.put("income",Double.valueOf(datum.get("incomeUp").toString())+ Double.valueOf(datum.get("incomeDown").toString()));
+                        camMap.put("income",Double.valueOf(camMap.get("incomeUp").toString())+ Double.valueOf(camMap.get("incomeDown").toString()));
                         //收入低迁率
                         if (datum.get("revenueReduceRate")!=null &&datum.get("revenueReduceRate")!=""){
                             camMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(datum.get("revenueReduceRate").toString()), 2, 2));
