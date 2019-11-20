@@ -14,7 +14,7 @@ import java.util.Map;
 public class XinNewAactivityController  extends BaseController {
 
 
-    @Autowired(required = false)
+    @Autowired
     private XinNewAactivityService xinNewAactivityService;
 
     //主题活动
@@ -75,5 +75,58 @@ public class XinNewAactivityController  extends BaseController {
         }
         return map;
     }
+
+
+    //主题活动渠道和省地市选择
+    @PostMapping("/activityThemeLevelAndChannel")
+    @CrossOrigin
+    public Map<String,Object> activityThemeLevelAndChannel(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.activityThemeLevelAndChannel(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 主题活动分类和数量  activityThemeLevelAndChannel] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    //主题活动分类和数量
+    @PostMapping("/activityThemeCount")
+    @CrossOrigin
+    public Map<String,Object> activityThemeCount(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.activityThemeCount(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 主题活动分类和数量  activityThemeCount] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    //主题活动分类和数量
+    @PostMapping("/activityThemeCountByC3")
+    @CrossOrigin
+    public Map<String,Object> activityThemeCountByC3(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.activityThemeCountByC3(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 主题活动分类和数量  activityThemeCount] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+
+    //季度营销活动
+    @PostMapping("/quarterActivities")
+    @CrossOrigin
+    public Map<String,Object> quarterActivities(@RequestBody Map<String, Object> params){
+        Map<String, Object> map  = xinNewAactivityService.quarterActivities(params);
+        return map;
+    }
+
 
 }

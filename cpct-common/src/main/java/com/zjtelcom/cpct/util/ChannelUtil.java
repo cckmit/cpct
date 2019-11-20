@@ -14,41 +14,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
 @Component
 public class ChannelUtil  {
-
-    /**
-     * 向文件中写入内容
-     *
-     * @param filepath 文件路径与名称
-     * @param newstr   写入的内容
-     * @return
-     * @throws IOException
-     */
-    public boolean writeFileContent(String filepath, String newstr) throws IOException {
-        File file = new File(filepath);
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try {
-            fw = new FileWriter(file, true);
-            bw = new BufferedWriter(fw);
-            bw.write(newstr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            bw.close();
-            fw.close();
-        }
-        return true;
-    }
-
 
     public static boolean equalsList(List<Long> list1, List<Long> list2){
         // null情况
@@ -148,6 +118,42 @@ public class ChannelUtil  {
         return null;
     }
 
+    public static String getAreaByOrg(String Org) {
+        if (Org.contains("800000000037")){
+            return "571";
+        }
+        if (Org.contains("800000000040")){
+            return "570";
+        }
+        if (Org.contains("800000000021")){
+            return "572";
+        }
+        if (Org.contains("800000000022")){
+            return "573";
+        }
+        if (Org.contains("800000000023")){
+            return "574";
+        }
+        if (Org.contains("800000000024")){
+            return "575";
+        }
+        if (Org.contains("800000000041")){
+            return "576";
+        }
+        if (Org.contains("800000000025")){
+            return "577";
+        }
+        if (Org.contains("800000000039")){
+            return "578";
+        }
+        if (Org.contains("800000000038")){
+            return "579";
+        }
+        if (Org.contains("800000000026")){
+            return "580";
+        }
+        return null;
+    }
 
     /**
      * 实体类转Map

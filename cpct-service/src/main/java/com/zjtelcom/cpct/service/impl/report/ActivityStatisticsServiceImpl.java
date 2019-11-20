@@ -581,7 +581,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
 
 
-    public Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize,Object ymktCampaignType) {
+    private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize,Object ymktCampaignType) {
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
         List<Map<String, Object>> data = new ArrayList<>();
