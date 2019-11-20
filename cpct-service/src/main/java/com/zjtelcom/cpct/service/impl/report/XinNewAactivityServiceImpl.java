@@ -348,6 +348,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             return result;
         }
         dataMap.put("contactNum",rptList.get(0).get("contactNum"));
+        dataMap.put("orderNum",rptList.get(0).get("orderNum")); //总商机数
         dataMap.put("successNum",rptList.get(0).get("orderSuccessNum"));
         dataMap.put("contactRate",getPercentFormat(Double.valueOf(rptList.get(0).get("contactRate").toString()),2,2));
 
@@ -881,6 +882,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             orgMap.put("income",orgMap.get("incomeUp"));
             orgMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
             orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+            orgMap.put("mktCampaignId",campaignDO.getMktCampaignId());
         }
 
         //权限控制C2 / C3
@@ -1280,7 +1282,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         camMap.put("upCount",datum.get("upCount"));//收入提升活动数
                         camMap.put("downCount",datum.get("downCount"));//收入低迁活动数
                         //收入拉动
-                        camMap.put("income",Double.valueOf(datum.get("incomeUp").toString())+ Double.valueOf(datum.get("incomeDown").toString()));
+                        camMap.put("income",Double.valueOf(camMap.get("incomeUp").toString())+ Double.valueOf(camMap.get("incomeDown").toString()));
                         //收入低迁率
                         if (datum.get("revenueReduceRate")!=null &&datum.get("revenueReduceRate")!=""){
                             camMap.put("revenueReduceRate",getPercentFormat(Double.valueOf(datum.get("revenueReduceRate").toString()), 2, 2));
