@@ -102,4 +102,5 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getQuarterActivities(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
+    MktCampaignDO selectByInitIdFromOne(@Param("initId")Long initId);
 }
