@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.es;
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 
+import java.util.List;
 import java.util.Map;
 
 public interface EsHitsService {
@@ -18,4 +19,7 @@ public interface EsHitsService {
     Map<String,Object> searchCampaignHitsTotal(CampaignHitParam param);
 
     Map<String,Object> searchLabelInfoByRuleId(String ruleId, String isi, String hitEntity);
+
+    List<Map<String, Object> > search(List<String> assetList);
+
 }
