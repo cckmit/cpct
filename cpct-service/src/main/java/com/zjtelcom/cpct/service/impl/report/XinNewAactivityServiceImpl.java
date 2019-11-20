@@ -70,7 +70,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             }
             if (regionFlg.equals("C4")) {
                 if (campaignDO.getLanIdFour()== null || campaignDO.getLanIdFour().toString().length()>6){
-                     result = sysArea;
+                    result = sysArea;
                 }else {
                     SysArea area = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(campaignDO.getLanIdFour().toString()));
                     String name = area == null ? "" : area.getName();
@@ -368,7 +368,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
+//                orgMap.put("name",sysArea.getName());
             }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
@@ -551,7 +556,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
             }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
@@ -903,7 +912,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
             }
             Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
             orgMap.put("totalIncome",totalIncome.toString());
