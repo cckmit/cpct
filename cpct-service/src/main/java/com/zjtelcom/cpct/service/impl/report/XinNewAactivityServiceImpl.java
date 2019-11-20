@@ -528,7 +528,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 转换率修改后 ："+JSON.toJSONString(stringOMap));
         List<Map<String,Object>> rptList = (List<Map<String,Object>>) stringOMap.get("rptOrderList");
         for (Map<String, Object> datum : rptList) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(datum.get("mktCampaignId").toString()));
             datum.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
             if (campaignDO == null){
@@ -886,7 +886,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("新活动报表 收入拉动 收入拉动top5:"+JSON.toJSONString(map));
         List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) map.get("rptOrderList");
         for (Map<String, Object> orgMap : incomeTop5List) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(orgMap.get("mktCampaignId").toString()));
             orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             orgMap.put("income",orgMap.get("incomeUp"));
             orgMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
@@ -979,7 +979,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 收入底迁率 top5 返回总数:"+JSON.toJSONString(stringObjectMap));
         List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
         for (Map<String, Object> orgMap : incomeTop5List) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(orgMap.get("mktCampaignId").toString()));
             orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             if (orgMap.get("revenueReduceRate")!=null &&orgMap.get("revenueReduceRate")!=""){
                 orgMap.put("revenueReduceRate", getPercentFormat(Double.valueOf(orgMap.get("revenueReduceRate").toString()), 2, 2));
@@ -1256,7 +1256,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     for (Map<String, Object> datum : data) {
                         HashMap<String, Object> camMap = new HashMap<>();
                         String mktCampaignId1 = datum.get("mktCampaignId").toString();
-                        MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+                        MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(mktCampaignId1));
                         if (campaignDO == null){
                             // 如果有为空 跳过
                             continue;
