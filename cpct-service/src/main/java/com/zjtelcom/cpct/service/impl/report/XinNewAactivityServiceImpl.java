@@ -881,7 +881,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             orgMap.put("income",orgMap.get("incomeUp"));
             orgMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
-            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
+//            orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             orgMap.put("mktCampaignId",campaignDO.getMktCampaignId());
         }
 
