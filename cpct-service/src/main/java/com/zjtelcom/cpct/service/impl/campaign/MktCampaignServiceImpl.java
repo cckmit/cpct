@@ -468,6 +468,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 logger.info("创建人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
                 return maps;
             }
+            if(mktCampaignDO.getUpdateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "更新人信息为空，请核实工号已选中的岗位权限");
+                logger.info("更新人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+                return maps;
+            }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
@@ -656,6 +662,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             CopyPropertiesUtil.copyBean2Bean(mktCampaignDO, mktCampaignVO);
             // 更新活动基本信息
             mktCampaignDO.setUpdateStaff(UserUtil.loginId());
+            if(mktCampaignDO.getUpdateStaff() == 1 ) {
+                maps.put("resultCode", CommonConstant.CODE_FAIL);
+                maps.put("resultMsg", "更新人信息为空，请核实工号已选中的岗位权限");
+                logger.info("更新人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+                return maps;
+            }
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
@@ -3377,6 +3389,41 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+    /**
+     * 刷活动数据
+     * @return
+     */
+    @Override
+    public Map<String, Object> campaignConfig(Long mktCampaignId) {
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
+            List<MktCamChlConfDO> list = camChlConfMapper.selectByCampaignId(mktCampaignId);
+            if (list.size()>1){
+                mktCampaignDO.setOneChannelFlg("false");
+            }else {
+                mktCampaignDO.setOneChannelFlg("true");
+            }
+            String creatChannel = mktCampaignDO.getCreateChannel()==null ? "" : mktCampaignDO.getCreateChannel();
+            String sysPostCode = "";
+            if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+            }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+            }else {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }
+            mktCampaignDO.setRegionFlg(sysPostCode);
+            mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+
+        Map<String,Object> RES = new HashMap<>();
+        RES.put("success","success");
+        return RES;
+    }
 
 
 

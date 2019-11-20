@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+
 @Mapper
 @Repository
 public interface MktCamChlConfMapper {
@@ -30,5 +32,5 @@ public interface MktCamChlConfMapper {
 
     List<MktCamChlConfDO> selectByContactChlId(Long contactChlId);
 
-    List<Long> countCamByChannel(Long contactChlId);
+    List<Long> countCamByChannel(@Param("map") Map<String,Object> map);
 }
