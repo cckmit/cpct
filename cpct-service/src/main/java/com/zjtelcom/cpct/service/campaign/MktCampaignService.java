@@ -77,4 +77,6 @@ public interface MktCampaignService {
 
     Map<String,Object> dataConfig(Map<String,String> map );
 
+    Map<String, Object> campaignConfig(Long mktCampaignId);
+
 }
