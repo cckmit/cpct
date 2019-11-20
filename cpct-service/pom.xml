@@ -113,6 +113,12 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+        <!--渠道协同接触任务id-->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-realtime-mkt-service-api</artifactId>
+        </dependency>
+
 
         <!--<dependency>-->
             <!--<groupId>com.zjhcsoft.bss</groupId>-->
