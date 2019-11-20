@@ -1265,8 +1265,18 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         camMap.put("orderSuccessNum",datum.get("orderSuccessNum")); //商机成功数
                         camMap.put("contactRate",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2)); //转化率
                         camMap.put("orgChannelRate",getPercentFormat(Double.valueOf(datum.get("orgChannelRate").toString()), 2, 2));//门店有销率
-                        camMap.put("incomeUp",datum.get("incomeUp"));//收入提升
-                        camMap.put("incomeDown",datum.get("incomeDown")); // 收入低迁
+                        if (datum.get("incomeUp")!=null &&datum.get("incomeUp")!=""){
+                            camMap.put("incomeUp",datum.get("incomeUp"));//收入提升
+                        }else {
+                            camMap.put("incomeUp",0);
+                        }
+//                        camMap.put("incomeUp",datum.get("incomeUp"));//收入提升
+                        if (datum.get("incomeDown")!=null &&datum.get("incomeDown")!=""){
+                            camMap.put("incomeDown",datum.get("incomeDown"));//收入提升
+                        }else {
+                            camMap.put("incomeDown",0);
+                        }
+//                        camMap.put("incomeDown",datum.get("incomeDown")); // 收入低迁
                         camMap.put("upCount",datum.get("upCount"));//收入提升活动数
                         camMap.put("downCount",datum.get("downCount"));//收入低迁活动数
                         //收入拉动
