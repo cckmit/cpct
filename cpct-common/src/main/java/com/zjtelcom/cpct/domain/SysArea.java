@@ -18,6 +18,8 @@ public class SysArea implements Serializable {
 
     private String cityFour; // c4
 
+    private String orgId;
+
     /**
      * 下级区域列表
      */
@@ -86,5 +88,13 @@ public class SysArea implements Serializable {
 
     public void setCityFour(String cityFour) {
         this.cityFour = cityFour;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 }
