@@ -48,6 +48,9 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
     private SysAreaService sysAreaService;
 
     @Autowired
+    private SysAreaMapper sysAreaMapper;
+
+    @Autowired
     private MktCampaignReportMapper mktCampaignReportMapper;
 
     @Autowired
@@ -129,7 +132,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         getDate(params);
         Integer lanId = 1;
         if (params.get("lanId") != null && !"".equals(params.get("lanId"))) {
-            lanId = ((Long) params.get("lanId")).intValue();
+            lanId = ((Integer) params.get("lanId"));
         }
         Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(lanId);
         List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
@@ -318,7 +321,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         getDate(params);
         Integer lanId = 1;
         if (params.get("lanId") != null && !"".equals(params.get("lanId"))) {
-            lanId = ((Long) params.get("lanId")).intValue();
+            lanId = ((Integer) params.get("lanId"));
         }
         Map<String, Object> sysAreaMap = sysAreaService.listCityByParentId(lanId);
         List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
@@ -756,7 +759,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         getDate(params);
         Integer lanId = 1;
         if (params.get("lanId") != null && !"".equals(params.get("lanId"))) {
-            lanId = ((Long) params.get("lanId")).intValue();
+            lanId = ((Integer) params.get("lanId"));
         }
         Map<String, Object> resultData = new HashMap<>();
 
@@ -928,11 +931,13 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(params.get("campaignType"))) {
             params.put("campaignType", "(1000, 2000, 3000, 4000)");
         }
-        if (params.get("lanId")!=null && !"8330000".equals((String) params.get("lanId")) && "8330000" !=((String) params.get("lanId"))) {
-            params.put("lanId", AreaCodeEnum.getLandIdByRegionId(Long.valueOf((String) params.get("lanId"))));
+        if (params.get("orglevel1")!=null && !"800000000004".equals((String) params.get("orglevel1")) && "800000000004" !=((String) params.get("orglevel1"))) {
+            SysArea sysArea = sysAreaMapper.getNameByOrgId((String) params.get("orglevel1"));
+            params.put("lanId", sysArea.getAreaId());
         } else {
             params.put("lanId", "");
         }
         return params;
     }
+
 }
