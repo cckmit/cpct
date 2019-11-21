@@ -231,7 +231,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             operMapList.add(cityMap);
         }
         // 活跃活动数量 = 总量 - 不活跃活动数量
-        int operCount =  totalCount + OperCountTotal;
+        int operCount =  totalCount - OperCountTotal;
         // 排序
         Collections.sort(operMapList, new Comparator<Map<String, Object>>() {
             @Override
@@ -251,7 +251,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Map<String, Object> noOperMap = new HashMap<>();
         noOperMap.put("name", "无运营活动");
         noOperMap.put("count", OperCountTotal);
-        noOperMap.put("percent", df.format( noOperCount * 100.0 / totalCount) + "%");
+        noOperMap.put("percent", df.format( OperCountTotal * 100.0 / totalCount) + "%");
         noOperMap.put("city", noOperMapList);
         List<Map<String, Object>> operationMapList = new ArrayList<>();
         operationMapList.add(operMap);
