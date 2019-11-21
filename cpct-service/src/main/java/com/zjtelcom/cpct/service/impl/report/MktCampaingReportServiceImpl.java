@@ -209,7 +209,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         List<MktCampaignDO> mktCampaignDOList = mktCampaignReportMapper.selectByStatus(marketParam);
         List<Map<String, Object>> operMapList = new ArrayList<>();
         // 活跃活动的总量
-        int operCount = mktCampaignDOList.size();
+        int totalCount = mktCampaignDOList.size();
         for (SysArea sysArea : sysAreaList) {
             Map<String, Object> cityMap = new HashMap<>();
             cityMap.put("name", sysArea.getName());
@@ -230,8 +230,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("count", count);
             operMapList.add(cityMap);
         }
-        // 总量 =  活跃活动数量 + 不活跃活动数量
-        int totalCount =  operCount + OperCountTotal;
+        // 活跃活动数量 = 总量 - 不活跃活动数量
+        int operCount =  totalCount + OperCountTotal;
         // 排序
         Collections.sort(operMapList, new Comparator<Map<String, Object>>() {
             @Override
@@ -250,7 +250,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
         Map<String, Object> noOperMap = new HashMap<>();
         noOperMap.put("name", "无运营活动");
-        noOperMap.put("count", noOperCount);
+        noOperMap.put("count", OperCountTotal);
         noOperMap.put("percent", df.format( noOperCount * 100.0 / totalCount) + "%");
         noOperMap.put("city", noOperMapList);
         List<Map<String, Object>> operationMapList = new ArrayList<>();
