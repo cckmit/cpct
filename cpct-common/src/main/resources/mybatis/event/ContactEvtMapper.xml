@@ -58,6 +58,33 @@
         ORDER BY e.UPDATE_DATE DESC
     </select>
 
+    <select id="getContactEvtByChlCode" resultType="map" parameterType="map">
+      select distinct r.EVENT_ID contactEvtId, e.EVENT_NBR contactEvtCode, e.EVENT_NAME contactEvtName
+      from mkt_evt_interface_rel r
+      left join event e on e.EVENT_ID = r.EVENT_ID
+      where r.CHANNEL_CODE = #{map.chlCode}
+      <if test="map.evtName != null and map.evtName != ''" >
+        and e.EVENT_NAME like CONCAT('%',#{map.evtName},'%')
+      </if>
+    </select>
+
+    <select id="getContactEvtByChlCode2" resultType="map" parameterType="map">
+        <!--select distinct r.INTERFACE_ID interfaceId, i.INTERFACE_NAME interfaceName
+        from mkt_evt_interface_rel r
+        left join interface_cfg i on i.INTERFACE_CFG_ID = r.INTERFACE_ID
+        where r.CHANNEL_CODE = #{map.chlCode}
+        <if test="map.intfName != null and map.intfName != ''" >
+            and i.INTERFACE_NAME like CONCAT('%',#{map.intfName},'%')
+        </if>-->
+        select distinct i.INTERFACE_CFG_ID interfaceId, i.INTERFACE_NAME interfaceName
+        from interface_cfg i
+        left join contact_channel c on c.CONTACT_CHL_ID = i.CALLER
+        where c.CONTACT_CHL_CODE = #{map.chlCode}
+        <if test="map.intfName != null and map.intfName != ''" >
+            and i.INTERFACE_NAME like CONCAT('%',#{map.intfName},'%')
+        </if>
+    </select>
+
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
         select * from event
@@ -444,5 +471,34 @@
         <foreach collection="contactEvtCodeList" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <sql id="ss">
+        EVENT_ID,INTERFACE_ID,CHANNEL_CODE,STATUS_CD,CREATE_STAFF,UPDATE_STAFF,CREATE_DATE,STATUS_DATE,UPDATE_DATE,REMARK
+    </sql>
+
+    <insert id="createEvtInterfaceRel" parameterType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
+        insert into mkt_evt_interface_rel (<include refid="ss"/>)
+        values (#{evtId,jdbcType=BIGINT},
+        #{interfaceId,jdbcType=BIGINT},
+        #{channelCode,jdbcType=VARCHAR},
+        #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{updateStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="delEvtInterfaceRel">
+        delete from mkt_evt_interface_rel
+        where EVENT_ID = #{evtId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectEvtInterfaceRelByEvtId" resultType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
+        select EVT_INTERFACE_REL_ID evtInterfaceRelId, EVENT_ID evtId, INTERFACE_ID interfaceId, CHANNEL_CODE channelCode
+        from mkt_evt_interface_rel
+        where EVENT_ID = #{evtId,jdbcType=BIGINT}
     </select>
 </mapper>

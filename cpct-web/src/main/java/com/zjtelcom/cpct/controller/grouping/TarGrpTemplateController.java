@@ -176,10 +176,8 @@ public class TarGrpTemplateController  extends BaseController {
 
     @PostMapping("tarGrpTemplateCountAndIssue")
     @CrossOrigin
-    public String tarGrpTemplateCountAndIssue(@RequestBody Map<String, String> params) {
-        String tarGrpTemplateId = params.get("tarGrpTemplateId");
-        String operationType = params.get("operationType");
-        Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountAndIssue(tarGrpTemplateId, operationType);
+    public String tarGrpTemplateCountAndIssue(@RequestBody Map<String, Object> params) {
+        Map<String, Object> map = tarGrpTemplateService.tarGrpTemplateCountAndIssue(params);
         return JSON.toJSONString(map);
     }
 

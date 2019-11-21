@@ -138,6 +138,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return result;
     }
 
+
+
     @Override
     public Map<String, Object> labelListByEventId(Long eventId) {
         List<Map<String,Object>> campaignDOS = evtRelMapper.listActivityByEventId(eventId);
@@ -879,6 +881,25 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
         }
         return tarGrpDetail;
+    }
+
+    @Override
+    public Integer modTarGrpOther(TarGrp tarGrp) {
+        return tarGrpMapper.modTarGrpOther(tarGrp);
+    }
+
+    @Override
+    public Map<String, Object> queryTarGrpOther(TarGrp tarGrp) {
+        Map<String, Object> map = new HashMap();
+        tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrp.getTarGrpId());
+        if (StringUtils.isNotBlank(tarGrp.getLabelCodes())) {
+            map.put("labelCodes", tarGrp.getLabelCodes().split(","));
+        } else {
+            map.put("labelCodes", "");
+        }
+        map.put("channelCode", tarGrp.getChannelCode());
+        map.put("tarGrpId", tarGrp.getTarGrpId());
+        return map;
     }
 
 }
