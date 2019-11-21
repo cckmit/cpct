@@ -163,7 +163,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             int count = 0;
             for (MktCampaignDO mktCampaignDO : mktCampaignDOInList) {
                 // "不活跃活动"活动判断地市
-                if (sysArea.getAreaLevel() == 1 && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
+                if (sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanId() != null
+                        && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanIdFour() != null
                         && sysArea.getAreaId().equals(mktCampaignDO.getLanIdFour().intValue())) {
@@ -200,7 +201,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 // 判断不是"不活跃活动"
                 if (!noOperationIdList.contains(mktCampaignDO.getMktCampaignId())
-                        && sysArea.getAreaLevel() == 1
+                        && sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanId() != null
                         && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (!noOperationIdList.contains(mktCampaignDO.getMktCampaignId())
@@ -329,7 +330,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 随销活动（实时营销活动）
         params.put("tiggerType", StatusCode.REAL_TIME_CAMPAIGN.getStatusCode());
         //  int realTimeCount = mktCampaignReportMapper.countByStatus(params);
-        List<MktCampaignDO> realTimeList = mktCampaignReportMapper.selectByStatus(params);
+        List<MktCampaignDO> realTimeList = new ArrayList<>();
+        realTimeList = mktCampaignReportMapper.selectByStatus(params);
         int realTimeCount = realTimeList.size();
         Map<String, Object> realTimeMap = new HashMap<>();
         realTimeMap.put("count", realTimeList.size());
@@ -341,7 +343,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             int count = 0;
             for (MktCampaignDO mktCampaignDO : realTimeList) {
-                if (sysArea.getAreaLevel() == 1 && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
+                if (sysArea.getAreaLevel() == 1  && mktCampaignDO.getLanId() != null
+                        && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (sysArea.getAreaLevel() == 2 && mktCampaignDO.getLanIdFour()!=null && sysArea.getAreaId().equals(mktCampaignDO.getLanIdFour().intValue())) {
                     count++;
@@ -402,7 +405,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 标签取数
         trilParamMap.put("batchType", "2000"); // 试算类型
         // int labelCount = mktCampaignMapper.countByTrial(trilParamMap);
-        List<MktCampaignDO> labelList = mktCampaignReportMapper.selectByStatus(trilParamMap);
+        List<MktCampaignDO> labelList = new ArrayList<>();
+        labelList = mktCampaignReportMapper.selectByStatus(trilParamMap);
         int labelCount = labelList.size();
         Map<String, Object> trilMap = new HashMap<>();
         trilMap.put("name", "派单活动 标签取数");
@@ -415,7 +419,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             int count = 0;
             for (MktCampaignDO mktCampaignDO : labelList) {
-                if (sysArea.getAreaLevel() == 1 && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
+                if (sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanId() != null
+                        && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (sysArea.getAreaLevel() == 2 && mktCampaignDO.getLanIdFour()!=null && sysArea.getAreaId().equals(mktCampaignDO.getLanIdFour().intValue())) {
                     count++;
@@ -461,13 +466,11 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
 
 
-
-
-
         // 清单导入
         trilParamMap.put("batchType", "1000");// 试算类型
         //  int listCount = mktCampaignMapper.countByTrial(trilParamMap);
-        List<MktCampaignDO> trilList = mktCampaignReportMapper.selectByStatus(trilParamMap);
+        List<MktCampaignDO> trilList = new ArrayList<>();
+        trilList = mktCampaignReportMapper.selectByStatus(trilParamMap);
         int listCount = trilList.size();
         Map<String, Object> listMap = new HashMap<>();
         listMap.put("name", "派单活动 清单取数");
@@ -480,7 +483,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             int count = 0;
             for (MktCampaignDO mktCampaignDO : trilList) {
-                if (sysArea.getAreaLevel() == 1 && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
+                if (sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanId() != null
+                        && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (sysArea.getAreaLevel() == 2 && mktCampaignDO.getLanIdFour()!=null && sysArea.getAreaId().equals(mktCampaignDO.getLanIdFour().intValue())) {
                     count++;
@@ -543,7 +547,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("orgid", OrgEnum.getLanIdByName(sysArea.getName()));
             int count = 0;
             for (MktCampaignDO mktCampaignDO : otherList) {
-                if (sysArea.getAreaLevel() == 1 && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
+                if (sysArea.getAreaLevel() == 1 && mktCampaignDO.getLanId() != null
+                        && sysArea.getAreaId().equals(mktCampaignDO.getLanId().intValue())) {
                     count++;
                 } else if (sysArea.getAreaLevel() == 2 && mktCampaignDO.getLanIdFour()!=null && sysArea.getAreaId().equals(mktCampaignDO.getLanIdFour().intValue())) {
                     count++;
@@ -905,7 +910,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Map<String, Object> countMapOn = new HashMap<>();
         Map<String, Object> onLineParam = new HashMap<>();
         onLineParam.putAll(headParam);
-      //  onLineParam.put("endDate", endDate);
+        //  onLineParam.put("endDate", endDate);
         onLineParam.put("statusCd", "(2002, 2008)"); // 在线的
         int onCount = mktCampaignReportMapper.countByStatus(onLineParam);
         countMapOn.put("type", "在线");

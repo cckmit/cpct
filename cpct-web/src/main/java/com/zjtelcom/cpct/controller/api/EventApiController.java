@@ -232,7 +232,7 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String queryEventInst(@RequestBody Map<String, String> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        eventInstService.queryEventInst(params);
+        resultMap = eventInstService.queryEventInst(params);
         return JSON.toJSONString(resultMap);
     }
 
@@ -241,9 +241,8 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String queryEventInstLog(@RequestBody Map<String, String> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        eventInstService.queryEventInstLog(params);
+        resultMap = eventInstService.queryEventInstLog(params);
         return JSON.toJSONString(resultMap);
     }
-
 
 }
