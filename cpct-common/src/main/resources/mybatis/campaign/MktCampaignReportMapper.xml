@@ -254,7 +254,7 @@
         SELECT
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C2' <include refid="reg"/>) C2,
+        WHERE REGION_FLG = 'C2' AND MKT_ACTIVITY_NBR LIKE CONCAT('%MKT%') <include refid="reg"/>) C2,
         (SELECT COUNT(1)
         FROM mkt_campaign
         WHERE REGION_FLG = 'C3' <include refid="reg"/>) C3,
