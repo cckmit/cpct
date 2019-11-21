@@ -153,6 +153,23 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         for (MktCampaignDO mktCampaignDO : mktCampaignList) {
             noOperationIdList.add(mktCampaignDO.getMktCampaignId());
         }
+
+        //
+        detailsParams.put("tiggerType", "1000");
+        Map<String, Object> mktCampaignDetailBatch = activityStatisticsService.getMktCampaignDetails(detailsParams);
+        List<MktCampaignDO> mktCampaignBatchList = (List<MktCampaignDO>) mktCampaignDetailBatch.get("resultMsg");
+        Page pageInfoBatch = (Page) mktCampaignDetails.get("pageInfo");
+        // 不活跃活动数量
+        int noOperCountBatch = 0;
+        if (pageInfo != null) {
+            noOperCountBatch = pageInfoBatch.getTotal().intValue();
+        }
+        int OperCountTotal = noOperCount + noOperCountBatch;
+        for (MktCampaignDO mktCampaignDO : mktCampaignBatchList) {
+            noOperationIdList.add(mktCampaignDO.getMktCampaignId());
+        }
+
+
         List<Map<String, Object>> noOperMapList = new ArrayList<>();
         // 查询所有不活跃报表信息
         List<MktCampaignDO> mktCampaignDOInList = mktCampaignMapper.selectBatch(noOperationIdList);
@@ -214,7 +231,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             operMapList.add(cityMap);
         }
         // 总量 =  活跃活动数量 + 不活跃活动数量
-        int totalCount =  operCount + noOperCount;
+        int totalCount =  operCount + OperCountTotal;
         // 排序
         Collections.sort(operMapList, new Comparator<Map<String, Object>>() {
             @Override

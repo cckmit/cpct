@@ -82,6 +82,7 @@
 
 
     <select id="countByStatus" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT (0) FROM (
         SELECT COUNT (1)
         from mkt_campaign
         where 1 = 1
@@ -110,10 +111,13 @@
         <if test="map.batchType != null and map.batchType != ''">
             AND BATCH_TYPE IN ${map.batchType}
         </if>
+        GROUP BY INIT_ID
+        ) ss
     </select>
 
 
     <select id="countByTime" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT (0) FROM (
         SELECT COUNT (1)
         from mkt_campaign
         where 1 = 1
@@ -133,6 +137,8 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        GROUP BY INIT_ID
+        ) ss
     </select>
 
     <select id="selectByStatus" parameterType="map" resultMap="BaseResultMap">
@@ -178,6 +184,7 @@
         <if test="map.batchType != null and map.batchType != '' and map.batchType == '3000'">
             AND BATCH_TYPE IS NULL
         </if>
+        GROUP BY INIT_ID
     </select>
 
 
@@ -227,23 +234,28 @@
             WHERE
             tril.CREATE_STAFF = 1000 )
         </if>
+        GROUP BY INIT_ID
     </select>
 
 
     <select id="selectCamSumByArea" resultType="java.util.Map" parameterType="map">
         SELECT a.name,t1.c3, t2.c4c5
         FROM sys_area a
-        LEFT JOIN (SELECT COUNT(1) c3, LAN_ID
+        LEFT JOIN (
+        SELECT COUNT(1) FROM
+        (SELECT COUNT(1) c3, LAN_ID
         FROM mkt_campaign
         WHERE REGION_FLG = 'C3'
         <include refid="ssss"/>
-        GROUP BY LAN_ID
+        GROUP BY LAN_ID,INIT_ID)
         ) t1 ON a.area_id = t1.LAN_ID
-        LEFT JOIN (SELECT COUNT(1) c4c5, LAN_ID
+        LEFT JOIN (
+        SELECT COUNT(1) FROM
+        (SELECT COUNT(1) c4c5, LAN_ID
         FROM mkt_campaign
         WHERE REGION_FLG IN ('C4','C5')
         <include refid="ssss"/>
-        GROUP BY LAN_ID
+        GROUP BY LAN_ID, INIT_ID)
         ) t2 ON a.area_id = t2.LAN_ID
         WHERE a.area_level = '1'
         GROUP BY a.name
@@ -252,18 +264,22 @@
 
     <select id="selectCamSumByArea1" resultType="java.util.Map" parameterType="map">
         SELECT
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C2' AND MKT_ACTIVITY_NBR LIKE CONCAT('%MKT%') <include refid="reg"/>) C2,
+        WHERE REGION_FLG = 'C2' AND MKT_ACTIVITY_NBR LIKE CONCAT('%MKT%')<include refid="reg"/>  GROUP BY INIT_ID) c2) C2,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C3' <include refid="reg"/>) C3,
+        WHERE REGION_FLG = 'C3' <include refid="reg"/> GROUP BY INIT_ID) c3 ) C3,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG IN ('C4','C5') <include refid="reg"/>) C4,
+        WHERE REGION_FLG IN ('C4','C5') <include refid="reg"/> GROUP BY INIT_ID) c4 ) C4,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="reg"/>) C1,
+        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="reg"/>GROUP BY INIT_ID)c1 ) C1,
         COUNT(1) SUM
         FROM mkt_campaign WHERE 1 = 1 <include refid="reg"/>
     </select>
