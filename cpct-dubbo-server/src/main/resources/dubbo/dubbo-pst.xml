@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://code.alibabatech.com/schema/dubbo
-    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
@@ -43,11 +43,8 @@
     <!-- 编码查询事件详情服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
         <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
-    </dubbo:service>
-
-    <!-- 名单导入服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
         <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
+        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
     </dubbo:service>
 
 
@@ -60,10 +57,6 @@
         <dubbo:method name="rollBackMktCampaign" servicecode="00.1083.rollBackMktCampaign" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 编码查询渠道详细服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="1.0" >
-        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
-    </dubbo:service>
 
     <!-- 调查问卷详情查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.QuestionService" ref="questionServiceImpl" version="1.0" >
@@ -117,7 +110,8 @@
     </dubbo:reference>
 
     <!--活动信息同步大数据-->
-    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
+    <dubbo:reference registry="esb2" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0"
+                     retries="0" check="false">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
     </dubbo:reference>
 
