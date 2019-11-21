@@ -888,4 +888,18 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         return tarGrpMapper.modTarGrpOther(tarGrp);
     }
 
+    @Override
+    public Map<String, Object> queryTarGrpOther(TarGrp tarGrp) {
+        Map<String, Object> map = new HashMap();
+        tarGrp = tarGrpMapper.selectByPrimaryKey(tarGrp.getTarGrpId());
+        if (StringUtils.isNotBlank(tarGrp.getLabelCodes())) {
+            map.put("labelCodes", tarGrp.getLabelCodes().split(","));
+        } else {
+            map.put("labelCodes", "");
+        }
+        map.put("channelCode", tarGrp.getChannelCode());
+        map.put("tarGrpId", tarGrp.getTarGrpId());
+        return map;
+    }
+
 }

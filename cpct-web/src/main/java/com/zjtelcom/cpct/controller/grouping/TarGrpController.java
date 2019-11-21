@@ -263,7 +263,7 @@ public class TarGrpController extends BaseController {
     /**
      * 修改目标分群
      */
-    @RequestMapping("/modTarGrpOther")
+    @PostMapping("/modTarGrpOther")
     @CrossOrigin
     public String modTarGrpOther(@RequestBody TarGrp tarGrp) {
         Map<String, Object> maps = new HashMap<>();
@@ -286,5 +286,24 @@ public class TarGrpController extends BaseController {
     }
 
 
-
+    /**
+     * 修改目标分群
+     */
+    @PostMapping("/queryTarGrpOther")
+    @CrossOrigin
+    public String queryTarGrpOther(@RequestBody TarGrp tarGrp) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            Map<String, Object> map = tarGrpService.queryTarGrpOther(tarGrp);
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", "修改成功！");
+            maps.put("resultData", map);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modTarGrpOther," +
+                    " Exception: ", JSONArray.toJSON(tarGrp), e);
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "修改失败！");
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
 }

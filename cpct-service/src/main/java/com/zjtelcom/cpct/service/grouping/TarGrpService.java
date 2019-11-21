@@ -47,4 +47,6 @@ public interface TarGrpService {
     Map<String,Object> conditionSwitch(Long conditionId,String type,String value);
 
     Integer modTarGrpOther(TarGrp tarGrp);
+
+    Map<String, Object> queryTarGrpOther(TarGrp tarGrp);
 }
