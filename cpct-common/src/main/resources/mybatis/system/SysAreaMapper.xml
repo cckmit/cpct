@@ -8,6 +8,7 @@
     <result column="area_level" jdbcType="INTEGER" property="areaLevel" />
     <result column="CITY_THREE" jdbcType="VARCHAR" property="cityThree" />
     <result column="CITY_FOUR" jdbcType="VARCHAR" property="cityFour" />
+    <result column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_area
@@ -41,7 +42,7 @@
     where area_level = #{areaLevel,jdbcType=INTEGER}
   </select>
   <select id="selectByParnetArea"  parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select area_id, parent_area, name, area_level
+    select area_id, parent_area, name, area_level,ORG_ID
     from sys_area
     where parent_area = #{parentArea,jdbcType=INTEGER}
   </select>
@@ -55,5 +56,9 @@
          SELECT  area_id, parent_area, name, area_level, CITY_THREE , CITY_FOUR
               FROM sys_area WHERE area_id = #{parentArea}
     </select>
+
+  <select id="getNameByOrgId" parameterType="java.lang.String" resultMap="BaseResultMap">
+         SELECT area_id, parent_area, name, area_level, CITY_THREE , CITY_FOUR FROM sys_area WHERE ORG_ID = #{orgId}
+  </select>
 
 </mapper>

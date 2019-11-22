@@ -77,6 +77,20 @@ public class XinNewAactivityController  extends BaseController {
     }
 
 
+    //收入底迁TOP5
+    @PostMapping("/incomeDown")
+    @CrossOrigin
+    public Map<String,Object> incomeDown(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.incomeDown(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 收入底迁TOP5  incomeDown] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
     //主题活动渠道和省地市选择
     @PostMapping("/activityThemeLevelAndChannel")
     @CrossOrigin

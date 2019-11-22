@@ -140,6 +140,12 @@ public class MktCampaign extends BaseEntity {
 
     private String lanIdFiveName;
 
+    private String oneChannelFlg;//是否单渠道活动
+
+    private String theMe;//活动主题
+
+    private String regionFlg;//活动创建地市
+
 
     public Long getDirectoryId() {
         return directoryId;
@@ -403,5 +409,29 @@ public class MktCampaign extends BaseEntity {
 
     public void setLanIdFiveName(String lanIdFiveName) {
         this.lanIdFiveName = lanIdFiveName;
+    }
+
+    public String getOneChannelFlg() {
+        return oneChannelFlg;
+    }
+
+    public void setOneChannelFlg(String oneChannelFlg) {
+        this.oneChannelFlg = oneChannelFlg;
+    }
+
+    public String getTheMe() {
+        return theMe;
+    }
+
+    public void setTheMe(String theMe) {
+        this.theMe = theMe;
+    }
+
+    public String getRegionFlg() {
+        return regionFlg;
+    }
+
+    public void setRegionFlg(String regionFlg) {
+        this.regionFlg = regionFlg;
     }
 }
