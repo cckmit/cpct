@@ -36,7 +36,7 @@ public class EventApiTestController {
     private YzServ yzServ;
 //    @Autowired
 //    private MktCampaignPrdMapper mktCampaignPrdMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignSyncApiService syncApiService;
     @Autowired
     private SearchLabelService searchLabelService;
