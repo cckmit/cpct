@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cpct</artifactId>
+        <groupId>com.zjtelcom.cpct</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cpct-label-statistic</artifactId>
+    <name>cpct-label-statistic</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjhcsoft</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <!-- druid -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+
+        <!-- ctgmq -->
+        <dependency>
+            <groupId>com.ctg.itrdc.mq</groupId>
+            <artifactId>ctg-mq-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-remoting</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-srvutil</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctg.mq</groupId>
+            <artifactId>ctgmq-rocketmq-tools</artifactId>
+        </dependency>
+
+        <!-- es -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.plugin</groupId>
+            <artifactId>transport-netty4-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>pst</id>
+            <properties>
+                <spring.profiles.active>pst</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pre</id>
+            <properties>
+                <spring.profiles.active>pre</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>gray</id>
+            <properties>
+                <spring.profiles.active>gray</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>gray-pre</id>
+            <properties>
+                <spring.profiles.active>gray-pre</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pt</id>
+            <properties>
+                <spring.profiles.active>pt</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <resource.delimiter>#</resource.delimiter>
+    </properties>
+
+    <build>
+        <finalName>cpct-label-statistic</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources.${spring.profiles.active}</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.4.3.RELEASE</version>
+                <configuration>
+                    <mainClass>com.zjtelcom.cpct.LabelStatisticApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
