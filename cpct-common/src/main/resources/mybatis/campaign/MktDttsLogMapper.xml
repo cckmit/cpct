@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktDttsLogMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktDttsLog">
+        <id column="DTTS_LOG_ID" jdbcType="BIGINT" property="dttsLogId" />
+        <result column="DTTS_TYPE" jdbcType="VARCHAR" property="dttsType" />
+        <result column="DTTS_STATE" jdbcType="VARCHAR" property="dttsState" />
+        <result column="BEGIN_TIME" jdbcType="TIMESTAMP" property="beginTime" />
+        <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="DTTS_RESULT" jdbcType="VARCHAR" property="dttsResult" />
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="REMARK_ONE" jdbcType="VARCHAR" property="remarkOne" />
+        <result column="REMARK_TWO" jdbcType="VARCHAR" property="remarkTwo" />
+    </resultMap>
+
+    <insert id="insert" parameterMap="BaseResultMap" keyProperty="dttsLogId" useGeneratedKeys="true">
+        insert into mkt_dtts_log (DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
+                                  CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO)
+        values (#{dttsLogId,jdbcType=BIGINT}, #{dttsType,jdbcType=VARCHAR}, #{dttsState,jdbcType=VARCHAR},
+                #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{dttsResult,jdbcType=VARCHAR},
+                #{statusDate,jdbcType=TIMESTAMP}, #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+                #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},
+                #{remarkOne,jdbcType=VARCHAR}, #{remarkTwo,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktDttsLog">
+        update mkt_dtts_log
+        set
+          <if test="dttsType != null and dttsType != ''">
+              DTTS_TYPE = #{dttsType,jdbcType=VARCHAR},
+          </if>
+          <if test="dttsState != null and dttsState != ''">
+              DTTS_STATE = #{dttsState,jdbcType=VARCHAR},
+          </if>
+          <if test="beginTime != null">
+              BEGIN_TIME = #{beginTime,jdbcType=TIMESTAMP},
+          </if>
+          <if test="endTime != null">
+              END_TIME = #{endTime,jdbcType=TIMESTAMP},
+          </if>
+          <if test="dttsResult != null and dttsResult != ''">
+              DTTS_RESULT = #{dttsResult,jdbcType=VARCHAR},
+          </if>
+          <if test="statusDate != null">
+              STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+          </if>
+          <if test="createStaff != null and createStaff != ''">
+              CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+          </if>
+          <if test="createDate != null">
+            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+          </if>
+          <if test="updateStaff != null and updateStaff != ''">
+              UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+          </if>
+          <if test="updateDate != null">
+              UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+          </if>
+          <if test="remark != null and remark != ''">
+              REMARK = #{remark,jdbcType=VARCHAR},
+          </if>
+          <if test="remarkOne != null and remarkOne != ''">
+              REMARK_ONE = #{remarkOne,jdbcType=VARCHAR},
+          </if>
+          REMARK_TWO = #{remarkTwo,jdbcType=VARCHAR}
+        where DTTS_LOG_ID = #{dttsLogId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
+               CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO
+        from mkt_dtts_log
+        where DTTS_LOG_ID = #{dttsLogId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        select DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
+               CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO
+        from mkt_dtts_log
+        where 1=1
+        <if test="dttsType != null and dttsType != ''">
+            and DTTS_TYPE = #{dttsType,jdbcType=VARCHAR}
+        </if>
+        order by BEGIN_TIME desc
+    </select>
+</mapper>
