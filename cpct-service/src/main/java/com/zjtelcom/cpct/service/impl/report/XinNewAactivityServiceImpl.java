@@ -70,7 +70,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             }
             if (regionFlg.equals("C4")) {
                 if (campaignDO.getLanIdFour()== null || campaignDO.getLanIdFour().toString().length()>6){
-                     result = sysArea;
+                    result = sysArea;
                 }else {
                     SysArea area = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(campaignDO.getLanIdFour().toString()));
                     String name = area == null ? "" : area.getName();
@@ -368,7 +368,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
+//                orgMap.put("name",sysArea.getName());
             }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
@@ -523,7 +528,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 转换率修改后 ："+JSON.toJSONString(stringOMap));
         List<Map<String,Object>> rptList = (List<Map<String,Object>>) stringOMap.get("rptOrderList");
         for (Map<String, Object> datum : rptList) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(datum.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(datum.get("mktCampaignId").toString()));
             datum.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
             if (campaignDO == null){
@@ -551,7 +556,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
             }
             if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
@@ -877,7 +886,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("新活动报表 收入拉动 收入拉动top5:"+JSON.toJSONString(map));
         List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) map.get("rptOrderList");
         for (Map<String, Object> orgMap : incomeTop5List) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(orgMap.get("mktCampaignId").toString()));
             orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             orgMap.put("income",orgMap.get("incomeUp"));
             orgMap.put("area",campaignDO==null ? "" : getArea(campaignDO));
@@ -903,7 +912,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 orgMap.put("name",OrgEnum.getNameByOrgId(Long.valueOf(orgMap.get("orgId").toString())));
             }else {
                 SysArea sysArea = sysAreaMapper.getNameByOrgId(orgMap.get("orgId").toString());
-                orgMap.put("name",sysArea.getName());
+                if (sysArea==null){
+                    orgMap.put("name","本部");
+                }else {
+                    orgMap.put("name",sysArea.getName());
+                }
             }
             Double totalIncome = Double.valueOf(orgMap.get("incomeUp").toString())+ Double.valueOf(orgMap.get("incomeDown").toString());
             orgMap.put("totalIncome",totalIncome.toString());
@@ -966,7 +979,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         log.info("【出参】新活动报表 收入底迁率 top5 返回总数:"+JSON.toJSONString(stringObjectMap));
         List<Map<String,Object>> incomeTop5List = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
         for (Map<String, Object> orgMap : incomeTop5List) {
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(orgMap.get("mktCampaignId").toString()));
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(orgMap.get("mktCampaignId").toString()));
             orgMap.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
             if (orgMap.get("revenueReduceRate")!=null &&orgMap.get("revenueReduceRate")!=""){
                 orgMap.put("revenueReduceRate", getPercentFormat(Double.valueOf(orgMap.get("revenueReduceRate").toString()), 2, 2));
@@ -1078,8 +1091,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             map.put("name","全部");
             map.put("value",count);
             list.add(0,map);
-            resultMap.put("resultCode","200");
-            resultMap.put("resultMsg",list);
+            resultMap.put("code","200");
+            resultMap.put("msg","成功");
+            resultMap.put("data",list);
         } catch (Exception e) {
             resultMap.put("resultCode","500");
             e.printStackTrace();
@@ -1109,6 +1123,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",orgId);
                     areaList.add(map);
                 }
+                HashMap<String, Object> map2 = new HashMap<>();
+                map2.put("name","全省");
+                map2.put("type","800000000004");
+                areaList.add(0,map2);
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("name","省级");
                 map.put("type","1");
@@ -1129,6 +1147,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",area.getOrgId());
                     areaList.add(map);
                 }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("name",sysArea.getName());
+                map.put("type",params.get("orglevel1"));
+                areaList.add(0,map);
                 resultMap.put("orglevel2",areaList);
             }
         }
@@ -1243,7 +1265,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     for (Map<String, Object> datum : data) {
                         HashMap<String, Object> camMap = new HashMap<>();
                         String mktCampaignId1 = datum.get("mktCampaignId").toString();
-                        MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+                        MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(mktCampaignId1));
                         if (campaignDO == null){
                             // 如果有为空 跳过
                             continue;
