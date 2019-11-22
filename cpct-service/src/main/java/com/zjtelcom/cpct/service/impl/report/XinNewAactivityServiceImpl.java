@@ -111,6 +111,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         }else if (params.get("orglevel1").toString().equals("1")){
             lanId = "";
             regionFlg = "C2";
+
         }else {
             lanId = ChannelUtil.getAreaByOrg(params.get("orglevel1").toString());
             regionFlg = "C3";
