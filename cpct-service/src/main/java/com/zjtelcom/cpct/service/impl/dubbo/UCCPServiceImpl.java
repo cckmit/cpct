@@ -1,5 +1,9 @@
 package com.zjtelcom.cpct.service.impl.dubbo;
 
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
@@ -7,16 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UCCPServiceImpl implements UCCPService {
 
     @Autowired(required = false)
     private UCCPSendService uCCPSendService;
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
     @Value("${uccp.userAcct}")
     private String userAcct;
@@ -24,6 +27,22 @@ public class UCCPServiceImpl implements UCCPService {
     private String password;
     @Value("${uccp.sceneId}")
     private String sceneId;
+
+    // 通过活动获取创建人，给活动创建人发送通知短信
+    @Override
+    public void sendShortMessage4CampaignStaff(MktCampaignDO mktCampaignDO, String sendContent) {
+        try {
+            Long staff = mktCampaignDO.getCreateStaff();
+            SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+            if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                Long lanId = mktCampaignDO.getLanId();
+                sendShortMessage(sysUserCode, sendContent, lanId.toString());
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {

@@ -834,7 +834,7 @@
 
     <select id="getMktCampaignDetailsForDate" parameterType="java.util.List" resultMap="BaseResultMap">
         SELECT
-        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE
+        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE,t.CREATE_STAFF,t.LAN_ID
         FROM
         mkt_campaign t
         WHERE
