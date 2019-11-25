@@ -1091,8 +1091,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             map.put("name","全部");
             map.put("value",count);
             list.add(0,map);
-            resultMap.put("resultCode","200");
-            resultMap.put("resultMsg",list);
+            resultMap.put("code","200");
+            resultMap.put("msg","成功");
+            resultMap.put("data",list);
         } catch (Exception e) {
             resultMap.put("resultCode","500");
             e.printStackTrace();
@@ -1122,6 +1123,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",orgId);
                     areaList.add(map);
                 }
+                HashMap<String, Object> map2 = new HashMap<>();
+                map2.put("name","全省");
+                map2.put("type","800000000004");
+                areaList.add(0,map2);
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("name","省级");
                 map.put("type","1");
@@ -1142,6 +1147,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",area.getOrgId());
                     areaList.add(map);
                 }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("name",sysArea.getName());
+                map.put("type",params.get("orglevel1"));
+                areaList.add(0,map);
                 resultMap.put("orglevel2",areaList);
             }
         }

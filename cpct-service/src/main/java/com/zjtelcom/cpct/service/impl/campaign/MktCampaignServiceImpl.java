@@ -3358,7 +3358,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 String creatChannel = cam.getCreateChannel()==null ? "" : cam.getCreateChannel();
                 String sysPostCode = "";
                 if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
-                    sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+                    sysPostCode = "C2";
                 }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
                     sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
                 }else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){

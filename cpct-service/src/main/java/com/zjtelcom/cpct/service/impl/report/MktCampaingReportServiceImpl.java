@@ -138,7 +138,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
         Map<String, Object> detailsParams = new HashMap<>();
         detailsParams.put("tiggerType", "2000");
-        detailsParams.put("createDate", "3000");
+        detailsParams.put("createDate", "2000");
         detailsParams.put("page", 1);
         detailsParams.put("pageSize", 999);
         Map<String, Object> mktCampaignDetails = activityStatisticsService.getMktCampaignDetails(detailsParams);
