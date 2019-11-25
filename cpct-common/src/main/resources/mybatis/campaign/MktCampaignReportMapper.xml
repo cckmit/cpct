@@ -310,5 +310,4 @@
         <include refid="mkt"/>
         group by INIT_ID
     </select>
-
 </mapper>

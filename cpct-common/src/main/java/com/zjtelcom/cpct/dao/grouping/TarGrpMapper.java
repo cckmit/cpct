@@ -31,4 +31,6 @@ public interface TarGrpMapper {
 
     List<TarGrp> queryList(TarGrp tarGrp);
 
+    int modTarGrpOther(TarGrp tarGrp);
+
 }

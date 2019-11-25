@@ -20,7 +20,8 @@ public interface InterfaceCfgMapper {
 
     List<InterfaceCfg> selectAll();
 
-    List<InterfaceCfg> findInterfaceCfgListByParam(@Param("evtSrcId") Long evtSrcId,@Param("interfaceName") String interfaceName,@Param("interfaceType") String interfaceType);
+    List<InterfaceCfg> findInterfaceCfgListByParam(@Param("evtSrcId") Long evtSrcId,@Param("interfaceName") String interfaceName,
+                                                   @Param("interfaceType") String interfaceType, @Param("interfaceIdList") List interfaceIdList);
 
     int updateByPrimaryKey(InterfaceCfg record);
 

@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -101,13 +102,13 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private TarGrpService tarGrpService;
     @Autowired
     private OfferResRelMapper offerResRelMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktResourceProdMapper resourceMapper;
     @Autowired
     private GrpSystemRelMapper grpSystemRelMapper;
-    @Autowired
+    @Autowired(required = false)
     private RequestInstRelMapper requestInstRelMapper;
-    @Autowired
+    @Autowired(required = false)
     private OfferProdMapper offerMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
@@ -232,8 +233,11 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         if (mapList != null ) {
             String[] tarGrpIds = mapList.get(0).get("value").split(",");
             for (String tarGrpId : tarGrpIds) {
+                Map<String, Object> map = new HashMap();
+                map.put("tarGrpTemplateId", tarGrpId);
+                map.put("operationType", "2");
                 try {
-                    Map<String, Object> map = tarGrpTemplateCountAndIssue(tarGrpId, "2");
+                    map = tarGrpTemplateCountAndIssue(map);
                     mapping.put(tarGrpId, map.get("resultData") == null ? "" : map.get("resultData").toString());
                 }catch (Exception e) {
                     failTarGrpIdList.add(tarGrpId);
@@ -256,9 +260,19 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     // operationType操作标识：1.看总数，2.下发
     @Override
-    public Map<String, Object> tarGrpTemplateCountAndIssue(String tarGrpTemplateId, String operationType) {
-        List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(tarGrpTemplateId));
-        return commonTarGrpTemplateCount(list, operationType);
+    public Map<String, Object> tarGrpTemplateCountAndIssue(Map<String, Object> params) {
+        if (params.get("operationType").toString().equals("2")) {
+            TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(Long.valueOf(params.get("tarGrpTemplateId").toString()));
+            if (StringUtils.isEmpty(tarGrp.getChannelCode()) || StringUtils.isEmpty(tarGrp.getLabelCodes())) {
+                params.put("resultCode",CODE_SUCCESS);
+                params.put("resultMsg","渠道和标签参数缺少");
+                return params;
+            } else {
+                params.put("tarGrp", tarGrp);
+            }
+        }
+        List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(params.get("tarGrpTemplateId").toString()));
+        return commonTarGrpTemplateCount(list, params);
     }
 
     @Override
@@ -276,7 +290,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             map1.put("labelType", label.getLabelDataType());
             arrayList.add(map1);
         }
-        return commonTarGrpTemplateCount(arrayList, "1");
+        map.put("operationType", "1");
+        return commonTarGrpTemplateCount(arrayList, map);
     }
 
     @Override
@@ -290,11 +305,18 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         return orgGridRelMapper.selectOrgGridByCode(codeList);
     }
 
-    public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> list, String operationType) {
-        Map<String, Object> map = new HashMap<>();
+    /**
+     * 客户分群—统计、下发
+     * @param tarGrplist
+     * @param params
+     *        必需(key:operationType、tarGrpTemplateId)
+     *        非必需(key:channelCode、labelCodeList)
+     * @return
+     */
+    public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> tarGrplist, Map<String, Object> params) {
         List<String> expressions = new ArrayList<>();
         List<LabelResultES> labelList = new ArrayList<>();
-        for (Map<String, String> tarGrpCondition : list) {
+        for (Map<String, String> tarGrpCondition : tarGrplist) {
             String code = tarGrpCondition.get("code");
             String operType = tarGrpCondition.get("operType");
             operType = equationSymbolConversion(operType);
@@ -306,21 +328,20 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             label.setLabelDataType(tarGrpCondition.get("labelType") == null? "":tarGrpCondition.get("labelType"));
             labelList.add(label);
         }
-        map.put("expressions", expressions);
-        map.put("operationType", operationType);
-        map.put("labelList", labelList);
+        params.put("expressions", expressions);
+        params.put("labelList", labelList);
         try {
-            String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(map);
-            map.put("resultCode",CODE_SUCCESS);
-            map.put("resultMsg","查询成功");
-            map.put("resultData", result);
+            String result = esTarGrpTemplateService.tarGrpTemplateCountAndIssue(params);
+            params.put("resultCode",CODE_SUCCESS);
+            params.put("resultMsg","查询成功");
+            params.put("resultData", result);
         }catch (Exception e){
             logger.error("esTarGrpTemplateService错误！");
             e.printStackTrace();
-            map.put("resultCode",CODE_FAIL);
-            map.put("resultMsg","查询失败");
+            params.put("resultCode",CODE_FAIL);
+            params.put("resultMsg","查询失败");
         }
-        return map;
+        return params;
     }
 
 

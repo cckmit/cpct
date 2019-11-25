@@ -58,7 +58,7 @@ public class EventApiController extends BaseController {
     @Autowired(required = false)
     private TestService testService;
 
-    @Autowired
+    @Autowired(required = false)
     private EventInstService eventInstService;
 
 
