@@ -41,6 +41,7 @@ import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
+import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -150,6 +151,9 @@ public class CamCpcServiceImpl implements CamCpcService {
 
     @Autowired
     private SysParamsService sysParamsService;
+
+    @Autowired
+    private CoopruleService coopruleService;
 
     Map<String,Boolean> flagMap = new ConcurrentHashMap();
 
@@ -1436,6 +1440,39 @@ public class CamCpcServiceImpl implements CamCpcService {
                     nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
                     return nonPassedMsg;
                 }
+
+
+                //受理规则校验 开关
+                String isaleCheck = redisUtils.get("ISALE_CHECK_FLG") == null ? "0" : redisUtils.get("ISALE_CHECK_FLG").toString();
+                //isale预校验固定参数
+                String loginId = "";
+                List<Map<String, String>> sysParam = sysParamsMapper.listParamsByKey("COOL_LOGIN_ID");
+                if (sysParam != null && !sysParam.isEmpty()) {
+                    loginId = sysParam.get(0).get("value");
+                }
+//
+//                boolean offerVilo = true;
+//                if (!taskChlList.isEmpty()) {
+//                    List<String> typeList = (List<String>) taskChlList.get(0).get("offerTypeList");
+//                    if (typeList.contains("11")) {
+//                        offerVilo = false;
+//                    }
+//                }
+
+                //if ("1".equals(isaleCheck) && offerVilo && !loginId.equals("")) {
+                if ("1".equals(isaleCheck) && !loginId.equals("")) {
+                    Long timeStart = System.currentTimeMillis();
+                //    testAddLog(assetRowId, "", "销售品：" + JSON.toJSONString(cpcList.get(0).get("productList")), "", true);
+                    log.info("进入受理规则校验，参数：taskChlList = "+ JSON.toJSONString(taskChlList) + ", activityType = " + privateParams.get("activityType") +", integrationId = " + params.get("integrationId") + ", loginId = " + loginId + ", LATN_ID = " + params.get("LATN_ID").toString());
+                    coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("LATN_ID").toString());
+                    Long time = System.currentTimeMillis() - timeStart;
+                //    testAddLog(assetRowId, "耗时：" + time + "ms", "", "", true);
+                    if (taskChlList == null || taskChlList.isEmpty()) {
+                        nonPassedMsg.put("rule_" + ruleId, "");
+                        return nonPassedMsg;
+                    }
+                }
+
                 esHitService.save(jsonObject, IndexList.RULE_MODULE);
             } catch (Exception e) {
                 e.printStackTrace();

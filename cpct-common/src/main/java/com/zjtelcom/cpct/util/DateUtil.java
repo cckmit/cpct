@@ -21,6 +21,8 @@ public class DateUtil {
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd";
     private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
     private static DateFormat ldf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateFormat yymmddhhmmss = new SimpleDateFormat("yyyyMMddHHmmss");
+
 
     public static String formatDate(Date date) {
         return ldf.format(date);
@@ -873,6 +875,14 @@ public class DateUtil {
                 break;
         }
         return cal.getTime();
+    }
+
+    public static String formatMilliesDate(Date date) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(date);
+    }
+
+    public static String formatDates(Date date) {
+        return yymmddhhmmss.format(date);
     }
 
 }
