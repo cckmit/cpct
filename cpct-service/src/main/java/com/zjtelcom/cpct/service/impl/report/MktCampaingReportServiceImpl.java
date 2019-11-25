@@ -138,7 +138,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         List<SysArea> sysAreaList = (List<SysArea>) sysAreaMap.get("sysAreaList");
         Map<String, Object> detailsParams = new HashMap<>();
         detailsParams.put("tiggerType", "2000");
-        detailsParams.put("createDate", "3000");
+        detailsParams.put("createDate", "2000");
         detailsParams.put("page", 1);
         detailsParams.put("pageSize", 999);
         Map<String, Object> mktCampaignDetails = activityStatisticsService.getMktCampaignDetails(detailsParams);
@@ -153,6 +153,23 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         for (MktCampaignDO mktCampaignDO : mktCampaignList) {
             noOperationIdList.add(mktCampaignDO.getMktCampaignId());
         }
+
+        //
+        detailsParams.put("tiggerType", "1000");
+        Map<String, Object> mktCampaignDetailBatch = activityStatisticsService.getMktCampaignDetails(detailsParams);
+        List<MktCampaignDO> mktCampaignBatchList = (List<MktCampaignDO>) mktCampaignDetailBatch.get("resultMsg");
+        Page pageInfoBatch = (Page) mktCampaignDetails.get("pageInfo");
+        // 不活跃活动数量
+        int noOperCountBatch = 0;
+        if (pageInfo != null) {
+            noOperCountBatch = pageInfoBatch.getTotal().intValue();
+        }
+        int OperCountTotal = noOperCount + noOperCountBatch;
+        for (MktCampaignDO mktCampaignDO : mktCampaignBatchList) {
+            noOperationIdList.add(mktCampaignDO.getMktCampaignId());
+        }
+
+
         List<Map<String, Object>> noOperMapList = new ArrayList<>();
         // 查询所有不活跃报表信息
         List<MktCampaignDO> mktCampaignDOInList = mktCampaignMapper.selectBatch(noOperationIdList);
@@ -192,7 +209,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         List<MktCampaignDO> mktCampaignDOList = mktCampaignReportMapper.selectByStatus(marketParam);
         List<Map<String, Object>> operMapList = new ArrayList<>();
         // 活跃活动的总量
-        int operCount = mktCampaignDOList.size();
+        int totalCount = mktCampaignDOList.size();
         for (SysArea sysArea : sysAreaList) {
             Map<String, Object> cityMap = new HashMap<>();
             cityMap.put("name", sysArea.getName());
@@ -213,8 +230,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
             cityMap.put("count", count);
             operMapList.add(cityMap);
         }
-        // 总量 =  活跃活动数量 + 不活跃活动数量
-        int totalCount =  operCount + noOperCount;
+        // 活跃活动数量 = 总量 - 不活跃活动数量
+        int operCount =  totalCount - OperCountTotal;
         // 排序
         Collections.sort(operMapList, new Comparator<Map<String, Object>>() {
             @Override
@@ -233,8 +250,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
         Map<String, Object> noOperMap = new HashMap<>();
         noOperMap.put("name", "无运营活动");
-        noOperMap.put("count", noOperCount);
-        noOperMap.put("percent", df.format( noOperCount * 100.0 / totalCount) + "%");
+        noOperMap.put("count", OperCountTotal);
+        noOperMap.put("percent", df.format( OperCountTotal * 100.0 / totalCount) + "%");
         noOperMap.put("city", noOperMapList);
         List<Map<String, Object>> operationMapList = new ArrayList<>();
         operationMapList.add(operMap);
@@ -916,8 +933,12 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         countMapOn.put("type", "在线");
         countMapOn.put("num", onCount);
         Map<String, Object> countMapOff = new HashMap<>();
+        Map<String, Object> offLineParam = new HashMap<>();
+        offLineParam.putAll(headParam);
+        offLineParam.put("statusCd", "(2010)"); // 在线的
+        int offCount = mktCampaignReportMapper.countByStatus(offLineParam);
         countMapOff.put("type", "下线");
-        countMapOff.put("num", (totalCount - onCount));
+        countMapOff.put("num", offCount);
         countList.add(countMapTotal);
         countList.add(countMapOn);
         countList.add(countMapOff);
