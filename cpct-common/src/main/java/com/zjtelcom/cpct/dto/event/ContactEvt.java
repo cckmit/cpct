@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.dto.event;
 import com.zjtelcom.cpct.BaseEntity;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description 事件实体类

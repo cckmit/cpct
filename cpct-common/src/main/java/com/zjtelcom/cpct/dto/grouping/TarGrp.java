@@ -17,6 +17,8 @@ public class TarGrp extends BaseEntity implements Serializable{
     private String tarGrpName;//目标分群名称
     private String tarGrpDesc;//目标分群的详细描述信息
     private String tarGrpType;//目标分群类型,1000客户 2000产品实例 3000	销售品 4000营销资源 5000礼包
+    private String channelCode;
+    private String labelCodes;
 
     public String getActType() {
         return actType;
@@ -56,5 +58,21 @@ public class TarGrp extends BaseEntity implements Serializable{
 
     public void setTarGrpType(String tarGrpType) {
         this.tarGrpType = tarGrpType;
+    }
+
+    public String getChannelCode() {
+        return channelCode;
+    }
+
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
+    }
+
+    public String getLabelCodes() {
+        return labelCodes;
+    }
+
+    public void setLabelCodes(String labelCodes) {
+        this.labelCodes = labelCodes;
     }
 }

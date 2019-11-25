@@ -151,7 +151,7 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     public Map<String, Object> listInterfaceCfg(Long evtSrcId,String interfaceName,String interfaceType,Integer page,Integer pageSize){
         Map<String,Object> result = new HashMap<>();
         PageHelper.startPage(page,pageSize);
-        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType);
+        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId,interfaceName,interfaceType,null);
         Page info = new Page(new PageInfo(cfgList));
         List<InterfaceCfgVO> voList = new ArrayList<>();
         getVOList(cfgList, voList);
@@ -219,6 +219,15 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",vo);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getInterfaceCfgListById(List interfaceIdList){
+        Map<String,Object> result = new HashMap<>();
+        List<InterfaceCfg> cfgList = interfaceCfgMapper.findInterfaceCfgListByParam(null,null,null,interfaceIdList);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",cfgList);
         return result;
     }
 }

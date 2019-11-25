@@ -6,10 +6,12 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.event.EventSorceDO;
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
@@ -80,6 +82,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private EventMatchRulService eventMatchRulService;
     @Autowired
     private SynContactEvtService synContactEvtService;
+    @Autowired
+    private ContactChannelMapper channelMapper;
 
     @Autowired
     private RedisUtils redisUtils;
@@ -182,6 +186,34 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     }
 
     /**
+     * 通过渠道编码查询事件列表
+     * @param params：key[chlCode,evtName]
+     * @return result：key[evtId,evtCode,evtName]
+     */
+    @Override
+    public Map<String, Object> selectContactEvtByChlCode(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        PageHelper.startPage((int) params.get("page"), (int) params.get("pageSize"));
+        String fuzzyQueryType = (String) params.get("fuzzyQueryType");
+        List<Map<String, Object>> result = null;
+        switch (fuzzyQueryType) {
+            case "1":
+                result = contactEvtMapper.getContactEvtByChlCode(params);
+                break;
+            case "2":
+                result = contactEvtMapper.getContactEvtByChlCode2(params);
+                break;
+            default:
+                break;
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("contactEvtList", result);
+        map.put("pageInfo", new Page(new PageInfo(result)));
+        return map;
+    }
+
+    /**
      * 新增事件(集团调用)
      */
     @Transactional(readOnly = false)
@@ -253,6 +285,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (ContactEventDetail evtDetail : evtDetailList) {
             //插入事件主题信息
             final ContactEvt contactEvt = evtDetail;
+
+            eventId = contactEvt.getContactEvtId();
+           // List<Long> interfaceCfgIdList = contactEvt.getInterfaceCfgId();
+            List<InterfaceCfg> interfaceCfgs = evtDetail.getInterfaceCfgs();
 //            //todo 待确认必填字段
 //            contactEvt.setInterfaceCfgId();
             contactEvt.setExtEventId(1000L);
@@ -262,10 +298,26 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvt.setCreateStaff(UserUtil.loginId());
             contactEvt.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+            contactEvt.setInterfaceCfgId(0L);
             contactEvtMapper.createContactEvt(contactEvt);
             //根据返回的id生成事件编码
             contactEvt.setContactEvtCode(generateEvtCode(contactEvt.getContactEvtId()));
             contactEvtMapper.modContactEvtCode(contactEvt.getContactEvtId(), contactEvt.getContactEvtCode());
+
+            // 添加事件关联事件源接口关系
+            for (InterfaceCfg interfaceCfg : interfaceCfgs) {
+                Long interfaceId = interfaceCfg.getInterfaceCfgId();
+                EventInterfaceRel eventInterfaceRel = new EventInterfaceRel();
+                BeanUtil.copy(evtDetail, eventInterfaceRel);
+                eventInterfaceRel.setEvtId(contactEvt.getContactEvtId());
+                eventInterfaceRel.setInterfaceId(interfaceId);
+                InterfaceCfg ic = interfaceCfgMapper.selectByPrimaryKey(interfaceId);
+                // 事件源接口调用方—事件接入渠道
+                Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(ic.getCaller()));
+                eventInterfaceRel.setChannelCode(channel.getContactChlCode());
+                int rel = contactEvtMapper.createEvtInterfaceRel(eventInterfaceRel);
+            }
+
             //插入事件采集项
             contactEvtItems = evtDetail.getContactEvtItems();
             for (EventItem contactEvtItem : contactEvtItems) {
@@ -314,27 +366,31 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     return eventMatchRul;
                 }
             }
+            List<InterfaceCfg> interfaceCfgs1 = evtDetail.getInterfaceCfgs();
 
-            eventId = contactEvt.getContactEvtId();
-            //大数据事件同步
-            InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
-            if(interfaceCfg != null) {
-                EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
-                Map<String, Object> map = new HashMap<>();
-                if (eventSorceDO.getEvtSrcName().equals("大数据")) {
-                    map.put("isi", DateUtil.getDetailTime());
-                    map.put("eventId", contactEvt.getContactEvtId());
-                    map.put("eventCode", contactEvt.getContactEvtCode());
-                    map.put("eventName", contactEvt.getContactEvtName());
+            // List<Long> interfaceCfgId = contactEvt.getInterfaceCfgId();
+            for (InterfaceCfg interfaceCfgId1 : interfaceCfgs1) {
+                Long aLong = interfaceCfgId1.getInterfaceCfgId();
+                //大数据事件同步
+                InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(aLong);
+                if(interfaceCfg != null) {
+                    EventSorceDO eventSorceDO = eventSorceMapper.selectByPrimaryKey(interfaceCfg.getEvtSrcId());
+                    Map<String, Object> map = new HashMap<>();
+                    if (eventSorceDO.getEvtSrcName().equals("大数据")) {
+                        map.put("isi", DateUtil.getDetailTime());
+                        map.put("eventId", contactEvt.getContactEvtId());
+                        map.put("eventCode", contactEvt.getContactEvtCode());
+                        map.put("eventName", contactEvt.getContactEvtName());
 
-                    if (contactEvt.getEvtTrigType().equals("1000")) {
-                        map.put("eventType", "1");
-                    } else {
-                        map.put("eventType", "2");
+                        if (contactEvt.getEvtTrigType().equals("1000")) {
+                            map.put("eventType", "1");
+                        } else {
+                            map.put("eventType", "2");
+                        }
+                        map.put("eventClass", "");
+                        map.put("state", contactEvt.getStatusCd());
+
                     }
-                    map.put("eventClass", "");
-                    map.put("state", contactEvt.getStatusCd());
-
                 }
             }
 
@@ -468,6 +524,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         ViewContactEvtRsp viewContactEvtRsp = new ViewContactEvtRsp();
         ContactEventDetail contactEventDetail = new ContactEventDetail();
         ContactEvt contactEvt = contactEvtMapper.getEventById(contactEvtId);
+        List<EventInterfaceRel> eventInterfaceRels = contactEvtMapper.selectEvtInterfaceRelByEvtId(contactEvtId);
         if (contactEvt==null){
             map.put("resultCode", CODE_FAIL);
             map.put("resultMsg","事件不存在");
@@ -478,10 +535,14 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         if (evtType!=null){
             contactEventDetail.setEventTypeName(evtType.getContactEvtName());
         }
-        InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(contactEvt.getInterfaceCfgId());
-        if (interfaceCfg!=null){
-            contactEventDetail.setInterfaceName(interfaceCfg.getInterfaceName());
+        List<InterfaceCfg> interfaceCfgs = new ArrayList<>();
+        for (EventInterfaceRel eventInterfaceRel : eventInterfaceRels) {
+            InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByPrimaryKey(eventInterfaceRel.getInterfaceId());
+            if (interfaceCfg != null){
+                interfaceCfgs.add(interfaceCfg);
+            }
         }
+        contactEventDetail.setInterfaceCfgs(interfaceCfgs);
 
         //查询出事件采集项
         List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(contactEvt.getContactEvtId());
@@ -593,6 +654,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         List<MktCamEvtRel> mktCamEvtRels = new ArrayList<>();
         Long eventId = null;
         for (ContactEventDetail evtDetail : evtDetailList) {
+            eventId = evtDetail.getContactEvtId();
+            List<InterfaceCfg> interfaceCfgs = evtDetail.getInterfaceCfgs();
+
+            // List<Long> interfaceCfgIdList = evtDetail.getInterfaceCfgId();
             //更新事件主题信息
             EventEditVO editVO = BeanUtil.create(evtDetail,new EventEditVO());
             final ContactEvt contactEvt = contactEvtMapper.getEventById(evtDetail.getContactEvtId());
@@ -602,9 +667,32 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 return map;
             }
             BeanUtil.copy(editVO,contactEvt);
-            contactEvt.setUpdateDate(DateUtil.getCurrentTime());
+            contactEvt.setInterfaceCfgId(0L);
+
             contactEvt.setUpdateStaff(UserUtil.loginId());
             contactEvtMapper.modContactEvt(contactEvt);
+            // 清除原有事件与事件源接口关联关系
+            int i = contactEvtMapper.delEvtInterfaceRel(eventId);
+            // 添加事件关联事件源接口关系
+            for (InterfaceCfg interfaceCfg : interfaceCfgs) {
+                Long interfaceId = interfaceCfg.getInterfaceCfgId();contactEvt.setUpdateDate(DateUtil.getCurrentTime());
+                EventInterfaceRel eventInterfaceRel = new EventInterfaceRel();
+                BeanUtil.copy(evtDetail, eventInterfaceRel);
+                eventInterfaceRel.setEvtId(eventId);
+                eventInterfaceRel.setInterfaceId(interfaceId);
+                eventInterfaceRel.setUpdateDate(DateUtil.getCurrentTime());
+                eventInterfaceRel.setCreateDate(DateUtil.getCurrentTime());
+                eventInterfaceRel.setStatusDate(DateUtil.getCurrentTime());
+                eventInterfaceRel.setUpdateStaff(UserUtil.loginId());
+                eventInterfaceRel.setCreateStaff(UserUtil.loginId());
+                eventInterfaceRel.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+                InterfaceCfg ic = interfaceCfgMapper.selectByPrimaryKey(interfaceId);
+                // 事件源接口调用方—事件接入渠道
+                Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(ic.getCaller()));
+                eventInterfaceRel.setChannelCode(channel.getContactChlCode());
+                int rel = contactEvtMapper.createEvtInterfaceRel(eventInterfaceRel);
+            }
+
             //更新事件采集项
             List<EventItem> oldItems = contactEvtItemMapper.listEventItem(evtDetail.getContactEvtId());
             contactEvtItems = evtDetail.getContactEvtItems();
