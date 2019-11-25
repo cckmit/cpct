@@ -830,7 +830,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         dataMap.put("收入高迁活跃数",list.get(0).get("upCount"));
         double v = Double.valueOf(dataMap.get("高迁收入").toString()).doubleValue() + Double.valueOf(dataMap.get("收入低迁金额").toString()).doubleValue();
         dataMap.put("总收入",fun2(v)); //总收入
-        dataMap.put("收入平迁金额","0.00"); //收入平迁金额
+        dataMap.put("收入平迁金额",0); //收入平迁金额
         //收入平迁活动数
         dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活跃数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
         //低迁率
