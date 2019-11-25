@@ -88,7 +88,7 @@ public class OpenEventSourceServiceImpl extends BaseService implements OpenEvent
             map.remove("createDate");
             map.remove("updateStaff");
             // 事件源接口中有关联事件源主键EVT_SRC_ID   集团openapi中InterfaceCfgParam信息在项目中没有采用无需返回
-            List<InterfaceCfg> interfaceCfgListByParam = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId, null, null);
+            List<InterfaceCfg> interfaceCfgListByParam = interfaceCfgMapper.findInterfaceCfgListByParam(evtSrcId, null, null,null);
             // 转化成集团openapi要求规范
             List<EventSourceInterface> list=new ArrayList<>();
             for (InterfaceCfg interfaceCfg:interfaceCfgListByParam){

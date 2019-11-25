@@ -682,7 +682,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 try {
                     //事件下所有活动的规则预校验，返回初步可命中活动
-                    resultByEvent = getResultByEvent(eventId, map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
+                    resultByEvent = getResultByEvent(eventId, map.get("eventCode"), map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
                 } catch (Exception e) {
                     esJson.put("hit", false);
                     esJson.put("success", true);
@@ -2019,7 +2019,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @param channel
      * @return
      */
-    private List<Map<String, Object>> getResultByEvent(Long eventId, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
+    private List<Map<String, Object>> getResultByEvent(Long eventId, String eventCode, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
         List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(eventId);
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
@@ -2027,6 +2027,7 @@ public class EventApiServiceImpl implements EventApiService {
         List<Map<String, Object>> resultMapList = new ArrayList<>();
         try {
             for (Map<String, Object> act : mktCampaginIdList) {
+                act.put("eventCode", eventCode);
                 Future<Map<String, Object>> future = fixThreadPool.submit(new ListResultByEventTask(lanId, channel, reqId, accNbr, act, c4, custId));
                 futureList.add(future);
             }
@@ -2093,6 +2094,7 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("activityName", act.get("mktCampaginName"));
                 esJson.put("activityCode", act.get("mktCampaginNbr"));
                 esJson.put("hitEntity", accNbr); //命中对象
+                esJson.put("eventCode", act.get("eventCode"));
 
 
                 if ("QD000015".equals(channel)) {

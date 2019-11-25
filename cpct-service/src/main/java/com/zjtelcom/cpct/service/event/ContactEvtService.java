@@ -22,6 +22,8 @@ public interface ContactEvtService {
 
     Map<String,Object> listEventNoPages(ContactEvt contactEvt);
 
+    Map<String,Object> selectContactEvtByChlCode(Map<String, Object> params);
+
     Map<String,Object> createContactEvtJt(CreateContactEvtJtReq createContactEvtJtReq) throws Exception;
 
     Map<String,Object> createContactEvt(CreateContactEvtReq createContactEvtReq) throws Exception;
