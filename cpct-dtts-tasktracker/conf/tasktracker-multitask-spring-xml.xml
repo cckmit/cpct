@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+>
+
+    <context:component-scan base-package="com.ctg.dtts.tasktracker"/>
+    <context:component-scan base-package="com.zjtelcom"/>
+
+    <bean id="restTemplate" class="com.ctg.dtts.tasktracker.Bean"/>
+    <bean id="multiJobRunner" class="com.ctg.dtts.tasktracker.MultiJobRunner"/>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleMarketCampaignDay"/>
+        <property name="shardValue" value="cycleMarketCampaignDay"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceCampaignDay"/>
+        <property name="shardValue" value="cycleServiceCampaignDay"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceAndMarketCampaignDay"/>
+        <property name="shardValue" value="cycleServiceAndMarketCampaignDay"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleMarketCampaignMonth"/>
+        <property name="shardValue" value="cycleMarketCampaignMonth"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceCampaignMonth"/>
+        <property name="shardValue" value="cycleServiceCampaignMonth"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceAndMarketCampaignMonth"/>
+        <property name="shardValue" value="cycleServiceAndMarketCampaignMonth"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleMarketCampaignWeek"/>
+        <property name="shardValue" value="cycleMarketCampaignWeek"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceCampaignWeek"/>
+        <property name="shardValue" value="cycleServiceCampaignWeek"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runCycleServiceAndMarketCampaignWeek"/>
+        <property name="shardValue" value="cycleServiceAndMarketCampaignWeek"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="runUserListPlan"/>
+        <property name="shardValue" value="userListPlan"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="querySaturationCpc"/>
+        <property name="shardValue" value="queryLabelSaturation"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="esLogLoadToSftp"/>
+        <property name="shardValue" value="esLogToSftp"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="dueMktCampaign"/>
+        <property name="shardValue" value="dueMktCampaign"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="campaignDelayNotice"/>
+        <property name="shardValue" value="campaignDelayNotice"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="tarGrpTemplateScheduledBatchIssue"/>
+        <property name="shardValue" value="tarGrpIssue"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="importUserListByExcel"/>
+        <property name="shardValue" value="importUserListByExcel"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="sendMsgByOfferOver"/>
+        <property name="shardValue" value="sendMsgByOfferOver"/>
+    </bean>
+
+    <!-- 这个 TaskTrackerAnnotationFactoryBean bean 要放在 MethodInvokingJobRunner的后面  -->
+    <bean id="taskTracker" class="com.ctg.dtts.spring.TaskTrackerAnnotationFactoryBean" init-method="start">
+        <!-- 使用JobRunnerItem注解一定要使用 JobDispatcher -->
+        <property name="jobRunnerClass" value="com.ctg.dtts.spring.tasktracker.JobDispatcher"/>
+        <!-- 如果指定为taskId, 取job.getTaskId() , 否则从 job.getParam("shardField") -->
+        <property name="shardField" value="taskId"/>
+    </bean>
+
+</beans>
