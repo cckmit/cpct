@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 public class AcitvityParams {
 
@@ -107,7 +108,7 @@ public class AcitvityParams {
         }else {
             paramMap.put("currenPage","1");
         }
-
+        paramMap.put("resultCode", CODE_SUCCESS);
         return paramMap;
     }
 }
