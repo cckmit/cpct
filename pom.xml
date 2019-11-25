@@ -22,6 +22,8 @@
         <module>cpct-count</module>
         <module>cpct-eslog</module>
         <module>cpct-dubbo-log</module>
+        <module>cpct-dtts-tasktracker</module>
+        <module>cpct-label-statistic</module>
     </modules>
 
     <properties>
@@ -32,7 +34,7 @@
         <jwt.version>3.2.0</jwt.version>
         <druid.version>1.1.9</druid.version>
         <!--<dubbo.version>2.5.4</dubbo.version>-->
-        <dubbo.version>2.5.4-SNAPSHOT-jdk1.6-8.7</dubbo.version>
+        <dubbo.version>2.6.2</dubbo.version>
         <javassist.version>3.20.0-GA</javassist.version>
         <shiro.version>1.4.0</shiro.version>
         <zookeeper.version>3.4.6</zookeeper.version>
@@ -71,6 +73,7 @@
         <cooperate-service-api.version>1.1</cooperate-service-api.version>
         <cpct-dubbo-log.version>1.0.0</cpct-dubbo-log.version>
         <open-complete.version>1.0.0</open-complete.version>
+        <bss-cooperate-realtime.version>1.2</bss-cooperate-realtime.version>
     </properties>
 
     <parent>
@@ -280,6 +283,14 @@
                 <artifactId>com.springsource.org.apache.commons.io</artifactId>
                 <version>${file.version}</version>
             </dependency>
+
+            <!--渠道协同接触任务id-->
+            <dependency>
+                <groupId>com.ctzj.smt.bss</groupId>
+                <artifactId>bss-cooperate-realtime-mkt-service-api</artifactId>
+                <version>${bss-cooperate-realtime.version}</version>
+            </dependency>
+
 
             <!-- 规则引擎 -->
             <dependency>

@@ -45,40 +45,56 @@
         <result column="ONE_CHANNEL_FLG" jdbcType="VARCHAR" property="oneChannelFlg" />
         <result column="THE_ME" jdbcType="VARCHAR" property="theMe" />
         <result column="REGION_FLG" jdbcType="VARCHAR" property="regionFlg" />
+        <result column="BATCH_TYPE" jdbcType="VARCHAR" property="batchType" />
     </resultMap>
 
     <sql id="ssss">
         AND STATUS_CD IN ('2002', '2006', '2008', '2010')
-        AND MKT_CAMPAIGN_TYPE = #{map.campaignType}
-        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
-        AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
+        AND MKT_CAMPAIGN_TYPE IN ${map.campaignType}
+        <include refid="mkt"/>
     </sql>
 
     <sql id="reg">
         AND STATUS_CD IN ('2002', '2006', '2008', '2010')
-        AND MKT_CAMPAIGN_TYPE = #{map.campaignType}
-        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        AND MKT_CAMPAIGN_TYPE IN ${map.campaignType}
+        <include refid="mkt"/>
+    </sql>
+
+    <sql id="mkt">
+        AND (
+        (
+          (
+            PLAN_BEGIN_TIME >= #{map.startDate}
+            AND #{map.endDate} >= PLAN_BEGIN_TIME
+          )
+        OR (
+        PLAN_BEGIN_TIME >= #{map.startDate}
+        AND #{map.endDate} >= PLAN_BEGIN_TIME
+        AND PLAN_END_TIME > #{map.endDate}
+          )
+        )
+        OR (
+        PLAN_END_TIME >= #{map.startDate}
+        AND  #{map.startDate} > PLAN_BEGIN_TIME
+          )
+        )
     </sql>
 
 
     <select id="countByStatus" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT (0) FROM (
         SELECT COUNT (1)
         from mkt_campaign
         where 1 = 1
-        <if test="map.startDate != null">
-            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
-        </if>
-        <if test="map.endDate != null">
-            AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
-        </if>
+        <include refid="mkt"/>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
         </if>
         <if test="map.lanId != null and map.lanId != ''">
             AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
-        <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
+        <if test="map.campaignType != null and map.campaignType != ''">
+            AND MKT_CAMPAIGN_TYPE IN ${map.campaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -89,15 +105,23 @@
         <if test="map.regionFlg != null and map.regionFlg != ''">
             AND REGION_FLG IN ${map.regionFlg}
         </if>
+        <if test="map.lanIdFour != null and map.lanIdFour != ''">
+            AND LAN_ID_FOUR IN ${map.lanIdFour}
+        </if>
+        <if test="map.batchType != null and map.batchType != ''">
+            AND BATCH_TYPE IN ${map.batchType}
+        </if>
+        GROUP BY INIT_ID
+        ) ss
     </select>
 
 
     <select id="countByTime" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT (0) FROM (
         SELECT COUNT (1)
         from mkt_campaign
-        where  #{map.endDate,jdbcType=TIMESTAMP} > PLAN_END_TIME
-        AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
-        AND PLAN_END_TIME > #{map.startDate,jdbcType=TIMESTAMP}
+        where 1 = 1
+        <include refid="mkt"/>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
         </if>
@@ -113,6 +137,8 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        GROUP BY INIT_ID
+        ) ss
     </select>
 
     <select id="selectByStatus" parameterType="map" resultMap="BaseResultMap">
@@ -127,23 +153,18 @@
         t.REMARK, t.LAN_ID, t.CREATE_CHANNEL, t.DIRECTORY_ID,
         t.CAM_LEVEL, t.IS_CHECK_RULE, t.SRC_TYPE, t.SRC_ID,
         t.SERVICE_CANCLE_FLAG, t.REGION_ID, t.LIFE_STAGE, t.SERVICE_TYPE, t.EXT_MKT_CAMPAIGN_ID, t.EXEC_INIT_TIME, t.LAN_ID_FOUR, t.LAN_ID_FIVE, t.ONE_CHANNEL_FLG,
-        t.THE_ME, t.REGION_FLG
+        t.THE_ME, t.REGION_FLG,BATCH_TYPE
         from mkt_campaign t
         where 1 = 1
-        <if test="map.startDate != null">
-            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP}
-        </if>
-        <if test="map.endDate != null">
-            AND PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
-        </if>
+        <include refid="mkt"/>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND STATUS_CD IN ${map.statusCd}
         </if>
         <if test="map.lanId != null and map.lanId != ''">
             AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
-        <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
+        <if test="map.campaignType != null and map.campaignType != ''">
+            AND MKT_CAMPAIGN_TYPE IN ${map.campaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -151,6 +172,19 @@
         <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
             AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
         </if>
+        <if test="map.regionFlg != null and map.regionFlg != ''">
+            AND REGION_FLG IN ${map.regionFlg}
+        </if>
+        <if test="map.lanIdFour != null and map.lanIdFour != ''">
+            AND LAN_ID_FOUR IN ${map.lanIdFour}
+        </if>
+        <if test="map.batchType != null and map.batchType != '' and map.batchType != '3000'">
+            AND BATCH_TYPE = #{map.batchType}
+        </if>
+        <if test="map.batchType != null and map.batchType != '' and map.batchType == '3000'">
+            AND BATCH_TYPE IS NULL
+        </if>
+        GROUP BY INIT_ID
     </select>
 
 
@@ -166,20 +200,18 @@
         t.REMARK, t.LAN_ID, t.CREATE_CHANNEL, t.DIRECTORY_ID,
         t.CAM_LEVEL, t.IS_CHECK_RULE, t.SRC_TYPE, t.SRC_ID,
         t.SERVICE_CANCLE_FLAG, t.REGION_ID, t.LIFE_STAGE, t.SERVICE_TYPE, t.EXT_MKT_CAMPAIGN_ID, t.EXEC_INIT_TIME, t.LAN_ID_FOUR, t.LAN_ID_FIVE, t.ONE_CHANNEL_FLG,
-        t.THE_ME, t.REGION_FLG
+        t.THE_ME, t.REGION_FLG,BATCH_TYPE
         from mkt_campaign t
         where 1 = 1
-        <if test="map.startDate != null and map.endDate != null">
-            AND PLAN_BEGIN_TIME > #{map.startDate,jdbcType=TIMESTAMP} AND  PLAN_END_TIME > #{map.endDate,jdbcType=TIMESTAMP}
-        </if>
+        <include refid="mkt"/>
         <if test="map.statusCd != null and map.statusCd != ''">
             AND t.STATUS_CD IN ${map.statusCd}
         </if>
         <if test="map.lanId != null and map.lanId != ''">
             AND t.LAN_ID = #{map.lanId,jdbcType=BIGINT}
         </if>
-        <if test="map.mktCampaignType != null and map.mktCampaignType != ''">
-            AND t.MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
+        <if test="map.campaignType != null and map.campaignType != ''">
+            AND t.MKT_CAMPAIGN_TYPE  IN ${map.campaignType}
         </if>
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND t.TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
@@ -202,23 +234,28 @@
             WHERE
             tril.CREATE_STAFF = 1000 )
         </if>
+        GROUP BY INIT_ID
     </select>
 
 
     <select id="selectCamSumByArea" resultType="java.util.Map" parameterType="map">
         SELECT a.name,t1.c3, t2.c4c5
         FROM sys_area a
-        LEFT JOIN (SELECT COUNT(1) c3, LAN_ID
+        LEFT JOIN (
+        SELECT COUNT(1) FROM
+        (SELECT COUNT(1) c3, LAN_ID
         FROM mkt_campaign
         WHERE REGION_FLG = 'C3'
         <include refid="ssss"/>
-        GROUP BY LAN_ID
+        GROUP BY LAN_ID,INIT_ID)
         ) t1 ON a.area_id = t1.LAN_ID
-        LEFT JOIN (SELECT COUNT(1) c4c5, LAN_ID
+        LEFT JOIN (
+        SELECT COUNT(1) FROM
+        (SELECT COUNT(1) c4c5, LAN_ID
         FROM mkt_campaign
         WHERE REGION_FLG IN ('C4','C5')
         <include refid="ssss"/>
-        GROUP BY LAN_ID
+        GROUP BY LAN_ID, INIT_ID)
         ) t2 ON a.area_id = t2.LAN_ID
         WHERE a.area_level = '1'
         GROUP BY a.name
@@ -227,20 +264,22 @@
 
     <select id="selectCamSumByArea1" resultType="java.util.Map" parameterType="map">
         SELECT
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C2' <include refid="reg"/>) C2,
+        WHERE REGION_FLG = 'C2' AND MKT_ACTIVITY_NBR LIKE CONCAT('%MKT%')<include refid="reg"/>  GROUP BY INIT_ID) c2) C2,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG = 'C3' <include refid="reg"/>) C3,
+        WHERE REGION_FLG = 'C3' <include refid="reg"/> GROUP BY INIT_ID) c3 ) C3,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE REGION_FLG IN ('C4','C5') <include refid="reg"/>) C4,
+        WHERE REGION_FLG IN ('C4','C5') <include refid="reg"/> GROUP BY INIT_ID) c4 ) C4,
+        (SELECT COUNT(1) FROM
         (SELECT COUNT(1)
         FROM mkt_campaign
-        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="reg"/>) C1,
-
-
+        WHERE MKT_ACTIVITY_NBR NOT LIKE CONCAT('%MKT%')<include refid="reg"/>GROUP BY INIT_ID)c1 ) C1,
         COUNT(1) SUM
         FROM mkt_campaign WHERE 1 = 1 <include refid="reg"/>
     </select>
@@ -252,7 +291,11 @@
         from mkt_campaign
         where SERVICE_TYPE = #{map.serviceType}
         and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002,2008)
+        AND STATUS_CD IN (2002,2008,2006,2010)
+        <if test="map.lanId != null and map.lanId != ''">
+            AND LAN_ID = #{map.lanId}
+        </if>
+        <include refid="mkt"/>
         group by INIT_ID
     </select>
 
@@ -260,7 +303,11 @@
         select INIT_ID
         from mkt_campaign
         where  MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
-        AND STATUS_CD IN (2002,2008)
+        AND STATUS_CD IN (2002,2008,2006,2010)
+        <if test="map.lanId != null and map.lanId != ''">
+            AND LAN_ID = #{map.lanId}
+        </if>
+        <include refid="mkt"/>
         group by INIT_ID
     </select>
 

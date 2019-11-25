@@ -495,12 +495,6 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         Sheet sheet = wb.getSheetAt(0);
-        int total = sheet.getLastRowNum() + rightListId.length;
-        if(total > 500) {
-            maps.put("resultCode", CODE_FAIL);
-            maps.put("resultMsg", "销售品数量超过上限500个");
-            return maps;
-        }
         for(int i=0;i<rightListId.length;i++) {
             Offer offer = offerMapper.selectByPrimaryKey(Integer.valueOf(rightListId[i].toString()));
             if (offer==null){
@@ -514,7 +508,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
             Row row = sheet.getRow(i);
             if (row.getLastCellNum() >= 2) {
                 maps.put("resultCode", CODE_FAIL);
-                maps.put("resultMsg", "请返回检查模板格式");
+                maps.put("resultMsg", "请检查Excel文件列数是否有两列及以上");
                 return maps;
             }
             Cell cell = row.getCell(0);
@@ -537,6 +531,12 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         if(errorOffer.size() > 0) {
             maps.put("resultCode", CODE_FAIL);
             maps.put("resultMsg", "失败原因：以下" + errorOffer.size() + "个销售品编码错误！" + "\n" + errorOffer);
+            return maps;
+        }
+        int total = resultList.size();
+        if(total > 500) {
+            maps.put("resultCode", CODE_FAIL);
+            maps.put("resultMsg", "销售品数量超过上限500个");
             return maps;
         }
         FilterRule filterRules = new FilterRule();
