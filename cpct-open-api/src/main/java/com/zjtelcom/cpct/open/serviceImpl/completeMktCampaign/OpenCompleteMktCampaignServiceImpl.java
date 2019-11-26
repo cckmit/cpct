@@ -182,7 +182,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
         for(MktCampaignComplete mktCampaignComplete : mktCampaignCompleteList) {
             logger.info(JSON.toJSONString(mktCampaignComplete));
             SysParams sysParams = sysParamsMapper.findParamsByValue("JTCAMPAIGN_NODE", mktCampaignComplete.getTacheCd());
-            if ("1100".equals(mktCampaignComplete.getTacheCd()) || "1400".equals(mktCampaignComplete.getTacheCd())) {
+            /*if ("1100".equals(mktCampaignComplete.getTacheCd()) || "1400".equals(mktCampaignComplete.getTacheCd())) {
                 detaileTacheList.append(sysParams.getParamName()).append(" 开始：").append(sdf.format(mktCampaignComplete.getBeginTime()))
                         .append(" 处理人：").append("Y33010117205").append("#").append("\r\n");
             } else {
@@ -192,6 +192,15 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                             .append(" 结束：").append(sdf.format(mktCampaignComplete.getEndTime()))
                             .append(" 处理人：").append("Y33010117205").append("#").append("\r\n");
                 }
+            }*/
+            if ("10".equals(mktCampaignComplete.getTacheValueCd())) {
+                detaileTacheList.append(sysParams.getParamName()).append(" 开始：").append(sdf.format(mktCampaignComplete.getBeginTime()))
+                        .append(" 处理人：").append("Y33010117205").append("#").append("\r\n");
+            } else {
+                MktCampaignComplete mktCampaignComplete1 = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, tacheCd, "10");
+                detaileTacheList.append(sysParams.getParamName()).append(" 开始：").append(sdf.format(mktCampaignComplete1.getBeginTime()))
+                        .append(" 结束：").append(sdf.format(mktCampaignComplete.getEndTime()))
+                        .append(" 处理人：").append("Y33010117205").append("#").append("\r\n");
             }
             if(mktCampaignComplete.getTacheCd().equals(tacheCd)) {
                 BeanUtil.copy(mktCampaignComplete, completeMktCampaign);
@@ -263,10 +272,35 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
     public Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd, String tacheValueCd) {
         if ("1100".equals(tacheCd)) {
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, tacheCd);
+            mktCampaignComplete.setStatusCd("1200");
+            mktCampaignComplete.setTacheValueCd(tacheValueCd);
             mktCampaignCompleteMapper.update(mktCampaignComplete);
         } else {
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, tacheCd, tacheValueCd);
-            if (mktCampaignComplete == null) {
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1100");
+            MktCampaignComplete mktCampaignComplete1 = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, tacheCd, tacheValueCd);
+            if (mktCampaignComplete1 == null) {
+                mktCampaignComplete.setCompleteId(null);
+                mktCampaignComplete.setTacheCd(tacheCd);
+                mktCampaignComplete.setTacheValueCd(tacheValueCd);
+                mktCampaignComplete.setCreateDate(new Date());
+                mktCampaignComplete.setUpdateDate(new Date());
+                mktCampaignComplete.setStatusCd("1100");
+                if (tacheValueCd.equals("10")) {
+                    mktCampaignComplete.setBeginTime(new Date());
+                } else {
+                    mktCampaignComplete.setEndTime(new Date());
+                }
+                switch (tacheCd){
+                    case "1200":
+                        mktCampaignComplete.setSort(2L);
+                        break;
+                    case "1300":
+                        mktCampaignComplete.setSort(3L);
+                        break;
+                    case "1400":
+                        mktCampaignComplete.setSort(4L);
+                        break;
+                }
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
         }
