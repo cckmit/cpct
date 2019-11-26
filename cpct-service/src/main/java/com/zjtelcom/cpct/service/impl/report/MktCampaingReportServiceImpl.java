@@ -147,7 +147,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 不活跃活动数量
         int noOperCount = 0;
         if (pageInfo != null) {
-            noOperCount = pageInfo.getTotal().intValue();
+            noOperCount = mktCampaignList.size();
+            System.out.println("noOperCount = " + pageInfo.getTotal().intValue() + "size= " + noOperCount);
         }
         List<Long> noOperationIdList = new ArrayList<>();
         for (MktCampaignDO mktCampaignDO : mktCampaignList) {
@@ -162,7 +163,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 不活跃活动数量
         int noOperCountBatch = 0;
         if (pageInfo != null) {
-            noOperCountBatch = pageInfoBatch.getTotal().intValue();
+            noOperCountBatch = mktCampaignBatchList.size();
+            System.out.println("pageInfoBatch = " + pageInfoBatch.getTotal() + "size= " + noOperCountBatch);
         }
         int OperCountTotal = noOperCount + noOperCountBatch;
         for (MktCampaignDO mktCampaignDO : mktCampaignBatchList) {
