@@ -18,7 +18,7 @@
         <result column="REMARK_TWO" jdbcType="VARCHAR" property="remarkTwo" />
     </resultMap>
 
-    <insert id="insert" parameterMap="BaseResultMap" keyProperty="dttsLogId" useGeneratedKeys="true">
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.MktDttsLog" keyProperty="dttsLogId" useGeneratedKeys="true">
         insert into mkt_dtts_log (DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
                                   CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO)
         values (#{dttsLogId,jdbcType=BIGINT}, #{dttsType,jdbcType=VARCHAR}, #{dttsState,jdbcType=VARCHAR},

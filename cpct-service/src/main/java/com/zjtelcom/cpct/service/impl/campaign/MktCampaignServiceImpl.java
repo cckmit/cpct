@@ -403,7 +403,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setCreateDate(new Date());
                 mktCampaignCompleteMapper.insert(mktCamComplete);
                 try {
-                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
+                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "11");
+                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1300", "10");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -866,7 +867,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setCreateDate(new Date());
                     mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
-                        openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1100");
+                        openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
