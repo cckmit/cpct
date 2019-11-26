@@ -383,7 +383,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         //集团活动环节信息更新反馈
         MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(campaignId));
-        MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1200");
+        /*MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1200");
         if(mktCampaignComplete != null) {
             mktCampaignComplete.setEndTime(new Date());
             mktCampaignComplete.setTacheValueCd("11");
@@ -415,6 +415,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                 }
             }
+        }*/
+        try {
+            openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "11");
+            openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1300", "10");
+        }catch (Exception e){
+            e.printStackTrace();
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
@@ -848,13 +854,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1100");
+            /*MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1100");
             if(mktCampaignComplete != null && !mktCampaignComplete.getTacheValueCd().equals("11")) {
                 try {
                     openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }*/
+            try {
+                openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
@@ -1250,7 +1261,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 maps.put("resultMsg", "已拒绝");
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaignDO.getInitId(), "1300");
+            /*MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaignDO.getInitId(), "1300");
             if(mktCampaignComplete != null) {
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setTacheValueCd("11");
@@ -1281,6 +1292,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
+            }*/
+            try {
+                openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1200", "11");
+                openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300", "10");
+            }catch (Exception e){
+                e.printStackTrace();
             }
         } catch (Exception e) {
             maps.put("resultCode", CODE_FAIL);
@@ -2123,7 +2140,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
+            /*MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
             if(mktCampaignComplete != null) {
                 mktCampaignComplete.setEndTime(new Date());
                 mktCampaignComplete.setTacheValueCd("10");
@@ -2137,6 +2154,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+            }*/
+            try {
+                openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1300", "11");
+                openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1400", "10");
+            }catch (Exception e){
+                e.printStackTrace();
             }
         } catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] failed to publishMktCampaign by mktCampaignId = {}, Exception = ", mktCampaignId, e);
