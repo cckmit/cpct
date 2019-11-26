@@ -104,6 +104,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
         mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
         mktCampaignDO.setSrcId("1");
+        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
         // 调用创建需求函接口
         logger.info("【添加需求函信息】"+mktCampaignDO.getMktCampaignName());
         generateRequest(mktCampaignDO);
@@ -117,8 +118,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             e.printStackTrace();
         }
     }
-
-
 
     // 集团活动不承接接口
     @Override

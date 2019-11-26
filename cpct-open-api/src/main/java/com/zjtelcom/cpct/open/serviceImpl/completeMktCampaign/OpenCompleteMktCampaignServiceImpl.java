@@ -261,14 +261,14 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
      */
     @Override
     public Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd, String tacheValueCd) {
-        MktCampaignComplete mktCampaignComplete = new MktCampaignComplete();
-        mktCampaignComplete.setMktCampaignId(mktCampaignId);
-        mktCampaignComplete.setTacheCd(tacheCd);
-        mktCampaignComplete.setTacheValueCd(tacheValueCd);
         if ("1100".equals(tacheCd)) {
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, tacheCd);
             mktCampaignCompleteMapper.update(mktCampaignComplete);
         } else {
-            mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, tacheCd, tacheValueCd);
+            if (mktCampaignComplete == null) {
+                mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            }
         }
         Map<String, Object> map = completeMktCampaign(mktCampaignId, tacheCd);
         return map;
