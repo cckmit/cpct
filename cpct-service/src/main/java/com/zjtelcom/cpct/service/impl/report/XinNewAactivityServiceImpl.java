@@ -1386,8 +1386,18 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         //成功数
                         camMap.put("orderSuccessNum", datum.get("orderSuccessNum"));
                         //开始和结束时间
-                        camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
-                        camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
+                        if (campaignDO.getPlanBeginTime()!=null) {
+                            camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
+                        }else {
+                            camMap.put("beginTime","无开始时间");
+                        }
+                        if (campaignDO.getPlanEndTime()!=null) {
+                            camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
+                        }else {
+                            camMap.put("endTime","无结束时间");
+                        }
+//                        camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
+//                        camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
                         camMap.put("contactNum",datum.get("contactNum")); //客户接触数
                         camMap.put("orderNum",datum.get("orderNum")); //商机推荐数
                         camMap.put("orderSuccessNum",datum.get("orderSuccessNum")); //商机成功数
