@@ -974,7 +974,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 //            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
 //                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
 //                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-//                return name2.compareTo(name1);
+//                return new Double(o1.get("lowIncome").toString()).compareTo(name1);
 //            }
 //        });
         channels.put("incomeSum",channelList);
