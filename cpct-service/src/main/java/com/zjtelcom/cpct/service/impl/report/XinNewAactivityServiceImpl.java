@@ -377,9 +377,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 }else {
                     orgMap.put("name",sysArea.getName());
                 }
-//                orgMap.put("name",sysArea.getName());
             }
-            if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
+            if (orgMap.get("contactRate")!=null &&  !orgMap.get("contactRate").toString().equals("null") && orgMap.get("contactRate")!=""){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
                 orgMap.put("contactRate","0%");
@@ -401,7 +400,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             if (revenueReduceNum==null || ""==revenueReduceNum){
                 channelMap.put("revenueReduceNum",0);
             }
-            if (channelMap.get("contactRate")!=null && channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
+            if (channelMap.get("contactRate")!=null && !channelMap.get("contactRate").toString().equals("null") && channelMap.get("contactRate")!=""){
                 channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
             }else {
                 channelMap.put("contactRate","0%");
@@ -412,6 +411,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         result.put("code","0000");
         result.put("message","成功");
         result.put("data",dataMap);
+        Map<String, Object> map1 = activityThemeLevel(params);
+        if (map1.get("code").equals("0000")){
+            dataMap.put("orglevel2",map1.get("orglevel2"));
+        }
         return result;
     }
 
@@ -567,7 +570,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     orgMap.put("name",sysArea.getName());
                 }
             }
-            if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
+            if (orgMap.get("contactRate")!=null &&  !orgMap.get("contactRate").toString().equals("null") && orgMap.get("contactRate")!=""){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
                 orgMap.put("contactRate","0%");
@@ -589,7 +592,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             if (revenueReduceNum==null || ""==revenueReduceNum){
                 channelMap.put("revenueReduceNum",0);
             }
-            if (channelMap.get("contactRate")!=null && channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
+            if (channelMap.get("contactRate")!=null && !channelMap.get("contactRate").toString().equals("null") && channelMap.get("contactRate")!=""){
                 channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
             }else {
                 channelMap.put("contactRate","0%");
@@ -1143,14 +1146,14 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     map.put("type",orgId);
                     areaList.add(map);
                 }
-                HashMap<String, Object> map2 = new HashMap<>();
-                map2.put("name","全省");
-                map2.put("type","800000000004");
-                areaList.add(0,map2);
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("name","省级");
                 map.put("type","1");
                 areaList.add(0,map);
+                HashMap<String, Object> map2 = new HashMap<>();
+                map2.put("name","全省");
+                map2.put("type","800000000004");
+                areaList.add(0,map2);
                 resultMap.put("orglevel2",areaList);
             }else {
                 resultMap.put("code","0001");
@@ -1195,6 +1198,52 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         return resultMap;
     }
 
+    /**
+     * 地市查询返回防止无数据没有地市显示数据
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> activityThemeLevel(Map<String, Object> params) {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        ArrayList<HashMap<String, Object>> areaList = new ArrayList<>();
+        //地市信息
+        if (params.get("orglevel1").toString().equals("800000000004")) {
+            List<Organization> organizations = organizationMapper.selectMenuByEleven();
+            if (organizations.size()>0 && organizations!=null){
+                for (Organization organization : organizations) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    String nameByOrgId = OrgEnum.getNameByOrgId(organization.getOrgId());
+                    Long orgId = organization.getOrgId();
+                    map.put("name",nameByOrgId);
+                    map.put("type",orgId);
+                    areaList.add(map);
+                }
+                resultMap.put("orglevel2",areaList);
+            }else {
+                resultMap.put("code","0001");
+                resultMap.put("msg","失败");
+            }
+        }else {
+            SysArea sysArea = sysAreaMapper.getNameByOrgId(params.get("orglevel1").toString());
+            if (sysArea == null){
+                resultMap.put("code","0001");
+                resultMap.put("msg","失败");
+            }else {
+                List<SysArea> sysAreas = sysAreaMapper.selectByParnetArea(sysArea.getAreaId());
+                for (SysArea area : sysAreas) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("name",area.getName());
+                    map.put("type",area.getOrgId());
+                    areaList.add(map);
+                }
+                resultMap.put("orglevel2",areaList);
+            }
+        }
+        resultMap.put("code","0000");
+        resultMap.put("msg","成功");
+        return resultMap;
+    }
 
 
 
@@ -1223,7 +1272,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
             String lanId = "";
             String regionFlg = "";
-            //权限控制 todo
+            //权限控制
             // 全省数据
             if (params.get("orglevel1").toString().equals("800000000004")) {
                 paramMap.put("orglevel2","all");
@@ -1264,7 +1313,13 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 //            }else {
 //                mktCampaignList = mktCampaignMapper.getQuarterActivities(theMe.toString(),status,startDate,endDate,type,lanId,regionFlg);
 //            }
-            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getQuarterActivities(value,status,startDate,endDate,type,lanId,regionFlg);
+            List<MktCampaignDO> mktCampaignList =null;
+            if (paramMap.get("isHis").toString().equals("1")) {
+                status = "2010";
+                mktCampaignList = mktCampaignMapper.getQuarterActivitiesIsEnd(value,status,startDate,endDate,type,lanId,regionFlg);
+            }else {
+                mktCampaignList = mktCampaignMapper.getQuarterActivities(value,status,startDate,endDate,type,lanId,regionFlg);
+            }
             List<Map<String, Object>> data = new ArrayList<>();
             if (mktCampaignList.size() > 0 && mktCampaignList != null) {
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
