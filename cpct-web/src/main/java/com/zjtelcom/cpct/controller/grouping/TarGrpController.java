@@ -1,9 +1,11 @@
 package com.zjtelcom.cpct.controller.grouping;
 
 import com.alibaba.fastjson.JSONArray;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDTO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -102,7 +104,7 @@ public class TarGrpController extends BaseController {
      * 新增目标分群
      * 服务号：5013030003
      */
-    @RequestMapping("/createTarGrp")
+    @PostMapping("/createTarGrp")
     @CrossOrigin
     public String createTarGrp(@RequestBody TarGrpDetail tarGrpDetail) {
         Map<String, Object> maps = new HashMap<>();
@@ -258,8 +260,50 @@ public class TarGrpController extends BaseController {
         return FastJsonUtils.objToJson(maps);
     }
 
+    /**
+     * 修改目标分群
+     */
+    @PostMapping("/modTarGrpOther")
+    @CrossOrigin
+    public String modTarGrpOther(@RequestBody TarGrp tarGrp) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            Integer result = tarGrpService.modTarGrpOther(tarGrp);
+            if (result > 0) {
+                maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+                maps.put("resultMsg", "修改成功！");
+            } else {
+                maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+                maps.put("resultMsg", "修改失败！");
+            }
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modTarGrpOther," +
+                    " Exception: ", JSONArray.toJSON(tarGrp), e);
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "修改失败！");
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
 
 
-
-
+    /**
+     * 修改目标分群
+     */
+    @PostMapping("/queryTarGrpOther")
+    @CrossOrigin
+    public String queryTarGrpOther(@RequestBody TarGrp tarGrp) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            Map<String, Object> map = tarGrpService.queryTarGrpOther(tarGrp);
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("resultMsg", "修改成功！");
+            maps.put("resultData", map);
+        } catch (Exception e) {
+            logger.error("[op:TarGrpController] fail to modTarGrpOther," +
+                    " Exception: ", JSONArray.toJSON(tarGrp), e);
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+            maps.put("resultMsg", "修改失败！");
+        }
+        return FastJsonUtils.objToJson(maps);
+    }
 }

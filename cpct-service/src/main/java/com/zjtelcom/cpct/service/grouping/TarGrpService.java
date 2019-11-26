@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.grouping;
 
+import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 
@@ -45,4 +46,7 @@ public interface TarGrpService {
 
     Map<String,Object> conditionSwitch(Long conditionId,String type,String value);
 
+    Integer modTarGrpOther(TarGrp tarGrp);
+
+    Map<String, Object> queryTarGrpOther(TarGrp tarGrp);
 }
