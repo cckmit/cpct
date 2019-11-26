@@ -379,7 +379,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 }
 //                orgMap.put("name",sysArea.getName());
             }
-            if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
+            if (orgMap.get("contactRate")!=null &&  !orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
                 orgMap.put("contactRate","0%");
@@ -401,7 +401,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             if (revenueReduceNum==null || ""==revenueReduceNum){
                 channelMap.put("revenueReduceNum",0);
             }
-            if (channelMap.get("contactRate")!=null && channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
+            if (channelMap.get("contactRate")!=null && !channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
                 channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
             }else {
                 channelMap.put("contactRate","0%");
@@ -567,7 +567,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     orgMap.put("name",sysArea.getName());
                 }
             }
-            if (orgMap.get("contactRate")!=null &&  orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
+            if (orgMap.get("contactRate")!=null &&  !orgMap.get("contactRate").toString().equals("") && orgMap.get("contactRate")!="null"){
                 orgMap.put("contactRate",getPercentFormat(Double.valueOf(orgMap.get("contactRate").toString()),2,2));
             }else {
                 orgMap.put("contactRate","0%");
@@ -589,7 +589,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             if (revenueReduceNum==null || ""==revenueReduceNum){
                 channelMap.put("revenueReduceNum",0);
             }
-            if (channelMap.get("contactRate")!=null && channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
+            if (channelMap.get("contactRate")!=null && !channelMap.get("contactRate").toString().equals("") && channelMap.get("contactRate")!="null"){
                 channelMap.put("contactRate",getPercentFormat(Double.valueOf(channelMap.get("contactRate").toString()),2,2));
             }else {
                 channelMap.put("contactRate","0%");
