@@ -2657,6 +2657,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // 在失效时间之后置为过期
                 if (mktCampaignDO.getPlanEndTime() != null && now.after(mktCampaignDO.getPlanEndTime())) {
                     mktCampaignDO.setStatusCd(StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode());
+                    mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                 }

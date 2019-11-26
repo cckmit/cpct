@@ -499,6 +499,7 @@
     <update id="changeMktCampaignStatus">
         update mkt_campaign
         set STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        STATUS_DATE = #{updateDate,jdbcType=TIMESTAMP},
         UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}

@@ -117,9 +117,9 @@
     </dubbo:reference>
 
     <!--渠道协同接触任务id-->
-    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl"
+                     version="1.0" check="false">
         <dubbo:method name="queryEventInst" servicecode="00.1079.queryEventInst"  timeout="120000"/>
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
     </dubbo:reference>
-
 </beans>

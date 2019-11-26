@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.event;
 
 import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 
+import java.util.List;
 import java.util.Map;
 
 public interface InterfaceCfgService {
@@ -16,4 +17,6 @@ public interface InterfaceCfgService {
     Map<String,Object> getInterfaceCfgDetail(InterfaceCfg interfaceCfg);
 
     Map<String,Object> getInterfaceCfgList();
+
+    Map<String,Object> getInterfaceCfgListById(List interfaceIdList);
 }

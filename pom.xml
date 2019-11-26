@@ -22,8 +22,8 @@
         <module>cpct-count</module>
         <module>cpct-eslog</module>
         <module>cpct-dubbo-log</module>
-        <module>cpct-dtts-tasktracker</module>
-        <module>cpct-label-statistic</module>
+        <!--<module>cpct-dtts-tasktracker</module>-->
+        <!--<module>cpct-label-statistic</module>-->
     </modules>
 
     <properties>
@@ -562,6 +562,25 @@
                 <groupId>com.zjtelcom.cpct</groupId>
                 <artifactId>open-complete</artifactId>
                 <version>${open-complete.version}</version>
+            </dependency>
+
+            <!-- 受理校验 -->
+            <dependency>
+                <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
+                <artifactId>biz-isale-inbound-service-api</artifactId>
+                <version>2.2.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
+                <artifactId>biz-isale-inbound-model</artifactId>
+                <version>2.1.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctzj.shared.biz.isale.model</groupId>
+                <artifactId>biz-isale-model</artifactId>
+                <version>1.0.0</version>
             </dependency>
 
         </dependencies>
