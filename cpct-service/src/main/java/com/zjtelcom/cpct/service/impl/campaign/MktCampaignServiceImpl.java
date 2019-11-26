@@ -105,10 +105,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
         mktCampaignDO.setSrcId("1");
         // 调用创建需求函接口
+        logger.info("【添加需求函信息】"+mktCampaignDO.getMktCampaignName());
         generateRequest(mktCampaignDO);
+        logger.info("【需求函信息添加成功】"+mktCampaignDO.getMktCampaignName());
         try {
             // 更新complete表状态
-            openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "10");
+            logger.info("【反馈】"+mktCampaignDO.getMktCampaignName());
+            Map<String, Object> map = openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "10");
+            logger.info("【反馈结束】"+JSON.toJSONString(map));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -122,8 +126,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
         mktCampaignDO.setStatusCd(STATUS_CODE_ROLL.getStatusCode());
         mktCampaignDO.setSrcId("2");
+        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
         try {
-            openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "11");
+            logger.info("【反馈】"+mktCampaignDO.getMktCampaignName());
+            Map<String, Object> map = openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "11");
+            logger.info("【反馈结束】"+JSON.toJSONString(map));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -844,36 +851,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //集团活动环节信息更新反馈
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1100");
             if(mktCampaignComplete != null && !mktCampaignComplete.getTacheValueCd().equals("11")) {
-                mktCampaignComplete.setEndTime(new Date());
-                mktCampaignComplete.setStatusCd("1200");
-                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
-                mktCampaignComplete.setUpdateDate(new Date());
-                mktCampaignCompleteMapper.update(mktCampaignComplete);
-                MktCampaignComplete campaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1200");
-                if(campaignComplete == null) {
-                    MktCampaignComplete mktCamComplete = new MktCampaignComplete();
-                    mktCamComplete.setMktCampaignId(mktCampaignComplete.getMktCampaignId());
-                    mktCamComplete.setMktActivityNbr(mktCampaignComplete.getMktActivityNbr());
-                    mktCamComplete.setOrderId(mktCampaignComplete.getOrderId());
-                    mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
-                    mktCamComplete.setTacheCd("1200");
-                    mktCamComplete.setTacheValueCd("10");
-                    mktCamComplete.setBeginTime(new Date());
-                    mktCamComplete.setEndTime(new Date());
-                    mktCamComplete.setSort(Long.valueOf("2"));
-                    mktCamComplete.setStatusCd("1100");
-                    mktCamComplete.setStatusDate(new Date());
-                    mktCamComplete.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCamComplete);
-                    try {
-                        openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+                try {
+                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());

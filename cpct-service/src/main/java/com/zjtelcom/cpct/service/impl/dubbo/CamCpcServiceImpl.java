@@ -1463,8 +1463,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                 if ("1".equals(isaleCheck) && !loginId.equals("")) {
                     Long timeStart = System.currentTimeMillis();
                 //    testAddLog(assetRowId, "", "销售品：" + JSON.toJSONString(cpcList.get(0).get("productList")), "", true);
-                    log.info("进入受理规则校验，参数：taskChlList = "+ JSON.toJSONString(taskChlList) + ", activityType = " + privateParams.get("activityType") +", integrationId = " + params.get("integrationId") + ", loginId = " + loginId + ", LATN_ID = " + params.get("LATN_ID").toString());
-                    coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("LATN_ID").toString());
+                    log.info("进入受理规则校验，参数：taskChlList = "+ JSON.toJSONString(taskChlList) + ", activityType = " + privateParams.get("activityType") +", integrationId = " + params.get("integrationId") + ", loginId = " + loginId + ", LATN_ID = " + params.get("lanId"));
+                    coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("lanId"));
                     Long time = System.currentTimeMillis() - timeStart;
                 //    testAddLog(assetRowId, "耗时：" + time + "ms", "", "", true);
                     if (taskChlList == null || taskChlList.isEmpty()) {
