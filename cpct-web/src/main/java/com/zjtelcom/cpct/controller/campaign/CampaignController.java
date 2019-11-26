@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
@@ -573,4 +574,35 @@ public class CampaignController extends BaseController {
         return result;
     }
 
+    @PostMapping(value = "/acceptGroupCampaign")
+    @CrossOrigin
+    public Map<String, Object> acceptGroupCampaign(@RequestBody MktCampaignDO mktCampaignDO) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            mktCampaignService.acceptGroupCampaign(mktCampaignDO);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
+    @PostMapping(value = "/notAcceptGroupCampaign")
+    @CrossOrigin
+    public Map<String, Object> notAcceptGroupCampaign(@RequestBody MktCampaignDO mktCampaignDO) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            mktCampaignService.notAcceptGroupCampaign(mktCampaignDO);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
 }
