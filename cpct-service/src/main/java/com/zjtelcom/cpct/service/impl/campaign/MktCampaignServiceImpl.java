@@ -85,6 +85,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.*;
 import static com.zjtelcom.cpct.enums.DateUnit.MONTH;
 import static com.zjtelcom.cpct.enums.DateUnit.YEAR;
 import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_PUBLISHED;
+import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_ROLL;
 import static com.zjtelcom.cpct.util.DateUtil.*;
 
 /**
@@ -96,6 +97,37 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
+
+
+    // 集团活动承接接口
+    @Override
+    public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
+        mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
+        mktCampaignDO.setSrcId("1");
+        // 调用创建需求函接口
+        generateRequest(mktCampaignDO);
+        try {
+            // 更新complete表状态
+            openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "10");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+    // 集团活动不承接接口
+    @Override
+    public void notAcceptGroupCampaign(MktCampaignDO mktCampaignDO) {
+        mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
+        mktCampaignDO.setStatusCd(STATUS_CODE_ROLL.getStatusCode());
+        mktCampaignDO.setSrcId("2");
+        try {
+            openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1100", "11");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     /**
@@ -271,8 +303,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
-
-
+    // 集团活动指定承接人
+    private final static String GROUP_CAMPAIGN_RECIPIENT = "GROUP_CAMPAIGN_RECIPIENT";
     /**
      * 校验协同渠道时间是否在活动时间范围之内
      * @param params
@@ -371,7 +403,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamComplete.setCreateDate(new Date());
                 mktCampaignCompleteMapper.insert(mktCamComplete);
                 try {
-                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200");
+                    openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "10");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -1260,7 +1292,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamComplete.setCreateDate(new Date());
                     mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
-                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300");
+                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1200", "11");
+                        openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300", "10");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -1590,6 +1623,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
+                    mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
+
 
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
@@ -1739,7 +1774,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
-
+                    mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
@@ -2114,7 +2149,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignComplete.setUpdateDate(new Date());
                 mktCampaignCompleteMapper.update(mktCampaignComplete);
                 try {
-                    openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1400");
+                    openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1300", "11");
+                    openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1400", "10");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -2229,6 +2265,59 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         rel.setStatusCd(STATUSCD_EFFECTIVE);
         requestInstRelMapper.insertInfo(rel);
 
+    }
+
+    public void generateRequest(MktCampaignDO mktCampaignDO) {
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setRequestType("mkt");
+        //需求函批次号按规律递增1
+        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setName(mktCampaignDO.getMktCampaignName());
+        requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
+        requestInfo.setReason(mktCampaignDO.getMktCampaignName());
+        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
+        requestInfo.setStatusCd("1000");
+        requestInfo.setStatusDate(new Date());
+        requestInfo.setCreateDate(new Date());
+        requestInfo.setUpdateDate(new Date());
+        requestInfo.setActionType("add");
+        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setRequestUrgentType("一般");
+        requestInfo.setProcessType("0");
+        requestInfo.setReportTag("0");
+        //得到指定下发的人员信息集合
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign(GROUP_CAMPAIGN_RECIPIENT);
+        if (!sysParams.isEmpty()) {
+            SysParams s = sysParams.get(0);
+            String paramValue = s.getParamValue();
+            if (StringUtils.isNotBlank(paramValue)) {
+                JSONArray jsonArray = JSONArray.parseArray(paramValue);
+                //for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject o = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(0)));
+                    //String lan = o.getString("lanId");
+                    //if (lanId - Long.valueOf(lan) == 0) {
+                        requestInfo.setContName(o.getString("name"));
+                        requestInfo.setDeptCode(o.getString("department"));
+                        requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+                        mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
+                        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                        //break;
+                    //}
+                //}
+            }
+        }
+        requestInfoMapper.insert(requestInfo);
+        //开始增加子活动和需求函的关系
+        RequestInstRel rel = new RequestInstRel();
+        rel.setRequestObjId(mktCampaignDO.getMktCampaignId());
+        rel.setRequestInfoId(requestInfo.getRequestTemplateInstId());
+        rel.setRequestObjType("mkt");
+        rel.setStatusDate(new Date());
+        rel.setUpdateDate(new Date());
+        rel.setCreateDate(new Date());
+        rel.setStatusCd(STATUSCD_EFFECTIVE);
+        requestInstRelMapper.insertInfo(rel);
     }
 
     /**
@@ -2555,6 +2644,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> dueMktCampaign() {
+        // 3月不活跃活动过期
         activityStatisticsService.MoreThan3MonthsOffline();
         Map<String, Object> result = new HashMap<>();
         // 查出所有已经发布的活动

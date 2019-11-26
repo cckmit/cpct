@@ -67,6 +67,7 @@
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="LAN_ID_FOUR" jdbcType="BIGINT" property="lanIdFour"/>
         <result column="LAN_ID_FIVE" jdbcType="BIGINT" property="lanIdFive"/>
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId"/>
     </resultMap>
 
 
@@ -362,7 +363,7 @@
     <!-- 没有发布状态的活动总览 -->
     <select id="qryMktCampaignListPageForNoPublish" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="countResultMap">
         select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF, CREATE_DATE,CREATE_STAFF, LAN_ID_FOUR, LAN_ID_FIVE,
+        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF, CREATE_DATE,CREATE_STAFF, LAN_ID_FOUR, LAN_ID_FIVE, SRC_ID,
         (
         SELECT
         count(*)
@@ -866,7 +867,7 @@
 
     <select id="getMktCampaignDetailsForDate" parameterType="java.util.List" resultMap="BaseResultMap">
         SELECT
-        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE
+        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE,t.CREATE_STAFF,t.LAN_ID
         FROM
         mkt_campaign t
         WHERE
