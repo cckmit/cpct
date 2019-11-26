@@ -931,20 +931,20 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             orgMap.put("totalIncome",totalIncome.toString());
         }
         Map<String,Object> areaList = new HashMap<>();
-        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
-        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
+//        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
+//        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
         areaList.put("incomeSum",orgList);
         areaList.put("lowIncome",orgList);
         camMap.put("areaList",areaList);
@@ -963,20 +963,20 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             channelMap.put("totalIncome",totalIncome.toString());
         }
         Map<String,Object> channels = new HashMap<>();
-        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
-        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
+//        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
+//        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return new Double(o1.get("lowIncome").toString()).compareTo(name1);
+//            }
+//        });
         channels.put("incomeSum",channelList);
         channels.put("lowIncome",channelList);
         camMap.put("channelList",channels);
