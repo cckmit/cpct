@@ -867,12 +867,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
         map3.put("name","收入高迁活跃");
         map3.put("value",dataMap.get("收入高迁活跃数"));
-        map3.put("rate",dataMap.get("平迁率"));
+        map3.put("rate",dataMap.get("高迁率"));
         map3.put("num",dataMap.get("高迁收入"));
 
         map4.put("name","收入平迁活动");
         map4.put("value",dataMap.get("收入平迁活动数"));
-        map4.put("rate",dataMap.get("高迁率"));
+        map4.put("rate",dataMap.get("平迁率"));
         map4.put("num",dataMap.get("收入平迁金额"));
 
         map5.put("name","总收入");
