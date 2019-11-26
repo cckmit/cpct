@@ -119,6 +119,22 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- 受理校验 -->
+        <dependency>
+            <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
+            <artifactId>biz-isale-inbound-service-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
+            <artifactId>biz-isale-inbound-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ctzj.shared.biz.isale.model</groupId>
+            <artifactId>biz-isale-model</artifactId>
+        </dependency>
+
     </dependencies>
 
     <profiles>

@@ -12,10 +12,7 @@ import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -109,6 +106,19 @@ public class ContactEvtController extends BaseController {
         return JSON.toJSONString(maps);
     }
 
+    @RequestMapping("selectContactEvtByChlCode")
+    @CrossOrigin
+    public String selectContactEvtByChlCode(@RequestBody Map<String, Object> params) {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtService.selectContactEvtByChlCode(params);
+        } catch (Exception e) {
+            logger.error("[op:EventController] fail to selectContactEvtByChlCode Exception: ", e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
     /**
      * 删除事件
      */
@@ -191,7 +201,7 @@ public class ContactEvtController extends BaseController {
     /**
      * 新增事件
      */
-    @RequestMapping("/createContactEvt")
+    @PostMapping("createContactEvt")
     @CrossOrigin
     public String createContactEvt(@RequestBody CreateContactEvtReq createContactEvtReq) {
         Map<String, Object> maps = new HashMap<>();
