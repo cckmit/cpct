@@ -123,13 +123,15 @@
         <dependency>
             <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
             <artifactId>biz-isale-inbound-service-api</artifactId>
-            <version>2.2.2</version>
         </dependency>
 
         <dependency>
             <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
             <artifactId>biz-isale-inbound-model</artifactId>
-            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ctzj.shared.biz.isale.model</groupId>
+            <artifactId>biz-isale-model</artifactId>
         </dependency>
 
 
