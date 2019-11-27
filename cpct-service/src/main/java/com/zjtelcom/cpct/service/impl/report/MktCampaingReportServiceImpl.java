@@ -93,7 +93,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 
         //营销活动
         Map<String, Object> marketCountMap = new HashMap<>();
-        headParam.put("campaignType", "(1000, 2000, 3000, 4000)");
+        headParam.put("campaignType", "(1000)");
         List<Map<String, Object>> marketList = countHeadInfo(headParam);
         marketCountMap.put("name", "营销活动");
         marketCountMap.put("count", marketList);
@@ -147,7 +147,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 不活跃活动数量
         int noOperCount = 0;
         if (pageInfo != null) {
-            noOperCount = pageInfo.getTotal().intValue();
+            noOperCount = mktCampaignList.size();
+            System.out.println("noOperCount = " + pageInfo.getTotal().intValue() + "size= " + noOperCount);
         }
         List<Long> noOperationIdList = new ArrayList<>();
         for (MktCampaignDO mktCampaignDO : mktCampaignList) {
@@ -162,7 +163,8 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         // 不活跃活动数量
         int noOperCountBatch = 0;
         if (pageInfo != null) {
-            noOperCountBatch = pageInfoBatch.getTotal().intValue();
+            noOperCountBatch = mktCampaignBatchList.size();
+            System.out.println("pageInfoBatch = " + pageInfoBatch.getTotal() + "size= " + noOperCountBatch);
         }
         int OperCountTotal = noOperCount + noOperCountBatch;
         for (MktCampaignDO mktCampaignDO : mktCampaignBatchList) {
@@ -955,7 +957,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
 //        }
         params.put("statusCd", "(2002, 2006, 2008, 2010)");   // 发布，暂停，调整中，过期
         if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(params.get("campaignType"))) {
-            params.put("campaignType", "(1000, 2000, 3000, 4000)");
+            params.put("campaignType", "(1000)");
         }
         if (params.get("orglevel1")!=null && !"800000000004".equals((String) params.get("orglevel1")) && "800000000004" !=((String) params.get("orglevel1"))) {
             SysArea sysArea = sysAreaMapper.getNameByOrgId((String) params.get("orglevel1"));

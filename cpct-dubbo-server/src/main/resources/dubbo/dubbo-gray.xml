@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://code.alibabatech.com/schema/dubbo
-    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
@@ -43,12 +43,10 @@
     <!-- 编码查询事件详情服务 -->
     <dubbo:service  registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="2.0" >
         <dubbo:method name="getEventDetail" servicecode="00.1083.getEventDetail" timeout="10000"/>
+        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
+        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 名单导入服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="2.0" >
-        <dubbo:method name="importRuleUserList" servicecode="00.1083.importRuleUserList" timeout="10000"/>
-    </dubbo:service>
 
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiService" ref="mktCampaignApiServiceImpl" version="2.0" >
         <!-- 营销活动详情服务 -->
@@ -57,10 +55,6 @@
         <dubbo:method name="copyMktCampaign" servicecode="00.1083.copyMktCampaign" timeout="10000"/>
     </dubbo:service>
 
-    <!-- 编码查询渠道详细服务 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ChannelService" ref="channelServiceImpl" version="2.0" >
-        <dubbo:method name="getChannelDetail" servicecode="00.1083.getChannelDetail" timeout="10000"/>
-    </dubbo:service>
 
     <!-- 调查问卷详情查询服务 -->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.QuestionService" ref="questionServiceImpl" version="2.0" >
@@ -89,6 +83,7 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" id="productService"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="5000"/>
+        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
     </dubbo:reference>
 
     <!-- 事件接入活动任务订阅 2.0 -->
@@ -153,9 +148,4 @@
     <dubbo:reference registry="esb3" id="ICacheIdMappingEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService" version="2.0" retries="0" check="false">
         <dubbo:method name="getProdInstIdMappingCacheEntity" servicecode="00.1074.getProdInstIdMappingCacheEntity"  timeout="10000"/>
     </dubbo:reference>
-
-    <!-- 根据filterType获取关单类型 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="2.0" >
-        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
-    </dubbo:service>
 </beans>
