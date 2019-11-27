@@ -233,6 +233,44 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+            // 集团电渠下发集团活动渠道属性缺失特殊逻辑弥补
+            if (3969983L == mktCamChlConfDO.getContactChlId()){
+                List<Long> list =  new ArrayList<>();
+                for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                    if (mktCamChlConfAttrDO.getAttrId() == null) {
+                        Long contactChlAttrRstrId = mktCamChlConfAttrDO.getContactChlAttrRstrId();
+                        mktCamChlConfAttrMapper.deleteByPrimaryKey(contactChlAttrRstrId);
+                    }else{
+                        list.add(mktCamChlConfAttrDO.getAttrId());
+                    }
+                }
+                MktCamChlConfAttrDO mktCamChlConfAttrDO = new MktCamChlConfAttrDO();
+                mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
+                mktCamChlConfAttrDO.setAttrValue("");
+                mktCamChlConfAttrDO.setAttrValueId(0L);
+                mktCamChlConfAttrDO.setCreateDate(new Date());
+                mktCamChlConfAttrDO.setCreateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setUpdateDate(new Date());
+                mktCamChlConfAttrDO.setUpdateStaff(UserUtil.loginId());
+                mktCamChlConfAttrDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCamChlConfAttrDO.setStatusDate(new Date());
+                if (!list.contains(500600010006L)) {
+                    mktCamChlConfAttrDO.setAttrId(500600010006L);
+                    mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
+                    mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                }
+                if (!list.contains(500600010007L)) {
+                    mktCamChlConfAttrDO.setAttrId(500600010007L);
+                    mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
+                    mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                }
+                if (!list.contains(500600010012L)) {
+                    mktCamChlConfAttrDO.setAttrId(500600010012L);
+                    mktCamChlConfAttrDO.setContactChlAttrRstrId(null);
+                    mktCamChlConfAttrMapper.insert(mktCamChlConfAttrDO);
+                }
+            }
+            mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDetail, mktCamChlConfDO);
             // 通过查询结果与推送渠道的关系，判断是否为二次协同
             MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
@@ -243,7 +281,6 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             }
             List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
             boolean isEffectiveDaysAttr = false;
-
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);

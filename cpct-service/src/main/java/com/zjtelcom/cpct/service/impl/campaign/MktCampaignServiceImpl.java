@@ -1606,9 +1606,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
-                    mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
-
-
+                    List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
+                    if (mktCampaignCompletes!=null && !mktCampaignCompletes.isEmpty() ){
+                        if (mktCampaignCountDO.getSrcId()==null){
+                            mktCampaignVO.setSrcId("0");
+                        }else {
+                            mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
+                        }
+                    }
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
@@ -2123,11 +2128,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1300");
             if(mktCampaignComplete != null) {
 //                mktCampaignComplete.setEndTime(new Date());
 //                mktCampaignComplete.setTacheValueCd("10");
-//                mktCampaignComplete.setStatusCd("1200");
+//                mktCampaignComplete.setStatusCd("1200");openCompleteMktCampaignService
 //                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
 //                mktCampaignComplete.setUpdateDate(new Date());
 //                mktCampaignCompleteMapper.update(mktCampaignComplete);
