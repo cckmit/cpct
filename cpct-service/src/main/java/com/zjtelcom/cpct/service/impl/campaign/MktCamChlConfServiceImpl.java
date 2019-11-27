@@ -233,6 +233,13 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+            for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
+                if (mktCamChlConfAttrDO.getAttrId() == null) {
+                    Long contactChlAttrRstrId = mktCamChlConfAttrDO.getContactChlAttrRstrId();
+                    mktCamChlConfAttrMapper.deleteByPrimaryKey(contactChlAttrRstrId);
+                }
+            }
+            mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
             CopyPropertiesUtil.copyBean2Bean(mktCamChlConfDetail, mktCamChlConfDO);
             // 通过查询结果与推送渠道的关系，判断是否为二次协同
             MktCamChlResultConfRelDO mktCamChlResultConfRelDO = mktCamChlResultConfRelMapper.selectByConfId(evtContactConfId);
@@ -243,7 +250,6 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             }
             List<MktCamChlConfAttr> mktCamChlConfAttrList = new ArrayList<>();
             boolean isEffectiveDaysAttr = false;
-
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
