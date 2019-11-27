@@ -867,12 +867,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
         map3.put("name","收入高迁活跃");
         map3.put("value",dataMap.get("收入高迁活跃数"));
-        map3.put("rate",dataMap.get("平迁率"));
+        map3.put("rate",dataMap.get("高迁率"));
         map3.put("num",dataMap.get("高迁收入"));
 
         map4.put("name","收入平迁活动");
         map4.put("value",dataMap.get("收入平迁活动数"));
-        map4.put("rate",dataMap.get("高迁率"));
+        map4.put("rate",dataMap.get("平迁率"));
         map4.put("num",dataMap.get("收入平迁金额"));
 
         map5.put("name","总收入");
@@ -931,20 +931,20 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             orgMap.put("totalIncome",totalIncome.toString());
         }
         Map<String,Object> areaList = new HashMap<>();
-        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
-        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
+//        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
+//        Collections.sort(orgList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
         areaList.put("incomeSum",orgList);
         areaList.put("lowIncome",orgList);
         camMap.put("areaList",areaList);
@@ -963,20 +963,20 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             channelMap.put("totalIncome",totalIncome.toString());
         }
         Map<String,Object> channels = new HashMap<>();
-        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
-        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
-                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
-                return name2.compareTo(name1);
-            }
-        });
+//        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("totalIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("totalIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return name2.compareTo(name1);
+//            }
+//        });
+//        Collections.sort(channelList, new Comparator<Map<String, Object>>() {
+//            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+//                Double name1 = Double.valueOf(o1.get("lowIncome").toString()) ;//name1是从你list里面拿出来的一个
+//                Double name2 = Double.valueOf(o2.get("lowIncome").toString()) ; //name1是从你list里面拿出来的第二个name
+//                return new Double(o1.get("lowIncome").toString()).compareTo(name1);
+//            }
+//        });
         channels.put("incomeSum",channelList);
         channels.put("lowIncome",channelList);
         camMap.put("channelList",channels);
@@ -1386,8 +1386,18 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                         //成功数
                         camMap.put("orderSuccessNum", datum.get("orderSuccessNum"));
                         //开始和结束时间
-                        camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
-                        camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
+                        if (campaignDO.getPlanBeginTime()!=null) {
+                            camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
+                        }else {
+                            camMap.put("beginTime","无开始时间");
+                        }
+                        if (campaignDO.getPlanEndTime()!=null) {
+                            camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
+                        }else {
+                            camMap.put("endTime","无结束时间");
+                        }
+//                        camMap.put("beginTime", fmt.format(campaignDO.getPlanBeginTime()));
+//                        camMap.put("endTime", fmt.format(campaignDO.getPlanEndTime()));
                         camMap.put("contactNum",datum.get("contactNum")); //客户接触数
                         camMap.put("orderNum",datum.get("orderNum")); //商机推荐数
                         camMap.put("orderSuccessNum",datum.get("orderSuccessNum")); //商机成功数

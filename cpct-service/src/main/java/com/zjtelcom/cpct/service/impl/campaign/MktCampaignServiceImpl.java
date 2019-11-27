@@ -104,6 +104,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
         mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCampaignDO.getMktCampaignId());
         mktCampaignDO.setSrcId("1");
+        mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
         // 调用创建需求函接口
         logger.info("【添加需求函信息】"+mktCampaignDO.getMktCampaignName());
         generateRequest(mktCampaignDO);
@@ -117,8 +118,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             e.printStackTrace();
         }
     }
-
-
 
     // 集团活动不承接接口
     @Override
@@ -386,36 +385,36 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(campaignId));
         MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1200");
         if(mktCampaignComplete != null) {
-            mktCampaignComplete.setEndTime(new Date());
-            mktCampaignComplete.setTacheValueCd("11");
-            mktCampaignComplete.setStatusCd("1200");
-            mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
-            mktCampaignComplete.setUpdateDate(new Date());
-            mktCampaignCompleteMapper.update(mktCampaignComplete);
-            MktCampaignComplete campaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1300");
-            if(campaignComplete == null) {
-                MktCampaignComplete mktCamComplete = new MktCampaignComplete();
-                mktCamComplete.setMktCampaignId(mktCampaignComplete.getMktCampaignId());
-                mktCamComplete.setMktActivityNbr(mktCampaignComplete.getMktActivityNbr());
-                mktCamComplete.setOrderId(mktCampaignComplete.getOrderId());
-                mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
-                mktCamComplete.setTacheCd("1300");
-                mktCamComplete.setTacheValueCd("10");
-                mktCamComplete.setBeginTime(new Date());
-                mktCamComplete.setEndTime(new Date());
-                mktCamComplete.setSort(Long.valueOf("3"));
-                mktCamComplete.setStatusCd("1100");
-                mktCamComplete.setStatusDate(new Date());
-                mktCamComplete.setCreateStaff(campaign.getCreateStaff());
-                mktCamComplete.setCreateDate(new Date());
-                mktCampaignCompleteMapper.insert(mktCamComplete);
+//            mktCampaignComplete.setEndTime(new Date());
+//            mktCampaignComplete.setTacheValueCd("11");
+//            mktCampaignComplete.setStatusCd("1200");
+//            mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
+//            mktCampaignComplete.setUpdateDate(new Date());
+//            mktCampaignCompleteMapper.update(mktCampaignComplete);
+//            MktCampaignComplete campaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1300");
+//            if(campaignComplete == null) {
+//                MktCampaignComplete mktCamComplete = new MktCampaignComplete();
+//                mktCamComplete.setMktCampaignId(mktCampaignComplete.getMktCampaignId());
+//                mktCamComplete.setMktActivityNbr(mktCampaignComplete.getMktActivityNbr());
+//                mktCamComplete.setOrderId(mktCampaignComplete.getOrderId());
+//                mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
+//                mktCamComplete.setTacheCd("1300");
+//                mktCamComplete.setTacheValueCd("10");
+//                mktCamComplete.setBeginTime(new Date());
+//                mktCamComplete.setEndTime(new Date());
+//                mktCamComplete.setSort(Long.valueOf("3"));
+//                mktCamComplete.setStatusCd("1100");
+//                mktCamComplete.setStatusDate(new Date());
+//                mktCamComplete.setCreateStaff(campaign.getCreateStaff());
+//                mktCamComplete.setCreateDate(new Date());
+//                mktCampaignCompleteMapper.insert(mktCamComplete);
                 try {
                     openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1200", "11");
                     openCompleteMktCampaignService.completeMktCampaign(campaign.getInitId(), "1300", "10");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-            }
+//            }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
@@ -1253,28 +1252,28 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //集团活动环节信息更新反馈
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaignDO.getInitId(), "1300");
             if(mktCampaignComplete != null) {
-                mktCampaignComplete.setEndTime(new Date());
-                mktCampaignComplete.setTacheValueCd("11");
-                mktCampaignComplete.setStatusCd("1200");
-                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
-                mktCampaignComplete.setUpdateDate(new Date());
-                mktCampaignCompleteMapper.update(mktCampaignComplete);
-                MktCampaignComplete campaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaignDO.getInitId(), "1400");
-                if(campaignComplete == null) {
-                    MktCampaignComplete mktCamComplete = new MktCampaignComplete();
-                    mktCamComplete.setMktCampaignId(mktCampaignComplete.getMktCampaignId());
-                    mktCamComplete.setMktActivityNbr(mktCampaignComplete.getMktActivityNbr());
-                    mktCamComplete.setOrderId(mktCampaignComplete.getOrderId());
-                    mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
-                    mktCamComplete.setTacheCd("1400");
-                    mktCamComplete.setBeginTime(new Date());
-                    mktCamComplete.setEndTime(new Date());
-                    mktCamComplete.setSort(Long.valueOf("4"));
-                    mktCamComplete.setStatusCd("1100");
-                    mktCamComplete.setStatusDate(new Date());
-                    mktCamComplete.setCreateStaff(campaignDO.getCreateStaff());
-                    mktCamComplete.setCreateDate(new Date());
-                    mktCampaignCompleteMapper.insert(mktCamComplete);
+//                mktCampaignComplete.setEndTime(new Date());
+//                mktCampaignComplete.setTacheValueCd("11");
+//                mktCampaignComplete.setStatusCd("1200");
+//                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
+//                mktCampaignComplete.setUpdateDate(new Date());
+//                mktCampaignCompleteMapper.update(mktCampaignComplete);
+//                MktCampaignComplete campaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaignDO.getInitId(), "1400");
+//                if(campaignComplete == null) {
+//                    MktCampaignComplete mktCamComplete = new MktCampaignComplete();
+//                    mktCamComplete.setMktCampaignId(mktCampaignComplete.getMktCampaignId());
+//                    mktCamComplete.setMktActivityNbr(mktCampaignComplete.getMktActivityNbr());
+//                    mktCamComplete.setOrderId(mktCampaignComplete.getOrderId());
+//                    mktCamComplete.setOrderName(mktCampaignComplete.getOrderName());
+//                    mktCamComplete.setTacheCd("1400");
+//                    mktCamComplete.setBeginTime(new Date());
+//                    mktCamComplete.setEndTime(new Date());
+//                    mktCamComplete.setSort(Long.valueOf("4"));
+//                    mktCamComplete.setStatusCd("1100");
+//                    mktCamComplete.setStatusDate(new Date());
+//                    mktCamComplete.setCreateStaff(campaignDO.getCreateStaff());
+//                    mktCamComplete.setCreateDate(new Date());
+//                    mktCampaignCompleteMapper.insert(mktCamComplete);
                     try {
                         openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1200", "11");
                         openCompleteMktCampaignService.completeMktCampaign(campaignDO.getInitId(), "1300", "10");
@@ -1282,7 +1281,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         e.printStackTrace();
                     }
                 }
-            }
+//            }
         } catch (Exception e) {
             maps.put("resultCode", CODE_FAIL);
         }
@@ -2126,12 +2125,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //集团活动环节信息更新反馈
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1400");
             if(mktCampaignComplete != null) {
-                mktCampaignComplete.setEndTime(new Date());
-                mktCampaignComplete.setTacheValueCd("10");
-                mktCampaignComplete.setStatusCd("1200");
-                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
-                mktCampaignComplete.setUpdateDate(new Date());
-                mktCampaignCompleteMapper.update(mktCampaignComplete);
+//                mktCampaignComplete.setEndTime(new Date());
+//                mktCampaignComplete.setTacheValueCd("10");
+//                mktCampaignComplete.setStatusCd("1200");
+//                mktCampaignComplete.setUpdateStaff(UserUtil.loginId());
+//                mktCampaignComplete.setUpdateDate(new Date());
+//                mktCampaignCompleteMapper.update(mktCampaignComplete);
                 try {
                     openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1300", "11");
                     openCompleteMktCampaignService.completeMktCampaign(mktCampaignDO.getInitId(), "1400", "10");

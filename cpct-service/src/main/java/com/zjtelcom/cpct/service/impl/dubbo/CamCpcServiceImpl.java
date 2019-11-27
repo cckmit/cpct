@@ -862,7 +862,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             //拼装redis key
             ExpressRunner runner = new ExpressRunner();
             runner.addFunction("toNum", new StringToNumOperator("toNum"));
-
+            log.info("12345");
             //如果分群id为空
             if (tarGrpId == null) {
                 jsonObject.put("hit", "false");
@@ -878,7 +878,6 @@ public class CamCpcServiceImpl implements CamCpcService {
 
             //判断表达式在缓存中有没有
             String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
-
             SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
             if (sysParams == null) {
                 List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
@@ -888,7 +887,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             }
             String realProdFilter = null;
             try {
+                log.info("23456");
                 realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
+                log.info("realProdFilter:!@#$%"+JSON.toJSONString(realProdFilter));
                 if (realProdFilter == null) {
                     List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
                     if (sysParamsList != null && sysParamsList.size() > 0) {
@@ -1458,7 +1459,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 //                        offerVilo = false;
 //                    }
 //                }
-
+                log.info("34567890" +isaleCheck + "   " + loginId);
                 //if ("1".equals(isaleCheck) && offerVilo && !loginId.equals("")) {
                 if ("1".equals(isaleCheck) && !loginId.equals("")) {
                     Long timeStart = System.currentTimeMillis();
