@@ -147,6 +147,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 paramMap.put("pageSize","5");
                 //按转换率排序去前五 top5
                 log.info("【入参】新活动报表 主题活动 按转换率排序去前五 top5:："+JSON.toJSONString(paramMap));
+                paramMap.put("sortColumn","contactRate");
                 Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
                 log.info("新活动报表 主题活动 按转换率排序去前五 top5:"+JSON.toJSONString(stringObjectMap));
                 List<Map<String,Object>> rptList = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
