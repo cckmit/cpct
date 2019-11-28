@@ -48,6 +48,7 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -497,12 +498,16 @@ public class CamCpcServiceImpl implements CamCpcService {
                     Map<String,Object> futureMap =  future.get();
                     if (!futureMap.isEmpty()) {
                         Boolean flag = true;
-                        for (String key : futureMap.keySet()) {
+                        /*for (String key : futureMap.keySet()) {
                             if (key.contains("rule_")) {
                                 flag = false;
                                 nonPassedMsg.put(key, futureMap.get(key));
                                 // break;
                             }
+                        }*/
+                        if (futureMap.get("nonPassedMsg") != null) {
+                            flag = false;
+                            nonPassedMsg.putAll((Map<String, Object>) futureMap.get("nonPassedMsg"));
                         }
                         if (flag) ruleList.add(futureMap);
                     }
@@ -833,7 +838,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                 //ES log 标签实例
                 esJson.put("reqId", reqId);
-                esJson.put("eventId", params.get("eventCode"));
+                esJson.put("eventCode", params.get("eventCode"));
                 esJson.put("activityId",  mktCampaignDO.getMktCampaignId());
                 esJson.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                 esJson.put("ruleName", ruleName);
@@ -1252,9 +1257,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
                                 if (channelMap.containsKey("rule_" + ruleId)){
                                     nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                } else {
+                                    taskChlList.add(channelMap);
                                 }
-                                taskChlList.add(channelMap);
-
                             } else {
                                 if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
                                     for (String str : evtContactConfIdArray) {
@@ -1268,8 +1273,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                                         if (channelMap != null && !channelMap.isEmpty()) {
                                             if (channelMap.containsKey("rule_" + ruleId)){
                                                 nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                            } else {
+                                                taskChlList.add(channelMap);
                                             }
-                                            taskChlList.add(channelMap);
                                         }
                                     }
                                 }
@@ -1431,6 +1437,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     }
                 }*/
                 ruleMap.put("taskChlList", taskChlList);
+                ruleMap.put("nonPassedMsg", nonPassedMsg);
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
                 } else {
@@ -1438,8 +1445,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
-                    return nonPassedMsg;
+                    // nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    // return nonPassedMsg;
                 }
 
 

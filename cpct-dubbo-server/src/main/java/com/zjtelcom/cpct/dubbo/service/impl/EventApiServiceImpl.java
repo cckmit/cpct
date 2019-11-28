@@ -64,6 +64,7 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct_prd.dao.event.CamEvtRelPrdMapper;
 import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -427,6 +428,7 @@ public class EventApiServiceImpl implements EventApiService {
             JSONObject paramsJson = new JSONObject();
             paramsJson.put("reqId", map.get("reqId"));
             paramsJson.put("intoParams", map);  //保存入参
+            paramsJson.put("eventCode", map.get("eventCode"));
 
             //es log
             esJson.put("reqId", map.get("reqId"));
@@ -448,6 +450,27 @@ public class EventApiServiceImpl implements EventApiService {
                 log.error("事件接入时间入参异常:" + map.get("reqId"));
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 esJson.put("evtCollectTime", simpleDateFormat.format(new Date()));
+            }
+
+            try {
+                List<String> list = contactEvtMapper.selectChannelListByEvtId(Long.valueOf(map.get("eventId")));
+                if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
+                    esJson.put("hit", false);
+                    esJson.put("success", true);
+                    esJson.put("msg", "接入渠道不符");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    log.info("接入渠道不符:" + map.get("reqId"));
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "接入渠道不符");
+                    return result;
+                }
+            }catch (Exception e){
+                esJson.put("hit", false);
+                esJson.put("success", true);
+                esJson.put("msg", "接入渠道查询异常");
+                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                e.printStackTrace();
+                return result;
             }
 
             try {
@@ -2367,7 +2390,8 @@ public class EventApiServiceImpl implements EventApiService {
                         continue;
                     }
                     //判断适用渠道
-                    if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
+                    // 使用渠道改造，渠道关联事件源接口，该校验提到事件级
+                    /*if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                         String[] strArrayChannelsId = mktStrategyConf.getChannelsId().split("/");
                         List<Long> channelsIdList = new ArrayList<>();
                         if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
@@ -2428,7 +2452,7 @@ public class EventApiServiceImpl implements EventApiService {
                         esJsonStrategy.put("msg", "适用渠道数据异常");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
-                    }
+                    }*/
                     log.info("预校验还没出错1");
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
