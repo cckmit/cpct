@@ -469,7 +469,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
 //    }
 
 
-    public void areaList2Redis(Long targrpId,List<Long> areaIdList){
+    public void Redis(Long targrpId,List<Long> areaIdList){
         List<String> resultList = new ArrayList<>();
         List<Organization> sysAreaList = new ArrayList<>();
         for (Long id : areaIdList){

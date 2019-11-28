@@ -383,7 +383,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
         //集团活动环节信息更新反馈
         MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(Long.valueOf(campaignId));
-        MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(campaign.getInitId(), "1200");
+        MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(campaign.getInitId(), "1200","10");
         if(mktCampaignComplete != null) {
 //            mktCampaignComplete.setEndTime(new Date());
 //            mktCampaignComplete.setTacheValueCd("11");
@@ -1608,7 +1608,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                     List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
                     if (mktCampaignCompletes!=null && !mktCampaignCompletes.isEmpty() ){
-                        if (mktCampaignCountDO.getSrcId()==null){
+                        if (mktCampaignCountDO.getSrcId()==null || "".equals(mktCampaignCountDO.getSrcId())){
                             mktCampaignVO.setSrcId("0");
                         }else {
                             mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
@@ -2128,7 +2128,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1300");
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, "1300","10");
             if(mktCampaignComplete != null) {
 //                mktCampaignComplete.setEndTime(new Date());
 //                mktCampaignComplete.setTacheValueCd("10");
