@@ -39,7 +39,7 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         Map<String,Object> result = new HashMap<>();
         mktDttsLog.setStatusDate(new Date());
         mktDttsLog.setCreateDate(new Date());
-        mktDttsLog.setCreateStaff(UserUtil.loginId());
+        mktDttsLog.setCreateStaff(UserUtil.loginId()); //UserUtil.loginId()
         mktDttsLogMapper.insert(mktDttsLog);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
