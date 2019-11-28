@@ -29,7 +29,7 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktDttsLog">
-        update mkt_dtts_log
+            update mkt_dtts_log
         set
           <if test="dttsType != null and dttsType != ''">
               DTTS_TYPE = #{dttsType,jdbcType=VARCHAR},

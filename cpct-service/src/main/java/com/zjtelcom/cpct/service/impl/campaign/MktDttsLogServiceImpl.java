@@ -90,7 +90,7 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
     public Map<String,Object> getMktDttsLogList(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
         MktDttsLog mktDttsLog = new MktDttsLog();
-        String dttsType = MapUtil.getString(params.get("dttsType"));;
+        String dttsType = MapUtil.getString(params.get("dttsType"));
         if(StringUtils.isNotBlank(dttsType)){
             mktDttsLog.setDttsType(dttsType);
         }
