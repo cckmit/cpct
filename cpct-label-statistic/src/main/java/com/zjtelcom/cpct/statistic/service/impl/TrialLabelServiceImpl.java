@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.statistic.service.TrialLabelService;
+import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -35,6 +36,8 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     private TransportClient client;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired(required = false)
+    private EsServiceInfo esServiceInfo;
 
     @Override
     public Map<String, Object> trialUerLabelLog(String s, String messageID, String key) {
@@ -52,6 +55,8 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         //数据导入
         if(result) {
             try {
+                Map map = esServiceInfo.queryCustomerByList(list);
+
                 //dubbo调用，获取用户全部标签
                 //批量导入
 //                BulkRequestBuilder bulkRequest = client.prepareBulk();
