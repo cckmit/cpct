@@ -12,7 +12,7 @@ import java.util.List;
  */
 public enum OrgEnum {
 
-    ZHEJIAGN(800000000003L, "浙江省"),
+    ZHEJIAGN(800000000004L, "浙江省"),
     QUZHOU(800000000040L, "衢州市"),
     HAGNZHOU(800000000037L, "杭州市"),
     HUZHOU(800000000021L, "湖州市"),

@@ -15,7 +15,29 @@
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+
+    <sql id="mkt">
+        AND (
+        (
+          (
+            t.PLAN_BEGIN_TIME >= #{map.startDate}
+            AND #{map.endDate} >= t.PLAN_BEGIN_TIME
+          )
+        OR (
+          t.PLAN_BEGIN_TIME >= #{map.startDate}
+        AND #{map.endDate} >= t.PLAN_BEGIN_TIME
+        AND t.PLAN_END_TIME > #{map.endDate}
+          )
+        )
+        OR (
+          t.PLAN_END_TIME >= #{map.startDate}
+        AND  #{map.startDate} > t.PLAN_BEGIN_TIME
+          )
+        )
+    </sql>
+
+
+<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from mkt_cam_chl_conf
     where EVT_CONTACT_CONF_ID = #{evtContactConfId,jdbcType=BIGINT}
   </delete>
@@ -107,21 +129,43 @@
     where CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
   </select>
 
-  <select id="countCamByChannel" parameterType="java.lang.Long" resultType="java.lang.Long">
+  <select id="countCamByChannel" parameterType="map" resultType="java.lang.Long">
     SELECT t.INIT_ID
       FROM
           mkt_campaign t
       WHERE
-          t.STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+          t.STATUS_CD IN ${map.statusCd}
+          <include refid="mkt"/>
       AND
-        t.MKT_CAMPAIGN_TYPE IN (1000, 2000, 3000, 4000)
+        t.MKT_CAMPAIGN_TYPE IN ${map.campaignType}
+      <if test="map.batchType != null and map.batchType != '' and map.batchType != '3000'">
+        AND BATCH_TYPE = #{map.batchType}
+      </if>
+      <if test="map.batchType != null and map.batchType != '' and map.batchType == '3000'">
+        AND BATCH_TYPE IS NULL
+      </if>
+      <if test="map.lanId != null and map.lanId != ''">
+        AND LAN_ID = #{map.lanId,jdbcType=BIGINT}
+      </if>
+      <if test="map.tiggerType != null and map.tiggerType != ''">
+        AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
+      </if>
+      <if test="map.oneChannelFlg != null and map.oneChannelFlg != ''">
+        AND ONE_CHANNEL_FLG = #{map.oneChannelFlg}
+      </if>
+      <if test="map.regionFlg != null and map.regionFlg != ''">
+        AND REGION_FLG IN ${map.regionFlg}
+      </if>
+      <if test="map.lanIdFour != null and map.lanIdFour != ''">
+        AND LAN_ID_FOUR IN ${map.lanIdFour}
+      </if>
       AND t.MKT_CAMPAIGN_ID IN (
           SELECT
               MKT_CAMPAIGN_ID
           FROM
               mkt_cam_chl_conf
           WHERE
-              CONTACT_CHL_ID = #{contactChlId,jdbcType=BIGINT}
+              CONTACT_CHL_ID = #{map.contactChlId}
       )
       GROUP BY
           t.INIT_ID

@@ -43,6 +43,7 @@ public class MktCampaignDO extends BaseEntity{
     private String oneChannelFlg;//是否单渠道活动
     private String theMe;//活动主题
     private String regionFlg;//活动创建地市
+    private String batchType;
 
 
     public String getOneChannelFlg() {
@@ -340,5 +341,13 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setLanIdFive(Long lanIdFive) {
         this.lanIdFive = lanIdFive;
+    }
+
+    public String getBatchType() {
+        return batchType;
+    }
+
+    public void setBatchType(String batchType) {
+        this.batchType = batchType;
     }
 }

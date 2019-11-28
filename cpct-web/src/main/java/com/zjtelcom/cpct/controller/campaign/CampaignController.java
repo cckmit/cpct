@@ -304,6 +304,7 @@ public class CampaignController extends BaseController {
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
             }
         }
+        mktCampaignService.campaignConfig(Long.valueOf(mktCampaignId));
         return JSON.toJSONString(mktCampaignMap);
     }
 

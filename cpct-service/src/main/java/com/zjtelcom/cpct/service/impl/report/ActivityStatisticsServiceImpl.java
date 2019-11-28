@@ -885,6 +885,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         return str;
     }
 
+    /**
+     * 不活跃表表   // 2000-实时, 1000-批量
+     * @param params
+     * @return
+     */
     @Override
     public Map<String, Object> getMktCampaignDetails(Map<String, Object> params) {
         HashMap<String, Object> resultMap = new HashMap<>();

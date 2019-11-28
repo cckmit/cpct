@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://code.alibabatech.com/schema/dubbo 
-	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
@@ -49,7 +50,8 @@
     </dubbo:reference>
 
     <!--活动信息同步大数据-->
-    <dubbo:reference registry="esb1" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService" version="1.0">
+    <dubbo:reference registry="esb1" id="activitySyncService" interface="com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService"
+                     version="1.0" check="false" retries="0">
         <dubbo:method name="syncActivity" servicecode="33.1307.syncActivity" timeout="30000"/>
     </dubbo:reference>
 
@@ -114,4 +116,10 @@
         <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
     </dubbo:reference>
 
+    <!--渠道协同接触任务id-->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl"
+                     version="1.0" check="false">
+        <dubbo:method name="queryEventInst" servicecode="00.1079.queryEventInst"  timeout="120000"/>
+        <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
+    </dubbo:reference>
 </beans>

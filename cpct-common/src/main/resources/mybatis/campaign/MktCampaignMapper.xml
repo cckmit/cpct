@@ -71,6 +71,26 @@
     </resultMap>
 
 
+    <sql id="mkt">
+        AND (
+                (
+                    (
+                        PLAN_BEGIN_TIME >= #{startDate}
+                        AND  #{endDate} >= PLAN_BEGIN_TIME
+                    )
+                    OR (
+                        PLAN_BEGIN_TIME >= #{startDate}
+                        AND #{endDate} >= PLAN_BEGIN_TIME
+                        AND #{endDate} > PLAN_END_TIME
+                       )
+                )
+                OR (
+                    PLAN_END_TIME >= #{startDate}
+                    AND #{startDate} > PLAN_BEGIN_TIME
+                    )
+            )
+    </sql>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from mkt_campaign
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -214,6 +234,18 @@
         from mkt_campaign
         where INIT_ID = #{initId,jdbcType=BIGINT}
         AND (STATUS_CD = 2002 or STATUS_CD = 2008)
+    </select>
+
+
+    <select id="selectByInitIdFromOne" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
+        from mkt_campaign
+        where INIT_ID = #{initId,jdbcType=BIGINT}
+        AND (STATUS_CD = 2002 or STATUS_CD = 2008 or STATUS_CD = 2006 or STATUS_CD = 2010)
     </select>
 
     <select id="selectAll" resultMap="BaseResultMap">
@@ -467,6 +499,7 @@
     <update id="changeMktCampaignStatus">
         update mkt_campaign
         set STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        STATUS_DATE = #{updateDate,jdbcType=TIMESTAMP},
         UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
@@ -1009,18 +1042,18 @@
         MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,THE_ME,
         CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
-        from mkt_campaign WHERE STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+        from mkt_campaign WHERE STATUS_CD IN (2002, 2006,2008, 2010)  <include refid="mkt"/>
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
-        </if>
-        <if test="date != null and date != ''">
-            AND PLAN_BEGIN_TIME > #{date}
         </if>
         <if test="value != null and value != ''">
             AND THE_ME = #{value}
         </if>
-        <if test="c3 != null and c3 != ''">
-            AND LAN_ID = #{c3}
+        <if test="lanId != null and lanId != ''">
+            AND LAN_ID = #{lanId}
+        </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG = #{regionFlg}
         </if>
         GROUP BY INIT_ID
     </select>
@@ -1031,11 +1064,16 @@
     </select>
 
     <select id="getCountFromActivityThemeByC3" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM (
         select COUNT(0) FROM mkt_campaign WHERE  STATUS_CD IN (2002, 2006, 2008, 2010)
-        AND MKT_CAMPAIGN_TYPE = #{type} and PLAN_BEGIN_TIME > #{start}
-        <if test="c3 != null and c3 != ''">
-            AND LAN_ID = #{c3}
+        AND MKT_CAMPAIGN_TYPE = #{type} <include refid="mkt"/>
+        <if test="lanId != null and lanId != ''">
+            AND LAN_ID = #{lanId}
         </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG = #{regionFlg}
+        </if>
+        GROUP BY INIT_ID) S
     </select>
 
 
@@ -1060,15 +1098,13 @@
                     STATUS_CD = #{status}
                 </when>
                 <otherwise>
-                    STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+                    STATUS_CD IN (2002, 2006, 2008, 2010)
                 </otherwise>
             </choose>
             <if test="type != null and type != ''">
                 AND MKT_CAMPAIGN_TYPE = #{type}
             </if>
-            <if test="date != null and date != ''">
-                AND PLAN_END_TIME > #{date}
-            </if>
+            <include refid="mkt"/>
             GROUP BY INIT_ID
     </select>
 
@@ -1085,7 +1121,7 @@
                 STATUS_CD = #{status}
             </when>
             <otherwise>
-                STATUS_CD IN (2002, 2006, 2007, 2008, 2010)
+                STATUS_CD IN (2002, 2006, 2008, 2010)
             </otherwise>
         </choose>
         <if test="type != null and type != ''">
@@ -1097,6 +1133,60 @@
         <if test="value != null and value != ''">
             AND THE_ME = #{value}
         </if>
+        GROUP BY INIT_ID
+    </select>
+
+    <select id="getQuarterActivities" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,THE_ME,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
+        from mkt_campaign WHERE
+        <choose>
+            <when test="statusCd != null and statusCd!=''">
+                STATUS_CD = #{statusCd}
+            </when>
+            <otherwise>
+                STATUS_CD IN (2002, 2006, 2008, 2010)
+            </otherwise>
+        </choose>
+        <if test="type != null and type != ''">
+            AND MKT_CAMPAIGN_TYPE = #{type}
+        </if>
+        <if test="value != null and value != '' ">
+            AND THE_ME = #{value}
+        </if>
+        <if test="lanId != null and lanId != ''">
+            AND LAN_ID = #{lanId}
+        </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG = #{regionFlg}
+        </if>
+        <include refid="mkt"/>
+        GROUP BY INIT_ID
+    </select>
+
+    <select id="getQuarterActivitiesIsEnd" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,THE_ME,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
+        from mkt_campaign WHERE STATUS_CD = #{statusCd}
+        <if test="type != null and type != ''">
+            AND MKT_CAMPAIGN_TYPE = #{type}
+        </if>
+        <if test="value != null and value != '' ">
+            AND THE_ME = #{value}
+        </if>
+        <if test="lanId != null and lanId != ''">
+            AND LAN_ID = #{lanId}
+        </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG = #{regionFlg}
+        </if>
+        AND (STATUS_DATE >= #{startDate} AND #{endDate} >= STATUS_DATE )
         GROUP BY INIT_ID
     </select>
 </mapper>

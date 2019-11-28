@@ -19,4 +19,7 @@ public interface XinNewAactivityService {
 
     Map<String,Object> activityThemeLevelAndChannel(Map<String, Object> params);
 
+    Map<String,Object> incomeDown(Map<String, Object> params);
+
+    Map<String,Object> activityThemeLevel(Map<String, Object> params);
 }

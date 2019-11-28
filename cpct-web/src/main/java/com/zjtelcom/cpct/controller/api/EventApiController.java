@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -56,6 +57,9 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private TestService testService;
+
+    @Autowired(required = false)
+    private EventInstService eventInstService;
 
 
     @PostMapping("caculateTest")
@@ -222,5 +226,23 @@ public class EventApiController extends BaseController {
         return randNum;
     }
 
+
+
+    @RequestMapping(value = "/queryEventInst", method = RequestMethod.POST)
+    @CrossOrigin
+    public String queryEventInst(@RequestBody Map<String, String> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap = eventInstService.queryEventInst(params);
+        return JSON.toJSONString(resultMap);
+    }
+
+
+    @RequestMapping(value = "/queryEventInstLog", method = RequestMethod.POST)
+    @CrossOrigin
+    public String queryEventInstLog(@RequestBody Map<String, String> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap = eventInstService.queryEventInstLog(params);
+        return JSON.toJSONString(resultMap);
+    }
 
 }
