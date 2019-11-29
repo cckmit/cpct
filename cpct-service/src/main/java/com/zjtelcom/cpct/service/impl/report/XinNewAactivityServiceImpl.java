@@ -145,6 +145,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 //维度 按活动
                 paramMap.put("rptType", 2);
                 paramMap.put("pageSize","5");
+                paramMap.put("sortColumn","contactRate");
                 //按转换率排序去前五 top5
                 log.info("【入参】新活动报表 主题活动 按转换率排序去前五 top5:："+JSON.toJSONString(paramMap));
                 Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
@@ -186,7 +187,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 log.info("【入参】新活动报表 主题活动 按收入提高排序取前五 top5:："+JSON.toJSONString(paramMap));
                 Map<String, Object> stringObjectMap1 = iReportService.queryRptOrder(paramMap);
                 log.info("新活动报表 主题活动 按收入提高排序取前五:"+JSON.toJSONString(stringObjectMap1));
-                List<Map<String,Object>> rptList2 = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
+                List<Map<String,Object>> rptList2 = (List<Map<String,Object>>) stringObjectMap1.get("rptOrderList");
                 for (Map<String, Object> stringMap : rptList2) {
                     for (MktCampaignDO campaignDO : mktCampaignList) {
                         if (campaignDO.getInitId().toString().equals(stringMap.get("mktCampaignId").toString())){
