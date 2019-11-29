@@ -2128,7 +2128,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }.start();
             }
             //集团活动环节信息更新反馈
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, "1300","10");
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignDO.getInitId(), "1300","10");
             if(mktCampaignComplete != null) {
 //                mktCampaignComplete.setEndTime(new Date());
 //                mktCampaignComplete.setTacheValueCd("10");
