@@ -5,4 +5,6 @@ import java.util.Map;
 public interface OpenCompleteMktCampaignService {
 
     Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd);
+
+    Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd, String tacheValueCd);
 }

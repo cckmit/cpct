@@ -67,6 +67,7 @@
         <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
         <result column="LAN_ID_FOUR" jdbcType="BIGINT" property="lanIdFour"/>
         <result column="LAN_ID_FIVE" jdbcType="BIGINT" property="lanIdFive"/>
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId"/>
     </resultMap>
 
 
@@ -362,7 +363,7 @@
     <!-- 没有发布状态的活动总览 -->
     <select id="qryMktCampaignListPageForNoPublish" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO" resultMap="countResultMap">
         select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
-        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF, CREATE_DATE,CREATE_STAFF, LAN_ID_FOUR, LAN_ID_FIVE,
+        MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,CREATE_STAFF, CREATE_DATE,CREATE_STAFF, LAN_ID_FOUR, LAN_ID_FIVE, SRC_ID,
         (
         SELECT
         count(*)
@@ -867,7 +868,7 @@
 
     <select id="getMktCampaignDetailsForDate" parameterType="java.util.List" resultMap="BaseResultMap">
         SELECT
-        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE
+        t.MKT_CAMPAIGN_ID,t.MKT_ACTIVITY_NBR,t.MKT_CAMPAIGN_NAME,t.CREATE_DATE,t.CREATE_STAFF,t.LAN_ID
         FROM
         mkt_campaign t
         WHERE
@@ -1163,6 +1164,29 @@
             AND REGION_FLG = #{regionFlg}
         </if>
         <include refid="mkt"/>
+        GROUP BY INIT_ID
+    </select>
+
+    <select id="getQuarterActivitiesIsEnd" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
+        BEGIN_TIME, END_TIME, MKT_CAMPAIGN_TYPE, MANAGE_TYPE, MKT_ACTIVITY_NBR,
+        MKT_ACTIVITY_TARGET, MKT_CAMPAIGN_DESC, CALC_DISPLAY, ISALE_DISPLAY, EXEC_TYPE, EXEC_INVL, EXEC_NUM, STATUS_CD,
+        STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,THE_ME,
+        CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE,ONE_CHANNEL_FLG,THE_ME,REGION_FLG
+        from mkt_campaign WHERE STATUS_CD = #{statusCd}
+        <if test="type != null and type != ''">
+            AND MKT_CAMPAIGN_TYPE = #{type}
+        </if>
+        <if test="value != null and value != '' ">
+            AND THE_ME = #{value}
+        </if>
+        <if test="lanId != null and lanId != ''">
+            AND LAN_ID = #{lanId}
+        </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG = #{regionFlg}
+        </if>
+        AND (STATUS_DATE >= #{startDate} AND #{endDate} >= STATUS_DATE )
         GROUP BY INIT_ID
     </select>
 </mapper>

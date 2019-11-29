@@ -105,6 +105,20 @@ public class XinNewAactivityController  extends BaseController {
         return map;
     }
 
+    //地市选择
+    @PostMapping("/activityThemeLevel")
+    @CrossOrigin
+    public Map<String,Object> activityThemeLevel(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = xinNewAactivityService.activityThemeLevel(params);
+        } catch (Exception e) {
+            logger.error("[XinNewAactivityController 主题活动分类和数量  activityThemeLevelAndChannel] fail to listEvents for getRptEventOrder = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
     //主题活动分类和数量
     @PostMapping("/activityThemeCount")
     @CrossOrigin

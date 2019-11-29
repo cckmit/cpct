@@ -100,4 +100,13 @@
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT} and TACHE_CD = #{tacheCd,jdbcType=VARCHAR}
         order by SORT asc
     </select>
+
+    <select id="selectByCampaignIdAndTacheCdAndTacheValueCd" resultMap="BaseResultMap">
+        select COMPLETE_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, ORDER_ID, ORDER_NAME, TACHE_CD, TACHE_VALUE_CD,
+               BEGIN_TIME, END_TIME, SORT, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
+               UPDATE_DATE, REMARK
+        from mkt_campaign_complete
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT} and TACHE_CD = #{tacheCd,jdbcType=VARCHAR} and TACHE_VALUE_CD = #{tacheValueCd,jdbcType=VARCHAR}
+        order by SORT asc
+    </select>
 </mapper>

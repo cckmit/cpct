@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.campaign;
 
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 
@@ -79,4 +80,7 @@ public interface MktCampaignService {
 
     Map<String, Object> campaignConfig(Long mktCampaignId);
 
+    void acceptGroupCampaign(MktCampaignDO mktCampaignDO);
+
+    void notAcceptGroupCampaign(MktCampaignDO mktCampaignDO);
 }

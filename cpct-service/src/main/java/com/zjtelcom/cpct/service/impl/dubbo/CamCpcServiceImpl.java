@@ -878,7 +878,6 @@ public class CamCpcServiceImpl implements CamCpcService {
 
             //判断表达式在缓存中有没有
             String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
-            log.info("express:!@#$%"+JSON.toJSONString(express));
             SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
             if (sysParams == null) {
                 List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");

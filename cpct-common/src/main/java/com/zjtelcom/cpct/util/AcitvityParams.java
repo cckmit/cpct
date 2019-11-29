@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 public class AcitvityParams {
 
@@ -72,10 +73,10 @@ public class AcitvityParams {
             paramMap.put("rptType","");
         }
         //是否返回历史活动(0:否,1:是)
-        //Object isHis = params.get("isHis");
-        Object isHis = "1";
+        Object isHis = params.get("isHis");
+//        String isHis = "1";
         if (isHis!=null && isHis!=""){
-            paramMap.put("isHis",isHis);
+            paramMap.put("isHis","1");
         }else {
             paramMap.put("isHis","0");
         }
@@ -107,7 +108,7 @@ public class AcitvityParams {
         }else {
             paramMap.put("currenPage","1");
         }
-
+        paramMap.put("resultCode", CODE_SUCCESS);
         return paramMap;
     }
 }
