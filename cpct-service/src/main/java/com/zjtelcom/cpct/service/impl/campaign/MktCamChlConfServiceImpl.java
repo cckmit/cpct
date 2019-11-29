@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.ServicePackageMapper;
 import com.zjtelcom.cpct.dao.question.MktQuestionnaireMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.Rule;
 import com.zjtelcom.cpct.domain.RuleDetail;
 import com.zjtelcom.cpct.domain.User;
@@ -19,6 +20,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamChlResultConfRelDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.ServicePackage;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.LabelValueVO;
@@ -92,6 +94,8 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
 
     @Autowired
     private ServicePackageMapper servicePackageMapper;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
@@ -233,8 +237,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
         try {
             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
             List<MktCamChlConfAttrDO> mktCamChlConfAttrDOList = mktCamChlConfAttrMapper.selectByEvtContactConfId(evtContactConfId);
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("JITUAN_CHANNEL");
+            String channelList = sysParams.isEmpty() ? "" :  sysParams.get(0).getParamValue();
+            List<String> list2 = ChannelUtil.StringToList(channelList);
             // 集团电渠下发集团活动渠道属性缺失特殊逻辑弥补
-            if (3969983L == mktCamChlConfDO.getContactChlId()){
+            if (list2.contains(mktCamChlConfDO.getContactChlId().toString()) ){
                 List<Long> list =  new ArrayList<>();
                 for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                     if (mktCamChlConfAttrDO.getAttrId() == null) {

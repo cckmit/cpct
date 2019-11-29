@@ -24,4 +24,6 @@ public interface ContactEvtTypeService {
     Map<String,Object> modContactEvtType(ContactEvtType contactEvtType);
 
     Map<String,Object> delContactEvtType(ContactEvtType contactEvtType);
+
+    Map<String,Object> listEventType();
 }
