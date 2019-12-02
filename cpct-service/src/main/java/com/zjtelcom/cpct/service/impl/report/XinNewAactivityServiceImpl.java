@@ -364,6 +364,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             paramMap.put("orglevel3","all");
         }
         //查询地市排名
+        paramMap.put("pageSize","11");
         log.info("【入参】新活动报表 客触数  查询地市排名："+JSON.toJSONString(paramMap));
         Map<String,Object> orgMapRes = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 客触数 查询地市排名:"+JSON.toJSONString(orgMapRes));
@@ -836,16 +837,16 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //收入底迁活动数
         dataMap.put("收入低迁活动数",list.get(0).get("downCount"));
         //收入高签活跃数
-        dataMap.put("收入高迁活跃数",list.get(0).get("upCount"));
+        dataMap.put("收入高迁活动数",list.get(0).get("upCount"));
         double v = Double.valueOf(dataMap.get("高迁收入").toString()).doubleValue() + Double.valueOf(dataMap.get("收入低迁金额").toString()).doubleValue();
         dataMap.put("总收入",fun2(v)); //总收入
         dataMap.put("收入平迁金额",0); //收入平迁金额
         //收入平迁活动数
-        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活跃数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
+        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活动数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
         //低迁率
         dataMap.put("低迁率",getPercentFormat(Double.valueOf(dataMap.get("收入低迁活动数").toString()).doubleValue()/(double) count,2,2));
         //高迁率
-        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活跃数").toString()).doubleValue()/(double)count,2,2));
+        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活动数").toString()).doubleValue()/(double)count,2,2));
         //平迁率
         dataMap.put("平迁率",getPercentFormat(Double.valueOf(dataMap.get("收入平迁活动数").toString()).doubleValue()/(double)count,2,2));
 //        Iterator<String> iterator = dataMap.keySet().iterator();
@@ -867,7 +868,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         map2.put("num",dataMap.get("收入低迁金额"));
 
         map3.put("name","收入高迁活跃");
-        map3.put("value",dataMap.get("收入高迁活跃数"));
+        map3.put("value",dataMap.get("收入高迁活动数"));
         map3.put("rate",dataMap.get("高迁率"));
         map3.put("num",dataMap.get("高迁收入"));
 
