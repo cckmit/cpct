@@ -1344,7 +1344,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 //                mktCampaignList = mktCampaignMapper.getQuarterActivities(theMe.toString(),status,startDate,endDate,type,lanId,regionFlg);
 //            }
             List<MktCampaignDO> mktCampaignList =null;
-            if (paramMap.get("isHis").toString().equals("1")) {
+            if (params.get("isHis")!=null && params.get("isHis")!="" && params.get("isHis").toString().equals("1")) {
                 status = "2010";
                 mktCampaignList = mktCampaignMapper.getQuarterActivitiesIsEnd(value,status,startDate,endDate,type,lanId,regionFlg);
             }else {
