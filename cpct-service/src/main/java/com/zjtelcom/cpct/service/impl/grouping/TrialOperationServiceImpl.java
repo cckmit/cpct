@@ -25,10 +25,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamItem;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.GroupingVO;
 import com.zjtelcom.cpct.domain.grouping.ServicePackage;
@@ -56,6 +53,7 @@ import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
@@ -157,6 +155,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
 
     @Value("${ctg.cpctTopic}")
     private String importTopic;
+
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
 
 //    private String ftpAddress = "134.108.3.130";
     private String ftpAddress = "134.108.0.93";
@@ -2391,6 +2392,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> importUserListByExcel() throws IOException {
         logger.info("定时任务importUserListByExcel启动");
+        HashMap<String, Object> map = new HashMap<>();
+        MktDttsLog mktDttsLog =new MktDttsLog();
+        Date beginTime = new Date();
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         logger.info("sftp已获得连接");
@@ -2487,12 +2491,26 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
             }
             quitSftp(sftp);
+            map.put("resultCode","200");
+            map.put("resultMsg","成功");
+            //定時任務
+            mktDttsLog.setDttsType("8000");
+            mktDttsLog.setDttsState("200");
+            mktDttsLog.setBeginTime(beginTime);
+            mktDttsLog.setEndTime(new Date());
+            mktDttsLog.setDttsResult("200");
         } catch (Exception e) {
             e.printStackTrace();
+            map.put("resultCode","500");
+            map.put("resultMsg","失败");
+            //定時任務
+            mktDttsLog.setDttsType("8000");
+            mktDttsLog.setDttsState("500");
+            mktDttsLog.setBeginTime(beginTime);
+            mktDttsLog.setEndTime(new Date());
+            mktDttsLog.setDttsResult("500"+"异常原因："+e);
         }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("resultCode","200");
-        map.put("resultMsg","成功");
+        mktDttsLogService.saveMktDttsLog(mktDttsLog);
         return map;
     }
 

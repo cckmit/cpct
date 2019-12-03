@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.campaign.MktDttsLogMapper;
 import com.zjtelcom.cpct.domain.campaign.MktDttsLog;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -93,6 +94,12 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         String dttsType = MapUtil.getString(params.get("dttsType"));
         if(StringUtils.isNotBlank(dttsType)){
             mktDttsLog.setDttsType(dttsType);
+        }
+        Object beginTime = params.get("beginTime");
+        Object endTime = params.get("endTime");
+        if (beginTime!=null && endTime!=null){
+            mktDttsLog.setBeginTime( DateUtil.parseDate(beginTime.toString(),"yyyy-MM-dd HH:mm:ss"));
+            mktDttsLog.setEndTime( DateUtil.parseDate(endTime.toString(),"yyyy-MM-dd HH:mm:ss"));
         }
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
