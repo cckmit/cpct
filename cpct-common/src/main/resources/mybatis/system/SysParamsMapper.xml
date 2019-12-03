@@ -64,7 +64,7 @@
     </select>
 
     <select id="listParamsByKey" resultType="Map">
-        select PARAM_NAME as label, PARAM_VALUE value
+        select PARAM_NAME as label, PARAM_VALUE as value ,DESCRIPTION as description
         from sys_params
         where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
     </select>

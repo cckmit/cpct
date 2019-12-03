@@ -29,7 +29,7 @@
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.campaign.MktDttsLog">
-        update mkt_dtts_log
+            update mkt_dtts_log
         set
           <if test="dttsType != null and dttsType != ''">
               DTTS_TYPE = #{dttsType,jdbcType=VARCHAR},
@@ -82,10 +82,14 @@
         select DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
                CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO
         from mkt_dtts_log
-        where 1=1
+       <where>
         <if test="dttsType != null and dttsType != ''">
             and DTTS_TYPE = #{dttsType,jdbcType=VARCHAR}
         </if>
+           <if test="beginTime != null and endTime != null">
+               and CREATE_DATE >= #{beginTime,jdbcType=TIMESTAMP} and  #{endTime,jdbcType=TIMESTAMP} >= CREATE_DATE
+           </if>
+       </where>
         order by BEGIN_TIME desc
     </select>
 </mapper>
