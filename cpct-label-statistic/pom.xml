@@ -65,6 +65,11 @@
             <artifactId>ctgmq-rocketmq-tools</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjtelcom.es</groupId>
+            <artifactId>es-service-info</artifactId>
+        </dependency>
+
         <!-- es -->
         <dependency>
             <groupId>org.elasticsearch</groupId>
