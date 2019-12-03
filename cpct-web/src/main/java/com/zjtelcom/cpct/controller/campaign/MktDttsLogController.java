@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,15 +21,15 @@ public class MktDttsLogController extends BaseController {
 
     /**
      * 新增定时任务日志
-     * @param mktDttsLog
+     * @param
      * @return
      */
     @RequestMapping(value = "saveMktDttsLog", method = RequestMethod.POST)
     @CrossOrigin
-    public Map<String,Object> saveMktDttsLog(@RequestBody MktDttsLog mktDttsLog) {
+    public Map<String,Object> saveMktDttsLog(String dttsType , String dttsState, Date beginTime, Date endTime, String dttsResult,String remark) {
         Map<String,Object> result = new HashMap<>();
         try{
-            result = mktDttsLogService.saveMktDttsLog(mktDttsLog);
+            result = mktDttsLogService.saveMktDttsLog(dttsType ,dttsState,beginTime,endTime,dttsResult,remark);
         }catch (Exception e) {
             logger.error("[op:MktDttsLogController] fail to saveMktDttsLog",e);
             result.put("resultCode",CODE_FAIL);

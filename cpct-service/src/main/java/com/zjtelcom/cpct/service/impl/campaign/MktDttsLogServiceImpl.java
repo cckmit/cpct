@@ -32,12 +32,27 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
 
     /**
      * 新增定时任务日志
-     * @param mktDttsLog
+     * @param
      * @return
+     *  private String dttsType;
+    private String dttsState;
+    private Date beginTime;
+    private Date endTime;
+    private String dttsResult;
+    private String remark;
+    private String remarkOne;
+    private String remarkTwo;
      */
     @Override
-    public Map<String,Object> saveMktDttsLog(MktDttsLog mktDttsLog) {
+    public Map<String,Object> saveMktDttsLog(String dttsType ,String dttsState,Date beginTime,Date endTime,String dttsResult,String remark) {
         Map<String,Object> result = new HashMap<>();
+        MktDttsLog mktDttsLog = new MktDttsLog();
+        mktDttsLog.setDttsType(dttsType);
+        mktDttsLog.setDttsState(dttsState);
+        mktDttsLog.setBeginTime(beginTime);
+        mktDttsLog.setEndTime(endTime);
+        mktDttsLog.setDttsResult(dttsResult);
+        mktDttsLog.setRemark(remark);
         mktDttsLog.setStatusDate(new Date());
         mktDttsLog.setCreateDate(new Date());
         mktDttsLog.setCreateStaff(UserUtil.loginId()); //UserUtil.loginId()
@@ -105,6 +120,12 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         PageHelper.startPage(page, pageSize);
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
+        if (mktDttsLogList!=null) {
+            for (MktDttsLog dttsLog : mktDttsLogList) {
+                mktDttsLog.setCreateDate( DateUtil.parseDate(dttsLog.getCreateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
+                mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
+            }
+        }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",mktDttsLogList);
