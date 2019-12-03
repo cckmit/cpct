@@ -110,4 +110,6 @@ public interface MktCampaignMapper {
     List<MktCampaignCountDO> qryMktCampaignListPage4Count(MktCampaignDO mktCampaignDO);
 
 
+
+
 }

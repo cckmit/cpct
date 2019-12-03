@@ -363,6 +363,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         }else {
             paramMap.put("orglevel3","all");
         }
+        paramMap.put("pageSize","11");
         //查询地市排名
         log.info("【入参】新活动报表 客触数  查询地市排名："+JSON.toJSONString(paramMap));
         Map<String,Object> orgMapRes = iReportService.queryRptOrder(paramMap);
@@ -836,16 +837,16 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         //收入底迁活动数
         dataMap.put("收入低迁活动数",list.get(0).get("downCount"));
         //收入高签活跃数
-        dataMap.put("收入高迁活跃数",list.get(0).get("upCount"));
+        dataMap.put("收入高迁活动数",list.get(0).get("upCount"));
         double v = Double.valueOf(dataMap.get("高迁收入").toString()).doubleValue() + Double.valueOf(dataMap.get("收入低迁金额").toString()).doubleValue();
         dataMap.put("总收入",fun2(v)); //总收入
         dataMap.put("收入平迁金额",0); //收入平迁金额
         //收入平迁活动数
-        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活跃数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
+        dataMap.put("收入平迁活动数",count - (Integer.valueOf(dataMap.get("收入高迁活动数").toString()) + Integer.valueOf(dataMap.get("收入低迁活动数").toString())) );
         //低迁率
         dataMap.put("低迁率",getPercentFormat(Double.valueOf(dataMap.get("收入低迁活动数").toString()).doubleValue()/(double) count,2,2));
         //高迁率
-        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活跃数").toString()).doubleValue()/(double)count,2,2));
+        dataMap.put("高迁率",getPercentFormat(Double.valueOf(dataMap.get("收入高迁活动数").toString()).doubleValue()/(double)count,2,2));
         //平迁率
         dataMap.put("平迁率",getPercentFormat(Double.valueOf(dataMap.get("收入平迁活动数").toString()).doubleValue()/(double)count,2,2));
 //        Iterator<String> iterator = dataMap.keySet().iterator();
@@ -866,8 +867,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         map2.put("rate",dataMap.get("低迁率"));
         map2.put("num",dataMap.get("收入低迁金额"));
 
-        map3.put("name","收入高迁活跃");
-        map3.put("value",dataMap.get("收入高迁活跃数"));
+        map3.put("name","收入高迁活动");
+        map3.put("value",dataMap.get("收入高迁活动数"));
         map3.put("rate",dataMap.get("高迁率"));
         map3.put("num",dataMap.get("高迁收入"));
 
@@ -1343,7 +1344,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 //                mktCampaignList = mktCampaignMapper.getQuarterActivities(theMe.toString(),status,startDate,endDate,type,lanId,regionFlg);
 //            }
             List<MktCampaignDO> mktCampaignList =null;
-            if (paramMap.get("isHis").toString().equals("1")) {
+            if (params.get("isHis")!=null && params.get("isHis")!="" && params.get("isHis").toString().equals("1")) {
                 status = "2010";
                 mktCampaignList = mktCampaignMapper.getQuarterActivitiesIsEnd(value,status,startDate,endDate,type,lanId,regionFlg);
             }else {

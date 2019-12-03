@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
@@ -111,19 +112,22 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                 }
                 LabelValue value = BeanUtil.create(labelValue, new LabelValue());
                 value.setInjectionLabelId(entity.getInjectionLabelId());
-                value.setValueDesc(labelValue.getValueName());
-                value.setValueName(labelValue.getValueName());
+                value.setValueDesc(labelValue.getValueName()==null || "null".equals(labelValue.getValueName()) ? labelValue.getLabelValue() : labelValue.getValueName());
+                value.setValueName(labelValue.getValueName()==null || "null".equals(labelValue.getValueName()) ? labelValue.getLabelValue() : labelValue.getValueName());
                 value.setLabelValue(labelValue.getLabelValue());
                 value.setCreateDate(new Date());
                 value.setStatusCd("1000");
                 value.setUpdateDate(new Date());
                 labelValueMapper.insert(value);
                 total++;
+            }else {
+                ids.add(labelValue.getTagRowId().toString());
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","size:"+total);
         result.put("ids",ids);
+        logger.info(JSON.toJSONString(result));
         return result;
     }
 
@@ -176,9 +180,9 @@ public class LabelServiceImpl extends BaseService implements LabelService {
                     entity.setLabBusiDesc(label.getLabBusiDesc());
                 }
                 labelDataType(label,entity);
-                entity.setRightOperand(label.getRightOperand());
                 entity.setTagRowId(label.getTagRowId());
                 entity.setInjectionLabelCode(label.getInjectionLabelCode());
+                entity.setLabTagCode(label.getLabTagCode());
                 entity.setOriginalLabLevel1Code(null == label.getOriginalLabLevel1Code()? "":label.getOriginalLabLevel1Code() == "null"? "": label.getOriginalLabLevel1Code());
                 entity.setOriginalLabLevel2Code(null == label.getOriginalLabLevel2Code()? "":label.getOriginalLabLevel2Code() == "null"? "": label.getOriginalLabLevel2Code());
                 entity.setOriginalLabLevel3Code(null == label.getOriginalLabLevel3Code()? "":label.getOriginalLabLevel3Code() == "null"? "": label.getOriginalLabLevel3Code());
@@ -193,6 +197,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","size:"+labels.size());
         result.put("ids",ids);
+        logger.info(JSON.toJSONString(result));
         return result;
     }
 
