@@ -48,6 +48,42 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     SynContactEvtTypeService synContactEvtTypeService;
 
 
+    /**
+     * 事件管理页面事件目录列表
+     * @return
+     */
+    @Override
+    public Map<String, Object> listEventType() {
+        Map<String, Object> maps = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
+        try {
+            QryContactEvtTypeReq req = new QryContactEvtTypeReq();
+            req.setParEvtTypeId(0L);
+            List<ContactEvtType> parentList = contactEvtTypeMapper.qryContactEvtTypeList(req);
+
+            for (ContactEvtType parent : parentList) {
+                Map<String, Object> parentMap = new HashMap<>();
+                List<Map<String,Object>> childs = new ArrayList<>();
+                parentMap.put("typeName",parent.getContactEvtName());
+                List<ContactEvtType> childList = contactEvtTypeMapper.listEventTypes(null,parent.getEvtTypeId());
+                for (ContactEvtType child : childList) {
+                    Map<String, Object> childMap = new HashMap<>();
+                    childMap.put("id",child.getEvtTypeId());
+                    childMap.put("name",child.getContactEvtName());
+                    childs.add(childMap);
+                }
+                parentMap.put("childList",childs);
+                list.add(parentMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("[op:ContactEvtTypeServiceImpl] fail to qryContactEvtTypeList ", e);
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", StringUtils.EMPTY);
+        maps.put("data",list );
+        return maps;
+    }
 
     /**
      * 查询事件目录

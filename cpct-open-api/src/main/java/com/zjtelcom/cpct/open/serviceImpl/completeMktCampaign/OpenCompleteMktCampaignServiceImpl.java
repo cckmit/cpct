@@ -271,6 +271,7 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
      */
     @Override
     public Map<String, Object> completeMktCampaign(Long initId, String tacheCd, String tacheValueCd) {
+        Map<String, Object> map = new HashMap<>();
         if ("1100".equals(tacheCd)) {
             MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(initId, tacheCd);
             mktCampaignComplete.setStatusCd("1200");
@@ -303,9 +304,11 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                         break;
                 }
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            } else {
+                return map;
             }
         }
-        Map<String, Object> map = completeMktCampaign(initId, tacheCd);
+        map = completeMktCampaign(initId, tacheCd);
         return map;
     }
 

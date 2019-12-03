@@ -1437,7 +1437,6 @@ public class CamCpcServiceImpl implements CamCpcService {
                     }
                 }*/
                 ruleMap.put("taskChlList", taskChlList);
-                ruleMap.put("nonPassedMsg", nonPassedMsg);
                 if (taskChlList.size() > 0) {
                     jsonObject.put("hit", true);
                 } else {
@@ -1445,8 +1444,8 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    // nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
-                    // return nonPassedMsg;
+                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    return nonPassedMsg;
                 }
 
 
