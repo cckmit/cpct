@@ -122,8 +122,10 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
         if (mktDttsLogList!=null) {
             for (MktDttsLog dttsLog : mktDttsLogList) {
+                if (dttsLog.getUpdateDate()!=null) {
+                    mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
+                }
                 mktDttsLog.setCreateDate( DateUtil.parseDate(dttsLog.getCreateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
-                mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
             }
         }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
