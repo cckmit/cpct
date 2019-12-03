@@ -2494,23 +2494,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             map.put("resultCode","200");
             map.put("resultMsg","成功");
             //定時任務
-            mktDttsLog.setDttsType("8000");
-            mktDttsLog.setDttsState("200");
-            mktDttsLog.setBeginTime(beginTime);
-            mktDttsLog.setEndTime(new Date());
-            mktDttsLog.setDttsResult("200");
+            mktDttsLogService.saveMktDttsLog("8000","成功",beginTime,new Date(),"成功",null);
         } catch (Exception e) {
             e.printStackTrace();
             map.put("resultCode","500");
             map.put("resultMsg","失败");
             //定時任務
-            mktDttsLog.setDttsType("8000");
-            mktDttsLog.setDttsState("500");
-            mktDttsLog.setBeginTime(beginTime);
-            mktDttsLog.setEndTime(new Date());
-            mktDttsLog.setDttsResult("500"+"异常原因："+e);
+            mktDttsLogService.saveMktDttsLog("8000","失败",beginTime,new Date(),"失败",e.toString());
         }
-        mktDttsLogService.saveMktDttsLog(mktDttsLog);
         return map;
     }
 

@@ -191,36 +191,23 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
                                     try {
                                         uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
                                         resuleMap.put("code","200");
-                                        mktDttsLog.setDttsType("9000");
-                                        mktDttsLog.setDttsState("200");
-                                        mktDttsLog.setBeginTime(date);
-                                        mktDttsLog.setEndTime(new Date());
-                                        mktDttsLog.setDttsResult("200");
+                                        mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"成功",null);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                         resuleMap.put("code","500");
-                                        mktDttsLog.setDttsType("9000");
-                                        mktDttsLog.setDttsState("500");
-                                        mktDttsLog.setBeginTime(date);
-                                        mktDttsLog.setEndTime(new Date());
-                                        mktDttsLog.setDttsResult("500"+"异常原因："+e);
+                                        mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"失败",e.toString());
                                     }
                                 }
                             }
                         }catch (Exception e){
                             e.printStackTrace();
                             resuleMap.put("code","500");
-                            mktDttsLog.setDttsType("9000");
-                            mktDttsLog.setDttsState("500");
-                            mktDttsLog.setBeginTime(date);
-                            mktDttsLog.setEndTime(new Date());
-                            mktDttsLog.setDttsResult("500"+"异常原因："+e);
+                            mktDttsLogService.saveMktDttsLog("9000","失败",date,new Date(),"失败",e.toString());
                         }
                     }
                 }
             }
         }
-        mktDttsLogService.saveMktDttsLog(mktDttsLog);
         return resuleMap;
     }
 
