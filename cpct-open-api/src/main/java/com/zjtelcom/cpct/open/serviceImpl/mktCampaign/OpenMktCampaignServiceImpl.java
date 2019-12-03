@@ -419,6 +419,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             mktCampaignDO.setServiceType("1000");
             mktCampaignDO.setIsCheckRule("不校验");
+            mktCampaignDO.setSrcId("0");
             if(openMktCampaignEntity.getCreateStaff() == null) {
                 mktCampaignDO.setCreateStaff(1L);
             }
