@@ -598,6 +598,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         contactEventDetail.setEventMatchRulDetail(eventMatchRulDetail);
 
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
+        // 删除事件接入缓存
+        redisUtils.del("EVENT_ITEM_" + contactEvtId);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         map.put("viewContactEvtRsp", viewContactEvtRsp);
@@ -635,6 +637,8 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 contactEvtMatchRul.setUpdateStaff(UserUtil.loginId());
                 contactEvtMatchRulMapper.modContactEvtMatchRul(contactEvtMatchRul);
             }
+            // 删除事件接入缓存
+            redisUtils.del("EVENT_ITEM_" + evtDetail.getContactEvtId());
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
@@ -752,6 +756,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);
                 }
             }
+            redisUtils.del("CAM_EVT_REL_" +evtDetail.getContactEvtId());
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
@@ -802,6 +807,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 //                    }
 //                }.start();
 //            }
+
+            // 删除事件接入缓存
+            redisUtils.del("EVENT_ITEM_" + eventId);
 
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);

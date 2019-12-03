@@ -284,7 +284,11 @@ public class CamCpcServiceImpl implements CamCpcService {
         if (filterRuleIds != null && filterRuleIds.size() > 0) {
             //循环并判断过滤规则
             for (Long filterRuleId : filterRuleIds) {
-                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
+                if(filterRule == null){
+                    filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                    redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
+                }
                 //判断过滤类型(红名单，黑名单)
                 if (filterRule != null) {
                     if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
@@ -984,7 +988,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                         //保存标签的es log
                         lr = new LabelResult();
                         if ("PROM_LIST".equals(labelMap.get("code")) && "1".equals(realProdFilter)) {
-                            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
+                            Long filterRuleId = Long.valueOf(labelMap.get("rightParam"));
+                            FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
+                            if(filterRule == null){
+                                filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                                redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
+                            }
                             if (filterRule != null) {
                                 String checkProduct = filterRule.getChooseProduct();
                                 String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
@@ -1451,25 +1460,14 @@ public class CamCpcServiceImpl implements CamCpcService {
                 if (sysParam != null && !sysParam.isEmpty()) {
                     loginId = sysParam.get(0).get("value");
                 }
-//
-//                boolean offerVilo = true;
-//                if (!taskChlList.isEmpty()) {
-//                    List<String> typeList = (List<String>) taskChlList.get(0).get("offerTypeList");
-//                    if (typeList.contains("11")) {
-//                        offerVilo = false;
-//                    }
-//                }
-                log.info("34567890" +isaleCheck + "   " + loginId);
-                //if ("1".equals(isaleCheck) && offerVilo && !loginId.equals("")) {
+
                 if ("1".equals(isaleCheck) && !loginId.equals("")) {
                     Long timeStart = System.currentTimeMillis();
-                //    testAddLog(assetRowId, "", "销售品：" + JSON.toJSONString(cpcList.get(0).get("productList")), "", true);
                     log.info("进入受理规则校验，参数：taskChlList = "+ JSON.toJSONString(taskChlList) + ", activityType = " + privateParams.get("activityType") +", integrationId = " + params.get("integrationId") + ", loginId = " + loginId + ", LATN_ID = " + params.get("lanId"));
                     coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("lanId"));
                     Long time = System.currentTimeMillis() - timeStart;
-                //    testAddLog(assetRowId, "耗时：" + time + "ms", "", "", true);
                     if (taskChlList == null || taskChlList.isEmpty()) {
-                        nonPassedMsg.put("rule_" + ruleId, "");
+                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过");
                         return nonPassedMsg;
                     }
                 }
@@ -2097,7 +2095,12 @@ public class CamCpcServiceImpl implements CamCpcService {
                 lr.setLabelCode(labelMap.get("code"));
                 lr.setLabelName(labelMap.get("name"));
                 if ("PROM_LIST".equals(labelMap.get("code"))) {
-                    FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(Long.valueOf(labelMap.get("rightParam")));
+                    Long filterRuleId = Long.valueOf(labelMap.get("rightParam"));
+                    FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
+                    if(filterRule == null){
+                        filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                        redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
+                    }
                     String checkProduct = filterRule.getChooseProduct();
                     String s = sysParamsService.systemSwitch("PRODUCT_FILTER_SWITCH");
                     if (s != null && s.equals("code")) {
