@@ -145,9 +145,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 //维度 按活动
                 paramMap.put("rptType", 2);
                 paramMap.put("pageSize","5");
+                paramMap.put("sortColumn","contactRate");
                 //按转换率排序去前五 top5
                 log.info("【入参】新活动报表 主题活动 按转换率排序去前五 top5:："+JSON.toJSONString(paramMap));
-                paramMap.put("sortColumn","contactRate");
                 Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
                 log.info("新活动报表 主题活动 按转换率排序去前五 top5:"+JSON.toJSONString(stringObjectMap));
                 List<Map<String,Object>> rptList = (List<Map<String,Object>>) stringObjectMap.get("rptOrderList");
@@ -363,8 +363,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         }else {
             paramMap.put("orglevel3","all");
         }
-        //查询地市排名
         paramMap.put("pageSize","11");
+        //查询地市排名
         log.info("【入参】新活动报表 客触数  查询地市排名："+JSON.toJSONString(paramMap));
         Map<String,Object> orgMapRes = iReportService.queryRptOrder(paramMap);
         log.info("【出参】新活动报表 客触数 查询地市排名:"+JSON.toJSONString(orgMapRes));
@@ -867,7 +867,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         map2.put("rate",dataMap.get("低迁率"));
         map2.put("num",dataMap.get("收入低迁金额"));
 
-        map3.put("name","收入高迁活跃");
+        map3.put("name","收入高迁活动");
         map3.put("value",dataMap.get("收入高迁活动数"));
         map3.put("rate",dataMap.get("高迁率"));
         map3.put("num",dataMap.get("高迁收入"));

@@ -264,21 +264,22 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
 
     /**
      *
-     * @param mktCampaignId
+     * @param initId
      * @param tacheCd
      * @param tacheValueCd
      * @return
      */
     @Override
-    public Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd, String tacheValueCd) {
+    public Map<String, Object> completeMktCampaign(Long initId, String tacheCd, String tacheValueCd) {
+        Map<String, Object> map = new HashMap<>();
         if ("1100".equals(tacheCd)) {
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, tacheCd);
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(initId, tacheCd);
             mktCampaignComplete.setStatusCd("1200");
             mktCampaignComplete.setTacheValueCd(tacheValueCd);
             mktCampaignCompleteMapper.update(mktCampaignComplete);
         } else {
-            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(mktCampaignId, "1100");
-            MktCampaignComplete mktCampaignComplete1 = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(mktCampaignId, tacheCd, tacheValueCd);
+            MktCampaignComplete mktCampaignComplete = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCd(initId, "1100");
+            MktCampaignComplete mktCampaignComplete1 = mktCampaignCompleteMapper.selectByCampaignIdAndTacheCdAndTacheValueCd(initId, tacheCd, tacheValueCd);
             if (mktCampaignComplete1 == null) {
                 mktCampaignComplete.setCompleteId(null);
                 mktCampaignComplete.setTacheCd(tacheCd);
@@ -303,9 +304,11 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
                         break;
                 }
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
+            } else {
+                return map;
             }
         }
-        Map<String, Object> map = completeMktCampaign(mktCampaignId, tacheCd);
+        map = completeMktCampaign(initId, tacheCd);
         return map;
     }
 
