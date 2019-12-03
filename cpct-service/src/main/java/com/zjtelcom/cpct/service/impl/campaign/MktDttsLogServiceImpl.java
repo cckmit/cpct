@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.campaign.MktDttsLogMapper;
 import com.zjtelcom.cpct.domain.campaign.MktDttsLog;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -31,15 +32,30 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
 
     /**
      * 新增定时任务日志
-     * @param mktDttsLog
+     * @param
      * @return
+     *  private String dttsType;
+    private String dttsState;
+    private Date beginTime;
+    private Date endTime;
+    private String dttsResult;
+    private String remark;
+    private String remarkOne;
+    private String remarkTwo;
      */
     @Override
-    public Map<String,Object> saveMktDttsLog(MktDttsLog mktDttsLog) {
+    public Map<String,Object> saveMktDttsLog(String dttsType ,String dttsState,Date beginTime,Date endTime,String dttsResult,String remark) {
         Map<String,Object> result = new HashMap<>();
+        MktDttsLog mktDttsLog = new MktDttsLog();
+        mktDttsLog.setDttsType(dttsType);
+        mktDttsLog.setDttsState(dttsState);
+        mktDttsLog.setBeginTime(beginTime);
+        mktDttsLog.setEndTime(endTime);
+        mktDttsLog.setDttsResult(dttsResult);
+        mktDttsLog.setRemark(remark);
         mktDttsLog.setStatusDate(new Date());
         mktDttsLog.setCreateDate(new Date());
-        mktDttsLog.setCreateStaff(UserUtil.loginId());
+        mktDttsLog.setCreateStaff(UserUtil.loginId()); //UserUtil.loginId()
         mktDttsLogMapper.insert(mktDttsLog);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -90,14 +106,28 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
     public Map<String,Object> getMktDttsLogList(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
         MktDttsLog mktDttsLog = new MktDttsLog();
-        String dttsType = MapUtil.getString(params.get("dttsType"));;
+        String dttsType = MapUtil.getString(params.get("dttsType"));
         if(StringUtils.isNotBlank(dttsType)){
             mktDttsLog.setDttsType(dttsType);
+        }
+        Object beginTime = params.get("beginTime");
+        Object endTime = params.get("endTime");
+        if (beginTime!=null && endTime!=null){
+            mktDttsLog.setBeginTime( DateUtil.parseDate(beginTime.toString(),"yyyy-MM-dd HH:mm:ss"));
+            mktDttsLog.setEndTime( DateUtil.parseDate(endTime.toString(),"yyyy-MM-dd HH:mm:ss"));
         }
         Integer page = MapUtil.getIntNum(params.get("page"));
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         PageHelper.startPage(page, pageSize);
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
+        if (mktDttsLogList!=null) {
+            for (MktDttsLog dttsLog : mktDttsLogList) {
+                if (dttsLog.getUpdateDate()!=null) {
+                    mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
+                }
+                mktDttsLog.setCreateDate( DateUtil.parseDate(dttsLog.getCreateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
+            }
+        }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",mktDttsLogList);
