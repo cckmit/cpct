@@ -23,7 +23,7 @@
         <module>cpct-eslog</module>
         <module>cpct-dubbo-log</module>
         <!--<module>cpct-dtts-tasktracker</module>-->
-        <!--<module>cpct-label-statistic</module>-->
+        <module>cpct-label-statistic</module>
     </modules>
 
     <properties>
@@ -415,7 +415,7 @@
             <dependency>
                 <groupId>com.zjtelcom.es</groupId>
                 <artifactId>es-service-info</artifactId>
-                <version>1.0.0</version>
+                <version>1.1.0</version>
             </dependency>
 
             <!-- es清单日志转大数据对内转对外 -->

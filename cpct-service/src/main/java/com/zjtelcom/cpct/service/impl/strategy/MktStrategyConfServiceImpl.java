@@ -167,6 +167,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         }
         //删除策略与活动的关联
         mktCamStrategyConfRelMapper.deleteByStrategyConfId(mktStrategyConfId);
+        // 删除事件接入缓存
+        redisUtils.del("RULE_LIST_" + mktStrategyConfId);
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -364,7 +366,8 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfMap.put("resultMsg", ErrorCode.SAVE_MKT_STR_CONF_SUCCESS.getErrorMsg());
             mktStrategyConfMap.put("mktStrategyConfId", mktStrategyConfId);
-
+            // 删除事件接入缓存
+            redisUtils.del("RULE_LIST_" + mktStrategyConfId);
             // 遍历策略下的所有规则
             if (mktStrategyConfDetail.getMktStrategyConfRuleList() != null) {
                 ExecutorService executorService = Executors.newCachedThreadPool();

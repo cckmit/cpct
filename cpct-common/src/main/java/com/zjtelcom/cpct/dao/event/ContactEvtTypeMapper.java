@@ -27,4 +27,6 @@ public interface ContactEvtTypeMapper {
     int createContactEvtType(ContactEvtType contactEvtType);
 
     List<EventTypeDO> listByEvtTypeName(@Param("name")String name);
+
+    List<ContactEvtType> listEventTypes(@Param("evtTypeId")Long evtTypeId,@Param("parEvtTypeId")Long parEvtTypeId);
 }

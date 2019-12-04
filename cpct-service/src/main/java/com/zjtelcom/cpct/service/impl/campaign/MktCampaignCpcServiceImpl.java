@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.service.MktCampaignResp;
 import com.zjtelcom.cpct.service.MktStrConfRuleResp;
 import com.zjtelcom.cpct.service.MktStrategyConfResp;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
@@ -120,6 +121,9 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired
     private MktCamItemPrdMapper mktCamItemPrdMapper;
 
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
+
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
         // 获取活动基本信息
@@ -164,6 +168,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     public Map<String, Object> salesOffShelf(Map<String, Object> map) {
         HashMap<String,Object> resuleMap = new HashMap<>();
         Date date = new Date();
+        MktDttsLog mktDttsLog =new MktDttsLog();
         String preDay = DateUtil.getPreDay(1);
         Date preDate = DateUtil.string2DateTime4Day(preDay);
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
@@ -185,13 +190,19 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
                                     String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                                     try {
                                         uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
+                                        resuleMap.put("code","200");
+                                        mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"成功",null);
                                     } catch (Exception e) {
                                         e.printStackTrace();
+                                        resuleMap.put("code","500");
+                                        mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"失败",e.toString());
                                     }
                                 }
                             }
                         }catch (Exception e){
                             e.printStackTrace();
+                            resuleMap.put("code","500");
+                            mktDttsLogService.saveMktDttsLog("9000","失败",date,new Date(),"失败",e.toString());
                         }
                     }
                 }

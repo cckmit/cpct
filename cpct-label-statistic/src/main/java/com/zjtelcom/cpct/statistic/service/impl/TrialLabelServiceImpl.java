@@ -1,14 +1,15 @@
 package com.zjtelcom.cpct.statistic.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.statistic.service.TrialLabelService;
+import com.zjtelcom.es.es.service.EsServiceInfo;
+import net.sf.json.JSONArray;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -35,6 +36,10 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     private TransportClient client;
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
+    @Autowired(required = false)
+    private EsServiceInfo esServiceInfo;
+
+    private String esType = "doc";
 
     @Override
     public Map<String, Object> trialUerLabelLog(String s, String messageID, String key) {
@@ -52,21 +57,13 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         //数据导入
         if(result) {
             try {
-                //dubbo调用，获取用户全部标签
-                //批量导入
-//                BulkRequestBuilder bulkRequest = client.prepareBulk();
-//                int count = 0;
-//                for(int i=0;i<mapList.size();i++) {
-//                    String id = list.get(i).toString();
-//                    JSONObject jsonObject = new JSONObject();
-//                    bulkRequest.add(client.prepareIndex(index, "doc", id).setSource(jsonObject));
-//                    count++;
-//                    if(count == 20) {
-//                        bulkRequest.get();
-//                        bulkRequest = client.prepareBulk();
-//                        count = 0;
-//                    }
-//                }
+                Map map = esServiceInfo.queryCustomerByList(list);
+                if (map!=null && map.get("resultCode").toString().equals("200")) {
+                    List<Map<String,Object>> resultData =( List<Map<String,Object>>) map.get("resultData");
+                    JSONArray jsonArray = JSONArray.fromObject(resultData);
+                    IndexResponse response = client.prepareIndex(index, esType).setSource(jsonArray).get();
+                    System.out.println(response.status().getStatus());
+                }
             } catch(Exception e) {
                 logger.error("标签入es库失败：" + e);
             }
@@ -77,12 +74,12 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     public boolean createIndex(String index) {
         boolean result = true;
         client.admin().indices().prepareCreate(index).setSettings(Settings.builder()
-                .put("index.number_of_shards", 15)
-                .put("index.number_of_replicas", 0)
-                .put("index.refresh_interval", "30s")
-                .put("index.translog.flush_threshold_size", "1g")
-                .put("index.translog.sync_interval", "60s")
-                .put("index.translog.durability", "async")
+                .put("index.number_of_shards", 15) //数据分片数
+                .put("index.number_of_replicas", 0) //数据备份数，如果只有一台机器，设置为0
+                .put("index.refresh_interval", "30s") //每个索引的刷新频率
+                .put("index.translog.flush_threshold_size", "1g") //事务日志大小到达此预设值，则执行flush
+                .put("index.translog.sync_interval", "60s") //保证操作不会丢失  写入的数据被缓存到内存中，再每60秒执行一次 fsync
+                .put("index.translog.durability", "async") //如果你不确定这个行为的后果，最好是使用默认的参数（ "index.translog.durability": "request" ）来避免数据丢失。
                 .put("index.mapping.total_fields.limit", 2000)).get();
         XContentBuilder mapping = null;
         try {

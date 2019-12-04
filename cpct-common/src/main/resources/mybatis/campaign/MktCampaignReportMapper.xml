@@ -289,7 +289,7 @@
     <select id="selectServiceCamList" parameterType="java.util.Map" resultType="Map">
         select MKT_CAMPAIGN_ID campaignId, MKT_CAMPAIGN_NAME campaignName,INIT_ID initId,PLAN_BEGIN_TIME startTime,PLAN_END_TIME endTime
         from mkt_campaign
-        where SERVICE_TYPE = #{map.serviceType}
+        where LIFE_STAGE = #{map.serviceType}
         and MKT_CAMPAIGN_TYPE = #{map.mktCampaignType}
         AND STATUS_CD IN (2002,2008)
         <if test="map.lanId != null and map.lanId != ''">

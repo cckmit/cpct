@@ -61,4 +61,9 @@
         <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
     </dubbo:reference>
 
+    <dubbo:reference  registry="esb2" interface="com.ctzj.shared.biz.isale.inbound.service.BizBusTradeOrderInboundService"
+                      id="bizBusTradeOrderInboundServiceImpl" version="1.0" check="false">
+        <dubbo:method name="beforehandValidate" servicecode="33.1001.tradeOrderBusinessAcceptanceValidate" timeout="10000"/>
+    </dubbo:reference>
+
 </beans>

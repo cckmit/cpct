@@ -120,6 +120,7 @@
         </dependency>
 
 
+        <!-- 受理校验 -->
         <dependency>
             <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
             <artifactId>biz-isale-inbound-service-api</artifactId>

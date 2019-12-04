@@ -27,6 +27,23 @@ public class ContactEvtTypeController extends BaseController {
     @Autowired
     private ContactEvtTypeService contactEvtTypeService;
 
+
+    /**
+     * 查询事件目录树
+     */
+    @RequestMapping("/listEventType")
+    @CrossOrigin
+    public String listEventType() {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = contactEvtTypeService.listEventType();
+        } catch (Exception e) {
+            logger.error("[op:EventTypeController] fail to listEventTypes for contactEvtType = {}! Exception: ", JSONArray.toJSON(maps), e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
     /**
      * 查询事件目录树
      */
