@@ -55,6 +55,7 @@ import com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaig
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
@@ -309,6 +310,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private ActivityStatisticsService activityStatisticsService;
     @Autowired
     private TrialOperationMapper trialOperationMapper;
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -2846,47 +2849,45 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public void campaignDelayNotice() {
+        Date startDate = new Date();
         ArrayList<String> list = new ArrayList<>();
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
-        System.out.println("11111111111");
-        List<String> sendFailList = new ArrayList();
+        List<Map> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
                 if (mktCampaignDO.getPlanEndTime() != null && mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                     Long staff = mktCampaignDO.getCreateStaff();
-                    System.out.println("222222222222");
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                         String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
-                        System.out.println("3333333333333");
                         String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                         System.out.println(sendContent);
-                        try {
-                            System.out.println("444444444444");
-                            if (lanId != null && lanId != 1) {
-                                uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
-                                i++;
+                        if (lanId != null && lanId != 1) {
+                            String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                            if (!resultMsg.isEmpty()) {
+                                Map map = new HashMap();
+                                map.put("campaignId", mktCampaignDO.getMktCampaignId());
+                                map.put("resuleMsg", resultMsg);
+                                sendFailList.add(map);
                             }
-                            System.out.println("555555555555");
-                        } catch (Exception e) {
-                            System.out.println("666666666666");
-                            sendFailList.add(mktCampaignDO.getMktCampaignId().toString());
-                            logger.error(sysUserCode);
-                            e.printStackTrace();
+                            i++;
                         }
                     }
                 }
             } catch (Exception e) {
-                System.out.println("777777777777");
+                Map map = new HashMap();
+                map.put("campaignId", mktCampaignDO.getMktCampaignId());
+                map.put("resuleMsg", e.toString().substring(500));
+                sendFailList.add(map);
                 e.printStackTrace();
             }
         }
-        System.out.println("888888888888");
         System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
+        mktDttsLogService.saveMktDttsLog("6000", "成功", startDate, new Date(), "成功", JSON.toJSONString(sendFailList));
     }
 
 

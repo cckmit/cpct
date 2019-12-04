@@ -45,7 +45,7 @@ public class UCCPServiceImpl implements UCCPService {
     }
 
     @Override
-    public void sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
+    public String sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
         HashMap params = new HashMap();
         //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
         params.put("TransactionId", userAcct + DateUtil.date2St4Trial(new Date()) + getRandom(10));
@@ -74,12 +74,19 @@ public class UCCPServiceImpl implements UCCPService {
         //外系统流水ID,查询发送结构用,可填
         //params.put("ExtOrderId", "");
 
-        System.out.println("-----------------------请求开始-------------------");
-        long beginTime = System.currentTimeMillis();
-        Map reqMap = uCCPSendService.sendShortMessage(params);
-        System.out.println("接口返回结果:"+reqMap);
-        System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
-        System.exit(0);
+        //System.out.println("-----------------------请求开始-------------------");
+        //long beginTime = System.currentTimeMillis();
+        //Map reqMap = uCCPSendService.sendShortMessage(params);
+        //System.out.println("接口返回结果:"+reqMap);
+        //System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
+        //System.exit(0);
+        Map map = uCCPSendService.sendShortMessage(params);
+        if (map == null) return "调用sendShortMessage返回结果异常！";
+        if (!map.get("code").equals("0000")) {
+            return map.get("msg").toString();
+        } else {
+            return "";
+        }
     }
 
     public static String getRandom(int length){
