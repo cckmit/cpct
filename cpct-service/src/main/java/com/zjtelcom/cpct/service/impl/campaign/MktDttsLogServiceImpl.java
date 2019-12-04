@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -120,14 +117,6 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         PageHelper.startPage(page, pageSize);
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
-        if (mktDttsLogList!=null) {
-            for (MktDttsLog dttsLog : mktDttsLogList) {
-                if (dttsLog.getUpdateDate()!=null) {
-                    mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
-                }
-                mktDttsLog.setCreateDate( DateUtil.parseDate(dttsLog.getCreateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
-            }
-        }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",mktDttsLogList);
