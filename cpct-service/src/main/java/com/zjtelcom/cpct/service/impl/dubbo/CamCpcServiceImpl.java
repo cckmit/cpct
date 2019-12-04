@@ -1261,8 +1261,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 Map<String, Object> channelMap = ChannelTask(evtContactConfId, productList, context, reqId, nonPassedMsg, ruleId);
                                 if (channelMap.containsKey("rule_" + ruleId)){
                                     nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                }else {
+                                    taskChlList.add(channelMap);
                                 }
-                                taskChlList.add(channelMap);
 
                             } else {
                                 if (evtContactConfIdArray != null && !"".equals(evtContactConfIdArray[0])) {
@@ -1277,8 +1278,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                                         if (channelMap != null && !channelMap.isEmpty()) {
                                             if (channelMap.containsKey("rule_" + ruleId)){
                                                 nonPassedMsg.put("rule_" + ruleId, channelMap.remove("rule_" + ruleId));
+                                            }else {
+                                                taskChlList.add(channelMap);
                                             }
-                                            taskChlList.add(channelMap);
                                         }
                                     }
                                 }

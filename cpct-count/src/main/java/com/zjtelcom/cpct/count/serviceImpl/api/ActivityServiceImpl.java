@@ -335,7 +335,7 @@ public class ActivityServiceImpl implements ActivityService {
             pageSize=10;
         }
         PageHelper.startPage(page,pageSize);
-        List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
+        List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage4Count(mktCampaignDO);
         List<MktCampaignCountDO> list=new ArrayList<>();
         for (MktCampaignCountDO mktCampaignCountDO:mktCampaignDOList){
              list.add(mktCampaignCountDO);

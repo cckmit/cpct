@@ -31,6 +31,12 @@
         <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="10000"/>
     </dubbo:service>
 
+    <!-- 活动发布接口 -->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="2.0" >
+        <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
+    </dubbo:service>
+
+
     <!--销售品关联活动查询-->
     <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="2.0" >
         <dubbo:method name="selectProductCam" servicecode="00.1083.selectProductCam" timeout="10000"/>
@@ -147,5 +153,16 @@
     <!-- 查询产品实例id映射缓存实体-->
     <dubbo:reference registry="esb3" id="ICacheIdMappingEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService" version="2.0" retries="0" check="false">
         <dubbo:method name="getProdInstIdMappingCacheEntity" servicecode="00.1074.getProdInstIdMappingCacheEntity"  timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- 集团下发活动反馈接口 1.0 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService"
+                     id="openCompleteMktCampaignServiceImpl" version="2.0" check="false">
+        <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
+    </dubbo:reference>
+
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
 </beans>

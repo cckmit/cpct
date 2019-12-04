@@ -25,6 +25,7 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -54,7 +55,6 @@ import com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaig
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
-import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
@@ -307,6 +307,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private OpenCompleteMktCampaignService openCompleteMktCampaignService;
     @Autowired
     private ActivityStatisticsService activityStatisticsService;
+    @Autowired
+    private TrialOperationMapper trialOperationMapper;
     @Autowired
     private MktDttsLogService mktDttsLogService;
 

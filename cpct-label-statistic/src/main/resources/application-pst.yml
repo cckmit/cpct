@@ -50,7 +50,7 @@ elasticsearch:
   port: 9200
   pool: 5
   cluster:
-    name:
+    name: es-cpct-label
 
 esnode:
   data1: 134.108.7.33
