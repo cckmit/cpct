@@ -2677,7 +2677,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         } catch (Exception e) {
             result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg", e);
-            mktDttsLogService.saveMktDttsLog("5000", "失败", startDate, new Date(), "失败", e);
+            mktDttsLogService.saveMktDttsLog("5000", "失败", startDate, new Date(), "失败", e.toString());
         }
         return result;
     }
