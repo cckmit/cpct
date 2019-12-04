@@ -190,8 +190,8 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
                                     String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                                     try {
                                         uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
-                                        resuleMap.put("code","200");
                                         mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"成功",null);
+                                        resuleMap.put("code","200");
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                         resuleMap.put("code","500");
