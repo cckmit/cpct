@@ -55,6 +55,7 @@ import com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaig
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
@@ -2652,15 +2653,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> dueMktCampaign() {
-        MktDttsLog mktDttsLog = new MktDttsLog();
-        mktDttsLog.setBeginTime(new Date());
-        mktDttsLog.setCreateDate(new Date());
-        mktDttsLog.setCreateStaff(UserUtil.loginId());
-        mktDttsLog.setStatusDate(new Date());
-        mktDttsLog.setUpdateStaff(UserUtil.loginId());
-        mktDttsLog.setUpdateDate(new Date());
-        mktDttsLog.setDttsType("5000");
-
+        Date startDate = new Date();
         // 3月不活跃活动过期
         activityStatisticsService.MoreThan3MonthsOffline();
         Map<String, Object> result = new HashMap<>();
@@ -2680,15 +2673,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
-            mktDttsLog.setDttsState(CommonConstant.CODE_SUCCESS);
+            mktDttsLogService.saveMktDttsLog("5000", "成功", startDate, new Date(), "成功", null);
         } catch (Exception e) {
             result.put("resultCode", CommonConstant.CODE_FAIL);
-            mktDttsLog.setDttsState(CommonConstant.CODE_SUCCESS);
             result.put("resultMsg", e);
+            mktDttsLogService.saveMktDttsLog("5000", "失败", startDate, new Date(), "失败", e);
         }
-        mktDttsLog.setEndTime(new Date());
-        mktDttsLog.setDttsResult(JSON.toJSONString(result));
-        mktDttsLogService.saveMktDttsLog(mktDttsLog);
         return result;
     }
 
