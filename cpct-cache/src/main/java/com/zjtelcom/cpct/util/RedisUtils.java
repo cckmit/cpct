@@ -536,53 +536,38 @@ public class RedisUtils {
 
     public static void main(String[] args) throws CtgJedisPoolException {
 
-        String serStr = "%C2%AC%C3%AD%00%05sr%00%11java.util.HashMap%05%07%C3%9A%C3%81%C3%83%16%60%C3%91%03%00%02F%00%0AloadFactorI%00%09thresholdxp%3F%40%00%00%00%00%00%0Cw%08%00%00%00%10%00%00%00%03t%00%0ApromLabelst%00%00t%00%0BassetLabelsq%00%7E%00%03t%00%0AcustLabelsq%00%7E%00%03x";
-        Object newObj = null;
-        try {
-            if(serStr != null) {
-                String redStr = java.net.URLDecoder.decode(serStr, "UTF-8");
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(redStr.getBytes("ISO-8859-1"));
-                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-                newObj = objectInputStream.readObject();
-                System.out.println(newObj);
-                objectInputStream.close();
-                byteArrayInputStream.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-//        List<HostAndPort> hostAndPortList = new ArrayList();
-//        // 接入机的ip和端口号
-//        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
-//        hostAndPortList.add(host);
-//
-//        GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
-//        poolConfig.setMaxIdle(5); //最大空闲连接数
-//        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
-//        poolConfig.setMinIdle(5); //保持的最小空闲连接数
-//        poolConfig.setMaxWaitMillis(3000);
-//
-//        CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
-//
-//        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
-//
-//        CtgJedisPool pool = new CtgJedisPool(config);
-//
-//        ProxyJedis jedis = new ProxyJedis();
-//        try {
-//            jedis = pool.getResource();
-//            //sendCommand 可能会抛出 运行时异常
-//            //jedis.set("test", "123");
-//            //sendCommand 可能会抛出 运行时异常
-//            //jedis.get("test");
-//            System.out.println(unserizlize(jedis.get("mktCampaignResp_test")));
-//            jedis.close();
-//        } catch (Throwable je) {
-//            je.printStackTrace();
-//            jedis.close();
-//        }
-//        pool.close();
+        List<HostAndPort> hostAndPortList = new ArrayList();
+        // 接入机的ip和端口号
+        HostAndPort host = new HostAndPort("134.96.231.228", 40201);
+        hostAndPortList.add(host);
+
+        GenericObjectPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxIdle(5); //最大空闲连接数
+        poolConfig.setMaxTotal(10); // 最大连接数（空闲+使用中），不超过应用线程数，建议为应用线程数的一半
+        poolConfig.setMinIdle(5); //保持的最小空闲连接数
+        poolConfig.setMaxWaitMillis(3000);
+
+        CtgJedisPoolConfig config = new CtgJedisPoolConfig(hostAndPortList);
+
+        config.setDatabase(4970).setPassword("bss_cpct_common_user#bss_cpct_common_user123").setPoolConfig(poolConfig).setPeriod(1000).setMonitorTimeout(100);
+
+        CtgJedisPool pool = new CtgJedisPool(config);
+
+        ProxyJedis jedis = new ProxyJedis();
+        try {
+            jedis = pool.getResource();
+            //sendCommand 可能会抛出 运行时异常
+            //jedis.set("test", "123");
+            //sendCommand 可能会抛出 运行时异常
+            //jedis.get("test");
+            System.out.println(unserizlize(jedis.get("mktCampaignResp_test")));
+            jedis.close();
+        } catch (Throwable je) {
+            je.printStackTrace();
+            jedis.close();
+        }
+        pool.close();
 
     }
 
