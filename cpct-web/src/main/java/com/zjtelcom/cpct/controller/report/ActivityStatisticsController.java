@@ -383,4 +383,19 @@ public class ActivityStatisticsController extends BaseController {
             ex.printStackTrace();
         }
     }
+
+    //consumer_log数据表删除数据
+    @PostMapping("/delectConsumerlogByDate")
+    @CrossOrigin
+    public Map<String,Object> delectConsumerlogByDate(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.delectConsumerlogByDate(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for delectConsumerlogByDate = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
 }
