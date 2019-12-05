@@ -59,7 +59,7 @@ public interface ContactEvtMapper {
 
     List<EventInterfaceRel> selectEvtInterfaceRelByEvtId(Long evtId);
 
-    EventInterfaceRel selectEvtInterfaceRel(EventInterfaceRel eventInterfaceRel);
+    EventInterfaceRel selectEvtInterfaceRel(@Param("EventInterfaceRel")EventInterfaceRel eventInterfaceRel);
 
     List<String> selectChannelListByEvtId(Long evtId);
 }
