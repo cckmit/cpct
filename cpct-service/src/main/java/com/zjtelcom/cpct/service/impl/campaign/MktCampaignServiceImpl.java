@@ -257,7 +257,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
-    @Autowired
+    @Autowired(required = false)
     private SyncActivityService syncActivityService;
 
 

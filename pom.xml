@@ -23,7 +23,7 @@
         <module>cpct-eslog</module>
         <module>cpct-dubbo-log</module>
         <!--<module>cpct-dtts-tasktracker</module>-->
-        <module>cpct-label-statistic</module>
+        <!--<module>cpct-label-statistic</module>-->
     </modules>
 
     <properties>
