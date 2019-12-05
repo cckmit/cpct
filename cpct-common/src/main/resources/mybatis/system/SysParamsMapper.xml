@@ -109,4 +109,8 @@
         where PARAM_KEY like concat(#{paramKey}, "%");
     </select>
 
+    <delete id="delectConsumerlogByDate" parameterType="java.lang.String" >
+        DELETE FROM consumer_log WHERE  #{createDate} > CREATE_DATE
+    </delete>
+
 </mapper>
