@@ -1074,16 +1074,14 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
                 }
-
-
                 //获取结果
-                Boolean flag = true;
                 try {
                     Map<String, Object> nonPassedMsg = new HashMap<>();
                     for (Future<Map<String, Object>> future : threadList) {
                         /*if (future.get() != null && !future.get().isEmpty()) {
                             activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                         }*/
+                        Boolean flag = true;
                         if (future.get() != null && !future.get().isEmpty()) {
                             Map<String, Object> map1 = future.get();
                             for (String s : map1.keySet()) {
