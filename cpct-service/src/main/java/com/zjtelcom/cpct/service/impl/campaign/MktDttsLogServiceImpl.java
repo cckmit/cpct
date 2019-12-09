@@ -117,14 +117,6 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         PageHelper.startPage(page, pageSize);
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
-        if (mktDttsLogList!=null) {
-            for (MktDttsLog dttsLog : mktDttsLogList) {
-                if (dttsLog.getUpdateDate()!=null) {
-                    mktDttsLog.setUpdateDate( DateUtil.parseDate(dttsLog.getUpdateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
-                }
-                mktDttsLog.setCreateDate( DateUtil.parseDate(dttsLog.getCreateDate().toString(),"yyyy-MM-dd HH:mm:ss"));
-            }
-        }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",mktDttsLogList);

@@ -187,6 +187,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         esJson.put("accNbr", params.get("accNbr"));
         esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
         esJson.put("eventCode", params.get("eventCode"));
+        esJson.put("context",JSON.toJSONString(context));
 
         MktCampaignDO mktCampaign = null;
         try {
