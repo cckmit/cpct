@@ -54,15 +54,18 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         if (!inExistsResponse.isExists()) {
             result = createIndex(index);
         }
-        //数据导入
+        logger.info("查看result:"+result);
+        //数据导入 todo
         if(result) {
             try {
                 Map map = esServiceInfo.queryCustomerByList(list);
+                logger.info("查询所有标签的值是否有数据:"+ (map==null?0:1));
                 if (map!=null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String,Object>> resultData =( List<Map<String,Object>>) map.get("resultData");
+                    logger.info("resultData数据接收成功,查看第一条数据:"+JSON.toJSON(resultData.get(0)));
                     JSONArray jsonArray = JSONArray.fromObject(resultData);
                     IndexResponse response = client.prepareIndex(index, esType).setSource(jsonArray).get();
-                    System.out.println(response.status().getStatus());
+                    System.out.println("走到这里是表示索引创建成功?:"+response.status().getStatus());
                 }
             } catch(Exception e) {
                 logger.error("标签入es库失败：" + e);

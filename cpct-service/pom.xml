@@ -130,6 +130,7 @@
             <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
             <artifactId>biz-isale-inbound-model</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.ctzj.shared.biz.isale.model</groupId>
             <artifactId>biz-isale-model</artifactId>
@@ -211,9 +212,9 @@
 
         <!--集团活动反馈接口-->
         <dependency>
-        <groupId>com.zjtelcom.cpct</groupId>
-        <artifactId>open-complete</artifactId>
-    </dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>open-complete</artifactId>
+        </dependency>
 
     </dependencies>
 

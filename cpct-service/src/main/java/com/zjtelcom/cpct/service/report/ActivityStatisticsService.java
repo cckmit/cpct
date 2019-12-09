@@ -21,4 +21,6 @@ public interface ActivityStatisticsService {
     Map<String,Object> getActivityStatisticsByName(Map<String, Object> params);
 
     void MoreThan3MonthsOffline();
+
+    Map<String,Object> delectConsumerlogByDate(Map<String, Object> params);
 }

@@ -1041,4 +1041,19 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
     }
 
+    @Override
+    public Map<String, Object> delectConsumerlogByDate(Map<String, Object> params) {
+        HashMap<String, Object> map = new HashMap<>();
+        Object createDate = params.get("createDate");
+        int result = sysParamsMapper.delectConsumerlogByDate(createDate.toString());
+        if (result>0){
+            map.put("code","200");
+            map.put("msg","成功");
+        }else {
+            map.put("code","500");
+            map.put("msg","失败");
+        }
+        return map;
+    }
+
 }
