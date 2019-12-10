@@ -5,4 +5,6 @@ import java.util.Map;
 public interface TargetGroupService {
 
     Map<String, Object> tarGrpTemplateScheduledBatchIssue();
+
+    void updateRedisOfDateTypeLabel();
 }
