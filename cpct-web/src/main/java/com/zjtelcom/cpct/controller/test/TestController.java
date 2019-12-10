@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
+import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -143,8 +144,12 @@ public class TestController extends BaseController {
 
         Object ob = redisUtils.hgetAllRedisList("LABEL_CODE_"+25);
         List<String> oblist = (List<String>) ob;
-
         System.out.println(oblist);
+
+        System.out.println("==============================================");
+
+        List<String> list = redisUtils.hgetAllField("LABEL_CODE_" + 25);
+        System.out.println(list);
         return "success";
     }
 
@@ -243,6 +248,22 @@ public class TestController extends BaseController {
         return JSON.toJSONString(map);
     }
 
+    @Autowired
+    private ContactEvtService contactEvtService;
+    // 刷新事件源接口与事件关系数据
+    // 1.先刷事件源接口表，把所有的渠道都刷进事件源接口表，一个渠道一个事件源接口
+    // 2.
+    @PostMapping("xxxxxx1")
+    @CrossOrigin
+    public void xxxxxx1() {
+        contactEvtService.xxxxxx1();
+    }
+
+    @PostMapping("xxxxxx2")
+    @CrossOrigin
+    public void xxxxxx2() {
+        contactEvtService.xxxxxx2();
+    }
 }
 
 
