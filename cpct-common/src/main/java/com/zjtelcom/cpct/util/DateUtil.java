@@ -865,6 +865,9 @@ public class DateUtil {
         Calendar cal = Calendar.getInstance();
         cal.setTime(targetDate);
         switch (unit){
+            case DAY:
+                cal.add(Calendar.DATE, count);
+                break;
             case MONTH:
                 cal.add(Calendar.MONTH, count);
                 break;

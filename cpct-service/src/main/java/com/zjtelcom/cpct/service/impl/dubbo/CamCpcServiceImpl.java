@@ -40,6 +40,7 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
+import com.zjtelcom.cpct.enums.DateUnit;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -61,6 +62,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zjtelcom.cpct.enums.DateUnit.DAY;
 
 @Service
 public class CamCpcServiceImpl implements CamCpcService {
@@ -886,15 +889,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             //记录实例不足的标签
             StringBuilder notEnoughLabel = new StringBuilder();
 
-            //判断表达式在缓存中有没有
-            String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
-            SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
-            if (sysParams == null) {
-                List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
-                if (systemParamList.size() > 0) {
-                    redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
-                }
-            }
+            // 销售品验证
             String realProdFilter = null;
             try {
                 log.info("23456");
@@ -947,6 +942,19 @@ public class CamCpcServiceImpl implements CamCpcService {
                 nonPassedMsg.put("rule_" + ruleId, "销售品过滤查询异常");
                 return nonPassedMsg;
             }
+
+            // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+            // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
+            // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+            //判断表达式在缓存中有没有
+            String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
+            if (sysParams == null) {
+                List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
+                if (systemParamList.size() > 0) {
+                    redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
+                }
+            }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
                 try {
@@ -988,7 +996,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                             flagMap.put(ruleId.toString(), true);
                             log.info(Thread.currentThread().getName() + "flag = true进入...");
                             expressSb.append("true&&");
-                            // continue;
+                            continue;
                         }
                         String type = labelMap.get("operType");
                         //保存标签的es log
@@ -1022,7 +1030,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         lr.setClassName(labelMap.get("className"));
 
                         //拼接表达式：主表达式
-                        expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
+                        expressSb.append(cpcExpression(labelMap));
 
                         //判断标签实例是否足够
                         if (context.containsKey(labelMap.get("code"))) {
@@ -1862,9 +1870,8 @@ public class CamCpcServiceImpl implements CamCpcService {
         }
     }
 
-    public String cpcExpression(String code, String type, String rightParam) {
+    public String cpcExpression(Map<String, String> labelMap) {
         StringBuilder express = new StringBuilder();
-
         // 从redis 中获取所有的时间类型标签集合
         List<String> labelCodeList = (List<String>) redisUtils.get("LABEL_CODE_LIST");
         if (labelCodeList == null) {
@@ -1873,13 +1880,18 @@ public class CamCpcServiceImpl implements CamCpcService {
                 redisUtils.set("LABEL_CODE_LIST", labelCodeList);
             }
         }
-
+        String code = labelMap.get("code");
+        String type = labelMap.get("operType");
+        String rightParam = labelMap.get("rightParam");
 
         if ("PROM_LIST".equals(code)) {
             express.append("(checkProm(").append(code).append(",").append(type).append(",").append(rightParam);
             express.append("))");
         } else if (labelCodeList.contains(code)) {
             // todo 时间类型标签
+            if ("1".equals(labelMap.get("updateStaff"))) {
+                rightParam = DateUtil.addDate(new Date(), Integer.parseInt(rightParam), DAY).toString();
+            }
             express.append("(dateLabel(").append(code).append(",").append(type).append(",").append("\"" + rightParam + "\"");
             express.append("))");
         } else {
@@ -1890,11 +1902,8 @@ public class CamCpcServiceImpl implements CamCpcService {
             express.append(assLabel(code, type, rightParam));
             express.append(")");
         }
-
-
         return express.toString();
     }
-
 
     public static String cpcLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();
@@ -2132,7 +2141,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                                 //将规则拼装为表达式
                                 StringBuilder expressSb = new StringBuilder();
                                 expressSb.append("if(");
-                                expressSb.append(cpcExpression(labelMap.get("code"), type, labelMap.get("rightParam")));
+                                expressSb.append(cpcExpression(labelMap));
                                 runnerQ.addFunction("toNum", new StringToNumOperator("toNum"));
                                 runnerQ.addFunction("checkProm", new PromCheckOperator("checkProm"));
                                 runnerQ.addFunction("dateLabel", new ComperDateLabel("dateLabel"));

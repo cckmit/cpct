@@ -495,6 +495,12 @@
     where LABEL_DATA_TYPE = #{labelDataType}
   </select>
 
+  <select id="selectLabelIdByType" parameterType="java.lang.String" resultType="java.lang.String">
+    select INJECTION_LABEL_ID
+    from injection_label
+    where LABEL_DATA_TYPE = #{labelDataType}
+  </select>
+
   <select id="selectDistributeLabelByType" resultType="java.util.Map">
     select LABEL_CODE labelCode,LABEL_NAME labelName
     from label_distribute_rel
