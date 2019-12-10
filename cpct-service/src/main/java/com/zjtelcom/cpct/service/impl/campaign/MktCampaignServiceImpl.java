@@ -2655,7 +2655,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> dueMktCampaign() {
         Date startDate = new Date();
         // 3月不活跃活动过期
-        activityStatisticsService.MoreThan3MonthsOffline();
+        //activityStatisticsService.MoreThan3MonthsOffline();
         Map<String, Object> result = new HashMap<>();
         // 查出所有已经发布的活动
         try {
