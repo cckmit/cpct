@@ -257,7 +257,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
-    @Autowired
+    @Autowired(required = false)
     private SyncActivityService syncActivityService;
 
 
@@ -2262,7 +2262,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setRequestType("mkt");
         //需求函批次号按规律递增1
-        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setBatchNo(getJITUANBatchNo(requestInfoMapper.selectMaxBatchNo()));
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
@@ -2314,15 +2314,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     /**
      * 得到最新的批次编号
      * 浙电产品套餐需求浙【2019】1002116号
-     *
      * @param batchNo
      * @return
      */
-    public String getBatchNo(String batchNo) {
-        String substring = batchNo.substring(0, batchNo.length() - 8);
-        Long s1 = Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1)) + 1;
-        String path = substring + s1 + "号";
-        return path;
+    public String getBatchNo(String batchNo){
+        String substring = "浙电营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
+    }
+
+    /**
+     * 得到最新的批次编号
+     * 浙电产品套餐需求浙【2019】1002116号
+     * @param batchNo
+     * @return
+     */
+    public String getJITUANBatchNo(String batchNo){
+        String substring = "集团营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
     }
 
 
