@@ -2470,7 +2470,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO> ) redisUtils.get("RULE_LIST_" + mktStrategyConf.getMktStrategyConfId());
-                    if (mktStrategyConfRuleList != null) {
+                    if (mktStrategyConfRuleList == null) {
                         mktStrategyConfRuleList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktStrategyConf.getMktStrategyConfId());
                     }
 
