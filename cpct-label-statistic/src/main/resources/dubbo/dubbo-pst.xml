@@ -15,7 +15,7 @@
     <dubbo:registry id="esb1" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30808"/>
+    <!--<dubbo:protocol name="dubbo" port="30808"/>-->
     <dubbo:monitor protocol="registry" />
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
