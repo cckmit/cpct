@@ -1622,14 +1622,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
-                    List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
+                    // 集团活动补丁逻辑（现去除）
+                    /*List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
                     if (mktCampaignCompletes!=null && !mktCampaignCompletes.isEmpty() ){
                         if (mktCampaignCountDO.getSrcId()==null || "".equals(mktCampaignCountDO.getSrcId())){
                             mktCampaignVO.setSrcId("0");
                         }else {
                             mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                         }
-                    }
+                    }*/
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
