@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -617,4 +618,34 @@ public class MultiJobRunner {
             LOGGER.info("Run sendMsgByOfferOver failed!", e);
         }
     }
+
+
+    /**
+     *
+     * @throws Throwable
+     */
+    public void updateRedisOfDateTypeLabel() {
+        methodInvoke(targetGroupService);
+    }
+
+    // 调用的方法名和注入要被调用的方法名要保持一致
+    public <T> void methodInvoke(T correspondingService) {
+        String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+        try {
+            springBean.hello();
+            String msg = methodName + "执行任务";
+            LOGGER.info(msg);
+            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
+            bizLogger.info(msg);
+
+            Class<?> aClass = correspondingService.getClass();
+            // Object o = aClass.newInstance();
+            Method method = aClass.getMethod(methodName);
+            Object invoke = method.invoke(correspondingService);
+        }catch (Exception e) {
+            LOGGER.info("Run" + methodName + "failed!", e);
+        }
+    }
+
+
 }
