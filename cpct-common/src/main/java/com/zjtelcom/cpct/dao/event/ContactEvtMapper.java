@@ -61,5 +61,5 @@ public interface ContactEvtMapper {
 
     EventInterfaceRel selectEvtInterfaceRel(EventInterfaceRel eventInterfaceRel);
 
-    List<String> selectChannelListByEvtCode(Long evtCode);
+    List<String> selectChannelListByEvtCode(String evtCode);
 }

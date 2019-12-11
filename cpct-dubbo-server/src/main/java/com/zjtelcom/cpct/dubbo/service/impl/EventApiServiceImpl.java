@@ -453,7 +453,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             try {
-                List<String> list = contactEvtMapper.selectChannelListByEvtCode(Long.valueOf(map.get("eventCode")));
+                List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
                 if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
                     esJson.put("hit", false);
                     esJson.put("success", true);
