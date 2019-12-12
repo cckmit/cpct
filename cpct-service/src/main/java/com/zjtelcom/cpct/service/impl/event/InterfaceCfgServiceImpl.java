@@ -183,13 +183,29 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
             if (eventSorce!=null){
                 vo.setEvtSrcName(eventSorce.getEvtSrcName());
             }
-            Channel caller = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getCaller()));
-            if (caller!=null){
-                vo.setCallerName(caller.getContactChlName());
+
+            Channel channel = new Channel();
+            if ("".equals(interfaceCfg1.getCaller()) || interfaceCfg1.getCaller() == null) {
+                vo.setCallerName("");
+                channel.setContactChlName("");
+            } else {
+                channel = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getCaller()));
+                if (channel != null){
+                    vo.setCallerName(channel.getContactChlName());
+                } else {
+                    vo.setCallerName("");
+                }
             }
-            Channel provider = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getProvider()));
-            if (provider!=null){
-                vo.setProviderName(provider.getContactChlName());
+
+            if (interfaceCfg1.getCaller().equals(interfaceCfg1.getProvider())) {
+                vo.setProviderName(channel.getContactChlName());
+            } else if ("".equals(interfaceCfg1.getProvider()) || interfaceCfg1.getProvider() == null) {
+                vo.setProviderName("");
+            } else {
+                Channel provider = channelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg1.getProvider()));
+                if (provider!=null){
+                    vo.setProviderName(provider.getContactChlName());
+                }
             }
             voList.add(vo);
         }

@@ -130,6 +130,7 @@
             <groupId>com.ctzj.shared.biz.isale.inbound</groupId>
             <artifactId>biz-isale-inbound-model</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.ctzj.shared.biz.isale.model</groupId>
             <artifactId>biz-isale-model</artifactId>

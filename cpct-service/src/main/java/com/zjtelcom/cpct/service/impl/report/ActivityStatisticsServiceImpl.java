@@ -18,6 +18,7 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.impl.querySaturation.QuerySaturationCpcServiceImpl;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_PRE_PAUSE;
 import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_ROLL;
 
 @Service
@@ -64,6 +66,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private MktCampaignRelMapper mktCampaignRelMapper;
     @Autowired
     private TrialOperationMapper trialOperationMapper;
+    @Autowired
+    private UCCPService uccpService;
 
 
     /**
@@ -1023,7 +1027,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             StringBuilder sb = new StringBuilder();
             for (MktCampaignDO mktCampaignDO : camList) {
                 try {
-                    mktCampaignMapper.changeMktCampaignStatus(mktCampaignDO.getMktCampaignId(), STATUS_CODE_ROLL.getStatusCode(), new Date(), 0L);
+                    mktCampaignMapper.changeMktCampaignStatus(mktCampaignDO.getMktCampaignId(), STATUS_CODE_PRE_PAUSE.getStatusCode(), new Date(), 0L);
+                    String sendContent = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "满足不活跃活动条件，当前活动已被自动过期。";
+                    uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, sendContent);
                     sb.append(mktCampaignDO.getMktCampaignId());
                 }catch (Exception e) {
                     e.printStackTrace();
@@ -1033,6 +1039,21 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Map<String, Object> delectConsumerlogByDate(Map<String, Object> params) {
+        HashMap<String, Object> map = new HashMap<>();
+        Object createDate = params.get("createDate");
+        int result = sysParamsMapper.delectConsumerlogByDate(createDate.toString());
+        if (result>0){
+            map.put("code","200");
+            map.put("msg","成功");
+        }else {
+            map.put("code","500");
+            map.put("msg","失败");
+        }
+        return map;
     }
 
 }

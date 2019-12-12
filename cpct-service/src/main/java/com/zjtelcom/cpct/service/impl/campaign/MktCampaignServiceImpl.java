@@ -258,7 +258,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
-    @Autowired
+    @Autowired(required = false)
     private SyncActivityService syncActivityService;
 
 
@@ -1630,14 +1630,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
-                    List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
+                    // 集团活动补丁逻辑（现去除）
+                    /*List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
                     if (mktCampaignCompletes!=null && !mktCampaignCompletes.isEmpty() ){
                         if (mktCampaignCountDO.getSrcId()==null || "".equals(mktCampaignCountDO.getSrcId())){
                             mktCampaignVO.setSrcId("0");
                         }else {
                             mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                         }
-                    }
+                    }*/
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
@@ -2289,7 +2290,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setRequestType("mkt");
         //需求函批次号按规律递增1
-        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setBatchNo(getJITUANBatchNo(requestInfoMapper.selectMaxBatchNo()));
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
@@ -2341,15 +2342,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     /**
      * 得到最新的批次编号
      * 浙电产品套餐需求浙【2019】1002116号
-     *
      * @param batchNo
      * @return
      */
-    public String getBatchNo(String batchNo) {
-        String substring = batchNo.substring(0, batchNo.length() - 8);
-        Long s1 = Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1)) + 1;
-        String path = substring + s1 + "号";
-        return path;
+    public String getBatchNo(String batchNo){
+        String substring = "浙电营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
+    }
+
+    /**
+     * 得到最新的批次编号
+     * 浙电产品套餐需求浙【2019】1002116号
+     * @param batchNo
+     * @return
+     */
+    public String getJITUANBatchNo(String batchNo){
+        String substring = "集团营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
     }
 
 
@@ -2664,7 +2677,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> dueMktCampaign() {
         Date startDate = new Date();
         // 3月不活跃活动过期
-        activityStatisticsService.MoreThan3MonthsOffline();
+        //activityStatisticsService.MoreThan3MonthsOffline();
         Map<String, Object> result = new HashMap<>();
         // 查出所有已经发布的活动
         try {
@@ -2876,47 +2889,45 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public void campaignDelayNotice() {
+        Date startDate = new Date();
         ArrayList<String> list = new ArrayList<>();
         list.add(STATUS_CODE_PUBLISHED.getStatusCode());
         List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAllMktCampaignDetailsByStatus(list,null);
         int i = 0;
-        System.out.println("11111111111");
-        List<String> sendFailList = new ArrayList();
+        List<Map> sendFailList = new ArrayList();
         for (MktCampaignDO mktCampaignDO : mktCampaignDOS) {
             try {
                 if (mktCampaignDO.getPlanEndTime() != null && mktCampaignDO.getPlanEndTime().after(new Date()) && DateUtil.daysBetween(new Date(), mktCampaignDO.getPlanEndTime()) == 7) {
                     Long staff = mktCampaignDO.getCreateStaff();
-                    System.out.println("222222222222");
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
                     if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                         String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
-                        System.out.println("3333333333333");
                         String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                         System.out.println(sendContent);
-                        try {
-                            System.out.println("444444444444");
-                            if (lanId != null && lanId != 1) {
-                                uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
-                                i++;
+                        if (lanId != null && lanId != 1) {
+                            String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                            if (!resultMsg.isEmpty()) {
+                                Map map = new HashMap();
+                                map.put("campaignId", mktCampaignDO.getMktCampaignId());
+                                map.put("resuleMsg", resultMsg);
+                                sendFailList.add(map);
                             }
-                            System.out.println("555555555555");
-                        } catch (Exception e) {
-                            System.out.println("666666666666");
-                            sendFailList.add(mktCampaignDO.getMktCampaignId().toString());
-                            logger.error(sysUserCode);
-                            e.printStackTrace();
+                            i++;
                         }
                     }
                 }
             } catch (Exception e) {
-                System.out.println("777777777777");
+                Map map = new HashMap();
+                map.put("campaignId", mktCampaignDO.getMktCampaignId());
+                map.put("resuleMsg", e.toString().substring(500));
+                sendFailList.add(map);
                 e.printStackTrace();
             }
         }
-        System.out.println("888888888888");
         System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
+        mktDttsLogService.saveMktDttsLog("6000", "成功", startDate, new Date(), "成功", JSON.toJSONString(sendFailList));
     }
 
 

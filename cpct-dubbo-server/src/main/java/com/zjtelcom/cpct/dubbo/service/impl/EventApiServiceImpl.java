@@ -454,6 +454,28 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("evtCollectTime", simpleDateFormat.format(new Date()));
             }
 
+
+            try {
+                List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
+                if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
+                    esJson.put("hit", false);
+                    esJson.put("success", true);
+                    esJson.put("msg", "接入渠道不符");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    log.info("接入渠道不符:" + map.get("reqId"));
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "接入渠道不符");
+                    return result;
+                }
+            }catch (Exception e){
+                esJson.put("hit", false);
+                esJson.put("success", true);
+                esJson.put("msg", "接入渠道查询异常");
+                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                e.printStackTrace();
+                return result;
+            }
+
             try {
                 //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓l
                 //解析事件采集项
