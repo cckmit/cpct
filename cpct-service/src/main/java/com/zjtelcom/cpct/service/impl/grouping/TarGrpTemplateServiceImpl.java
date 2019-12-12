@@ -8,6 +8,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
 import com.ctzj.smt.bss.cpc.evn.type.EvnType;
 import com.ctzj.smt.bss.cpc.model.offer.atomic.OfferRestrict;
@@ -273,7 +274,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 params.put("resultMsg","渠道和标签参数缺少");
                 return params;
             } else {
-                params.put("tarGrp", tarGrp);
+                params.put("tarGrp", JSONObject.toJSON(tarGrp));
             }
         }
         List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(params.get("tarGrpTemplateId").toString()));
