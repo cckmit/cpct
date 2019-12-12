@@ -200,6 +200,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     if (contactRate!=null && contactRate!=""){
                         if (contactRate.toString().contains("%")){
                             stringMap.put("contactRate",contactRate);
+                        }else if (contactRate.toString().equals("1")){
+                            stringMap.put("contactRate","100%");
                         }else {
                             String string = contactRate.toString();
                             log.info("转换率百分比数值："+string);
