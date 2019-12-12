@@ -743,8 +743,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
+                    redisUtils.del("MKT_STRATEGY_" + mktCampaignId);
                 }
             }
+
+
 
             //更新推荐条目
             if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
@@ -777,11 +780,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     for (MktCamEvtRelDO mktCamEvtRelDO : delList) {
                         mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
+
                     }
                 } else {
                     for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
                         mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                     }
                 }
                 if (mktCampaignVO.getEventDTOS() != null) {
@@ -807,6 +813,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
             // 删除事件接入过滤规则缓存
             redisUtils.del("FILTER_RULE_LIST_" + mktCampaignId);
+            redisUtils.del("FILTER_RULE_STR_" + mktCampaignId);
             if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
                 for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
                     MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
@@ -1090,6 +1097,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
             for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                 redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
             }
             // 删除活动与事件的关系
             mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -1892,6 +1900,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
                     for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                     }
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -2677,7 +2686,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         } catch (Exception e) {
             result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg", e);
-            mktDttsLogService.saveMktDttsLog("5000", "失败", startDate, new Date(), "失败", e);
+            mktDttsLogService.saveMktDttsLog("5000", "失败", startDate, new Date(), "失败", e.toString());
         }
         return result;
     }

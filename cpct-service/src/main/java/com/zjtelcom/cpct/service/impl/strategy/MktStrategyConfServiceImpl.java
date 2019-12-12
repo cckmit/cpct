@@ -169,8 +169,15 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         mktCamStrategyConfRelMapper.deleteByStrategyConfId(mktStrategyConfId);
         // 删除事件接入缓存
         redisUtils.del("RULE_LIST_" + mktStrategyConfId);
+        // 删除策略下渠道缓存
+        redisUtils.del("CHANNEL_CODE_LIST_" + mktStrategyConfId);
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
+        List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyConfId);
+        for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
+            redisUtils.del("MKT_STRATEGY_" + mktCamStrategyConfRelDO.getStrategyConfId());
+        }
+
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         mktStrategyConfMap.put("resultMsg", ErrorCode.DELETE_MKT_STR_CONF_SUCCESS.getErrorMsg());
         return mktStrategyConfMap;
@@ -328,6 +335,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 }
             }
             mktStrategyConfDO.setChannelsId(channelIds);
+            redisUtils.del("CHANNEL_CODE_LIST_" + mktStrategyConfDO.getMktStrategyConfId());
             // 下发城市
             String areaIds = "";
             if (mktStrategyConfDetail.getAreaIdList() != null) {

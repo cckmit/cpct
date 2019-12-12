@@ -262,7 +262,6 @@
     WHERE
         r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
         AND f.RULE_ID = r.RULE_ID
-        AND f.FILTER_TYPE = 6000
         AND c.CONDITION_ID = f.CONDITION_ID
         AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
     </select>

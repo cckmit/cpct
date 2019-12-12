@@ -43,6 +43,7 @@ import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
+import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -155,6 +156,9 @@ public class CamCpcServiceImpl implements CamCpcService {
     @Autowired
     private CoopruleService coopruleService;
 
+    @Autowired
+    private EventRedisService eventRedisService;
+
     Map<String,Boolean> flagMap = new ConcurrentHashMap();
 
     /**
@@ -187,30 +191,36 @@ public class CamCpcServiceImpl implements CamCpcService {
         esJson.put("hitEntity", privateParams.get("accNbr")); //命中对象
         esJson.put("eventCode", params.get("eventCode"));
 
-        MktCampaignDO mktCampaign = null;
+
+        MktCampaignDO mktCampaign = new MktCampaignDO();
         try {
-            //查询活动基本信息
-            try {
-                Object campaign =  redisUtils.get("MKT_CAMPAIGN_" + activityId);
-                if (campaign!=null){
-                    mktCampaign = (MktCampaignDO) campaign;
-                }
-            } catch (Exception e) {
-                log.info("活动信息查询失败，缓存失败");
-                e.printStackTrace();
-            }
-            if (mktCampaign == null) {
-                mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
-                if (mktCampaign == null) {
-                    //活动信息查询失败
-                    esJson.put("hit", false);
-                    esJson.put("msg", "活动信息查询失败，活动为null");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                    nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
-                    return nonPassedMsg;
-                } else {
-                    redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
-                }
+//            //查询活动基本信息
+//            try {
+//                Object campaign =  redisUtils.get("MKT_CAMPAIGN_" + activityId);
+//                if (campaign!=null){
+//                    mktCampaign = (MktCampaignDO) campaign;
+//                }
+//            } catch (Exception e) {
+//                log.info("活动信息查询失败，缓存失败");
+//                e.printStackTrace();
+//            }
+//            if (mktCampaign == null) {
+//                mktCampaign = mktCampaignMapper.selectByPrimaryKey(activityId);
+//                if (mktCampaign == null) {
+//                    //活动信息查询失败
+//                    esJson.put("hit", false);
+//                    esJson.put("msg", "活动信息查询失败，活动为null");
+//                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+//                    nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+//                    return nonPassedMsg;
+//                } else {
+//                    redisUtils.set("MKT_CAMPAIGN_" + activityId, mktCampaign);
+//                }
+//            }
+            //查询活动信息
+            Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", activityId, new HashMap<>());
+            if (mktCampaignRedis != null) {
+                mktCampaign = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + activityId);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -262,32 +272,50 @@ public class CamCpcServiceImpl implements CamCpcService {
         //iSale展示列参数对象初始化
         List<Map<String, Object>> itgTriggers = new ArrayList<>();
         //验证过滤规则 活动级
-        Object o = redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
-        List<Long> filterRuleIds = null;
-        if (o!=null){
-            filterRuleIds = (List<Long>)o;
-        }
-        if (filterRuleIds == null) {
-            filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
-            if (filterRuleIds == null) {
-                //过滤规则信息查询失败
-                esJson.put("hit", false);
-                esJson.put("msg", "过滤规则信息查询失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
-                nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
-                return nonPassedMsg;
-            } else {
-                redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
-            }
+//        Object o = redisUtils.get("MKT_FILTER_RULE_IDS_" + activityId);
+//        List<Long> filterRuleIds = null;
+//        if (o!=null){
+//            filterRuleIds = (List<Long>)o;
+//        }
+//        if (filterRuleIds == null) {
+//            filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(activityId);
+//            if (filterRuleIds == null) {
+//                //过滤规则信息查询失败
+//                esJson.put("hit", false);
+//                esJson.put("msg", "过滤规则信息查询失败");
+//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+//                nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+//                return nonPassedMsg;
+//            } else {
+//                redisUtils.set("MKT_FILTER_RULE_IDS_" + activityId, filterRuleIds);
+//            }
+//        }
+
+        Map<String, Object> filterRuleIdsRedis = eventRedisService.getRedis("MKT_FILTER_RULE_IDS_", activityId, new HashMap<>());
+        List<Long> filterRuleIds = new ArrayList<>();
+        if (filterRuleIdsRedis != null) {
+            filterRuleIds = (List<Long>) filterRuleIdsRedis.get("MKT_FILTER_RULE_IDS_" + activityId);
+        } else {
+            // 过滤规则信息查询失败
+            esJson.put("hit", false);
+            esJson.put("msg", "过滤规则信息查询失败");
+            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + params.get("accNbr"));
+            nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
+            return nonPassedMsg;
         }
 
         if (filterRuleIds != null && filterRuleIds.size() > 0) {
             //循环并判断过滤规则
             for (Long filterRuleId : filterRuleIds) {
-                FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
-                if(filterRule == null){
-                    filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
-                    redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
+//                FilterRule filterRule = (FilterRule) redisUtils.get("FILTER_RULE_" + filterRuleId);
+//                if(filterRule == null){
+//                    filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+//                    redisUtils.set("FILTER_RULE_" + filterRuleId, filterRule);
+//                }
+                Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_", filterRuleId, null);
+                FilterRule filterRule = null;
+                if(filterRuleIdsRedis!=null){
+                    filterRule = (FilterRule) filterRuleRedis.get("FILTER_RULE_" + filterRuleId);
                 }
                 //判断过滤类型(红名单，黑名单)
                 if (filterRule != null) {
@@ -304,13 +332,18 @@ public class CamCpcServiceImpl implements CamCpcService {
                             //获取用户已办理销售品
                             String productStr = "";
                             // 销售品过滤
-                            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
-                            if (realProdFilter == null) {
-                                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
-                                if (sysParamsList != null && sysParamsList.size() > 0) {
-                                    realProdFilter = sysParamsList.get(0).getParamValue();
-                                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
-                                }
+//                            String realProdFilter = (String) redisUtils.get("REAL_PROD_FILTER");
+//                            if (realProdFilter == null) {
+//                                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
+//                                if (sysParamsList != null && sysParamsList.size() > 0) {
+//                                    realProdFilter = sysParamsList.get(0).getParamValue();
+//                                    redisUtils.set("REAL_PROD_FILTER", realProdFilter);
+//                                }
+//                            }
+                            String realProdFilter = null;
+                            Map<String, Object> realProdFilterRedis = eventRedisService.getRedis("REAL_PROD_FILTER", 0L, new HashMap<>());
+                            if (realProdFilterRedis != null) {
+                                realProdFilter = (String) realProdFilterRedis.get("REAL_PROD_FILTER");
                             }
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
