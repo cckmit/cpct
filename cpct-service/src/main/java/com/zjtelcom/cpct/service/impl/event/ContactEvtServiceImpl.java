@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.event.*;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -761,7 +762,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
             redisUtils.del("CAM_EVT_REL_" +evtDetail.getContactEvtId());
-            redisUtils.del("CHANNEL_CODE_LIST_"+evtDetail.getContactEvtCode())
+            redisUtils.del("CHANNEL_CODE_LIST_"+evtDetail.getContactEvtCode());
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
@@ -868,13 +869,11 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     }
 
     @Autowired
-    private ContactChannelPrdMapper contactChannelPrdMapper;
-    @Autowired
-    private InterfaceCfgPrdMapper interfaceCfgPrdMapper;
+    private ContactChannelMapper contactChannelMapper;
 
     @Override
     public void xxxxxx1() {
-        List<Channel> childList = contactChannelPrdMapper.findChildList();
+        List<Channel> childList = contactChannelMapper.findChildList();
         for (Channel channel : childList) {
             InterfaceCfg ic = new InterfaceCfg();
             ic.setEvtSrcId(58L);
@@ -883,12 +882,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             ic.setProvider(channel.getContactChlId().toString());
             ic.setCaller(channel.getContactChlId().toString());
             ic.setProtocolType("1000");
-            interfaceCfgPrdMapper.insert(ic);
+            interfaceCfgMapper.insert(ic);
         }
     }
 
     @Autowired
-    private MktStrategyConfPrdMapper mktStrategyConfPrdMapper;
+    private MktStrategyConfMapper mktStrategyConfMapper;
     
     @Override
     public void xxxxxx2() {
@@ -901,7 +900,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                 Long eventId = mktCamEvtRelDO.getEventId();
                 if (eventId != null) {
-                    List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfPrdMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+                    List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
                     for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
                         String channelsId = mktStrategyConfDO.getChannelsId();
                         if (channelsId.isEmpty()) {
@@ -909,7 +908,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                         }
                         String[] split = channelsId.split("/");
                         for (String chlId : split) {
-                            InterfaceCfg interfaceCfg = interfaceCfgPrdMapper.selectByProvider(chlId);
+                            InterfaceCfg interfaceCfg = interfaceCfgMapper.selectByProvider(chlId);
                             if (interfaceCfg != null) {
                                 EventInterfaceRel eventInterfaceRel = new EventInterfaceRel();
                                 eventInterfaceRel.setEvtId(eventId);
@@ -931,12 +930,12 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 
     @Override
     public void xxxxxx3() {
-        List<InterfaceCfg> interfaceCfgs = interfaceCfgPrdMapper.selectAll();
+        List<InterfaceCfg> interfaceCfgs = interfaceCfgMapper.selectAll();
         for (InterfaceCfg interfaceCfg : interfaceCfgs) {
-            Channel channel = contactChannelPrdMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg.getProvider()));
+            Channel channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg.getProvider()));
             String contactChlName = channel.getContactChlName();
             interfaceCfg.setInterfaceName(contactChlName + "渠道事件源接口");
-            interfaceCfgPrdMapper.updateByPrimaryKey(interfaceCfg);
+            interfaceCfgMapper.updateByPrimaryKey(interfaceCfg);
         }
     }
 }
