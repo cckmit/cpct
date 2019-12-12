@@ -864,6 +864,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             TransDetailDataVO dataVO;
             List<Map<String, Object>> labelList = new ArrayList<>();
             dataVO = xlsxProcess.processAllSheet(multipartFile);
+            if (dataVO.contentList.size() - 3 < 0) {
+                result.put("resultCode", CommonConstant.CODE_SUCCESS);
+                result.put("resultMsg", "导入文件无数据！");
+                return result;
+            }
             String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
             String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
             if (nameList.length != codeList.length) {
