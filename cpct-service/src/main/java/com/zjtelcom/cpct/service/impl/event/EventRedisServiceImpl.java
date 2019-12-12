@@ -78,12 +78,15 @@ public class EventRedisServiceImpl implements EventRedisService {
     public Map<String, Object> getRedis(String key, Long id, Map<String, Object> params) {
         Map<String, Object> resutlt = new HashMap<>();
         Object o = new Object();
-        if (id != 0) {
+        if (!id.equals(0L)) {
             o = redisUtils.get(key + id);
         } else {
             o = redisUtils.get(key);
+            if (o != null) {
+                resutlt.put(key, o);
+            }
         }
-        if (o != null) {
+        if (o != null && !id.equals(0L)) {
             resutlt.put(key + id, o);
         } else {
             // 活动和事件的关联关系
@@ -109,19 +112,6 @@ public class EventRedisServiceImpl implements EventRedisService {
                 List<String> list = contactEvtMapper.selectChannelListByEvtCode(eventCode);
                 redisUtils.set(key + eventCode, list);
                 resutlt.put(key + eventCode, list   );
-                /*String channelsIdStr = (String) params.get("channelsId");
-                if (channelsIdStr != null && !"".equals(channelsIdStr)) {
-                    String[] strArrayChannelsId = channelsIdStr.split("/");
-                    List<Long> channelsIdList = new ArrayList<>();
-                    if (strArrayChannelsId != null && !"".equals(strArrayChannelsId[0])) {
-                        for (String channelsId : strArrayChannelsId) {
-                            channelsIdList.add(Long.valueOf(channelsId));
-                        }
-                    }
-                    List<String> channelCodeList = contactChannelMapper.selectChannelCodeByPrimaryKey(channelsIdList);
-                    redisUtils.set(key + id, channelCodeList);
-                    resutlt.put(key + id, channelCodeList);
-                }*/
             } else if ("RULE_LIST_".equals(key)) {   // 过滤规则
                 List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktStrategyConfRuleMapper.selectByMktStrategyConfId(id);
                 redisUtils.setRedis(key + id, mktStrategyConfRuleList);
@@ -132,8 +122,8 @@ public class EventRedisServiceImpl implements EventRedisService {
                 for (SysParams sysParams : sysParamsList) {
                     mktCamCodeList.add(sysParams.getParamValue());
                 }
-                redisUtils.set("MKT_CAM_API_CODE_KEY", mktCamCodeList);
-                resutlt.put("MKT_CAM_API_CODE_KEY", mktCamCodeList);
+                redisUtils.set(key, mktCamCodeList);
+                resutlt.put(key, mktCamCodeList);
             } else if ("EVENT_ITEM_".equals(key)) {  // 事件采集项
                 List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(id);
                 redisUtils.setRedis(key + id, contactEvtItems);
