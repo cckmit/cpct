@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bss-cpct-label-statistic
+  labels:
+    name: bss-cpct-label-statistic
+spec:
+  type: NodePort
+  ports:
+  - port: 30811
+    nodePort: 30811
+  selector:
+    name: bss-cpct-label-statistic

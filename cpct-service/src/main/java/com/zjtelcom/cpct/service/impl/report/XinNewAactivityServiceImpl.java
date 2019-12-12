@@ -540,7 +540,11 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         for (Map<String, Object> datum : rptList) {
             MktCampaignDO campaignDO = mktCampaignMapper.selectByInitIdFromOne(Long.valueOf(datum.get("mktCampaignId").toString()));
             datum.put("mktCampaignName",campaignDO==null ? "" : campaignDO.getMktCampaignName());
-            datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
+            if (datum.get("contactRate").toString().equals("1")) {
+                datum.put("conversion","100%");
+            }else {
+                datum.put("conversion",getPercentFormat(Double.valueOf(datum.get("contactRate").toString()),2,2));
+            }
             if (campaignDO == null){
                 datum.put("area","");
             }else {
