@@ -64,6 +64,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.zjtelcom.cpct.enums.DateUnit.DAY;
+import static com.zjtelcom.cpct.enums.Operator.BETWEEN;
 
 @Service
 public class CamCpcServiceImpl implements CamCpcService {
@@ -942,8 +943,16 @@ public class CamCpcServiceImpl implements CamCpcService {
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-            //判断表达式在缓存中有没有
-            String express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            String express = null;
+            Object datetypeTargouidList = redisUtils.get("DATETYPE_TARGOUID_LIST");
+            if (datetypeTargouidList != null) {
+                String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
+                List<String> list = Arrays.asList(timeTypeTarGrpIdList);
+                if (!list.contains(tarGrpId)) {
+                    //判断表达式在缓存中有没有
+                    express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                }
+            }
             SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
             if (sysParams == null) {
                 List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
@@ -1891,8 +1900,15 @@ public class CamCpcServiceImpl implements CamCpcService {
             express.append("))");
         } else if (labelCodeList.contains(code)) {
             // todo 时间类型标签
-            if ("1".equals(labelMap.get("updateStaff"))) {
-                rightParam = DateUtil.addDate(new Date(), Integer.parseInt(rightParam), DAY).toString();
+            if ("200".equals(labelMap.get("updateStaff"))) {
+                if (type.equals(BETWEEN.getValue().toString())) {
+                    String[] split = rightParam.split(",");
+                    String time1 = DateUtil.getPreDay(Integer.parseInt(split[0]));
+                    String time2 = DateUtil.getPreDay(Integer.parseInt(split[0]));
+                    rightParam = time1 + "," + time2;
+                } else {
+                    rightParam = DateUtil.getPreDay(Integer.parseInt(rightParam));
+                }
             }
             express.append("(dateLabel(").append(code).append(",").append(type).append(",").append("\"" + rightParam + "\"");
             express.append("))");
