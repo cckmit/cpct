@@ -501,4 +501,18 @@
         from mkt_evt_interface_rel
         where EVENT_ID = #{evtId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectEvtInterfaceRel" resultType="com.zjtelcom.cpct.dto.event.EventInterfaceRel">
+        select EVT_INTERFACE_REL_ID evtInterfaceRelId, EVENT_ID evtId, INTERFACE_ID interfaceId, CHANNEL_CODE channelCode
+        from mkt_evt_interface_rel
+        where EVENT_ID = #{evtId,jdbcType=BIGINT}
+        and INTERFACE_ID = #{interfaceId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectChannelListByEvtCode" resultType="string">
+        select r.CHANNEL_CODE
+        from event e
+        LEFT JOIN mkt_evt_interface_rel r ON r.EVENT_ID = e.EVENT_ID
+        where e.EVENT_NBR = #{evtCode}
+    </select>
 </mapper>

@@ -58,4 +58,8 @@ public interface ContactEvtMapper {
     int delEvtInterfaceRel (Long evtId);
 
     List<EventInterfaceRel> selectEvtInterfaceRelByEvtId(Long evtId);
+
+    EventInterfaceRel selectEvtInterfaceRel(EventInterfaceRel eventInterfaceRel);
+
+    List<String> selectChannelListByEvtCode(String evtCode);
 }

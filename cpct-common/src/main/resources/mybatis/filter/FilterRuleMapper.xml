@@ -40,6 +40,18 @@
         <result column="RIGHT_PARAM" jdbcType="VARCHAR" property="rightParam"/>
         <result column="DAYS" jdbcType="VARCHAR" property="days"/>
         <result column="TIMES" jdbcType="VARCHAR" property="times"/>
+        <result column="EXECUTION_CHANNEL" jdbcType="VARCHAR" property="executionChannel"/>
+        <result column="CHANNEL_CONTACTS" jdbcType="VARCHAR" property="channelContacts"/>
+        <result column="EFFECTIVE_DATE" jdbcType="TIMESTAMP" property="effectiveDate"/>
+        <result column="FAILURE_DATE" jdbcType="TIMESTAMP" property="failureDate"/>
+        <result column="CHOOSE_PRODUCT" jdbcType="VARCHAR" property="chooseProduct"/>
+        <result column="EXPRESSION" jdbcType="VARCHAR" property="expression"/>
+        <result column="DAY_START" jdbcType="TIMESTAMP" property="dayStart"/>
+        <result column="DAY_END" jdbcType="TIMESTAMP" property="dayEnd"/>
+        <result column="USER_LIST" jdbcType="VARCHAR" property="userList"/>
+        <result column="CONDITION_ID" jdbcType="BIGINT" property="conditionId"/>
+        <result column="OFFER_INFO" jdbcType="VARCHAR" property="offerInfo"/>
+        <result column="OPERATOR" jdbcType="VARCHAR" property="operator"/>
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -244,27 +256,35 @@
     </select>
 
     <select id="selectFilterRuleByStrategyIdArrayList" parameterType="java.lang.Long" resultMap="FilterRuleModelMap">
-    SELECT
+        SELECT
         f.RULE_ID,
         f.RULE_NAME,
         f.FILTER_TYPE,
         f.DAYS,
         f.TIMES,
+        f.EXECUTION_CHANNEL,
+        f.CHANNEL_CONTACTS,
+        f.EFFECTIVE_DATE,
+        f.FAILURE_DATE,
+        f.CHOOSE_PRODUCT,
+        f.EXPRESSION,
+        f.DAY_START,
+        f.DAY_END,
+        f.USER_LIST,
+        f.CONDITION_ID,
+        f.OFFER_INFO,
+        f.OPERATOR,
         c.OPER_TYPE,
         c.RIGHT_PARAM,
         l.INJECTION_LABEL_CODE,
         l.INJECTION_LABEL_NAME
-    FROM
-        filter_rule f,
-        mkt_verbal_condition c,
-        injection_label l,
-        mkt_strategy_filter_rule_rel r
-    WHERE
-        r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
-        AND f.RULE_ID = r.RULE_ID
-        AND f.FILTER_TYPE = 6000
-        AND c.CONDITION_ID = f.CONDITION_ID
-        AND c.LEFT_PARAM = l.INJECTION_LABEL_ID
+        FROM
+            filter_rule f
+        LEFT JOIN mkt_strategy_filter_rule_rel r ON f.RULE_ID = r.RULE_ID
+        LEFT JOIN mkt_verbal_condition c ON c.CONDITION_ID = f.CONDITION_ID
+        LEFT JOIN injection_label l ON l.INJECTION_LABEL_ID = c.LEFT_PARAM
+        WHERE
+            r.STRATEGY_ID = #{strategyId, jdbcType=VARCHAR}
     </select>
 
     <select id="selectFilterRuleList" resultMap="BaseResultMap">

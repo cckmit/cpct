@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.enums.ErrorCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleRelService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
     @Autowired
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
+    @Autowired
+    private RedisUtils redisUtils;  // redis方法
     /**
      * 添加策略配置与规则的关联关系
      *
@@ -196,6 +199,8 @@ public class MktStrategyConfRuleRelServiceImpl extends BaseService implements Mk
         Map<String, Object> mktStryConfRuleRelMap = new HashMap<>();
         try {
             mktStrategyConfRuleRelMapper.deleteByMktStrategyConfId(mktStrategyConfId);
+            // 删除事件接入缓存
+            redisUtils.del("RULE_LIST_" + mktStrategyConfId);
             mktStryConfRuleRelMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStryConfRuleRelMap.put("resultMsg", "删除成功！");
         } catch (Exception e) {

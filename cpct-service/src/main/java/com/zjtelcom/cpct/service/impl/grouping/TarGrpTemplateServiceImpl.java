@@ -36,6 +36,7 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
@@ -128,7 +129,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private SysParamsMapper systemParamMapper;
     @Autowired
     private OrgGridRelMapper orgGridRelMapper;
-
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
     /**
      * 分群模板导入清单
      */
@@ -226,6 +228,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
 
     @Override
     public Map<String, Object> tarGrpTemplateScheduledBatchIssue() {
+        Date startDate = new Date();
         Map<String, Object> resultMap = new HashMap<>();
         List<Map<String, String>> mapList = systemParamMapper.listParamsByKey("TARGRPTEMPLATE_SCHEDULED_BATCH");
         List<String> failTarGrpIdList = new ArrayList<>();
@@ -249,11 +252,13 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         if (failTarGrpIdList.isEmpty()) {
             resultMap.put("result", "succees");
             resultMap.put("mapping", mapping);
+            mktDttsLogService.saveMktDttsLog("7000", "成功", startDate, new Date(), "成功", JSON.toJSONString(resultMap));
             return resultMap;
         }else {
             resultMap.put("result", "error");
             resultMap.put("mapping", mapping);
             resultMap.put("failTarGrpIdList", failTarGrpIdList);
+            mktDttsLogService.saveMktDttsLog("7000", "失败", startDate, new Date(), "失败", JSON.toJSONString(resultMap));
             return resultMap;
         }
     }

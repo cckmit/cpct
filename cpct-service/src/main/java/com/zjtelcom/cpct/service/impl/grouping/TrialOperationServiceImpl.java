@@ -1117,7 +1117,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             }
                             customerList.add(customers);
                         }
-                        importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
+                        if (customerList.size() > 0) {
+                            importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
+                        }
                     } catch (RuntimeException e) {
                         e.printStackTrace();
                     }

@@ -106,7 +106,6 @@ public class MqLabelServiceImpl implements MqLabelService, InitializingBean, Dis
     public void initLabelStatisticConsumer() throws Exception {
         logger.info("initLabelStatisticConsumer...init...." + namesrvAddr);
         Properties properties = new Properties();
-        labelStatisiticConsumer = CTGMQFactory.createPushConsumer(properties);
         properties.setProperty(PropertyKeyConst.ConsumerGroupName, consumerGroupName);
         properties.setProperty(PropertyKeyConst.NamesrvAddr, namesrvAddr);
         properties.setProperty(PropertyKeyConst.NamesrvAuthID, namesrvAuthID);
@@ -115,6 +114,7 @@ public class MqLabelServiceImpl implements MqLabelService, InitializingBean, Dis
         properties.setProperty(PropertyKeyConst.ClusterName, clusterName);
         properties.setProperty(PropertyKeyConst.TenantID, tenantID);
         properties.setProperty(PropertyKeyConst.ClientWorkerThreads, clientWorkerThreads);
+        labelStatisiticConsumer = CTGMQFactory.createPushConsumer(properties);
         labelStatisiticConnect = labelStatisiticConsumer.connect();
         logger.info("esLogConnect" + labelStatisiticConnect);
     }
