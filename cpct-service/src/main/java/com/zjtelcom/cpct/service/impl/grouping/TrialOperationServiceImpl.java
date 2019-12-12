@@ -46,10 +46,7 @@ import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
-import com.zjtelcom.cpct.enums.ConfAttrEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.enums.TrialCreateType;
-import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -2316,13 +2313,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             if (tarGrpConditionDOs.get(i).getRightParam().contains("-")){
                                 tarGrpConditionDOs.get(i).setUpdateStaff(0L);
                             }else {
-                                tarGrpConditionDOs.get(i).setUpdateStaff(1L);
+                                tarGrpConditionDOs.get(i).setUpdateStaff(200L);
                             }
                         }
-                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==1L){
+                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==200L){
                             String date = tarGrpConditionDOs.get(i).getRightParam();
                             if (!tarGrpConditionDOs.get(i).getRightParam().contains("-")){
-                               date =  DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                                if (Operator.BETWEEN.getValue().toString().equals(tarGrpConditionDOs.get(i).getOperType())){
+                                    String[] conditions = tarGrpConditionDOs.get(i).getRightParam().split(",");
+                                    date = DateUtil.getPreDay(Integer.valueOf(conditions[0])) +","+DateUtil.getPreDay(Integer.valueOf(conditions[1]));
+                                }else {
+                                    date =  DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
+                                }
                             }
                             express.append(date);
                         }else if (label.getInjectionLabelCode().equals("PROM_LIST")){
