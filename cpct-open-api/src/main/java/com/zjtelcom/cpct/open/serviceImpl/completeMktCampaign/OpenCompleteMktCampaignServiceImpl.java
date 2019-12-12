@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
+@Transactional
 public class OpenCompleteMktCampaignServiceImpl extends BaseService implements OpenCompleteMktCampaignService {
 
     @Autowired
@@ -67,7 +68,6 @@ public class OpenCompleteMktCampaignServiceImpl extends BaseService implements O
     private SysParamsMapper sysParamsMapper;
 
     @Override
-    @Transactional
     public Map<String, Object> completeMktCampaign(Long mktCampaignId, String tacheCd) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> inputMap = new HashMap<>();

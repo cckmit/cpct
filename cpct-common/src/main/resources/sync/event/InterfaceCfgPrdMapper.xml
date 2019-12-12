@@ -193,5 +193,13 @@
     </if>
   </select>
 
+  <select id="selectByProvider" resultMap="BaseResultMap">
+    select INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME, INTERFACE_DESC, INTERFACE_NBR,
+    INTERFACE_TYPE, PROVIDER, CALLER, PROTOCOL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from interface_cfg
+    where PROVIDER = #{provider}
+  </select>
+
 
 </mapper>

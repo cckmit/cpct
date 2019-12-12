@@ -22,11 +22,9 @@
     </dubbo:reference>
 
     <!-- 分群定时批量下发 -->
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService"
-                     id="targetGroupServiceImpl"
-                     version="1.0" retries="0" check="false">
-        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue"
-                      timeout="10000"/>
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" id="targetGroupServiceImpl" version="1.0" retries="0" check="false">
+        <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
+        <dubbo:method name="updateRedisOfDateTypeLabel" servicecode="33.1083.updateRedisOfDateTypeLabel" timeout="10000"/>
     </dubbo:reference>
 
     <!--活动延期短信通知-->
@@ -40,5 +38,7 @@
                      id="querySaturationService" version="1.0" retries="0" check="false">
         <dubbo:method name="querySaturation" servicecode="33.1307.querySaturation" timeout="10000"/>
     </dubbo:reference>
+
+
 
 </beans>

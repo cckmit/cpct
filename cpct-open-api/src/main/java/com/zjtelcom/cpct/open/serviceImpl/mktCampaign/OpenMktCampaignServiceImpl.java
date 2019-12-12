@@ -46,6 +46,7 @@ import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpEntity;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -126,7 +127,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private MktCampaignCompleteMapper mktCampaignCompleteMapper;
     @Autowired(required = false)
     private IReportService iReportService;
-
+    @Autowired
+    private UCCPService uccpService;
 
     /**
      * 查询营销活动详情
@@ -419,6 +421,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             mktCampaignDO.setServiceType("1000");
             mktCampaignDO.setIsCheckRule("不校验");
+            mktCampaignDO.setSrcId("0");
             if(openMktCampaignEntity.getCreateStaff() == null) {
                 mktCampaignDO.setCreateStaff(1L);
             }
@@ -824,6 +827,11 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
+        }
+        try {
+            String resultMsg = uccpService.sendShortMessage("号码", "内容", "");
+        }catch (Exception e){
+            e.printStackTrace();
         }
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
