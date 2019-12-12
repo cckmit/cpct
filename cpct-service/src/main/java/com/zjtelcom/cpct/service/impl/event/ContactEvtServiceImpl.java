@@ -869,7 +869,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         for (Channel channel : childList) {
             InterfaceCfg ic = new InterfaceCfg();
             ic.setEvtSrcId(58L);
-            ic.setInterfaceName(channel.getChannelName() + "渠道事件源接口");
+            ic.setInterfaceName(channel.getContactChlName() + "渠道事件源接口");
             ic.setInterfaceType("1000");
             ic.setProvider(channel.getContactChlId().toString());
             ic.setCaller(channel.getContactChlId().toString());
@@ -881,7 +881,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     @Autowired
     private MktStrategyConfPrdMapper mktStrategyConfPrdMapper;
     
-    
     @Override
     public void xxxxxx2() {
         List<MktCampaignDO> mktCampaignDOS = campaignMapper.selectAll();
@@ -892,29 +891,43 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
 
             for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                 Long eventId = mktCamEvtRelDO.getEventId();
-
-                List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfPrdMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
-                for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
-                    String channelsId = mktStrategyConfDO.getChannelsId();
-                    if (channelsId.isEmpty()) {
-                        break;
-                    }
-                    String[] split = channelsId.split("/");
-                    for (String chlId : split) {
-                        InterfaceCfg interfaceCfg = interfaceCfgPrdMapper.selectByProvider(chlId);
-
-                        EventInterfaceRel eventInterfaceRel = new EventInterfaceRel();
-                        eventInterfaceRel.setEvtId(eventId);
-                        eventInterfaceRel.setInterfaceId(interfaceCfg.getInterfaceCfgId());
-                        EventInterfaceRel result = contactEvtMapper.selectEvtInterfaceRel(eventInterfaceRel);
-                        if (result == null) {
-                            Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(chlId));
-                            eventInterfaceRel.setChannelCode(channel.getContactChlCode());
-                            int evtInterfaceRel = contactEvtMapper.createEvtInterfaceRel(eventInterfaceRel);
+                if (eventId != null) {
+                    List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfPrdMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
+                    for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
+                        String channelsId = mktStrategyConfDO.getChannelsId();
+                        if (channelsId.isEmpty()) {
+                            break;
+                        }
+                        String[] split = channelsId.split("/");
+                        for (String chlId : split) {
+                            InterfaceCfg interfaceCfg = interfaceCfgPrdMapper.selectByProvider(chlId);
+                            if (interfaceCfg != null) {
+                                EventInterfaceRel eventInterfaceRel = new EventInterfaceRel();
+                                eventInterfaceRel.setEvtId(eventId);
+                                eventInterfaceRel.setInterfaceId(interfaceCfg.getInterfaceCfgId());
+                                EventInterfaceRel result = contactEvtMapper.selectEvtInterfaceRel(eventInterfaceRel);
+                                eventInterfaceRel.setStatusCd("1000");
+                                if (result == null) {
+                                    Channel channel = channelMapper.selectByPrimaryKey(Long.valueOf(chlId));
+                                    eventInterfaceRel.setChannelCode(channel.getContactChlCode());
+                                    int evtInterfaceRel = contactEvtMapper.createEvtInterfaceRel(eventInterfaceRel);
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void xxxxxx3() {
+        List<InterfaceCfg> interfaceCfgs = interfaceCfgPrdMapper.selectAll();
+        for (InterfaceCfg interfaceCfg : interfaceCfgs) {
+            Channel channel = contactChannelPrdMapper.selectByPrimaryKey(Long.valueOf(interfaceCfg.getProvider()));
+            String contactChlName = channel.getContactChlName();
+            interfaceCfg.setInterfaceName(contactChlName + "渠道事件源接口");
+            interfaceCfgPrdMapper.updateByPrimaryKey(interfaceCfg);
         }
     }
 }
