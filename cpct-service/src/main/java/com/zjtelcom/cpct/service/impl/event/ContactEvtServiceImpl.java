@@ -761,6 +761,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 }
             }
             redisUtils.del("CAM_EVT_REL_" +evtDetail.getContactEvtId());
+            redisUtils.del("CHANNEL_CODE_LIST_"+evtDetail.getContactEvtCode())
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
