@@ -25,4 +25,6 @@ public interface InterfaceCfgMapper {
 
     int updateByPrimaryKey(InterfaceCfg record);
 
+    InterfaceCfg selectByProvider(String provider);
+
 }
