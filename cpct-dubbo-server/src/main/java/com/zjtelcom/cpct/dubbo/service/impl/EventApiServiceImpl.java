@@ -456,7 +456,15 @@ public class EventApiServiceImpl implements EventApiService {
 
 
             try {
-                List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
+               // List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
+                List<String> list =new ArrayList<>();
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("eventCode", map.get("eventCode"));
+                Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", 0L, paramMap);
+                if(channelCodeRedis!=null){
+                    list = (List<String>) channelCodeRedis.get("CHANNEL_CODE_LIST_" + map.get("eventCode"));
+                }
+
                 if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
                     esJson.put("hit", false);
                     esJson.put("success", true);
@@ -487,7 +495,9 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 //根据事件code查询事件信息
-                Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", Long.valueOf((String) map.get("eventCode")), new HashMap<>());
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("eventCode", map.get("eventCode"));
+                Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", 0L, paramMap);
                 ContactEvt event = new ContactEvt();
                 if(eventRedis!=null){
                     event = (ContactEvt) eventRedis.get("EVENT_" + map.get("eventCode"));
@@ -2415,7 +2425,7 @@ public class EventApiServiceImpl implements EventApiService {
                         continue;
                     }
                     //判断适用渠道
-                    if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
+                 /*   if (mktStrategyConf.getChannelsId() != null && !"".equals(mktStrategyConf.getChannelsId())) {
                         List<String> channelCodeList = new ArrayList<>();
                         Map<String, Object> params = new HashMap<>();
                         params.put("channelsId", mktStrategyConf.getChannelsId());
@@ -2475,7 +2485,7 @@ public class EventApiServiceImpl implements EventApiService {
                         esJsonStrategy.put("msg", "适用渠道数据异常");
                         esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
-                    }
+                    }*/
                     log.info("预校验还没出错1");
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();

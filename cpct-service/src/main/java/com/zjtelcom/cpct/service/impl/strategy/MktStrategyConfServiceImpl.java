@@ -335,7 +335,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 }
             }
             mktStrategyConfDO.setChannelsId(channelIds);
-            redisUtils.del("CHANNEL_CODE_LIST_" + mktStrategyConfDO.getMktStrategyConfId());
+           // redisUtils.del("CHANNEL_CODE_LIST_" + mktStrategyConfDO.getMktStrategyConfId());
             // 下发城市
             String areaIds = "";
             if (mktStrategyConfDetail.getAreaIdList() != null) {
