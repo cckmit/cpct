@@ -24,13 +24,13 @@
     where INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.InterfaceCfg" keyProperty="interfaceCfgId" useGeneratedKeys="true">
-    insert into interface_cfg (INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME, 
+    insert into interface_cfg (INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME,
       INTERFACE_DESC, INTERFACE_NBR, INTERFACE_TYPE, 
       PROVIDER, CALLER, PROTOCOL_TYPE, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
       CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
       REMARK)
-    values (#{interfaceCfgId,jdbcType=BIGINT}, #{evtSrcId,jdbcType=BIGINT}, #{interfaceName,jdbcType=VARCHAR}, 
+    values (#{interfaceCfgId,jdbcType=BIGINT}, #{evtSrcId,jdbcType=BIGINT}, #{interfaceName,jdbcType=VARCHAR},
       #{interfaceDesc,jdbcType=VARCHAR}, #{interfaceNbr,jdbcType=VARCHAR}, #{interfaceType,jdbcType=VARCHAR}, 
       #{provider,jdbcType=VARCHAR}, #{caller,jdbcType=VARCHAR}, #{protocolType,jdbcType=VARCHAR}, 
       #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
@@ -191,6 +191,14 @@
     <if test="interfaceType != null and interfaceType != ''">
       and INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR}
     </if>
+  </select>
+
+  <select id="selectByProvider" resultMap="BaseResultMap">
+    select INTERFACE_CFG_ID, EVT_SRC_ID, INTERFACE_NAME, INTERFACE_DESC, INTERFACE_NBR,
+    INTERFACE_TYPE, PROVIDER, CALLER, PROTOCOL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from interface_cfg
+    where PROVIDER = #{provider}
   </select>
 
 

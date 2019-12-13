@@ -171,6 +171,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         MktDttsLog mktDttsLog =new MktDttsLog();
         String preDay = DateUtil.getPreDay(1);
         Date preDate = DateUtil.string2DateTime4Day(preDay);
+        String dateFormatStr = DateUtil.getDateFormatStr(date);
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
 //        offerList.get(0).setOfferId(290508);
 //        offerList.get(1).setOfferId(290936);
@@ -187,7 +188,8 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
                                 if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                                     String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                                     System.out.println("11111+sysUserCode:"+sysUserCode+"123444324 lanId:"+mktCampaignDO.getLanId());
-                                    String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+//                                    String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                                    String sendContent = "您好，活动编码："+mktCampaignDO.getMktActivityNbr()+" 活动名称："+mktCampaignDO.getMktCampaignName()+" 中配置的推荐条目:"+ mktCamItem.getOfferName()+"将于"+dateFormatStr+"下架，为保证活动营销正常，请您尽快修改活动配置。";
                                     try {
                                         uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
                                         mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"成功",null);

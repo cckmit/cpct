@@ -48,4 +48,9 @@ public interface ContactEvtService {
 
     Map<String,Object> selectBatchByCode(List<String> contactChlCodeList);
 
+    void xxxxxx1();
+
+    void xxxxxx2();
+
+    void xxxxxx3();
 }

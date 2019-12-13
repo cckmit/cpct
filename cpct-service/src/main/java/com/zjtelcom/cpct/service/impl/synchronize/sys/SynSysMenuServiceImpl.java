@@ -29,7 +29,7 @@ public class SynSysMenuServiceImpl implements SynSysMenuService {
 
     @Autowired
     private SynchronizeRecordService synchronizeRecordService;
-    @Autowired
+    @Autowired(required = false)
     private SysMenuPrdMapper sysMenuPrdMapper;
     @Autowired
     private SysMenuMapper sysMenuMapper;

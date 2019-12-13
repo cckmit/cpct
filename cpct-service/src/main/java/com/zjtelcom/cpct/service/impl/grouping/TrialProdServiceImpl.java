@@ -9,7 +9,9 @@ import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -22,6 +24,7 @@ import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.LabelResult;
 import com.zjtelcom.cpct.domain.channel.MktProductRule;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -31,6 +34,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
@@ -142,6 +146,10 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
+    @Autowired
+    private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
     /**
      * 提供dtts定时任务清单存入es
@@ -279,6 +287,24 @@ public class TrialProdServiceImpl implements TrialProdService {
         }
         redisUtils.set("ISALE_LABEL_" + trialOperation.getBatchNum(), iSaleDisplay);
 
+        List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaignDO.getMktCampaignId());
+        //todo 关单规则配置信息
+        if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
+            List<Map<String,Object>> closeRule = new ArrayList<>();
+            for (MktStrategyCloseRuleRelDO ruleRelDO : closeRuleRelDOS){
+                CloseRule closeR = closeRuleMapper.selectByPrimaryKey(ruleRelDO.getRuleId());
+                if (closeR!=null){
+                    Map<String,Object> ruleMap = new HashMap<>();
+                    ruleMap.put("closeName",closeR.getCloseName());
+                    ruleMap.put("closeCode",closeR.getCloseCode());
+                    ruleMap.put("closeNbr",closeR.getExpression());
+                    ruleMap.put("closeType",closeR.getCloseType());
+                    closeRule.add(ruleMap);
+                }
+            }
+            redisUtils_es.set("CLOSE_RULE_"+campaignDO.getMktCampaignId(),closeRule);
+        }
+
         TrialOperationVO request = BeanUtil.create(trialOperation, new TrialOperationVO());
         request.setFieldList(fieldList);
         request.setCampaignType(campaignDO.getMktCampaignType());
@@ -293,15 +319,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(), false);
             List<LabelResultES> labelResultList = param.getLabelResultList();
-            List<String> labelTypeList = new ArrayList<>();
-            for (LabelResultES la : labelResultList) {
-                labelTypeList.add(la.getRightOperand());
-            }
-            if (!labelTypeList.contains("2000")) {
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则：" + param.getRuleName() + "不满足查询条件，请至少配置一条用户级标签查询条件！");
-                return result;
-            }
             paramList.add(param);
         }
         requests.setParamList(paramList);
