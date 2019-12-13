@@ -161,9 +161,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     }
                     //转换率百分比
                     Object contactRate = stringMap.get("contactRate");
+                    log.info("contactRate!@#$%:"+contactRate);
                     if (contactRate!=null && contactRate!=""){
-                        if (contactRate.toString().contains("%")){
+                        if (contactRate.toString().contains("%") && !contactRate.toString().equals("00.00%")){
                             stringMap.put("contactRate",contactRate);
+                        }else if (contactRate.toString().equals("00.00%") || contactRate.toString().equals("1")){
+                            stringMap.put("contactRate","100%");
                         }else {
                             stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
                         }
@@ -200,6 +203,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     if (contactRate!=null && contactRate!=""){
                         if (contactRate.toString().contains("%")){
                             stringMap.put("contactRate",contactRate);
+                        }else if (contactRate.toString().equals("1")){
+                            stringMap.put("contactRate","100%");
                         }else {
                             String string = contactRate.toString();
                             log.info("转换率百分比数值："+string);
