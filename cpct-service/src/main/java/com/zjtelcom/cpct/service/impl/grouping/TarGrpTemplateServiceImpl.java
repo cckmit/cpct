@@ -274,7 +274,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 params.put("resultMsg","渠道和标签参数缺少");
                 return params;
             } else {
-                params.put("tarGrp", JSONObject.toJSON(tarGrp));
+                params.put("tarGrp", JSON.toJSONString(tarGrp));
             }
         }
         List<Map<String, String>> list = tarGrpConditionMapper.selectAllLabelByTarId(Long.valueOf(params.get("tarGrpTemplateId").toString()));
