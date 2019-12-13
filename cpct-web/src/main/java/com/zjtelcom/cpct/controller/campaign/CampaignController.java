@@ -334,7 +334,7 @@ public class CampaignController extends BaseController {
     @CrossOrigin
     public String getMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long mktCampaignId = Long.valueOf(params.get("mktCampaignId"));
-        Map<String, Object> map = null;
+        Map<String, Object> map = new HashMap<>();
         try {
             map = mktCampaignService.getMktCampaign(mktCampaignId);
         } catch (Exception e) {
