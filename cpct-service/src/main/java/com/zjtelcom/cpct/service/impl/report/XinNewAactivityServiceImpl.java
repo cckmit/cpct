@@ -162,8 +162,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                     //转换率百分比
                     Object contactRate = stringMap.get("contactRate");
                     if (contactRate!=null && contactRate!=""){
-                        if (contactRate.toString().contains("%")){
+                        if (contactRate.toString().contains("%") && !contactRate.toString().equals("00.00%")){
                             stringMap.put("contactRate",contactRate);
+                        }else if (contactRate.toString().equals("00.00%")){
+                            stringMap.put("contactRate","100%");
                         }else {
                             stringMap.put("contactRate",getPercentFormat(Double.valueOf(contactRate.toString()),2,2));
                         }
