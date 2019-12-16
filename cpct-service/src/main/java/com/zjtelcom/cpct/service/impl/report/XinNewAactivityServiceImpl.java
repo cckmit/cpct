@@ -828,7 +828,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         String startDate = params.get("startDate").toString();
         String type = paramMap.get("mktCampaignType").toString();
         //总数
-        Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
+        Integer count = mktCampaignMapper.getCountFromActivityTheme(startDate,type,date);
         //查询一条数据 返回总数
         log.info("【入参】新活动报表 收入拉动  查询一条数据 ："+JSON.toJSONString(paramMap));
         Map<String, Object> stringObjectMap = iReportService.queryRptOrder(paramMap);
