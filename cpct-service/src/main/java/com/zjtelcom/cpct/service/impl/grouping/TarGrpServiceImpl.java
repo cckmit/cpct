@@ -388,6 +388,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     @Transactional(readOnly = false)
     @Override
     public Map<String, Object> createTarGrp(TarGrpDetail tarGrpDetail, boolean isCopy) {
+        boolean flag = false;
         Map<String, Object> maps = new HashMap<>();
         try {
             tarGrpDetail = finalWillBeIn(tarGrpDetail);
@@ -405,11 +406,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }else {
                 tarGrp.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             }
-            tarGrpMapper.createTarGrp(tarGrp);
+            int tarGrp1 = tarGrpMapper.createTarGrp(tarGrp);
             List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
             List<TarGrpCondition> conditionList = new ArrayList<>();
             if(tarGrpConditions!=null && tarGrpConditions.size()>0){
                 for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+                    if (tarGrpCondition.getUpdateStaff().equals(200L)) {
+                        flag = true;
+                    }
                     if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
                         maps.put("resultCode", CODE_FAIL);
                         maps.put("resultMsg", "请选择下拉框运算类型");
@@ -441,6 +445,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             //数据加入redis
             TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
             detail.setTarGrpConditions(conditionList);
+            if (flag) {
+                Object o = redisUtils.get("DATETYPE_TARGOUID_LIST");
+                if (o == null) {
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp1);
+                } else {
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp1);
+                }
+            }
             redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
             //插入客户分群条件
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -628,6 +640,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
      */
     @Override
     public Map<String, Object> modTarGrp(TarGrpDetail tarGrpDetail) {
+        boolean flag = false;
         Map<String, Object> maps = new HashMap<>();
         try {
             tarGrpDetail = finalWillBeIn(tarGrpDetail);
@@ -643,6 +656,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<Long> delList = new ArrayList<>();
 
             for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
+                if (tarGrpCondition.getUpdateStaff().equals(200L)) {
+                    flag = true;
+                }
                 TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());
                 if (tarGrpCondition1 == null) {
                     if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
@@ -693,6 +709,14 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                 tarGrpConditionMapper.deleteBatch(delList);
             }
             //更新redis分群数据
+            if (flag) {
+                Object o = redisUtils.get("DATETYPE_TARGOUID_LIST");
+                if (o == null) {
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp.getTarGrpId());
+                } else {
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp.getTarGrpId());
+                }
+            }
             TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
             detail.setTarGrpConditions(allCondition);
             redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);

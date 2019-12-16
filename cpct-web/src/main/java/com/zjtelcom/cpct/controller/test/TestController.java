@@ -252,7 +252,6 @@ public class TestController extends BaseController {
     private ContactEvtService contactEvtService;
     // 刷新事件源接口与事件关系数据
     // 1.先刷事件源接口表，把所有的渠道都刷进事件源接口表，一个渠道一个事件源接口
-    // 2.
     @PostMapping("xxxxxx1")
     @CrossOrigin
     public void xxxxxx1() {
@@ -263,6 +262,12 @@ public class TestController extends BaseController {
     @CrossOrigin
     public void xxxxxx2() {
         contactEvtService.xxxxxx2();
+    }
+
+    @PostMapping("xxxxxx3")
+    @CrossOrigin
+    public void xxxxxx3() {
+        contactEvtService.xxxxxx3();
     }
 }
 

@@ -34,11 +34,11 @@ public class SynMessageLabelServiceImpl implements SynMessageLabelService{
     private SynchronizeRecordService synchronizeRecordService;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
-    @Autowired
+    @Autowired(required = false)
     private DisplayColumnLabelPrdMapper displayColumnLabelPrdMapper;
     @Autowired
     private DisplayColumnMapper displayColumnMapper;
-    @Autowired
+    @Autowired(required = false)
     private DisplayColumnPrdMapper displayColumnPrdMapper;
 
 
