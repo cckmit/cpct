@@ -105,6 +105,7 @@
         <dubbo:method name="queryRptEventOrder" servicecode="00.1079.queryRptEventOrder" timeout="12000"/>
         <!--<dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>-->
         <dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>
+        <dubbo:method name="queryRptOrder" servicecode="00.1079.queryRptOrder" timeout="12000"/>
     </dubbo:reference>
 
     <!-- eslog -->
@@ -121,6 +122,8 @@
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
         <dubbo:method name="queryEventInst" servicecode="00.1079.queryEventInst"  timeout="120000"/>
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
+        <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
+        <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
     </dubbo:reference>
 
 </beans>

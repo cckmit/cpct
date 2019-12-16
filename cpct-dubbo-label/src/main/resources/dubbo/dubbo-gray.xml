@@ -67,6 +67,7 @@
     <!-- 分群定时批量下发 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TargetGroupService" ref="targetGroupServiceImpl" version="2.0" >
         <dubbo:method name="tarGrpTemplateScheduledBatchIssue" servicecode="33.1083.tarGrpTemplateScheduledBatchIssue" timeout="10000"/>
+        <!--<dubbo:method name="updateRedisOfDateTypeLabel" servicecode="33.1083.updateRedisOfDateTypeLabel" timeout="10000"/>-->
     </dubbo:service>
 
     <!-- 活动延期短信通知 -->

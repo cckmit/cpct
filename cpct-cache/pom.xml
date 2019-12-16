@@ -56,10 +56,29 @@
             <groupId>com.ctg.itrdc.cache</groupId>
             <artifactId>ctg-cache-client</artifactId>
         </dependency>
+
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.netflix.hystrix</groupId>
+            <artifactId>hystrix-javanica</artifactId>
+            <version>1.5.18</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- ctgmq -->
@@ -88,6 +107,8 @@
             <artifactId>ctgmq-rocketmq-tools</artifactId>
         </dependency>
     </dependencies>
+
+
 
 
 </project>

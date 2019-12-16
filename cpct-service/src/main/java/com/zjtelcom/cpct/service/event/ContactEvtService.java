@@ -51,4 +51,6 @@ public interface ContactEvtService {
     void xxxxxx1();
 
     void xxxxxx2();
+
+    void xxxxxx3();
 }

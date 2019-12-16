@@ -41,12 +41,12 @@ platformConfig:
    bis_detail: 内容策略中心
    version: v1.0
 
-#集团定制的redis配置prod环境
+#集团CPCT定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.59
-   port: 41701
-   database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro
+   ip: 134.108.0.40,134.108.0.41
+   port: 9051
+   database: 0
+   password: CRM_CPCP_002_USER#bssCpc_ro
 
 #集团定制的redis配置生产环境
 redisConfig_Prd:

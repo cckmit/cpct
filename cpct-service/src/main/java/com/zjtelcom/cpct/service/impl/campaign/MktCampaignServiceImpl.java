@@ -34,6 +34,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -59,6 +60,7 @@ import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
@@ -312,6 +314,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private TrialOperationMapper trialOperationMapper;
     @Autowired
     private MktDttsLogService mktDttsLogService;
+    @Autowired
+    private ProjectManageService projectManageService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -743,8 +747,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
+                    redisUtils.del("MKT_STRATEGY_" + mktCampaignId);
                 }
             }
+
+
 
             //更新推荐条目
             if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
@@ -777,11 +784,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     for (MktCamEvtRelDO mktCamEvtRelDO : delList) {
                         mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
+
                     }
                 } else {
                     for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
                         mktCamEvtRelMapper.deleteByPrimaryKey(mktCamEvtRelDO.getMktCampEvtRelId());
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                     }
                 }
                 if (mktCampaignVO.getEventDTOS() != null) {
@@ -807,6 +817,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktCampaignId);
             // 删除事件接入过滤规则缓存
             redisUtils.del("FILTER_RULE_LIST_" + mktCampaignId);
+            redisUtils.del("FILTER_RULE_STR_" + mktCampaignId);
             if (mktCampaignVO.getFilterRuleIdList() != null && mktCampaignVO.getFilterRuleIdList().size() > 0) {
                 for (Long FilterRuleId : mktCampaignVO.getFilterRuleIdList()) {
                     MktStrategyFilterRuleRelDO mktStrategyFilterRuleRelDO = new MktStrategyFilterRuleRelDO();
@@ -915,14 +926,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
 
         // c4,c5
-        if (mktCampaignDO.getLanIdFour() != null) {
+        if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel())
+                || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel()))
+                && mktCampaignDO.getLanIdFour() != null) {
             SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
             //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
             if (sysArea != null) {
                 mktCampaignVO.setLanIdFourName(sysArea.getName());
             }
         }
-        if (mktCampaignDO.getLanIdFive() != null) {
+        if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel())
+                && mktCampaignDO.getLanIdFive() != null) {
             Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
             if(organization!=null){
                 mktCampaignVO.setLanIdFiveName(organization.getOrgName());
@@ -1090,6 +1104,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
             for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                 redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
             }
             // 删除活动与事件的关系
             mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -1149,6 +1164,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
             List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
+            PageHelper.startPage(1, 50);
+            Page pageInfo = new Page(new PageInfo(mktCampaignDOList));
             List<CampaignVO> voList = new ArrayList<>();
             for (MktCampaignDO campaignDO : mktCampaignDOList) {
                 if (relationCamList.contains(campaignDO.getMktCampaignId())) {
@@ -1622,23 +1639,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setPreMktCampaignType("自主活动");
                         }
                     }
-                    List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
+                    // 集团活动补丁逻辑（现去除）
+                    /*List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
                     if (mktCampaignCompletes!=null && !mktCampaignCompletes.isEmpty() ){
                         if (mktCampaignCountDO.getSrcId()==null || "".equals(mktCampaignCountDO.getSrcId())){
                             mktCampaignVO.setSrcId("0");
                         }else {
                             mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                         }
+                    }*/
+                    if (mktCampaignCountDO.getSrcId() != null && !mktCampaignCountDO.getSrcId().isEmpty()) {
+                        mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                     }
                     // c4,c5
-                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                    if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel()))
+                            && mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                    if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            && mktCampaignCountDO.getLanIdFive() != null) {
                         Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
@@ -1780,20 +1804,22 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                     mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                     // c4,c5
-                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                    if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel()))
+                            && mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                    if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            && mktCampaignCountDO.getLanIdFive() != null) {
                         Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
                     }
-
                     // 获取创建人信息
                     long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
@@ -1892,9 +1918,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
                     for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
                         redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                     }
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
+                    //派单活动状态修改接口
+                    List<TrialOperation> trialOperations = trialOperationMapper.listOperationByCamIdAndStatusCd(mktCampaignId, TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue());
+                    if (trialOperations != null && trialOperations.size() > 0) {
+                        projectManageService.updateProjectPcState(mktCampaignId);
+                    }
                 }
 
                 // 删除准生产的redis缓存
@@ -2280,7 +2312,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setRequestType("mkt");
         //需求函批次号按规律递增1
-        requestInfo.setBatchNo(getBatchNo(requestInfoMapper.selectMaxBatchNo()));
+        requestInfo.setBatchNo(getJITUANBatchNo(requestInfoMapper.selectMaxBatchNo()));
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
@@ -2332,15 +2364,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     /**
      * 得到最新的批次编号
      * 浙电产品套餐需求浙【2019】1002116号
-     *
      * @param batchNo
      * @return
      */
-    public String getBatchNo(String batchNo) {
-        String substring = batchNo.substring(0, batchNo.length() - 8);
-        Long s1 = Long.valueOf(batchNo.substring(batchNo.length() - 8, batchNo.length() - 1)) + 1;
-        String path = substring + s1 + "号";
-        return path;
+    public String getBatchNo(String batchNo){
+        String substring = "浙电营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
+    }
+
+    /**
+     * 得到最新的批次编号
+     * 浙电产品套餐需求浙【2019】1002116号
+     * @param batchNo
+     * @return
+     */
+    public String getJITUANBatchNo(String batchNo){
+        String substring = "集团营销活动需求【"+DateUtil.getCurrentYear().toString()+"】";
+        Long num = requestInfoMapper.selectBatchNoNum();
+        String path=substring+num.toString()+"号";
+        return  path;
     }
 
 

@@ -12,6 +12,10 @@ public class CommonConstant {
 
     public static final String STATUSCD_EFFECTIVE = "1000";
 
+    public static final String DUBBO_SUCCESS = "1";
+
+    public static final String DUBBO_FAILURE = "1000";
+
     public static final String CONTENTTYPE = "application/vnd.ms-excel;charset=utf-8";
 
 
