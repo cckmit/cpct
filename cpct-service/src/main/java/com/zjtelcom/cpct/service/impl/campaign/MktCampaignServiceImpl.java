@@ -1157,6 +1157,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
             List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
+            PageHelper.startPage(1, 50);
+            Page pageInfo = new Page(new PageInfo(mktCampaignDOList));
             List<CampaignVO> voList = new ArrayList<>();
             for (MktCampaignDO campaignDO : mktCampaignDOList) {
                 if (relationCamList.contains(campaignDO.getMktCampaignId())) {
@@ -1639,6 +1641,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                             mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                         }
                     }*/
+                    if (mktCampaignCountDO.getSrcId() != null && !mktCampaignCountDO.getSrcId().isEmpty()) {
+                        mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
+                    }
                     // c4,c5
                     if (mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
