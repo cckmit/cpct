@@ -1880,9 +1880,18 @@ public class CamCpcServiceImpl implements CamCpcService {
             // 左参数转成时间
             Date dateLeft = dateFormat.parse(date);
             // 右参数转成时间
-            Date dateRight = dateFormat.parse(rightParam);
+            Integer countDay = null;
+            if (rightParam.contains(",")) {
+                String[] rightParamArry = rightParam.split(",");
+                String rightParam1 = rightParamArry[0];
+                String rightParam2 = rightParamArry[1];
+                Date dateRight1 = dateFormat.parse(rightParam1);
+                countDay = dateLeft.compareTo(dateRight1);
+            } else {
+                Date dateRight = dateFormat.parse(rightParam);
+                countDay = dateLeft.compareTo(dateRight);
+            }
             // 左参跟右参对比
-            int countDay = dateLeft.compareTo(dateRight);
             if ("1000".equals(operType) && countDay > 0) {            //  > 大于
                 result = true;
             } else if ("2000".equals(operType) && countDay < 0) {     // < 小于
@@ -1931,11 +1940,12 @@ public class CamCpcServiceImpl implements CamCpcService {
             express.append("))");
         } else if (labelCodeList.contains(code)) {
             // todo 时间类型标签
-            if ("200".equals(labelMap.get("updateStaff"))) {
+            String updateStaff = String.valueOf(labelMap.get("updateStaff"));
+            if ("200".equals(updateStaff)) {
                 if (type.equals(BETWEEN.getValue().toString())) {
                     String[] split = rightParam.split(",");
                     String time1 = DateUtil.getPreDay(Integer.parseInt(split[0]));
-                    String time2 = DateUtil.getPreDay(Integer.parseInt(split[0]));
+                    String time2 = DateUtil.getPreDay(Integer.parseInt(split[1]));
                     rightParam = time1 + "," + time2;
                 } else {
                     rightParam = DateUtil.getPreDay(Integer.parseInt(rightParam));
