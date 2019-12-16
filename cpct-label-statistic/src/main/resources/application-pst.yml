@@ -47,10 +47,10 @@ spring:
 
 elasticsearch:
   ip: 134.108.7.33
-  port: 9200
+  port: 9300
   pool: 5
   cluster:
-    name: es-cpct-label
+    name: my-application3
 
 esnode:
   data1: 134.108.3.30
