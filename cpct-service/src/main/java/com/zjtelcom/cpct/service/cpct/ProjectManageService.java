@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface ProjectManageService {
 
-    Map<String, Object> updateProjectStateTime(Map<String, String> params);
+    Map<String, Object> updateProjectStateTime(Map<String, Object> params);
 
     Map<String, Object> updateProjectPcState(Long mktCampaginId);
 
