@@ -34,6 +34,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -59,6 +60,7 @@ import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.MktOperatorLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
+import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
@@ -312,6 +314,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private TrialOperationMapper trialOperationMapper;
     @Autowired
     private MktDttsLogService mktDttsLogService;
+    @Autowired
+    private ProjectManageService projectManageService;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -922,14 +926,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         mktCampaignVO.setApplyRegionIdList(applyRegionIds);
 
         // c4,c5
-        if (mktCampaignDO.getLanIdFour() != null) {
+        if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel())
+                || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel()))
+                && mktCampaignDO.getLanIdFour() != null) {
             SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
             //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
             if (sysArea != null) {
                 mktCampaignVO.setLanIdFourName(sysArea.getName());
             }
         }
-        if (mktCampaignDO.getLanIdFive() != null) {
+        if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignDO.getCreateChannel())
+                && mktCampaignDO.getLanIdFive() != null) {
             Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFive());
             if(organization!=null){
                 mktCampaignVO.setLanIdFiveName(organization.getOrgName());
@@ -1645,14 +1652,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                     }
                     // c4,c5
-                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                    if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel()))
+                            && mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                    if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            && mktCampaignCountDO.getLanIdFive() != null) {
                         Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
@@ -1794,20 +1804,22 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                     mktCampaignVO.setSrcId(mktCampaignCountDO.getSrcId());
                     // c4,c5
-                    if (mktCampaignCountDO.getLanIdFour() != null) {
+                    if ((AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            || AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel()))
+                            && mktCampaignCountDO.getLanIdFour() != null) {
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFour().intValue());
                         //    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
                         if (sysArea != null) {
                             mktCampaignVO.setLanIdFourName(sysArea.getName());
                         }
                     }
-                    if (mktCampaignCountDO.getLanIdFive() != null) {
+                    if (AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode().equals(mktCampaignCountDO.getCreateChannel())
+                            && mktCampaignCountDO.getLanIdFive() != null) {
                         Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignCountDO.getLanIdFive());
                         if(organization!=null){
                             mktCampaignVO.setLanIdFiveName(organization.getOrgName());
                         }
                     }
-
                     // 获取创建人信息
                     long before2 = System.currentTimeMillis();
                     SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(mktCampaignCountDO.getCreateStaff(), new ArrayList<Long>());
@@ -1910,6 +1922,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     }
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
+                    //派单活动状态修改接口
+                    List<TrialOperation> trialOperations = trialOperationMapper.listOperationByCamIdAndStatusCd(mktCampaignId, TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue());
+                    if (trialOperations != null && trialOperations.size() > 0) {
+                        projectManageService.updateProjectPcState(mktCampaignId);
+                    }
                 }
 
                 // 删除准生产的redis缓存
