@@ -172,8 +172,19 @@
  </select>
 
 
-
-
+  <select id="listOperationByCamIdAndStatusCd" resultMap="BaseResultMap">
+    SELECT
+    ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    FROM trial_operation
+    WHERE 1 = 1
+    <if test="campaignId != null">
+      AND CAMPAIGN_ID = #{campaignId}
+    </if>
+    <if test="statusCd != null">
+      AND STATUS_CD = #{statusCd}
+    </if>
+  </select>
 
 
 </mapper>
