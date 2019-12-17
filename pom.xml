@@ -432,6 +432,26 @@
                 <version>${ctg-cache.version}</version>
             </dependency>
 
+            <!--<dependency>-->
+                <!--<groupId>com.google.guava</groupId>-->
+                <!--<artifactId>guava</artifactId>-->
+                <!--<version>15.0</version>-->
+                <!--<scope>compile</scope>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.netflix.hystrix</groupId>-->
+                <!--<artifactId>hystrix-javanica</artifactId>-->
+                <!--<version>1.5.18</version>-->
+                <!--<exclusions>-->
+                    <!--<exclusion>-->
+                        <!--<groupId>com.google.guava</groupId>-->
+                        <!--<artifactId>guava</artifactId>-->
+                    <!--</exclusion>-->
+                <!--</exclusions>-->
+            <!--</dependency>-->
+
+
+
             <!-- es试算模块 -->
             <dependency>
                 <groupId>com.zjtelcom.es</groupId>
