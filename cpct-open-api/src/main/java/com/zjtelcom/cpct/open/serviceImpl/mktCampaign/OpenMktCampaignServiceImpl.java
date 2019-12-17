@@ -842,6 +842,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 Object lanId = jsonObject.get("lanId");
                 String content = "集团活动已下发，请尽快登陆系统处理。";
                 String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                logger.info("uccp=======================================");
+                logger.info(resultMsg);
             }
         }catch (Exception e){
             e.printStackTrace();
