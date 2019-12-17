@@ -1060,7 +1060,7 @@
 
     <select id="getCountFromActivityTheme" resultType="java.lang.Integer">
         select COUNT(0) FROM mkt_campaign WHERE  STATUS_CD IN (2002, 2006, 2008, 2010)
-        AND MKT_CAMPAIGN_TYPE = #{type} and PLAN_BEGIN_TIME > #{start}
+        AND MKT_CAMPAIGN_TYPE = #{type} <include refid="mkt"/>
     </select>
 
     <select id="getCountFromActivityThemeByC3" resultType="java.lang.Integer">
