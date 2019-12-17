@@ -56,12 +56,12 @@ spring:
 sync:
    value: 1
 
-#集团定制的redis配置prod环境
+#集团CPCT定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.57
-   port: 41601
-   database: 4970
-   password: bss_cpcp_poczsc_user#Bsscpc!z3
+   ip: 134.108.0.40,134.108.0.41
+   port: 9051
+   database: 0
+   password: CRM_CPCP_002_USER#bssCpc_ro
 
 
 redisConfig_Prd:

@@ -19,7 +19,9 @@ spring:
     username: cpct_prod
     password: DWdtV7Wy
 
-
+#是否同步  0不开启  1开启
+sync:
+   value: 1
 
   redis:
       host: 47.94.168.117
@@ -54,5 +56,29 @@ redisConfig_Prd:
    port: 41701
    database: 4970
    password: bss_cpcp_pocpro_user#bssCpc_ro
+
+
+# cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
+# cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
+ctg:
+  namesrvAddr: 134.108.6.201:9876;134.108.6.202:9876;134.108.6.203:9876
+  cpctGroupName: cpct_detailed_list_group_gray
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: Cpct!@3e#
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clientWorkerThreads : 4
+  clusterName: CRM_MQ
+  tenantID: 2
+  cpctTopic: cpct_detailed_list_topic_gray
+
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_prod
+  cpctEsLogGroup: cpct_eslog_group_gray
 
 
