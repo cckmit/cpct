@@ -37,6 +37,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
@@ -988,6 +989,16 @@ public class CamCpcServiceImpl implements CamCpcService {
                 if (!list.contains(tarGrpId)) {
                     //判断表达式在缓存中有没有
                     express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                }
+            } else {
+                List<TarGrpCondition> conditionList = tarGrpConditionMapper.selectAllByUpdateStaff("200");
+                if (conditionList != null) {
+                    StringBuilder sb = new StringBuilder();
+                    for (TarGrpCondition tarGrpCondition : conditionList) {
+                        Long tarGrpId = tarGrpCondition.getTarGrpId();
+                        sb.append(tarGrpId + ",");
+                    }
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", sb.toString());
                 }
             }
             SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
