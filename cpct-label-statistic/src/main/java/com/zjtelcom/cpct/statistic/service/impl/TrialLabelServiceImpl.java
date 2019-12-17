@@ -162,7 +162,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         Object list2 = stringObjectMap2.get("expressions");
         List<String> expressions2 = list == null ? new ArrayList<>() : (ArrayList) list2;
         Object labelList2 = stringObjectMap2.get("labelList");
-        List<LabelResultES> labelDataList2 = labelList == null ? new ArrayList<>() : (ArrayList) labelList2;
+        List<LabelResultES> labelDataList2 = labelList2 == null ? new ArrayList<>() : (ArrayList) labelList2;
 
         String id = param.get("id").toString();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(Long.valueOf(id));
@@ -172,7 +172,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         //每一个规则查询
         for (int i = 0; i < mktStrategyConfRuleRelDOS.size(); i++) {
             ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
-            String indexs = batchNum + mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId().toString();
+            String indexs = batchNum + mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString();
             logger.info("indexs=>:" + indexs);
             SearchResponse myresponse = null;
             Long totalHits = null;
