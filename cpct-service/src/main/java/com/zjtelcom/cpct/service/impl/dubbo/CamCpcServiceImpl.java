@@ -541,20 +541,19 @@ public class CamCpcServiceImpl implements CamCpcService {
                     Map<String,Object> futureMap =  future.get();
                     if (!futureMap.isEmpty()) {
                         Boolean flag = true;
-                        /*for (String key : futureMap.keySet()) {
+                        for (String key : futureMap.keySet()) {
                             if (key.contains("rule_")) {
                                 flag = false;
                                 nonPassedMsg.put(key, futureMap.get(key));
-                                // break;
                             }
-                        }*/
-                        if (futureMap.get("nonPassedMsg") != null) {
+                        }
+                        /*if (futureMap.get("nonPassedMsg") != null) {
                             flag = false;
                             nonPassedMsg.putAll((Map<String, Object>) futureMap.get("nonPassedMsg"));
-                        }
-                        if (flag) ruleList.add(futureMap);
+                        }*/
+                        if (flag)
+                            ruleList.add(futureMap);
                     }
-                    activity.put("nonPassedMsg", nonPassedMsg);
                 } catch (InterruptedException e) {
                     esJson.put("hit", "false");
                     esJson.put("msg", "规则校验出错:" + e.getMessage());
@@ -567,6 +566,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     e.printStackTrace();
                 }
             }
+            activity.put("nonPassedMsg", nonPassedMsg);
 
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
