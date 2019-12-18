@@ -90,7 +90,7 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> selectCampaignThemeByC3(@Param("value") String value, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
 
-    Integer getCountFromActivityTheme(@Param("date") String date,@Param("type") String type,@Param("start")String start);
+    Integer getCountFromActivityTheme(@Param("startDate") String startDate,@Param("type") String type,@Param("endDate")String endDate);
 
     Integer getCountFromActivityThemeByC3(@Param("startDate") String startDate,@Param("type") String type,@Param("endDate")String endDate,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 

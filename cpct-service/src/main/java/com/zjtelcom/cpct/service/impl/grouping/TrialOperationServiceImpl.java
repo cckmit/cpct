@@ -2316,13 +2316,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (tarGrpConditionDOs.get(i).getUpdateStaff()==null && label.getLabelDataType().equals("1100")){
-                            if (tarGrpConditionDOs.get(i).getRightParam().contains("-")){
-                                tarGrpConditionDOs.get(i).setUpdateStaff(0L);
-                            }else {
-                                tarGrpConditionDOs.get(i).setUpdateStaff(200L);
-                            }
-                        }
+
                         if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==200L){
                             String date = tarGrpConditionDOs.get(i).getRightParam();
                             if (!tarGrpConditionDOs.get(i).getRightParam().contains("-")){

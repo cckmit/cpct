@@ -48,7 +48,7 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
     private MktCampaignMapper mktCampaignMapper;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
-    @Autowired
+    @Autowired(required = false)
     private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
 
 
