@@ -70,7 +70,18 @@ public class EventRedisServiceImpl implements EventRedisService {
      * 获取缓存，若没有缓存则查询数据库并存入缓存
      *
      * @param key    索引的前部分key
-     * @param id     索引的后部分id,若没有则传0
+     * @param params 其它参数
+     * @return
+     */
+    public Map<String, Object> getRedis(String key, Map<String, Object> params) {
+        return getRedis(key, 0L, params);
+    }
+
+    /**
+     * 获取缓存，若没有缓存则查询数据库并存入缓存
+     *
+     * @param key    索引的前部分key
+     * @param id     索引的后部分id
      * @param params 其它参数
      * @return
      */
@@ -79,97 +90,125 @@ public class EventRedisServiceImpl implements EventRedisService {
         Map<String, Object> resutlt = new HashMap<>();
         Object o = new Object();
         if (!id.equals(0L)) {
-            o = redisUtils.get(key + id);
+            key = key + id;
+        }
+        o = redisUtils.get(key);
+        if (o != null && !id.equals(0L)) {
+            resutlt.put(key, o);
         } else {
-            o = redisUtils.get(key);
-            if (o != null) {
-                resutlt.put(key, o);
+            if (!id.equals(0L)) {
+                resutlt = keyContains(key, id, params);
+            } else {
+                resutlt = keyEquals(key, params);
             }
         }
-        if (o != null && !id.equals(0L)) {
-            resutlt.put(key + id, o);
-        } else {
-            // 活动和事件的关联关系
-            if ("CAM_IDS_EVT_REL_".equals(key)) {
-                List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(id);
-                redisUtils.set(key + id, mktCampaginIdList);
-                resutlt.put(key + id, mktCampaginIdList);
-            } else if ("FILTER_RULE_STR_".equals(key)) { // 过滤规则
-                List<String> strategyTypeList = (List<String>) params.get("strategyTypeList");
-                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(id, strategyTypeList);
-                redisUtils.set("FILTER_RULE_STR_" + id, filterRuleList);
-                resutlt.put(key + id, filterRuleList);
-            } else if ("MKT_CAMPAIGN_".equals(key)) {  // 活动基本信息
-                MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(id);
-                redisUtils.set(key + id, mktCampaign);
-                resutlt.put(key + id, mktCampaign);
-            } else if ("MKT_STRATEGY_".equals(key)) {    //  通过活动查询相关联的策略
-                List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(id);
-                redisUtils.set(key + id, mktStrategyConfDOS);
-                resutlt.put(key + id, mktStrategyConfDOS);
-            } else if ("CHANNEL_CODE_LIST_".equals(key)) {
-                String eventCode = (String) params.get("eventCode");
-                List<String> list = contactEvtMapper.selectChannelListByEvtCode(eventCode);
-                redisUtils.set(key + eventCode, list);
-                resutlt.put(key + eventCode, list   );
-            } else if ("RULE_LIST_".equals(key)) {   // 过滤规则
-                List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktStrategyConfRuleMapper.selectByMktStrategyConfId(id);
-                redisUtils.setRedis(key + id, mktStrategyConfRuleList);
-                resutlt.put(key + id, mktStrategyConfRuleList);
-            } else if ("MKT_CAM_API_CODE_KEY".equals(key)) {    // 走清单活动列表
-                List<String> mktCamCodeList = new ArrayList<>();
-                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
-                for (SysParams sysParams : sysParamsList) {
-                    mktCamCodeList.add(sysParams.getParamValue());
-                }
-                redisUtils.set(key, mktCamCodeList);
-                resutlt.put(key, mktCamCodeList);
-            } else if ("EVENT_ITEM_".equals(key)) {  // 事件采集项
-                List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(id);
-                redisUtils.setRedis(key + id, contactEvtItems);
-                resutlt.put(key + id, contactEvtItems);
-            } else if ("EVT_ALL_LABEL_".equals(key)) {  // 事件下所有标签
-                Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id);  //查询事件下使用的所有标签
-                if (null != mktAllLabels) {
-                    redisUtils.set("EVT_ALL_LABEL_" + id, mktAllLabels);
-                    resutlt.put("EVT_ALL_LABEL_" + id, mktAllLabels);
-                }
-            } else if("EVENT_".equals(key)){  // 事件
-                String eventCode = (String) params.get("eventCode");
-                ContactEvt event = contactEvtMapper.getEventByEventNbr(eventCode);
-                redisUtils.set(key + eventCode, event);
-                resutlt.put(key + eventCode, event);
-            } else if("CAM_EVT_REL_".equals(key)){   // 活动事件关系
-                List<MktCamEvtRel> resultByEvent = mktCamEvtRelMapper.qryBycontactEvtId(id);
-                redisUtils.set(key + id, resultByEvent);
-                resutlt.put(key + id, resultByEvent);
-            } else if("CUST_PROD_FILTER".equals(key)){ // 清单销售品过滤
-                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
-                if (sysParamsList != null && sysParamsList.size() > 0) {
-                    String custProdFilter = sysParamsList.get(0).getParamValue();
-                    redisUtils.set(key, custProdFilter);
-                    resutlt.put(key, custProdFilter);
-                }
-            } else if("FILTER_RULE_LIST_".equals(key)){ // 过滤规则集合
-                List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleList(id);
-                redisUtils.set(key + id, filterRuleList);
-                resutlt.put(key + id, filterRuleList);
-            } else if("MKT_FILTER_RULE_IDS_".equals(key)){ // 过滤规则Id
-                List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(id);
-                redisUtils.set(key + id, filterRuleIds);
-                resutlt.put(key + id, filterRuleIds);
-            } else if("FILTER_RULE_".equals(key)){ // 过滤规则
-                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
-                redisUtils.set(key + id, filterRule);
-                resutlt.put(key + id, filterRule);
-            } else if("REAL_PROD_FILTER".equals(key)){ // 清单销售品过滤
-                List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
-                if (sysParamsList != null && sysParamsList.size() > 0) {
-                    String realProdFilter = sysParamsList.get(0).getParamValue();
-                    redisUtils.set(key, realProdFilter);
-                    resutlt.put(key, realProdFilter);
-                }
+        return resutlt;
+    }
+
+    /**
+     * 缓存key有后缀
+     *
+     * @param key
+     * @param id
+     * @param params
+     * @return
+     */
+    private Map<String, Object> keyContains(String key, Long id, Map<String, Object> params) {
+        Map<String, Object> resutlt = new HashMap<>();
+        // 活动和事件的关联关系
+        if (key.contains("CAM_IDS_EVT_REL_")) {
+            List<Map<String, Object>> mktCampaginIdList = mktCamEvtRelMapper.listActivityByEventId(id);
+            redisUtils.set(key, mktCampaginIdList);
+            resutlt.put(key, mktCampaginIdList);
+        } else if (key.contains("FILTER_RULE_STR_")) { // 过滤规则
+            List<String> strategyTypeList = (List<String>) params.get("strategyTypeList");
+            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleListByStrategyId(id, strategyTypeList);
+            redisUtils.set("FILTER_RULE_STR_" + id, filterRuleList);
+            resutlt.put(key, filterRuleList);
+        } else if (key.contains("MKT_CAMPAIGN_")) {  // 活动基本信息
+            MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(id);
+            redisUtils.set(key, mktCampaign);
+            resutlt.put(key, mktCampaign);
+        } else if (key.contains("MKT_STRATEGY_")) {    //  通过活动查询相关联的策略
+            List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(id);
+            redisUtils.set(key, mktStrategyConfDOS);
+            resutlt.put(key, mktStrategyConfDOS);
+        } else if (key.contains("CHANNEL_CODE_LIST_")) {
+            String eventCode = (String) params.get("eventCode");
+            List<String> list = contactEvtMapper.selectChannelListByEvtCode(eventCode);
+            redisUtils.set(key + eventCode, list);
+            resutlt.put(key + eventCode, list);
+        } else if (key.contains("RULE_LIST_")) {   // 过滤规则
+            List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktStrategyConfRuleMapper.selectByMktStrategyConfId(id);
+            redisUtils.setRedis(key, mktStrategyConfRuleList);
+            resutlt.put(key, mktStrategyConfRuleList);
+        } else if (key.contains("EVENT_ITEM_")) {  // 事件采集项
+            List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(id);
+            redisUtils.setRedis(key, contactEvtItems);
+            resutlt.put(key, contactEvtItems);
+        } else if (key.contains("EVT_ALL_LABEL_")) {  // 事件下所有标签
+            Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id);  //查询事件下使用的所有标签
+            if (null != mktAllLabels) {
+                redisUtils.set(key, mktAllLabels);
+                resutlt.put(key, mktAllLabels);
             }
+        } else if (key.contains("CAM_EVT_REL_")) {   // 活动事件关系
+            List<MktCamEvtRel> resultByEvent = mktCamEvtRelMapper.qryBycontactEvtId(id);
+            redisUtils.set(key, resultByEvent);
+            resutlt.put(key, resultByEvent);
+        } else if (key.contains("FILTER_RULE_LIST_")) { // 过滤规则集合
+            List<FilterRule> filterRuleList = filterRuleMapper.selectFilterRuleList(id);
+            redisUtils.set(key, filterRuleList);
+            resutlt.put(key, filterRuleList);
+        } else if (key.contains("MKT_FILTER_RULE_IDS_")) { // 过滤规则Id
+            List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(id);
+            redisUtils.set(key, filterRuleIds);
+            resutlt.put(key, filterRuleIds);
+        } else if (key.contains("resutlt")) { // 过滤规则
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
+            redisUtils.set(key, filterRule);
+            resutlt.put(key, filterRule);
+        }
+        return resutlt;
+    }
+
+    /**
+     * 缓存key无后缀
+     *
+     * @param key
+     * @param params
+     * @return
+     */
+    private Map<String, Object> keyEquals(String key, Map<String, Object> params) {
+        Map<String, Object> resutlt = new HashMap<>();
+        if ("MKT_CAM_API_CODE_KEY".equals(key)) {    // 走清单活动列表
+            List<String> mktCamCodeList = new ArrayList<>();
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
+            for (SysParams sysParams : sysParamsList) {
+                mktCamCodeList.add(sysParams.getParamValue());
+            }
+            redisUtils.set(key, mktCamCodeList);
+            resutlt.put(key, mktCamCodeList);
+        } else if ("CUST_PROD_FILTER".equals(key)) { // 清单销售品过滤
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+            if (sysParamsList != null && sysParamsList.size() > 0) {
+                String custProdFilter = sysParamsList.get(0).getParamValue();
+                redisUtils.set(key, custProdFilter);
+                resutlt.put(key, custProdFilter);
+            }
+        } else if ("REAL_PROD_FILTER".equals(key)) { // 清单销售品过滤
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
+            if (sysParamsList != null && sysParamsList.size() > 0) {
+                String realProdFilter = sysParamsList.get(0).getParamValue();
+                redisUtils.set(key, realProdFilter);
+                resutlt.put(key, realProdFilter);
+            }
+        }
+        if ("EVENT_".equals(key)) {  // 事件
+            String eventCode = (String) params.get("eventCode");
+            ContactEvt event = contactEvtMapper.getEventByEventNbr(eventCode);
+            redisUtils.set(key + eventCode, event);
+            resutlt.put(key + eventCode, event);
         }
         return resutlt;
     }

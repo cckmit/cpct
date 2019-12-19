@@ -153,24 +153,27 @@ public class EventApiCountServiceImpl implements EventApiCountService {
         for (Map<String, String> eventCount : eventCountList) {
 
             Map<String, Object> eventCountMap = new HashMap<>();
-            Long initId = Long.valueOf(eventCount.get("mktCampaignId"));
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectCampaignByInitId(initId);
-            if (mktCampaignDO != null) {
-                eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
-                eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+            if (eventCount.get("mktCampaignId") != null) {
+                Long initId = Long.valueOf(eventCount.get("mktCampaignId"));
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectCampaignByInitId(initId);
+                if (mktCampaignDO != null) {
+                    eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
+                    eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
+                }
             }
-
-            ContactEvt eventCode = contactEvtMapper.getEventByEventNbr(eventCount.get("eventCode"));
-            if (eventCode != null) {
-                eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
-                eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+            if (eventCount.get("eventCode") != null) {
+                ContactEvt eventCode = contactEvtMapper.getEventByEventNbr(eventCount.get("eventCode"));
+                if (eventCode != null) {
+                    eventCountMap.put("eventCode", eventCount.get("eventCode"));    // 事件编码
+                    eventCountMap.put("eventName", eventCode.getContactEvtName());  // 事件名称
+                }
             }
-
-
-            Channel channel = contactChannelMapper.selectByCode(eventCount.get("channelCode"));
-            if (channel != null) {
-                eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
-                eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+            if (eventCount.get("channelCode") != null) {
+                Channel channel = contactChannelMapper.selectByCode(eventCount.get("channelCode"));
+                if (channel != null) {
+                    eventCountMap.put("channelCode", eventCount.get("channelCode"));  // 渠道编码
+                    eventCountMap.put("channelName", channel.getChannelName()); // 渠道名称
+                }
             }
             try {
                 eventCountMap.put("orderDate", strToDateFormat(eventCount.get("orderDate"))); // 统计日期
