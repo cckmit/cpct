@@ -4,7 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktDttsLogMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktDttsLog;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -26,6 +28,8 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
 
     @Autowired
     private MktDttsLogMapper mktDttsLogMapper;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     /**
      * 新增定时任务日志
@@ -117,6 +121,11 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
         PageHelper.startPage(page, pageSize);
         List<MktDttsLog> mktDttsLogList = mktDttsLogMapper.selectByCondition(mktDttsLog);
+        for (MktDttsLog dttsLog : mktDttsLogList) {
+            String dttsType1 = dttsLog.getDttsType();
+            Map<String, String> task_time = sysParamsMapper.getParamsByValue("TASK_TIME", dttsType1);
+            dttsLog.setDttsType(task_time.get("PARAM_NAME"));
+        }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",mktDttsLogList);
