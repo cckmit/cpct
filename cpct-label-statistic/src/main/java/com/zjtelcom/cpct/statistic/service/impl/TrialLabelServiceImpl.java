@@ -63,6 +63,9 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     @Autowired
     MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
 
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
     @Override
     public Map<String, Object> trialUerLabelLog(String s, String messageID, String key) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -208,6 +211,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         result.put("data",data);
         return result;
     }
+
 
     public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> tarGrplist, Map<String, Object> params) {
         List<String> expressions = new ArrayList<>();
@@ -397,4 +401,20 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         String result = sdf.format(date);
         return result;
     }
+
+    @Override
+    public Map<String, Object> getCustomByLabel(String name) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        List<Label> sysLabel = labelMapper.selectByScopeLikeName(name);
+        if (sysLabel.size()>0 && sysLabel!=null){
+            hashMap.put("code","200");
+            hashMap.put("msg",sysLabel);
+        }else {
+            ArrayList<Label> labels = new ArrayList<>();
+            hashMap.put("code","500");
+            hashMap.put("msg",labels);
+        }
+        return hashMap;
+    }
+
 }

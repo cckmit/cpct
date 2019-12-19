@@ -37,4 +37,26 @@ public class AnalystController {
         }
         return result;
     }
+
+
+    /**
+     * 查询自定义标签
+     * @param name
+     * @return
+     */
+
+    @PostMapping("/getCustomByLabel")
+    @CrossOrigin
+    public Map<String, Object> getCustomByLabel(String name) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = trialLabelService.getCustomByLabel(name);
+        }catch (Exception e){
+            logger.error("[op:AnalystController] fail to getCustomByLabel",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getCustomByLabel");
+            return result;
+        }
+        return result;
+    }
 }

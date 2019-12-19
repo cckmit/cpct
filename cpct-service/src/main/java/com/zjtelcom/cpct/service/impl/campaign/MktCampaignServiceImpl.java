@@ -138,6 +138,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     }
 
 
+
+
     /**
      * 营销活动
      */
@@ -3553,7 +3555,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return RES;
     }
 
-
+    /**
+     * 活动描述为空补全活动名称为活动描述 防止老活动试算或清单异常
+     * @return
+     */
+    @Override
+    public Map<String, Object> saveMktCamDesc() {
+        List<MktCampaignDO> mktCampaignDOS = mktCampaignMapper.selectAll();
+        for (int i = 0; i < mktCampaignDOS.size(); i++) {
+            if (mktCampaignDOS.get(i).getMktCampaignDesc().isEmpty()) {
+                mktCampaignMapper.saveMktCamDesc(mktCampaignDOS.get(i));
+            }
+        }
+        return null;
+    }
 
 
 
