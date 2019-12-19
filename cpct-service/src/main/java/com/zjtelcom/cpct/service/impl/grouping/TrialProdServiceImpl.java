@@ -39,6 +39,7 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
@@ -216,6 +217,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operation.setStrategyId(strategy.getMktStrategyConfId());
                 operation.setStrategyName(strategy.getMktStrategyConfName());
                 operation.setBatchNum(Long.valueOf(batchNumSt));
+                operation.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
                 trialOperationMapper.insert(operation);
                 //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
