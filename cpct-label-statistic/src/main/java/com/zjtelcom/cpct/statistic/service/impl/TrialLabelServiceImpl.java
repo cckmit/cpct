@@ -84,7 +84,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         if (result) {
             try {
                 Map map = esServiceInfo.queryCustomerByList(list);
-                logger.info("查询所有标签的值是否有数据:" + (map == null ? 0 : 1));
+                logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
                 if (map != null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
                     logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
