@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.statistic.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -87,9 +88,11 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
                 if (map != null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
-                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
-                    JSONArray jsonArray = JSONArray.fromObject(resultData);
-                    IndexResponse response = client.prepareIndex(index, esType).setSource(jsonArray).get();
+//                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
+//                    JSONArray jsonArray = JSONArray.fromObject(resultData);
+                    JSONObject jsonObject = JSON.parseObject(resultData.toString());
+                    logger.info("jsonObject:"+jsonObject);
+                    IndexResponse response = client.prepareIndex(index, esType).setSource(jsonObject).get();
                     System.out.println("走到这里是表示索引创建成功?:" + response.status().getStatus());
                 }
             } catch (Exception e) {
