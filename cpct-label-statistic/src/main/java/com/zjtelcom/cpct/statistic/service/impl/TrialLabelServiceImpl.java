@@ -90,8 +90,11 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
 //                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
 //                    JSONArray jsonArray = JSONArray.fromObject(resultData);
-                    JSONObject jsonObject = JSON.parseObject(resultData.toString());
-                    logger.info("jsonObject:"+jsonObject);
+                    String string = JSON.toJSON(resultData).toString();
+                    logger.info("我没出错");
+                    JSONObject jsonObject = JSONObject.parseObject(string);
+//                    logger.info("jsonObject:"+jsonObject);
+                    logger.info("我还没出错");
                     IndexResponse response = client.prepareIndex(index, esType).setSource(jsonObject).get();
                     System.out.println("走到这里是表示索引创建成功?:" + response.status().getStatus());
                 }
