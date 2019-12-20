@@ -17,6 +17,8 @@ import net.sf.json.JSONArray;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
@@ -86,17 +88,19 @@ public class TrialLabelServiceImpl implements TrialLabelService {
             try {
                 Map map = esServiceInfo.queryCustomerByList(list);
                 logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
                 if (map != null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
 //                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
 //                    JSONArray jsonArray = JSONArray.fromObject(resultData);
-                    String string = JSON.toJSON(resultData).toString();
-                    logger.info("我没出错");
-                    JSONObject jsonObject = JSONObject.parseObject(string);
-//                    logger.info("jsonObject:"+jsonObject);
-                    logger.info("我还没出错");
-                    IndexResponse response = client.prepareIndex(index, esType).setSource(jsonObject).get();
-                    System.out.println("走到这里是表示索引创建成功?:" + response.status().getStatus());
+                    for (Map<String, Object> resultDatum : resultData) {
+                        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(resultDatum));
+                        bulkRequest.add(client.prepareIndex(index, esType, jsonObject.get("ASSET_INTEG_ID").toString()).setSource(jsonObject));
+                    }
+                    if (bulkRequest.numberOfActions() > 0) {
+                        BulkResponse bulkItemResponses = bulkRequest.get();
+                        logger.info("b:"+bulkItemResponses.hasFailures());
+                    }
                 }
             } catch (Exception e) {
                 logger.error("标签入es库失败：" + e);
