@@ -104,6 +104,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
             script.setUpdateDate(new Date());
             script.setUpdateStaff(userId);
             camScriptMapper.updateByPrimaryKey(script);
+            redisUtils.del("MKT_CAM_SCRIPT_" + script.getEvtContactConfId());
         }else {
              script = BeanUtil.create(addVO,new CamScript());
             //todo 添加活动id
@@ -140,6 +141,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
         script.setUpdateDate(new Date());
         script.setUpdateStaff(userId);
         camScriptMapper.updateByPrimaryKey(script);
+        redisUtils.del("MKT_CAM_SCRIPT_" + script.getEvtContactConfId());
         //更新redis推送渠道配置
         MktCamChlConfDetail detail = (MktCamChlConfDetail)redisUtils.get("MktCamChlConfDetail_"+editVO.getEvtContactConfId());
         if (detail!=null){
@@ -161,6 +163,7 @@ public class CamScriptServiceImpl extends BaseService implements CamScriptServic
                 return result;
             }
             camScriptMapper.deleteByPrimaryKey(camScriptId);
+        redisUtils.del("MKT_CAM_SCRIPT_" + script.getEvtContactConfId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
         return result;

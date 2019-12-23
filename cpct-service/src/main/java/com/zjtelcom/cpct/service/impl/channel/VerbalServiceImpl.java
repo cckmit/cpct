@@ -160,6 +160,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
             verbalConditionMapper.deleteByPrimaryKey(condition.getConditionId());
         }
         verbalMapper.deleteByPrimaryKey(verbal.getVerbalId());
+        redisUtils.del("MKT_VERBAL_" + confId);
         VerbalAddVO addVO = BeanUtil.create(editVO, new VerbalAddVO());
         addVO.setContactConfId(confId);
         try {
@@ -278,6 +279,7 @@ public class VerbalServiceImpl extends BaseService implements VerbalService {
         }
         Long confId = mktVerbal.getContactConfId();
         verbalMapper.deleteByPrimaryKey(verbalId);
+        redisUtils.del("MKT_VERBAL_" + confId);
         List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(confId);
         List<VerbalVO> voList = new ArrayList<>();
         MktCamChlConfDetail detail = (MktCamChlConfDetail) redisUtils.get("MktCamChlConfDetail_"+mktVerbal.getContactConfId());
