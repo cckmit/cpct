@@ -37,6 +37,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
@@ -540,20 +541,19 @@ public class CamCpcServiceImpl implements CamCpcService {
                     Map<String,Object> futureMap =  future.get();
                     if (!futureMap.isEmpty()) {
                         Boolean flag = true;
-                        /*for (String key : futureMap.keySet()) {
+                        for (String key : futureMap.keySet()) {
                             if (key.contains("rule_")) {
                                 flag = false;
                                 nonPassedMsg.put(key, futureMap.get(key));
-                                // break;
                             }
-                        }*/
-                        if (futureMap.get("nonPassedMsg") != null) {
+                        }
+                        /*if (futureMap.get("nonPassedMsg") != null) {
                             flag = false;
                             nonPassedMsg.putAll((Map<String, Object>) futureMap.get("nonPassedMsg"));
-                        }
-                        if (flag) ruleList.add(futureMap);
+                        }*/
+                        if (flag)
+                            ruleList.add(futureMap);
                     }
-                    activity.put("nonPassedMsg", nonPassedMsg);
                 } catch (InterruptedException e) {
                     esJson.put("hit", "false");
                     esJson.put("msg", "规则校验出错:" + e.getMessage());
@@ -566,6 +566,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     e.printStackTrace();
                 }
             }
+            activity.put("nonPassedMsg", nonPassedMsg);
 
             boolean isWithDefaultLabel = false;
             for (Map.Entry entry:flagMap.entrySet()) {
@@ -981,21 +982,40 @@ public class CamCpcServiceImpl implements CamCpcService {
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             String express = null;
-            Object datetypeTargouidList = redisUtils.get("DATETYPE_TARGOUID_LIST");
-            if (datetypeTargouidList != null) {
-                String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
-                List<String> list = Arrays.asList(timeTypeTarGrpIdList);
-                if (!list.contains(tarGrpId)) {
-                    //判断表达式在缓存中有没有
-                    express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            SysParams sysParams = null;
+            try {
+                express = null;
+                Object datetypeTargouidList = redisUtils.get("DATETYPE_TARGOUID_LIST");
+                if (datetypeTargouidList != null) {
+                    String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
+                    List<String> list = Arrays.asList(timeTypeTarGrpIdList);
+                    if (!list.contains(tarGrpId.toString())) {
+                        //判断表达式在缓存中有没有
+                        if (redisUtils.get("EXPRESS_" + tarGrpId)!=null){
+                            express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                        }
+                    }
+                } else {
+                    List<TarGrpCondition> conditionList = tarGrpConditionMapper.selectAllByUpdateStaff("200");
+                    if (conditionList != null) {
+                        StringBuilder sb = new StringBuilder();
+                        for (TarGrpCondition tarGrpCondition : conditionList) {
+                            Long tarGrpId = tarGrpCondition.getTarGrpId();
+                            sb.append(tarGrpId + ",");
+                        }
+                        redisUtils.set("DATETYPE_TARGOUID_LIST", sb.toString());
+                    }
                 }
-            }
-            SysParams sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
-            if (sysParams == null) {
-                List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
-                if (systemParamList.size() > 0) {
-                    redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
+                sysParams = (SysParams) redisUtils.get("EVT_SWITCH_CHECK_LABEL");
+                if (sysParams == null) {
+                    List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
+                    if (systemParamList.size() > 0) {
+                        redisUtils.set("EVT_SWITCH_CHECK_LABEL", systemParamList.get(0));
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info("【express】读取失败");
             }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
@@ -1880,9 +1900,18 @@ public class CamCpcServiceImpl implements CamCpcService {
             // 左参数转成时间
             Date dateLeft = dateFormat.parse(date);
             // 右参数转成时间
-            Date dateRight = dateFormat.parse(rightParam);
+            Integer countDay = null;
+            if (rightParam.contains(",")) {
+                String[] rightParamArry = rightParam.split(",");
+                String rightParam1 = rightParamArry[0];
+                String rightParam2 = rightParamArry[1];
+                Date dateRight1 = dateFormat.parse(rightParam1);
+                countDay = dateLeft.compareTo(dateRight1);
+            } else {
+                Date dateRight = dateFormat.parse(rightParam);
+                countDay = dateLeft.compareTo(dateRight);
+            }
             // 左参跟右参对比
-            int countDay = dateLeft.compareTo(dateRight);
             if ("1000".equals(operType) && countDay > 0) {            //  > 大于
                 result = true;
             } else if ("2000".equals(operType) && countDay < 0) {     // < 小于
@@ -1931,11 +1960,12 @@ public class CamCpcServiceImpl implements CamCpcService {
             express.append("))");
         } else if (labelCodeList.contains(code)) {
             // todo 时间类型标签
-            if ("200".equals(labelMap.get("updateStaff"))) {
+            String updateStaff = String.valueOf(labelMap.get("updateStaff"));
+            if ("200".equals(updateStaff)) {
                 if (type.equals(BETWEEN.getValue().toString())) {
                     String[] split = rightParam.split(",");
                     String time1 = DateUtil.getPreDay(Integer.parseInt(split[0]));
-                    String time2 = DateUtil.getPreDay(Integer.parseInt(split[0]));
+                    String time2 = DateUtil.getPreDay(Integer.parseInt(split[1]));
                     rightParam = time1 + "," + time2;
                 } else {
                     rightParam = DateUtil.getPreDay(Integer.parseInt(rightParam));

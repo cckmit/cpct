@@ -44,6 +44,8 @@ import com.zjtelcom.cpct.open.entity.script.OpenScript;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrp;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpEntity;
+import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
+import com.zjtelcom.cpct.open.service.mktCampaign.MktDttsLogService;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import org.apache.commons.lang.StringUtils;
@@ -126,8 +128,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private MktCampaignCompleteMapper mktCampaignCompleteMapper;
     @Autowired(required = false)
     private IReportService iReportService;
-//    @Autowired
-//    private UCCPService uccpService;
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
+    @Autowired
+    private UCCPService uccpService;
 
     /**
      * 查询营销活动详情
@@ -375,6 +379,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
     @Override
     public Map<String, Object> addByObject(Object object) {
+        String s = JSON.toJSONString(object);
+        mktDttsLogService.saveMktDttsLog("1111", "成功", new Date(), new Date(), "成功", s);
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> resultObject = new HashMap<>();
         Map<String, Object> singleMktCampaign = new HashMap<>();
@@ -827,11 +833,21 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
         }
-//        try {
-//            String resultMsg = uccpService.sendShortMessage("号码", "内容", "");
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try {
+            List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
+            for (Map<String, String> stringStringMap : group_campaign_recipient) {
+                String value = stringStringMap.get("value");
+                JSONObject jsonObject = JSONObject.parseObject(value);
+                Object phone = jsonObject.get("phone");
+                Object lanId = jsonObject.get("lanId");
+                String content = "集团活动已下发，请尽快登陆系统处理。";
+                String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                logger.info("uccp=======================================");
+                logger.info(resultMsg);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
         resultMap.put("resultMsg","处理成功");

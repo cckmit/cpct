@@ -118,7 +118,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired(required = false)
     private UCCPService uccpService;
 
-    @Autowired
+    @Autowired(required = false)
     private MktCamItemPrdMapper mktCamItemPrdMapper;
 
     @Autowired

@@ -39,9 +39,11 @@ import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.TrialCreateType;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
@@ -150,6 +152,8 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
 
     /**
      * 提供dtts定时任务清单存入es
@@ -176,6 +180,7 @@ public class TrialProdServiceImpl implements TrialProdService {
         }
 
         List<Map<String,Object>> resList = new ArrayList<>();
+        mktDttsLogService.saveMktDttsLog("1000","活动",new Date(),new Date(),"成功",null);
 
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
@@ -212,6 +217,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operation.setStrategyId(strategy.getMktStrategyConfId());
                 operation.setStrategyName(strategy.getMktStrategyConfName());
                 operation.setBatchNum(Long.valueOf(batchNumSt));
+                operation.setCreateStaff(TrialCreateType.TRIAL_OPERATION.getValue());
                 trialOperationMapper.insert(operation);
                 //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
