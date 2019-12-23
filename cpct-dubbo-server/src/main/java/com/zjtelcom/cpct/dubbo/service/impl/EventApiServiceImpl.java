@@ -2332,10 +2332,10 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 查询策略信息
-                Map<String, Object> MktStrategyConfRedis = eventRedisService.getRedis("MKT_STRATEGY_", mktCampaginId);
+                Map<String, Object> MktStrategyConfRedis = eventRedisService.getRedis("MKT_CAM_STRATEGY_", mktCampaginId);
                 List<MktStrategyConfDO> mktStrategyConfDOS = new ArrayList<>();
                 if (MktStrategyConfRedis != null) {
-                    mktStrategyConfDOS = ( List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_STRATEGY_" + mktCampaginId);
+                    mktStrategyConfDOS = ( List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_CAM_STRATEGY_" + mktCampaginId);
                 }
 
                 if (mktStrategyConfDOS == null) {

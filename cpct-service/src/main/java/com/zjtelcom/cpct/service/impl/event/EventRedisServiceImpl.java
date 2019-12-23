@@ -178,7 +178,7 @@ public class EventRedisServiceImpl implements EventRedisService {
             MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(id);
             redisUtils.set(key, mktCampaign);
             resutlt.put(key, mktCampaign);
-        } else if (key.startsWith("MKT_STRATEGY_")) {    //  通过活动查询相关联的策略
+        } else if (key.startsWith("MKT_CAM_STRATEGY_")) {    //  通过活动查询相关联的策略
             List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(id);
             redisUtils.set(key, mktStrategyConfDOS);
             resutlt.put(key, mktStrategyConfDOS);
