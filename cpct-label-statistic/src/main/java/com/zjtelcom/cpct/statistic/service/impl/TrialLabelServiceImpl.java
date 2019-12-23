@@ -91,8 +91,6 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 BulkRequestBuilder bulkRequest = client.prepareBulk();
                 if (map != null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
-//                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
-//                    JSONArray jsonArray = JSONArray.fromObject(resultData);
                     for (Map<String, Object> resultDatum : resultData) {
                         JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(resultDatum));
                         bulkRequest.add(client.prepareIndex(index, esType, jsonObject.get("ASSET_INTEG_ID").toString()).setSource(jsonObject));
