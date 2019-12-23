@@ -825,7 +825,7 @@ public class DateUtil {
             Date date = new Date();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
-            calendar.add(Calendar.DAY_OF_YEAR,-days);
+            calendar.add(Calendar.DAY_OF_YEAR,days);
             Date dateNew = calendar.getTime();
             timeNew = simpleDateFormat.format(dateNew);
         } catch (Exception e) {

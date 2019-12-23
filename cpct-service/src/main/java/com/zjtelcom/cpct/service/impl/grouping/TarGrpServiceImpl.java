@@ -448,9 +448,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (flag) {
                 Object o = redisUtils.get("DATETYPE_TARGOUID_LIST");
                 if (o == null) {
-                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp1);
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp.getTarGrpId());
                 } else {
-                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp1);
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp.getTarGrpId());
                 }
             }
             redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);

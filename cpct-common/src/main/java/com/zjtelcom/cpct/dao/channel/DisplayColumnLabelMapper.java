@@ -35,5 +35,5 @@ public interface DisplayColumnLabelMapper {
 
     List<DisplayColumnLabel> listByLabelId(@Param("labelId")Long labelId);
 
-    int deleteByDisplayIdAndLabelList(@Param("displayId")Long displayColumnLabelId,@Param("idList")List<Long> list);
+    int deleteByDisplayIdAndLabelList(@Param("displayId")Long displayColumnLabelId,@Param("list")List<Long> list);
 }

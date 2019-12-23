@@ -304,6 +304,7 @@ public class CampaignController extends BaseController {
                 mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
             }
         }
+        // 刷活动报表数据
         mktCampaignService.campaignConfig(Long.valueOf(mktCampaignId));
         return JSON.toJSONString(mktCampaignMap);
     }
