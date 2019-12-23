@@ -177,7 +177,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         redisUtils.del("MKT_STRATEGY_" + mktStrategyConfId);
         List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyConfId);
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-            redisUtils.del("MKT_STRATEGY_" + mktCamStrategyConfRelDO.getStrategyConfId());
+            redisUtils.del("MKT_CAM_STRATEGY_" + mktCamStrategyConfRelDO.getMktCampaignId());
         }
 
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
