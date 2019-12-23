@@ -520,8 +520,11 @@ public class ChannelUtil  {
     }
 
     public static List<String> StringToList4LabelValue(String var1) {
-        String[] array = var1.split("/");
         List<String> list = new ArrayList<String>();
+        if (var1==null){
+            return list;
+        }
+        String[] array = var1.split("/");
         for (String str : array)
         {
             list.add(str);

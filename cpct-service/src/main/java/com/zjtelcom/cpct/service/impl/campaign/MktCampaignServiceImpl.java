@@ -1400,6 +1400,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             for (MktStrategyConfDO strategy : strategyConfList) {
                 strategy.setEndTime(lastTime);
                 mktStrategyConfMapper.updateByPrimaryKey(strategy);
+                redisUtils.del("MKT_STRATEGY_" + strategy.getMktStrategyConfId());
             }
 
             // 渠道生失效时间延期

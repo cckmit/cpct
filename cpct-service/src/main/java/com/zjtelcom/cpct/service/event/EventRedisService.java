@@ -10,6 +10,12 @@ import java.util.Map;
  */
 public interface EventRedisService {
 
+    Map<String, Object> getRedis(String key);
+
+    Map<String, Object> getRedis(String key, Long id);
+
+    Map<String, Object> getRedis(String key, Map<String, Object> params);
+
     Map<String, Object> getRedis(String key, Long id, Map<String, Object> params);
 
 }
