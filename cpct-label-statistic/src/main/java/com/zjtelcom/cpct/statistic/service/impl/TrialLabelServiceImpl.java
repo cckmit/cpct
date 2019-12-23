@@ -160,7 +160,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     @Override
     public Map<String, Object> statisticalAnalysts(Map<String, Object> param) {
         HashMap<String, Object> result = new HashMap<>();
-        HashMap<String, Object> data = new HashMap<>();
+        ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
         List<Map<String, String>> list1 = (List<Map<String, String>>) param.get("list");
         Map<String, Object> stringObjectMap = commonTarGrpTemplateCount(list1, result);
         Object list = stringObjectMap.get("expressions");
@@ -182,7 +182,8 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(strategyId);
         //每一个规则查询
         for (int i = 0; i < mktStrategyConfRuleRelDOS.size(); i++) {
-            ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
+            ArrayList<Map<String, Object>> expressionList = new ArrayList<>();
+            HashMap<String, Object> data = new HashMap<>();
             String indexs = batchNum + mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString();
             logger.info("indexs=>:" + indexs);
             SearchResponse myresponse = null;
@@ -208,15 +209,17 @@ public class TrialLabelServiceImpl implements TrialLabelService {
 
                 map.put("total", totalHits.toString());
                 map.put("expression2", expression2);
-                arrayList.add(map);
+                expressionList.add(map);
+//                arrayList.add(map);
             }
             // 遍历ES查询
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId());
             data.put("name", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
-            data.put("rule",arrayList);
+            data.put("rule", expressionList);
+            arrayList.add(data);
         }
-        result.put("code",200);
-        result.put("data",data);
+        result.put("resultCode",200);
+        result.put("resultMsg",arrayList);
         return result;
     }
 
