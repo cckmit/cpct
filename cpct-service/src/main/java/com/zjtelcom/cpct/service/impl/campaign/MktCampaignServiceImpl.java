@@ -747,7 +747,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
-                    redisUtils.del("MKT_STRATEGY_" + mktCampaignId);
+                    redisUtils.del("MKT_CAM_STRATEGY_" + mktCampaignId);
                 }
             }
 
