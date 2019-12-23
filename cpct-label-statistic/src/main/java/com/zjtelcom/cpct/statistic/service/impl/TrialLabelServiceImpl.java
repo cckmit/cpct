@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.statistic.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -16,6 +17,8 @@ import net.sf.json.JSONArray;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Requests;
@@ -63,6 +66,9 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     @Autowired
     MktStrategyConfRuleMapper mktStrategyConfRuleMapper;
 
+    @Autowired
+    private InjectionLabelMapper labelMapper;
+
     @Override
     public Map<String, Object> trialUerLabelLog(String s, String messageID, String key) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -81,13 +87,18 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         if (result) {
             try {
                 Map map = esServiceInfo.queryCustomerByList(list);
-                logger.info("查询所有标签的值是否有数据:" + (map == null ? 0 : 1));
+                logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
                 if (map != null && map.get("resultCode").toString().equals("200")) {
                     List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
-                    logger.info("resultData数据接收成功,查看第一条数据:" + JSON.toJSON(resultData.get(0)));
-                    JSONArray jsonArray = JSONArray.fromObject(resultData);
-                    IndexResponse response = client.prepareIndex(index, esType).setSource(jsonArray).get();
-                    System.out.println("走到这里是表示索引创建成功?:" + response.status().getStatus());
+                    for (Map<String, Object> resultDatum : resultData) {
+                        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(resultDatum));
+                        bulkRequest.add(client.prepareIndex(index, esType, jsonObject.get("ASSET_INTEG_ID").toString()).setSource(jsonObject));
+                    }
+                    if (bulkRequest.numberOfActions() > 0) {
+                        BulkResponse bulkItemResponses = bulkRequest.get();
+                        logger.info("b:"+bulkItemResponses.hasFailures());
+                    }
                 }
             } catch (Exception e) {
                 logger.error("标签入es库失败：" + e);
@@ -162,7 +173,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         Object list2 = stringObjectMap2.get("expressions");
         List<String> expressions2 = list == null ? new ArrayList<>() : (ArrayList) list2;
         Object labelList2 = stringObjectMap2.get("labelList");
-        List<LabelResultES> labelDataList2 = labelList == null ? new ArrayList<>() : (ArrayList) labelList2;
+        List<LabelResultES> labelDataList2 = labelList2 == null ? new ArrayList<>() : (ArrayList) labelList2;
 
         String id = param.get("id").toString();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(Long.valueOf(id));
@@ -172,7 +183,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         //每一个规则查询
         for (int i = 0; i < mktStrategyConfRuleRelDOS.size(); i++) {
             ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
-            String indexs = batchNum + mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId().toString();
+            String indexs = batchNum + mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString();
             logger.info("indexs=>:" + indexs);
             SearchResponse myresponse = null;
             Long totalHits = null;
@@ -208,6 +219,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         result.put("data",data);
         return result;
     }
+
 
     public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> tarGrplist, Map<String, Object> params) {
         List<String> expressions = new ArrayList<>();
@@ -397,4 +409,20 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         String result = sdf.format(date);
         return result;
     }
+
+    @Override
+    public Map<String, Object> getCustomByLabel(String name) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        List<Label> sysLabel = labelMapper.selectByScopeLikeName(name);
+        if (sysLabel.size()>0 && sysLabel!=null){
+            hashMap.put("code","200");
+            hashMap.put("msg",sysLabel);
+        }else {
+            ArrayList<Label> labels = new ArrayList<>();
+            hashMap.put("code","500");
+            hashMap.put("msg",labels);
+        }
+        return hashMap;
+    }
+
 }
