@@ -178,7 +178,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         String id = param.get("id").toString();
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(Long.valueOf(id));
         Long batchNum = trialOperation.getBatchNum();//批次
-        Long strategyId = trialOperation.getStrategyId();//规则
+        Long strategyId = trialOperation.getStrategyId();//策略
         List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOS = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(strategyId);
         //每一个规则查询
         for (int i = 0; i < mktStrategyConfRuleRelDOS.size(); i++) {
@@ -207,7 +207,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 totalHits = hits.totalHits;
                 logger.info("totalHits=>" + totalHits.toString());
 
-                map.put("total", totalHits.toString());
+                map.put("total", Long.valueOf(totalHits));
                 map.put("expression2", expression2);
                 expressionList.add(map);
 //                arrayList.add(map);
@@ -215,6 +215,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
             // 遍历ES查询
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId());
             data.put("name", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+            data.put("ruleId", mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString());
             data.put("rule", expressionList);
             arrayList.add(data);
         }

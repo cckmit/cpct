@@ -69,5 +69,5 @@ public interface InjectionLabelMapper{
 
     List<Label> selectByTagCode(@Param("labTagCode") String labTagCode);
 
-    List<Label> selectByScopeLikeName(@Param("name") String name);
+    List<Label> selectByScopeLikeName(String name);
 }
