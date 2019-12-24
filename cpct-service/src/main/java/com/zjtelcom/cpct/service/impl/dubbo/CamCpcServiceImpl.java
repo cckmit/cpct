@@ -1366,6 +1366,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             camScript = (CamScript) mktCamScriptRedis.get("MKT_CAM_SCRIPT_" + evtContactConfId);
         }
         if (camScript != null && camScript.getScriptDesc() != null) {
+            contactScript = camScript.getScriptDesc();
             scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
         } else {
             //未查询到话术 不命中
