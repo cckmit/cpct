@@ -396,6 +396,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         //初始化线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         //遍历策略列表
+        log.info("strategyMapList = " + JSON.toJSONString(strategyMapList));
         for (Map<String, Object> strategyMap : strategyMapList) {
             Long strategyConfId = (Long) strategyMap.get("strategyConfId");
             String strategyConfName = (String) strategyMap.get("strategyConfName");
@@ -881,7 +882,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //查询规则下所有标签
                     List<Map<String, String>> labelMapList = new ArrayList<>();
                     try {
-                        Map<String, Object> ruleAllLabelRedis = eventRedisService.getRedis("RULE_ALL_LABEL_" + tarGrpId);
+                        Map<String, Object> ruleAllLabelRedis = eventRedisService.getRedis("RULE_ALL_LABEL_", tarGrpId);
                         if (ruleAllLabelRedis != null) {
                             labelMapList = (List<Map<String, String>>) ruleAllLabelRedis.get("RULE_ALL_LABEL_" + tarGrpId);
                         }
@@ -994,7 +995,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     //查询规则下所有标签
                     List<Map<String, String>> labelMapList = new ArrayList<>();
                     try {
-                        Map<String, Object> ruleAllLabelRedis = eventRedisService.getRedis("RULE_ALL_LABEL_" + tarGrpId);
+                        Map<String, Object> ruleAllLabelRedis = eventRedisService.getRedis("RULE_ALL_LABEL_", tarGrpId);
                         if (ruleAllLabelRedis != null) {
                             labelMapList = (List<Map<String, String>>) ruleAllLabelRedis.get("RULE_ALL_LABEL_" + tarGrpId);
                         }
@@ -1359,7 +1360,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         String contactScript = null;
         String mktVerbalStr = null;
         // 从redis中获取脚本
-        Map<String, Object> mktCamScriptRedis = eventRedisService.getRedis("MKT_CAM_SCRIPT_" + evtContactConfId);
+        Map<String, Object> mktCamScriptRedis = eventRedisService.getRedis("MKT_CAM_SCRIPT_", evtContactConfId);
         CamScript camScript = new CamScript();
         if (mktCamScriptRedis != null) {
             camScript = (CamScript) mktCamScriptRedis.get("MKT_CAM_SCRIPT_" + evtContactConfId);
@@ -1373,7 +1374,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         }
 
         // 从redis中获取指引
-        Map<String, Object> mktVerbalRedis = eventRedisService.getRedis("MKT_VERBAL_" + evtContactConfId);
+        Map<String, Object> mktVerbalRedis = eventRedisService.getRedis("MKT_VERBAL_", evtContactConfId);
         List<VerbalVO> verbalVOList = new ArrayList<>();
         if (mktVerbalRedis != null) {
             verbalVOList = (List<VerbalVO>) mktVerbalRedis.get("MKT_VERBAL_" + evtContactConfId);
