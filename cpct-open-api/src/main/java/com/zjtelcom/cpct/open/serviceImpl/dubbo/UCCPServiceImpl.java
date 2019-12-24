@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.open.serviceImpl.dubbo;
 
+import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
@@ -7,6 +8,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class UCCPServiceImpl implements UCCPService {
 
     @Autowired(required = false)
@@ -80,8 +83,10 @@ public class UCCPServiceImpl implements UCCPService {
         //System.out.println("接口返回结果:"+reqMap);
         //System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
         //System.exit(0);
+        log.info("【调用UCCP短信接口入参】："+JSON.toJSONString(params));
         Map map = uCCPSendService.sendShortMessage(params);
         if (map == null) return "调用sendShortMessage返回结果异常！";
+        log.info("【调用UCCP短信接口返回】："+JSON.toJSONString(map));
         if (!map.get("code").equals("0000")) {
             return map.get("msg").toString();
         } else {

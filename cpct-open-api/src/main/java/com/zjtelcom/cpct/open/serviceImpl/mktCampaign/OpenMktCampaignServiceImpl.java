@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.open.serviceImpl.mktCampaign;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -832,22 +833,24 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
-        }
-        try {
-            List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
-            for (Map<String, String> stringStringMap : group_campaign_recipient) {
-                String value = stringStringMap.get("value");
-                JSONObject jsonObject = JSONObject.parseObject(value);
-                Object phone = jsonObject.get("phone");
-                Object lanId = jsonObject.get("lanId");
-                String content = "集团活动已下发，请尽快登陆系统处理。";
-                String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
-                logger.info("uccp=======================================");
-                logger.info(resultMsg);
+            try {
+                List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
+                logger.info("【获取承接人信息】"+JSON.toJSONString(group_campaign_recipient));
+                for (Map<String, String> stringStringMap : group_campaign_recipient) {
+                    String value = stringStringMap.get("value");
+                    JSONArray jsonArray = JSONArray.parseArray(value);
+                    //for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(0)));
+                    String content = "营销活动：[" + mktCampaignDO.getMktCampaignName() + "]集团活动已下发，请尽快登陆系统处理。";
+                    String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                    logger.info("uccp=======================================");
+                    logger.info(resultMsg);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        }catch (Exception e){
-            e.printStackTrace();
         }
+
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
         resultMap.put("resultMsg","处理成功");
