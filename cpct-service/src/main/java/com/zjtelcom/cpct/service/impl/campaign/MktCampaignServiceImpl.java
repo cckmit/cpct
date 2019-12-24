@@ -1931,46 +1931,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            List<MktCamEvtRelDO> eventRelList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
-                            for (MktCamEvtRelDO eventDo : eventRelList) {
-                                Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(eventDo.getEventId());  //查询事件下使用的所有标签
-                                if (null != mktAllLabels) {
-                                    redisUtils.set("EVT_ALL_LABEL_" + eventDo.getEventId(), mktAllLabels);
-                                }
-                            }
-                            List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(mktCampaignId);
-                            redisUtils.set("CAM_LABEL_DTO_LIST" + mktCampaignId, labelDTOList);
-                            //过滤规则标签
-                            List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId.toString()));
-                            redisUtils.set("CAM_FILTER_LIST_" + mktCampaignId, filterRules);
-                            //规则级的标签
-                            List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(Long.valueOf(mktCampaignId.toString()));
-                            redisUtils.set("CAM_RULE_LIST_" + mktCampaignId, ruleList);
-                            //话术标签
-                            for (MktStrategyConfRuleDO ruleDO : ruleList) {
-                                if (ruleDO.getEvtContactConfId() != null && !ruleDO.getEvtContactConfId().equals("")) {
-                                    String[] confList = ruleDO.getEvtContactConfId().split("/");
-                                    //推荐指引标签
-                                    for (String confId : confList) {
-                                        List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
-                                        redisUtils.set("CAM_VERBAL_LIST_" + confId, verbalList);
-                                        List<MktCamChlConfAttrDO> confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
-                                        redisUtils.set("CAM_CONF_ATTR_LIST_" + confId, confAttrDOList);
-                                    }
-                                }
-                                List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(ruleDO.getTarGrpId());
-                                redisUtils.set("CAM_TAR_CONDITION_LIST_" + ruleDO.getTarGrpId(), conditionList);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
-                        }
-                    }
-                }.start();
+
+                try {
+                    campaignRedisChane(mktCampaignId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
+                }
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
@@ -2034,6 +2001,43 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
 
         return maps;
+    }
+
+    /**
+     * 缓存处理
+     * @param mktCampaignId
+     */
+    private void campaignRedisChane(Long mktCampaignId) {
+        List<MktCamEvtRelDO> eventRelList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+        for (MktCamEvtRelDO eventDo : eventRelList) {
+            Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(eventDo.getEventId());  //查询事件下使用的所有标签
+            if (null != mktAllLabels) {
+                redisUtils.set("EVT_ALL_LABEL_" + eventDo.getEventId(), mktAllLabels);
+            }
+        }
+        List<LabelDTO> labelDTOList = mktCamDisplayColumnRelMapper.selectLabelDisplayListByCamId(mktCampaignId);
+        redisUtils.set("CAM_LABEL_DTO_LIST" + mktCampaignId, labelDTOList);
+        //过滤规则标签
+        List<FilterRule> filterRules = filterRuleMapper.selectFilterRuleList(Long.valueOf(mktCampaignId.toString()));
+        redisUtils.set("CAM_FILTER_LIST_" + mktCampaignId, filterRules);
+        //规则级的标签
+        List<MktStrategyConfRuleDO> ruleList = ruleMapper.selectByCampaignId(Long.valueOf(mktCampaignId.toString()));
+        redisUtils.set("CAM_RULE_LIST_" + mktCampaignId, ruleList);
+        //话术标签
+        for (MktStrategyConfRuleDO ruleDO : ruleList) {
+            if (ruleDO.getEvtContactConfId() != null && !ruleDO.getEvtContactConfId().equals("")) {
+                String[] confList = ruleDO.getEvtContactConfId().split("/");
+                //推荐指引标签
+                for (String confId : confList) {
+                    List<MktVerbal> verbalList = verbalMapper.findVerbalListByConfId(Long.valueOf(confId));
+                    redisUtils.set("CAM_VERBAL_LIST_" + confId, verbalList);
+                    List<MktCamChlConfAttrDO> confAttrDOList = confAttrMapper.selectByEvtContactConfId(Long.valueOf(confId));
+                    redisUtils.set("CAM_CONF_ATTR_LIST_" + confId, confAttrDOList);
+                }
+            }
+            List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(ruleDO.getTarGrpId());
+            redisUtils.set("CAM_TAR_CONDITION_LIST_" + ruleDO.getTarGrpId(), conditionList);
+        }
     }
 
 
