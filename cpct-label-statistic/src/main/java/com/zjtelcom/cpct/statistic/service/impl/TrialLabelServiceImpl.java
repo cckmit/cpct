@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.statistic.service.TrialLabelService;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.service.EsServiceInfo;
 import net.sf.json.JSONArray;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -72,36 +73,53 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     @Override
     public Map<String, Object> trialUerLabelLog(String s, String messageID, String key) {
         Map<String, Object> resultMap = new HashMap<>();
-        boolean result = true;
-        List list = JSON.parseObject(s, List.class);
-        String[] split = key.split("_");
-        String index = split[0] + split[1];
-        //判断索引是否存在
-        IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(index);
-        IndicesExistsResponse inExistsResponse = client.admin().indices().exists(inExistsRequest).actionGet();
-        if (!inExistsResponse.isExists()) {
-            result = createIndex(index);
-        }
-        logger.info("查看result:" + result);
-        //数据导入 todo
-        if (result) {
-            try {
-                Map map = esServiceInfo.queryCustomerByList(list);
-                logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
-                BulkRequestBuilder bulkRequest = client.prepareBulk();
-                if (map != null && map.get("resultCode").toString().equals("200")) {
-                    List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
-                    for (Map<String, Object> resultDatum : resultData) {
-                        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(resultDatum));
-                        bulkRequest.add(client.prepareIndex(index, esType, jsonObject.get("ASSET_INTEG_ID").toString()).setSource(jsonObject));
-                    }
-                    if (bulkRequest.numberOfActions() > 0) {
-                        BulkResponse bulkItemResponses = bulkRequest.get();
-                        logger.info("b:"+bulkItemResponses.hasFailures());
-                    }
+        //删除集群3全量数据index
+        if (!key.contains("_")) {
+            //判断索引是否存在
+            IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(key+"*");
+            IndicesExistsResponse inExistsResponse = client.admin().indices().exists(inExistsRequest).actionGet();
+            if (!inExistsResponse.isExists()) {
+                return null;
+            }else {
+                DeleteIndexResponse response = client.admin().indices().prepareDelete(key + "*").execute().actionGet();
+                if (response.isAcknowledged()){
+                    logger.info("索引库: " + key +  "删除成功");
+                } else {
+                    logger.info("删除失败！");
                 }
-            } catch (Exception e) {
-                logger.error("标签入es库失败：" + e);
+            }
+        }else {
+            boolean result = true;
+            List list = JSON.parseObject(s, List.class);
+            String[] split = key.split("_");
+            String index = split[0] + split[1];
+            //判断索引是否存在
+            IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(index);
+            IndicesExistsResponse inExistsResponse = client.admin().indices().exists(inExistsRequest).actionGet();
+            if (!inExistsResponse.isExists()) {
+                result = createIndex(index);
+            }
+            logger.info("查看result:" + result);
+            //数据导入 todo
+            if (result) {
+                try {
+                    Map map = esServiceInfo.queryCustomerByList(list);
+                    logger.info("查询所有标签的值是否有数据:" + JSON.toJSONString(map));
+                    BulkRequestBuilder bulkRequest = client.prepareBulk();
+                    if (map != null && map.get("resultCode").toString().equals("200")) {
+                        List<Map<String, Object>> resultData = (List<Map<String, Object>>) map.get("resultData");
+                        for (Map<String, Object> resultDatum : resultData) {
+                            JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(resultDatum));
+                            bulkRequest.add(client.prepareIndex(index, esType, jsonObject.get("ASSET_INTEG_ID").toString()).setSource(jsonObject));
+                        }
+                        if (bulkRequest.numberOfActions() > 0) {
+                            BulkResponse bulkItemResponses = bulkRequest.get();
+                            logger.info("b:"+bulkItemResponses.hasFailures());
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("标签入es库失败：" + e);
+                }
             }
         }
         return resultMap;
