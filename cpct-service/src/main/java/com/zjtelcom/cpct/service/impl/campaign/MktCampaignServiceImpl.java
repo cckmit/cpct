@@ -749,7 +749,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
-                    redisUtils.del("MKT_STRATEGY_" + mktCampaignId);
+                    redisUtils.del("MKT_CAM_STRATEGY_" + mktCampaignId);
                 }
             }
 
@@ -1402,6 +1402,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             for (MktStrategyConfDO strategy : strategyConfList) {
                 strategy.setEndTime(lastTime);
                 mktStrategyConfMapper.updateByPrimaryKey(strategy);
+                redisUtils.del("MKT_STRATEGY_" + strategy.getMktStrategyConfId());
             }
 
             // 渠道生失效时间延期

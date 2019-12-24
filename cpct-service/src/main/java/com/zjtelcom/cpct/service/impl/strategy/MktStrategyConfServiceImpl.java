@@ -157,6 +157,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
             // 删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            redisUtils.del("MKT_RULE_" + mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             // 删除活动与分群的关系
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
             if (mktStrategyConfRuleDO!=null && mktStrategyConfRuleDO.getTarGrpId()!=null) {
@@ -173,9 +174,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
         redisUtils.del("CHANNEL_CODE_LIST_" + mktStrategyConfId);
         //删除策略
         mktStrategyConfMapper.deleteByPrimaryKey(mktStrategyConfId);
+        redisUtils.del("MKT_STRATEGY_" + mktStrategyConfId);
         List<MktCamStrategyConfRelDO> mktCamStrategyConfRelDOList = mktCamStrategyConfRelMapper.selectByStrategyConfId(mktStrategyConfId);
         for (MktCamStrategyConfRelDO mktCamStrategyConfRelDO : mktCamStrategyConfRelDOList) {
-            redisUtils.del("MKT_STRATEGY_" + mktCamStrategyConfRelDO.getStrategyConfId());
+            redisUtils.del("MKT_CAM_STRATEGY_" + mktCamStrategyConfRelDO.getMktCampaignId());
         }
 
         mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -351,9 +353,10 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
 
             // 更新策略配置基本，并返回策略Id -- mktStrategyConfId
             mktStrategyConfMapper.updateByPrimaryKey(mktStrategyConfDO);
+
             // 策略Id
             Long mktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
-
+            redisUtils.del("MKT_STRATEGY_" + mktStrategyConfId);
             //重建策略与过滤规则关系
 /*
             mktStrategyFilterRuleRelMapper.deleteByStrategyId(mktStrategyConfId);

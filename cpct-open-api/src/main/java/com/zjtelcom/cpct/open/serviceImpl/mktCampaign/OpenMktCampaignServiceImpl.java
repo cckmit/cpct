@@ -48,6 +48,7 @@ import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.open.service.mktCampaign.MktDttsLogService;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,6 +133,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private MktDttsLogService mktDttsLogService;
     @Autowired
     private UCCPService uccpService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 查询营销活动详情
@@ -1022,11 +1025,13 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                         MktCamChlConfDO mktCamChlConfDO = BeanUtil.create(openMktCamChlConfEntity, new MktCamChlConfDO());
                         mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                         mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
+                        redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfDO.getEvtContactConfId());
                         //修改调查问卷
                         List<OpenMktCamQuestEntity> mktCamQuests = openMktCamChlConfEntity.getMktCamQuests();
                         //修改营服活动执行渠道配置属性
                         if(mktCamChlConfAttrs.size() > 0 ) {
                             mktCamChlConfAttrMapper.deleteByEvtContactConfId(openMktCamChlConfEntity.getEvtContactConfId());
+                            redisUtils.del("CHL_CONF_DETAIL_" + openMktCamChlConfEntity.getEvtContactConfId());
                             for (OpenMktCamChlConfAttrEntity openMktCamChlConfAttrEntity : mktCamChlConfAttrs) {
                                 MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(openMktCamChlConfAttrEntity, new MktCamChlConfAttrDO());
                                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
@@ -1037,6 +1042,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }else if(openMktCamChlConfEntity.getActType().equals("DEL")) {
                         mktCamChlConfMapper.deleteByPrimaryKey(openMktCamChlConfEntity.getEvtContactConfId());
                         mktCamChlConfAttrMapper.deleteByEvtContactConfId(openMktCamChlConfEntity.getEvtContactConfId());
+                        redisUtils.del("CHL_CONF_DETAIL_" + openMktCamChlConfEntity.getEvtContactConfId());
                     }
                     //修改营服活动脚本
                     List<OpenMktCamScriptEntity> mktCamScripts = openMktCamChlConfEntity.getMktCamScripts();
@@ -1062,8 +1068,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                 }
                                 camScript.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                                 mktCamScriptMapper.updateByPrimaryKey(camScript);
+                                redisUtils.del("MKT_CAM_SCRIPT_" + openMktCamScriptEntity.getMktCampaignScptId());
                             }else if(openMktCamScriptEntity.getActType().equals("DEL")) {
                                 mktCamScriptMapper.deleteByPrimaryKey(openMktCamScriptEntity.getMktCampaignScptId());
+                                redisUtils.del("MKT_CAM_SCRIPT_" + openMktCamScriptEntity.getMktCampaignScptId());
                             }
                         }
                     }
