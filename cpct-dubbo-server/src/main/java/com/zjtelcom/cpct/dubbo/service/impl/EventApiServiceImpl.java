@@ -2490,7 +2490,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleList = new ArrayList<>();
-                    Map<String, Object> mktRuleListRedis = eventRedisService.getRedis("RULE_LIST_", mktStrategyConf.getMktStrategyConfId(), new HashMap<>());
+                    Map<String, Object> mktRuleListRedis = eventRedisService.getRedis("RULE_LIST_", mktStrategyConf.getMktStrategyConfId());
                     if (mktRuleListRedis != null) {
                         mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktRuleListRedis.get("RULE_LIST_" + mktStrategyConf.getMktStrategyConfId());
                     }
