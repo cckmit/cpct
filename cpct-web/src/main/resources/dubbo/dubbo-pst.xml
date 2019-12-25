@@ -125,8 +125,9 @@
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
     </dubbo:reference>
 
-    <!-- UCCP短信发送 -->
-    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService" version="1.0" check="false">
+    <!-- 统计分析 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService"
+                     id="trialLabelServiceImpl" version="1.0" check="false">
         <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="120000"/>
     </dubbo:reference>
 

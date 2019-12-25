@@ -855,6 +855,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
             String express = null;
             Object datetypeTargouidList = new Object();
             Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
@@ -1251,7 +1252,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("lanId"));
                     Long time = System.currentTimeMillis() - timeStart;
                     if (taskChlList == null || taskChlList.isEmpty()) {
-                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过");
+                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过   ");
                         return nonPassedMsg;
                     }
                 }

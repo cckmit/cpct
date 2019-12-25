@@ -25,7 +25,7 @@
 
     <!-- 统计分析 -->
     <dubbo:service  registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService"
-                    ref="TrialLabelServiceImpl" version="1.0" >
+                    ref="trialLabelServiceImpl" version="1.0" >
         <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="10000"/>
     </dubbo:service>
 </beans>

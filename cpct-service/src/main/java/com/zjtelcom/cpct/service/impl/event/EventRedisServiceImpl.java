@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.event;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
@@ -142,7 +143,7 @@ public class EventRedisServiceImpl implements EventRedisService {
             key = key + id;
         }
         Object o = redisUtils.get(key);
-        if (o != null && id.equals(0L)) {
+        if (o != null && !id.equals(0L)) {
             resutlt.put(key, o);
         } else {
             if (!id.equals(0L)) {
@@ -221,7 +222,9 @@ public class EventRedisServiceImpl implements EventRedisService {
             redisUtils.set(key, iSaleDisplay);
             resutlt.put(key, iSaleDisplay);
         } else if (key.startsWith("RULE_ALL_LABEL_")) {
+            System.out.println("key = "+ key);
             List<Map<String, String>> labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(id);
+            System.out.println("labelMapList = "+ JSON.toJSONString(labelMapList));
             redisUtils.set(key, labelMapList);
             resutlt.put(key, labelMapList);
         } else if (key.startsWith("MKT_CAM_ITEM_LIST_")) {
