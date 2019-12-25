@@ -432,19 +432,4 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         return result;
     }
 
-    @Override
-    public Map<String, Object> getCustomByLabel(String name) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        List<Label> sysLabel = labelMapper.selectByScopeLikeName(name);
-        if (sysLabel.size()>0 && sysLabel!=null){
-            hashMap.put("code","200");
-            hashMap.put("msg",sysLabel);
-        }else {
-            ArrayList<Label> labels = new ArrayList<>();
-            hashMap.put("code","500");
-            hashMap.put("msg",labels);
-        }
-        return hashMap;
-    }
-
 }

@@ -31,8 +31,8 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>com.zjtelcom.cpct</groupId>-->
-            <!--<artifactId>cpct-dubbo-server</artifactId>-->
+        <!--<groupId>com.zjtelcom.cpct</groupId>-->
+        <!--<artifactId>cpct-dubbo-server</artifactId>-->
         <!--</dependency>-->
 
         <!-- PageHelper 分页插件 -->
@@ -138,8 +138,8 @@
 
 
         <!--<dependency>-->
-            <!--<groupId>com.zjhcsoft.bss</groupId>-->
-            <!--<artifactId>cooperate-service-api</artifactId>-->
+        <!--<groupId>com.zjhcsoft.bss</groupId>-->
+        <!--<artifactId>cooperate-service-api</artifactId>-->
         <!--</dependency>-->
 
 
@@ -214,6 +214,12 @@
         <dependency>
             <groupId>com.zjtelcom.cpct</groupId>
             <artifactId>open-complete</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjtelcom.triallabel</groupId>
+            <artifactId>es-service-triallabel</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
     </dependencies>

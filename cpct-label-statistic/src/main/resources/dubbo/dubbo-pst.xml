@@ -15,11 +15,17 @@
     <dubbo:registry id="esb1" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <!--<dubbo:protocol name="dubbo" port="30808"/>-->
+    <dubbo:protocol name="dubbo" port="30812"/>
     <dubbo:monitor protocol="registry" />
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo"
                      id="esServiceInfoImpl" version="1.0" check="false">
         <dubbo:method name="queryCustomerByList" servicecode="00.1083.queryCustomerByList" timeout="10000"/>
     </dubbo:reference>
+
+    <!-- 统计分析 -->
+    <dubbo:service  registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService"
+                    ref="TrialLabelServiceImpl" version="1.0" >
+        <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="10000"/>
+    </dubbo:service>
 </beans>
