@@ -260,7 +260,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                                                 CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
                                                 //                    log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                                                 if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                                        OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
                                                     // 查询销售品实例缓存实体
                                                     CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
@@ -577,7 +577,6 @@ public class CamCpcServiceImpl implements CamCpcService {
 
                     Map<String, Object> itgTrigger;
 
-                    //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                     //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                     List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
                     Map<String, Object> iSaleDisplayRedis = eventRedisService.getRedis("MKT_ISALE_LABEL_", mktCampaign.getIsaleDisplay());

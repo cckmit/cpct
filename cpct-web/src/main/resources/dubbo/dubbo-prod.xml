@@ -40,7 +40,7 @@
     </dubbo:reference>
 
     <dubbo:reference interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"
-                     id="dictionaryDubboServiceImpl" version="1.0">
+                     id="dictionaryDubboServiceImpl" version="1.0" check="false">
         <dubbo:method name="getDictionaryByType" servicecode="00.1077.getDictionaryByType"/>
         <dubbo:method name="getValueByTypeAndCode" servicecode="00.1077.getValueByTypeAndCode"/>
         <dubbo:method name="getDictionaryByTypeAndCode" servicecode="00.1077.getDictionaryByTypeAndCode"/>
@@ -124,6 +124,12 @@
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
         <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
+    </dubbo:reference>
+
+    <!-- 集团下发活动反馈接口 1.0 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService"
+                     id="openCompleteMktCampaignServiceImpl" version="1.0" check="false">
+        <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
     </dubbo:reference>
 
 </beans>
