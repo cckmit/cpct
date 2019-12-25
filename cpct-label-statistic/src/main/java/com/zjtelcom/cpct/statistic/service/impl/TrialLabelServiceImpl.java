@@ -180,20 +180,22 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         HashMap<String, Object> result = new HashMap<>();
         ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
         List<Map<String, String>> list1 = (List<Map<String, String>>) param.get("list");
+        logger.info("list1:"+JSON.toJSONString(list1));
         Map<String, Object> stringObjectMap = commonTarGrpTemplateCount(list1, result);
         Object list = stringObjectMap.get("expressions");
         List<String> expressions = list == null ? new ArrayList<>() : (ArrayList) list;
         Object labelList = stringObjectMap.get("labelList");
         List<LabelResultES> labelDataList = labelList == null ? new ArrayList<>() : (ArrayList) labelList;
         // 二次搜索条件 查询拼接
-        List analustList = (List<Object>) param.get("analustList");
+        List<Map<String, String>> analustList = (List<Map<String, String>>) param.get("analustList");
+        logger.info("analustList:"+JSON.toJSONString(analustList));
         Map<String, Object> stringObjectMap2 = commonTarGrpTemplateCount(analustList, result);
         Object list2 = stringObjectMap2.get("expressions");
         List<String> expressions2 = list == null ? new ArrayList<>() : (ArrayList) list2;
         Object labelList2 = stringObjectMap2.get("labelList");
         List<LabelResultES> labelDataList2 = labelList2 == null ? new ArrayList<>() : (ArrayList) labelList2;
-
         String id = param.get("id").toString();
+        logger.info("id:"+id);
         TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(Long.valueOf(id));
         Long batchNum = trialOperation.getBatchNum();//批次
         Long strategyId = trialOperation.getStrategyId();//策略
@@ -229,6 +231,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 map.put("expression2", expression2);
                 expressionList.add(map);
 //                arrayList.add(map);
+                logger.info("expression2:"+JSON.toJSONString(expression2));
             }
             // 遍历ES查询
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId());
@@ -236,6 +239,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
             data.put("ruleId", mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString());
             data.put("rule", expressionList);
             arrayList.add(data);
+            logger.info("name=>" +mktStrategyConfRuleDO.getMktStrategyConfRuleName());
         }
         result.put("resultCode",200);
         result.put("resultMsg",arrayList);
