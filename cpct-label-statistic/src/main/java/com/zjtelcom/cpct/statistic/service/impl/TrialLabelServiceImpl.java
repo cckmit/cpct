@@ -252,7 +252,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         List<LabelResultES> labelList = new ArrayList<>();
         for (Map<String, String> tarGrpCondition : tarGrplist) {
             String code = tarGrpCondition.get("code");
-            String operType = tarGrpCondition.get("operType");
+            String operType = tarGrpCondition.get("operType").toString();
             operType = equationSymbolConversion(operType);
             String rightParam = tarGrpCondition.get("rightParam");
             String expression = code + operType + rightParam;
