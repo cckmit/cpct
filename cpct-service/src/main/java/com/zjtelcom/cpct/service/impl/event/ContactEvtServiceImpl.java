@@ -778,9 +778,26 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 List<Long> list = new ArrayList<>();
                 //遍历旧的事件规则条件
                 Map<String, Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
-                EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
-                Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
-                List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+                if (eventMatchRulMap != null) {
+                    EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
+                    if (eventMatchRulDTO != null) {
+                        Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+                        if (eventMatchRulConditionMap != null ) {
+                            // List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+
+                            List<EventMatchRulConditionVO> rulConditionList =  eventMatchRulConditionMap.get("listEventMatchRulCondition") == null ? new ArrayList<>() : (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+                            if (!rulConditionList.isEmpty()) {
+                                //删除多余的事件规则条件
+                                for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
+                                    if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
+                                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
+                                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 //事件规则更新
                 Map<String, Object> eventMatchRul = eventMatchRulService.modEventMatchRul(eventMatchRulDetail);
@@ -793,13 +810,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     list.add(eventMatchRulCondition.getConditionId());
                 }
 
-                //删除多余的事件规则条件
-                for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
-                    if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
-                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
-                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
-                    }
-                }
             }
             eventId = evtDetail.getContactEvtId();
 //            if (SystemParamsUtil.isSync()){
