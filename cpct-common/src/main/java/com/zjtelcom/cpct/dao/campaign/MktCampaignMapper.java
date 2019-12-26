@@ -106,8 +106,8 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getQuarterActivitiesIsEnd(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
-
     List<MktCampaignCountDO> qryMktCampaignListPage4Count(MktCampaignDO mktCampaignDO);
 
 
+    List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
 }

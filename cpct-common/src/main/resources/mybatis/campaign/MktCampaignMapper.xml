@@ -995,7 +995,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID = #{lanId}
         </if>
-          AND MKT_CAMPAIGN_ID IN
+          AND INIT_ID IN
         <foreach item="item" index="index" collection="campaignIdLists"
                  open="(" separator="," close=")">
             #{item}
@@ -1249,4 +1249,15 @@
     </select>
 
 
+    <select id="selectByMktCampaingIDFromTrial" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT INIT_ID FROM mkt_campaign WHERE MKT_CAMPAIGN_ID IN (
+        SELECT CAMPAIGN_ID FROM trial_operation WHERE STATUS_CD IN (7300,8100,8000)
+        <if test="activeDate != null and activeDate != ''">
+            AND CREATE_DATE > #{activeDate}
+        </if>
+        <if test="overDate != null and overDate != ''">
+            AND  #{overDate} > CREATE_DATE
+        </if>
+        GROUP BY CAMPAIGN_ID )
+    </select>
 </mapper>
