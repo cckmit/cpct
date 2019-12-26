@@ -1900,7 +1900,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     if (StatusCode.STATUS_CODE_STOP.getStatusCode().equals(statusCd)) {
                         mktCamResultRelMapper.updateByPrimaryKey(mktCamResultRelDO);
                     }
-
+                }
+                // 删除事件接入缓存
+                List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
+                for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
+                    redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
+                    redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                 }
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                     //活动发布若是清单活动重新试算全量清单
@@ -1916,12 +1921,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 活动下线清缓存
                     redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
-                    // 删除事件接入缓存
-                    List<MktCamEvtRelDO> mktCamEvtRelDOS = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
-                    for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOS) {
-                        redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
-                        redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
-                    }
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
                     //派单活动状态修改接口
