@@ -14,7 +14,7 @@
     <dubbo:registry id="esb4" protocol="dubbo" address="134.96.249.149:8001"/><!--bss3.0 prod环境-->
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30809"/>
+    <dubbo:protocol name="dubbo" port="30813"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 因子实时查询 -->

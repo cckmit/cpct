@@ -52,7 +52,19 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         mktDttsLog.setBeginTime(beginTime);
         mktDttsLog.setEndTime(endTime);
         mktDttsLog.setDttsResult(dttsResult);
-        mktDttsLog.setRemark(remark);
+        if (remark.length()>1900){
+            mktDttsLog.setRemark(remark.substring(0,1900));
+        }else {
+            mktDttsLog.setRemark(remark);
+        }
+        if (remark.length()>3800){
+            mktDttsLog.setRemarkOne(remark.substring(1900,3800));
+        }
+        if (remark.length()>5700){
+            mktDttsLog.setRemarkTwo(remark.substring(3800,5700));
+        }else if (remark.length()>3800 && remark.length()<5700){
+            mktDttsLog.setRemarkTwo(remark.substring(3800,remark.length()));
+        }
         mktDttsLog.setStatusDate(new Date());
         mktDttsLog.setCreateDate(new Date());
         mktDttsLog.setCreateStaff(UserUtil.loginId()); //UserUtil.loginId()
