@@ -837,6 +837,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
             String express = null;
             Object datetypeTargouidList = new Object();
             Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
@@ -1209,7 +1210,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    // nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
                     return nonPassedMsg;
                 }
 
@@ -1233,7 +1234,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("lanId"));
                     Long time = System.currentTimeMillis() - timeStart;
                     if (taskChlList == null || taskChlList.isEmpty()) {
-                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过");
+                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过   ");
                         return nonPassedMsg;
                     }
                 }
@@ -1351,9 +1352,12 @@ public class CamCpcServiceImpl implements CamCpcService {
             camScript = (CamScript) mktCamScriptRedis.get("MKT_CAM_SCRIPT_" + evtContactConfId);
             log.info("camScript = " + JSON.toJSONString(camScript));
         }
-        if (camScript != null && camScript.getScriptDesc() != null) {
+        if (camScript != null) {
             contactScript = camScript.getScriptDesc();
-            scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            if (contactScript != null) {
+                scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            }
+
         } else {
             //未查询到话术 不命中
             nonPassedMsg.put("rule_" + ruleId, "未查询到推送话术");

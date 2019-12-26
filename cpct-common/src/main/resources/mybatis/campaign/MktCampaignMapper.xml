@@ -1248,6 +1248,10 @@
         order by t.UPDATE_DATE desc
     </select>
 
+    <update id="saveMktCamDesc" parameterType="java.util.List" >
+        UPDATE mkt_campaign SET MKT_CAMPAIGN_DESC = #{mktCampaignName} WHERE MKT_CAMPAIGN_ID = #{mktCampaignId}
+    </update>
+
 
     <select id="selectByMktCampaingIDFromTrial" parameterType="java.util.Map" resultType="java.lang.String">
         SELECT INIT_ID FROM mkt_campaign WHERE MKT_CAMPAIGN_ID IN (

@@ -139,7 +139,7 @@ public class EventRedisServiceImpl implements EventRedisService {
     @Override
     public Map<String, Object> getRedis(String key, Long id, Map<String, Object> params) {
         Map<String, Object> resutlt = new HashMap<>();
-        if (!id.equals(0L)) {
+        if (id != 0L) {
             key = key + id;
         }
         Object o = redisUtils.get(key);
