@@ -2145,6 +2145,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(attr, new MktCamChlConfAttrDO());
                                     mktCamChlConfAttrDO.setRemark(servicePackage.getLabel());
                                     mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                                    redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfAttrDO.getEvtContactConfId());
                                 }
                             }
                         }

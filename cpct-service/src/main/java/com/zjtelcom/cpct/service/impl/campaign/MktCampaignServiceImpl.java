@@ -723,7 +723,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), campaign.getStatusCd(), mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.UPDATE.getOperatorValue());
-
+            redisUtils.del("MKT_CAMPAIGN_" + mktCampaignId);
             //删除原来的活动与城市之间的关系
             mktCamCityRelMapper.deleteByMktCampaignId(mktCampaignId);
             //创建活动与城市之间的关系
@@ -747,7 +747,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyConfService.updateMktStrategyConf(mktStrategyConfDetail);
                 } else {
                     mktStrategyConfService.saveMktStrategyConf(mktStrategyConfDetail);
-                    redisUtils.del("MKT_STRATEGY_" + mktCampaignId);
+                    redisUtils.del("MKT_CAM_STRATEGY_" + mktCampaignId);
                 }
             }
 
@@ -1400,6 +1400,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             for (MktStrategyConfDO strategy : strategyConfList) {
                 strategy.setEndTime(lastTime);
                 mktStrategyConfMapper.updateByPrimaryKey(strategy);
+                redisUtils.del("MKT_STRATEGY_" + strategy.getMktStrategyConfId());
             }
 
             // 渠道生失效时间延期
