@@ -112,4 +112,5 @@ public interface MktCampaignMapper {
 
     List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
 
+    List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
 }

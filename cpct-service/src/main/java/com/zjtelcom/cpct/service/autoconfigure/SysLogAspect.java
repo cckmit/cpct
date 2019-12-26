@@ -63,7 +63,7 @@ public class SysLogAspect {
         JSONObject esJson = new JSONObject();
         // 需要记录日志
         if(targetMethod.isAnnotationPresent(SysLog.class)) {
-            Gson gson = new Gson();
+//            Gson gson = new Gson();
 //            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
             // 获取注解
@@ -88,6 +88,7 @@ public class SysLogAspect {
         // 发送消息到 系统日志队列
         if(targetMethod.isAnnotationPresent(SysLog.class)) {
             SysLog sysLog = targetMethod.getAnnotation(SysLog.class);
+            log.info(">>>>>>>>>>>>>>> <<<<<<<<<<<<<<<<");
             mqProducerService.msg2ESLogProducer(esJson, cpctEsLogTopic, sysLog.indexName() + "," + esType, null);
         }
         return result;

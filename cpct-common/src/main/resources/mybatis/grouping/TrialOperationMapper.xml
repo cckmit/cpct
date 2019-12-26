@@ -160,9 +160,6 @@
   </select>
 
 
-
-
-
   <select id="listOperationByCamIdAndStatusCd" resultMap="BaseResultMap">
     SELECT
     ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD,
