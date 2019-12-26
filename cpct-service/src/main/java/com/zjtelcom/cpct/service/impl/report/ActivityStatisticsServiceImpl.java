@@ -483,7 +483,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("activeDate", activeDate.toString());
             paramMap.put("overDate", overDate.toString());
         }
-        List<String> campaignIdLists =trialOperationMapper.selectByMktCampaingIDFromTrial(paramMap);
+        List<String> campaignIdLists =mktCampaignMapper.selectByMktCampaingIDFromTrial(paramMap);
         if (campaignIdLists==null || campaignIdLists.size()<0) {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "无区间段派单活动!");

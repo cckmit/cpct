@@ -160,16 +160,7 @@
   </select>
 
 
- <select id="selectByMktCampaingIDFromTrial" parameterType="java.util.Map" resultType="java.lang.String">
-   SELECT CAMPAIGN_ID FROM trial_operation WHERE STATUS_CD IN (7300,8100,8000)
-   <if test="activeDate != null and activeDate != ''">
-     AND CREATE_DATE > #{activeDate}
-   </if>
-   <if test="overDate != null and overDate != ''">
-     AND  #{overDate} > CREATE_DATE
-   </if>
-    GROUP BY CAMPAIGN_ID
- </select>
+
 
 
   <select id="listOperationByCamIdAndStatusCd" resultMap="BaseResultMap">
