@@ -585,6 +585,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCamEvtRelDO.setUpdateStaff(UserUtil.loginId());
                 mktCamEvtRelDO.setUpdateDate(new Date());
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
+                redisUtils.del("CAM_IDS_EVT_REL_" + eventDTO.getEventId());
             }
 
             //更新推荐条目
