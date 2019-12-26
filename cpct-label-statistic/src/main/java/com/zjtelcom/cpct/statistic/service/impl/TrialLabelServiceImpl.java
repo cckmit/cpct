@@ -234,7 +234,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 logger.info("expression2:"+JSON.toJSONString(expression2));
             }
             // 遍历ES查询
-            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleRelId());
+            MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId());
             data.put("name", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
             data.put("ruleId", mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId().toString());
             data.put("rule", expressionList);
@@ -251,15 +251,17 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         List<String> expressions = new ArrayList<>();
         List<LabelResultES> labelList = new ArrayList<>();
         for (Map<String, String> tarGrpCondition : tarGrplist) {
-            String code = tarGrpCondition.get("code");
-            String operType = tarGrpCondition.get("operType").toString();
+            String leftParam = String.valueOf(tarGrpCondition.get("leftParam"));
+            Label label1 = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(leftParam));
+            String code = label1.getInjectionLabelCode();
+            String operType = String.valueOf(tarGrpCondition.get("operType"));
             operType = equationSymbolConversion(operType);
             String rightParam = tarGrpCondition.get("rightParam");
             String expression = code + operType + rightParam;
             expressions.add(expression);
             LabelResultES label = new LabelResultES();
             label.setLabelCode(code);
-            label.setLabelDataType(tarGrpCondition.get("labelType") == null ? "" : tarGrpCondition.get("labelType"));
+            label.setLabelDataType(label1.getLabelDataType() == null ? "" : label1.getLabelDataType());
             labelList.add(label);
         }
         params.put("expressions", expressions);
