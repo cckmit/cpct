@@ -269,6 +269,13 @@ public class TestController extends BaseController {
     public void xxxxxx3() {
         contactEvtService.xxxxxx3();
     }
+
+    @RequestMapping(value = "/saveMktCamDesc", method = RequestMethod.POST)
+    @CrossOrigin
+    public String saveMktCamDesc() {
+        Map<String, Object> map = mktCampaignService.saveMktCamDesc();
+        return JSON.toJSONString(map);
+    }
 }
 
 
