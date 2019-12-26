@@ -33,7 +33,7 @@ public class OpenMktCampaignController extends BaseController {
      * 查询营销活动列表
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign", method = RequestMethod.POST)
+    @RequestMapping(value = "/campaign/mktCampaign", method = RequestMethod.POST)
     public String getMktCampaignList(@RequestParam(required = false) String mktActivityNbr,
                                      @RequestParam(required = false) String accNum, HttpServletResponse response) {
         try {
@@ -53,7 +53,7 @@ public class OpenMktCampaignController extends BaseController {
      * @return
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign/{mktCampaignId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/mktCampaign/{mktCampaignId}", method = RequestMethod.GET)
     public String getMktCampaignDetail(@PathVariable String mktCampaignId, HttpServletResponse response) {
         try {
             Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktCampaignId);
