@@ -33,7 +33,6 @@ import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
@@ -45,7 +44,6 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
 import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
@@ -54,12 +52,10 @@ import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
-import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -77,7 +73,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Filter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -460,7 +455,7 @@ public class EventApiServiceImpl implements EventApiService {
                 List<String> list =new ArrayList<>();
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("eventCode", map.get("eventCode"));
-                Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", 0L, paramMap);
+                Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", paramMap);
                 if(channelCodeRedis!=null){
                     list = (List<String>) channelCodeRedis.get("CHANNEL_CODE_LIST_" + map.get("eventCode"));
                 }
@@ -497,7 +492,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //根据事件code查询事件信息
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("eventCode", map.get("eventCode"));
-                Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", 0L, paramMap);
+                Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", paramMap);
                 ContactEvt event = new ContactEvt();
                 if(eventRedis!=null){
                     event = (ContactEvt) eventRedis.get("EVENT_" + map.get("eventCode"));
@@ -535,7 +530,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //验证事件采集项
                 List<EventItem> contactEvtItems = new ArrayList<>();
-                Map<String, Object> evtItemsRedis = eventRedisService.getRedis("EVENT_ITEM_", eventId, new HashMap<>());
+                Map<String, Object> evtItemsRedis = eventRedisService.getRedis("EVENT_ITEM_", eventId);
                 if (evtItemsRedis != null) {
                     contactEvtItems = (List<EventItem>) evtItemsRedis.get("EVENT_ITEM_" + eventId);
                 }
@@ -772,7 +767,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //查询事件下使用的所有标签
                 DefaultContext<String, Object> context = new DefaultContext<String, Object>();
                 Map<String, String> mktAllLabels = new HashMap<>();
-                Map<String, Object> eventLabelRedis = eventRedisService.getRedis("EVT_ALL_LABEL_", eventId, new HashMap<>());
+                Map<String, Object> eventLabelRedis = eventRedisService.getRedis("EVT_ALL_LABEL_", eventId);
                 if(eventLabelRedis!=null){
                     mktAllLabels = (Map<String, String>) eventLabelRedis.get("EVT_ALL_LABEL_" + eventId);
                 }
@@ -2062,7 +2057,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     private List<Map<String, Object>> getResultByEvent(Long eventId, String eventCode, String lanId, String channel, String reqId, String accNbr, String c4, String custId) {
-        Map<String, Object> redis = eventRedisService.getRedis("CAM_IDS_EVT_REL_", eventId, new HashMap<>());
+        Map<String, Object> redis = eventRedisService.getRedis("CAM_IDS_EVT_REL_", eventId);
         List<Map<String, Object>> mktCampaginIdList = new ArrayList<>();
         if (redis != null) {
             mktCampaginIdList = (List<Map<String, Object>>) redis.get("CAM_IDS_EVT_REL_" + eventId);
@@ -2272,7 +2267,7 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 //查询活动信息
-                Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", mktCampaginId, new HashMap<>());
+                Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", mktCampaginId);
                 MktCampaignDO mktCampaign = new MktCampaignDO();
                 if (mktCampaignRedis != null) {
                     mktCampaign = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + mktCampaginId);
@@ -2332,10 +2327,10 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 查询策略信息
-                Map<String, Object> MktStrategyConfRedis = eventRedisService.getRedis("MKT_STRATEGY_", mktCampaginId, new HashMap<>());
+                Map<String, Object> MktStrategyConfRedis = eventRedisService.getRedis("MKT_CAM_STRATEGY_", mktCampaginId);
                 List<MktStrategyConfDO> mktStrategyConfDOS = new ArrayList<>();
                 if (MktStrategyConfRedis != null) {
-                    mktStrategyConfDOS = ( List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_STRATEGY_" + mktCampaginId);
+                    mktStrategyConfDOS = ( List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_CAM_STRATEGY_" + mktCampaginId);
                 }
 
                 if (mktStrategyConfDOS == null) {
@@ -2490,7 +2485,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 获取规则
                     List<Map<String, Object>> ruleMapList = new ArrayList<>();
                     List<MktStrategyConfRuleDO> mktStrategyConfRuleList = new ArrayList<>();
-                    Map<String, Object> mktRuleListRedis = eventRedisService.getRedis("RULE_LIST_", mktStrategyConf.getMktStrategyConfId(), new HashMap<>());
+                    Map<String, Object> mktRuleListRedis = eventRedisService.getRedis("RULE_LIST_", mktStrategyConf.getMktStrategyConfId());
                     if (mktRuleListRedis != null) {
                         mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktRuleListRedis.get("RULE_LIST_" + mktStrategyConf.getMktStrategyConfId());
                     }
@@ -2523,7 +2518,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 log.info("预校验还没出错2");
                 List<String> mktCamCodeList = new ArrayList<>();
-                Map<String, Object> mktCamCodeListRedis = eventRedisService.getRedis("MKT_CAM_API_CODE_KEY", 0L, new HashMap<>());
+                Map<String, Object> mktCamCodeListRedis = eventRedisService.getRedis("MKT_CAM_API_CODE_KEY");
                 if(mktCamCodeListRedis!=null){
                     mktCamCodeList = (List<String>) mktCamCodeListRedis.get("MKT_CAM_API_CODE_KEY");
                 }
@@ -2683,7 +2678,7 @@ public class EventApiServiceImpl implements EventApiService {
             Map<String, Object> resultMap = new HashMap<>();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             try {
-                Map<String, Object> resultByEventRedis = eventRedisService.getRedis("CAM_EVT_REL_", eventId, new HashMap<>());
+                Map<String, Object> resultByEventRedis = eventRedisService.getRedis("CAM_EVT_REL_", eventId);
                 List<MktCamEvtRel> resultByEvent = new ArrayList<>();
                 if (resultByEventRedis != null) {
                     resultByEvent = (List<MktCamEvtRel>) resultByEventRedis.get("CAM_EVT_REL_" + eventId);
@@ -2796,7 +2791,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                             // 销售品过滤
                             String custProdFilter = null;
-                            Map<String, Object> custProdFilterRedis = eventRedisService.getRedis("CUST_PROD_FILTER", 0L, new HashMap<>());
+                            Map<String, Object> custProdFilterRedis = eventRedisService.getRedis("CUST_PROD_FILTER");
                             if (custProdFilterRedis != null) {
                                 custProdFilter = (String) custProdFilterRedis.get("CUST_PROD_FILTER");
                             }
@@ -2824,7 +2819,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 // 判断该活动是否配置了销售品过滤
                                 Integer mktCampaignId = (Integer) taskMap.get("activityId");
 
-                                Map<String, Object> filterRuleListRedis = eventRedisService.getRedis("FILTER_RULE_LIST_", mktCampaignId.longValue(), new HashMap<>());
+                                Map<String, Object> filterRuleListRedis = eventRedisService.getRedis("FILTER_RULE_LIST_", mktCampaignId.longValue());
                                 List<FilterRule> filterRuleList = new ArrayList<>();
                                 if (filterRuleListRedis != null) {
                                     filterRuleList = (List<FilterRule>) filterRuleListRedis.get("FILTER_RULE_LIST_"+mktCampaignId);
@@ -2919,7 +2914,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 Long activityId = Long.valueOf(resultMap1.get("ACTIVITY_ID").toString());
 
                                 //查询活动信息
-                                Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", activityId, new HashMap<>());
+                                Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", activityId);
                                 MktCampaignDO mktCampaignDO = new MktCampaignDO();
                                 if (mktCampaignRedis != null) {
                                     mktCampaignDO = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + activityId);
