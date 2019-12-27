@@ -23,4 +23,6 @@ public interface EventRedisService {
     Map<String, Object> delRedisByKey(String key);
 
     Map<String, Object> getRedisByKey(String key);
+
+    Map<String, Object> deleteByCampaign( Long mktCampaginId);
 }
