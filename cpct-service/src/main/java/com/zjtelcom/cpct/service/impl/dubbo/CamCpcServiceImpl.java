@@ -834,29 +834,40 @@ public class CamCpcServiceImpl implements CamCpcService {
                 return nonPassedMsg;
             }
 
+            jsonObject.put("msg", "实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接");
+            esHitService.save(jsonObject, IndexList.RULE_MODULE);
+
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
             String express = null;
             Object datetypeTargouidList = new Object();
-            Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
-            if (datetypeRedis != null) {
-                datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
-            }
-
-            if (datetypeTargouidList != null) {
-                String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
-                List<String> list = Arrays.asList(timeTypeTarGrpIdList);
-                if (!list.contains(tarGrpId)) {
-                    //判断表达式在缓存中有没有
-                    express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            SysParams sysParams = null;
+            try {
+                Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
+                if (datetypeRedis != null) {
+                    datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
                 }
-            }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
-            SysParams sysParams = new SysParams();
-            if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+
+                if (datetypeTargouidList != null) {
+                    String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
+                    List<String> list = Arrays.asList(timeTypeTarGrpIdList);
+                    if (!list.contains(tarGrpId)) {
+                        //判断表达式在缓存中有没有
+                        express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                    }
+                }
+                Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
+                sysParams = new SysParams();
+                if (checkLabelRedis != null) {
+                    sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "表达式缓存查询失败" + e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
@@ -1210,7 +1221,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    // nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
                     return nonPassedMsg;
                 }
 
@@ -1352,9 +1363,12 @@ public class CamCpcServiceImpl implements CamCpcService {
             camScript = (CamScript) mktCamScriptRedis.get("MKT_CAM_SCRIPT_" + evtContactConfId);
             log.info("camScript = " + JSON.toJSONString(camScript));
         }
-        if (camScript != null && camScript.getScriptDesc() != null) {
+        if (camScript != null) {
             contactScript = camScript.getScriptDesc();
-            scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            if (contactScript != null) {
+                scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            }
+
         } else {
             //未查询到话术 不命中
             nonPassedMsg.put("rule_" + ruleId, "未查询到推送话术");
