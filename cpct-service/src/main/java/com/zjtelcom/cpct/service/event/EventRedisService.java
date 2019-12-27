@@ -18,4 +18,11 @@ public interface EventRedisService {
 
     Map<String, Object> getRedis(String key, Long id, Map<String, Object> params);
 
+    Map<String, Object> delRedisByEventCode(String eventCode);
+
+    Map<String, Object> delRedisByKey(String key);
+
+    Map<String, Object> getRedisByKey(String key);
+
+    Map<String, Object> deleteByCampaign( Long mktCampaginId);
 }

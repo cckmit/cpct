@@ -64,7 +64,7 @@ public class TargetGroupServiceImpl implements TargetGroupService {
                 Long tarGrpId = tarGrpCondition.getTarGrpId();
                 List<TarGrpCondition> conditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
                 String resultString = generateExpress(conditionList);
-                redisUtils.del("EXPRESS_" + tarGrpId);
+                //redisUtils.del("EXPRESS_" + tarGrpId);
                 redisUtils.set("EXPRESS_" + tarGrpId, resultString);
             }
         }

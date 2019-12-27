@@ -15,17 +15,6 @@ import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.zjpii.biz.serv.YzServ;
-import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.*;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
-import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -37,21 +26,16 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
-import com.zjtelcom.cpct.enums.DateUnit;
 import com.zjtelcom.cpct.service.dubbo.CamCpcService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
-import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +49,6 @@ import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.zjtelcom.cpct.enums.DateUnit.DAY;
 import static com.zjtelcom.cpct.enums.Operator.BETWEEN;
 
 @Service
@@ -260,7 +243,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                                                 CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
                                                 //                    log.info("555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
                                                 if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                                        OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
 
                                                     // 查询销售品实例缓存实体
                                                     CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
@@ -578,7 +561,6 @@ public class CamCpcServiceImpl implements CamCpcService {
                     Map<String, Object> itgTrigger;
 
                     //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
-                    //查询展示列 （iSale）   todo  展示列的标签未查询到是否影响命中
                     List<Map<String, Object>> iSaleDisplay = new ArrayList<>();
                     Map<String, Object> iSaleDisplayRedis = eventRedisService.getRedis("MKT_ISALE_LABEL_", mktCampaign.getIsaleDisplay());
                     if (iSaleDisplayRedis != null) {
@@ -852,28 +834,40 @@ public class CamCpcServiceImpl implements CamCpcService {
                 return nonPassedMsg;
             }
 
+            jsonObject.put("msg", "实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接");
+            esHitService.save(jsonObject, IndexList.RULE_MODULE);
+
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
             String express = null;
             Object datetypeTargouidList = new Object();
-            Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
-            if (datetypeRedis != null) {
-                datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
-            }
-
-            if (datetypeTargouidList != null) {
-                String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
-                List<String> list = Arrays.asList(timeTypeTarGrpIdList);
-                if (!list.contains(tarGrpId)) {
-                    //判断表达式在缓存中有没有
-                    express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            SysParams sysParams = null;
+            try {
+                Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
+                if (datetypeRedis != null) {
+                    datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
                 }
-            }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
-            SysParams sysParams = new SysParams();
-            if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+
+                if (datetypeTargouidList != null) {
+                    String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
+                    List<String> list = Arrays.asList(timeTypeTarGrpIdList);
+                    if (!list.contains(tarGrpId)) {
+                        //判断表达式在缓存中有没有
+                        express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                    }
+                }
+                Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
+                sysParams = new SysParams();
+                if (checkLabelRedis != null) {
+                    sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "表达式缓存查询失败" + e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
@@ -1251,7 +1245,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     coopruleService.validateProduct(taskChlList, privateParams.get("activityType"), params.get("integrationId"), loginId, params.get("lanId"));
                     Long time = System.currentTimeMillis() - timeStart;
                     if (taskChlList == null || taskChlList.isEmpty()) {
-                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过");
+                        nonPassedMsg.put("rule_" + ruleId, "受理规则校验未通过   ");
                         return nonPassedMsg;
                     }
                 }
@@ -1364,10 +1358,14 @@ public class CamCpcServiceImpl implements CamCpcService {
         CamScript camScript = new CamScript();
         if (mktCamScriptRedis != null) {
             camScript = (CamScript) mktCamScriptRedis.get("MKT_CAM_SCRIPT_" + evtContactConfId);
+            log.info("camScript = " + JSON.toJSONString(camScript));
         }
-        if (camScript != null && camScript.getScriptDesc() != null) {
+        if (camScript != null) {
             contactScript = camScript.getScriptDesc();
-            scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            if (contactScript != null) {
+                scriptLabelList.addAll(subScript(camScript.getScriptDesc()));
+            }
+
         } else {
             //未查询到话术 不命中
             nonPassedMsg.put("rule_" + ruleId, "未查询到推送话术");

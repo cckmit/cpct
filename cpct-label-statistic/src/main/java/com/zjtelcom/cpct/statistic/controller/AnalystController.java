@@ -13,7 +13,7 @@
 //import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 //
 //@RestController
-//@RequestMapping("${adminPath}/analyst")//"${adminPath}
+//@RequestMapping("${adminPath}/analystByLabel")//"${adminPath}
 //public class AnalystController {
 //
 //    protected Logger logger = LoggerFactory.getLogger(AnalystController.class);
@@ -39,5 +39,5 @@
 //    }
 //
 //
-
+//
 //}

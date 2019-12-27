@@ -111,4 +111,5 @@ public interface MktCampaignMapper {
     int saveMktCamDesc(MktCampaignDO mktCampaignDOS);
 
     List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
+
 }

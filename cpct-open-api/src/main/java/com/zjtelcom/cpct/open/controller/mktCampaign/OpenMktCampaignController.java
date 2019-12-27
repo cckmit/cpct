@@ -33,7 +33,7 @@ public class OpenMktCampaignController extends BaseController {
      * 查询营销活动列表
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign", method = RequestMethod.GET)
+    @RequestMapping(value = "/campaign/mktCampaign", method = RequestMethod.POST)
     public String getMktCampaignList(@RequestParam(required = false) String mktActivityNbr,
                                      @RequestParam(required = false) String accNum, HttpServletResponse response) {
         try {
