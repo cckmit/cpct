@@ -1221,7 +1221,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+                    // nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
                     return nonPassedMsg;
                 }
 
@@ -1274,8 +1274,10 @@ public class CamCpcServiceImpl implements CamCpcService {
         MktCamChlConfDetail mktCamChlConfDetail = new MktCamChlConfDetail();
         if (chlConfDetailRedis != null) {
             mktCamChlConfDetail = (MktCamChlConfDetail) chlConfDetailRedis.get("CHL_CONF_DETAIL_" + evtContactConfId);
+            log.info("mktCamChlConfDetail = " + JSON.toJSONString(mktCamChlConfDetail));
         }
         boolean checkTime = true;
+        log.info("渠道属性校验开始.....");
         for (MktCamChlConfAttr mktCamChlConfAttr : mktCamChlConfDetail.getMktCamChlConfAttrList()) {
             //渠道属性数据返回给协同中心
             if (mktCamChlConfAttr.getAttrId() == 500600010001L || mktCamChlConfAttr.getAttrId() == 500600010002L || mktCamChlConfAttr.getAttrId() == 500600010003L || mktCamChlConfAttr.getAttrId() == 500600010004L) {
@@ -1335,6 +1337,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             }
 
         }
+        log.info("渠道属性校验结束.....");
         channelMap.put("taskChlAttrList", taskChlAttrList);
 
         if (!checkTime) {
@@ -1373,11 +1376,13 @@ public class CamCpcServiceImpl implements CamCpcService {
         }
 
         // 从redis中获取指引
+        log.info("渠道话术校验通过");
         Map<String, Object> mktVerbalRedis = eventRedisService.getRedis("MKT_VERBAL_", evtContactConfId);
         List<VerbalVO> verbalVOList = new ArrayList<>();
         if (mktVerbalRedis != null) {
             verbalVOList = (List<VerbalVO>) mktVerbalRedis.get("MKT_VERBAL_" + evtContactConfId);
         }
+        log.info("渠道痛痒点校验verbalVOList开始");
         if (verbalVOList.size() > 0) {
             for (VerbalVO verbalVO : verbalVOList) {
                 //查询指引规则 todo
@@ -1387,6 +1392,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                 }
             }
         }
+        log.info("渠道痛痒点校验scriptLabelList开始");
         if (scriptLabelList.size() > 0) {
             for (String labelStr : scriptLabelList) {
                 if (context.containsKey(labelStr)) {
@@ -1404,6 +1410,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         String channelFilterCode = null;
         if (channelFilterCodeRedis != null) {
             channelFilterCode = (String) channelFilterCodeRedis.get("CHANNEL_FILTER_CODE");
+            log.info("渠道话术拦截开关 channelFilterCode = " + channelFilterCode);
         }
         int index = -1;
         if (channelFilterCode != null) {

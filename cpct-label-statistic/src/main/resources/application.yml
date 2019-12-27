@@ -5,6 +5,9 @@ logging:
 #    com.zjtelcom.cpct.dao: debug
     com.ctg.itrdc.cache.pool.CtgJedisPool: warn
 
+#contextPath
+adminPath: data
+
 #Mybatis配置
 mybatis:
   mapper-locations: classpath:mybatis/*/*.xml
