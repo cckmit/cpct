@@ -177,7 +177,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
                     mktCamChlConfDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
-                    redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfId);
+                    //redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfId);
 
                             // 保存话术
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
@@ -373,7 +373,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
      */
     @Override
     public Map<String, Object> updateMktStrategyConfRule(MktStrategyConfRule mktStrategyConfRule) {
-        redisUtils.del("MKT_RULE_" + mktStrategyConfRule.getMktStrategyConfRuleId());
+       // redisUtils.del("MKT_RULE_" + mktStrategyConfRule.getMktStrategyConfRuleId());
         Map<String, Object> mktStrategyConfRuleMap = new HashMap<>();
         String mktCamChlResultIds = "";
         String productIds = "";
@@ -432,7 +432,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(evtContactConfId);
                     mktCamChlConfDO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
                     mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
-                    redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfId);
+                    //redisUtils.del("CHL_CONF_DETAIL_" + evtContactConfId);
                     CamScriptAddVO camScriptAddVO = new CamScriptAddVO();
                     camScriptAddVO.setEvtContactConfId(evtContactConfId);
                     camScriptAddVO.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
@@ -473,7 +473,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-            redisUtils.del("MKT_RULE_" + mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+            //redisUtils.del("MKT_RULE_" + mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             //营销组织树
             if (mktStrategyConfRule.getOrganizationList()!=null && !mktStrategyConfRule.getOrganizationList().isEmpty()){
                 if (redisUtils.get("ORG_"+mktStrategyConfRuleDO.getMktStrategyConfRuleId().toString())==null
@@ -864,14 +864,14 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         try {
             //删除规则跟策略的关联
             mktStrategyConfRuleRelMapper.deleteByMktStrategyConfRulId(mktStrategyConfRuleId);
-            redisUtils.del("MKT_RULE_" + mktStrategyConfRuleId);
+            //redisUtils.del("MKT_RULE_" + mktStrategyConfRuleId);
             //删除活动与客户分群的关系
             MktStrategyConfRuleDO strategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleId);
             if (strategyConfRuleDO!=null){
                 List<String> confList = ChannelUtil.StringToList4LabelValue(strategyConfRuleDO.getEvtContactConfId());
                 for (String confId : confList){
                    mktCamChlConfAttrMapper.deleteByEvtContactConfId(Long.valueOf(confId));
-                    redisUtils.del("CHL_CONF_DETAIL_" + Long.valueOf(confId));
+                    //redisUtils.del("CHL_CONF_DETAIL_" + Long.valueOf(confId));
                 }
             }
             if(strategyConfRuleDO!=null && strategyConfRuleDO.getTarGrpId()!=null){
@@ -879,7 +879,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
             //删除规则
             mktStrategyConfRuleMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
-            redisUtils.del("MKT_RULE_" + mktStrategyConfRuleId);
+            //redisUtils.del("MKT_RULE_" + mktStrategyConfRuleId);
             // 删除规则下的渠道关系
             mktStrategyMapper.deleteByPrimaryKey(mktStrategyConfRuleId);
             mktCamStrategyRelMapper.deleteByStrategyId(mktStrategyConfRuleId);
@@ -1163,7 +1163,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         mktStrategyConfRuleDO.setUpdateDate(new Date());
         mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
         mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-        redisUtils.del("MKT_RULE_" + ruleId);
+        //redisUtils.del("MKT_RULE_" + ruleId);
         mktStrategyConfRuleMap.put("ruleId", ruleId);
         return mktStrategyConfRuleMap;
     }
@@ -1338,7 +1338,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                         ruleNew.setUpdateDate(new Date());
                         ruleNew.setUpdateStaff(UserUtil.loginId());
                         mktStrategyConfRuleMapper.updateByPrimaryKey(ruleNew);
-                        redisUtils.del("MKT_RULE_" + ruleId);
+                       // redisUtils.del("MKT_RULE_" + ruleId);
                     }
                 }
                 List<TarGrpCondition> moreList = new ArrayList<>();
@@ -1366,7 +1366,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 ruleNew.setUpdateDate(new Date());
                 ruleNew.setUpdateStaff(UserUtil.loginId());
                 mktStrategyConfRuleMapper.updateByPrimaryKey(ruleNew);
-                redisUtils.del("MKT_RULE_" + ruleId);
+                //redisUtils.del("MKT_RULE_" + ruleId);
             }
             return map;
         }
@@ -1628,7 +1628,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-            redisUtils.del("MKT_RULE_" + ruleId);
+           // redisUtils.del("MKT_RULE_" + ruleId);
             map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             return map;
         }
@@ -1732,7 +1732,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-            redisUtils.del("MKT_RULE_" + ruleId);
+            //redisUtils.del("MKT_RULE_" + ruleId);
             map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             return map;
         }
@@ -1835,7 +1835,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             mktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleDO.setUpdateDate(new Date());
             mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-            redisUtils.del("MKT_RULE_" + ruleId);
+            //redisUtils.del("MKT_RULE_" + ruleId);
             map.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());
             return map;
         }

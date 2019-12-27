@@ -834,29 +834,40 @@ public class CamCpcServiceImpl implements CamCpcService {
                 return nonPassedMsg;
             }
 
+            jsonObject.put("msg", "实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接");
+            esHitService.save(jsonObject, IndexList.RULE_MODULE);
+
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             // ！！！实时接入自定义时间类型标签值，那就不能拿缓存，只能实时拼接！！！
             // ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
             String express = null;
             Object datetypeTargouidList = new Object();
-            Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
-            if (datetypeRedis != null) {
-                datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
-            }
-
-            if (datetypeTargouidList != null) {
-                String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
-                List<String> list = Arrays.asList(timeTypeTarGrpIdList);
-                if (!list.contains(tarGrpId)) {
-                    //判断表达式在缓存中有没有
-                    express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+            SysParams sysParams = null;
+            try {
+                Map<String, Object> datetypeRedis = eventRedisService.getRedis("DATETYPE_TARGOUID_LIST");
+                if (datetypeRedis != null) {
+                    datetypeTargouidList = datetypeRedis.get("DATETYPE_TARGOUID_LIST");
                 }
-            }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
-            SysParams sysParams = new SysParams();
-            if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+
+                if (datetypeTargouidList != null) {
+                    String[] timeTypeTarGrpIdList = datetypeTargouidList.toString().split(",");
+                    List<String> list = Arrays.asList(timeTypeTarGrpIdList);
+                    if (!list.contains(tarGrpId)) {
+                        //判断表达式在缓存中有没有
+                        express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
+                    }
+                }
+                Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
+                sysParams = new SysParams();
+                if (checkLabelRedis != null) {
+                    sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("hit", "false");
+                jsonObject.put("msg", "表达式缓存查询失败" + e.getMessage());
+                esHitService.save(jsonObject, IndexList.RULE_MODULE);
             }
             if (express == null || "".equals(express)) {
                 List<LabelResult> labelResultList = new ArrayList<>();
