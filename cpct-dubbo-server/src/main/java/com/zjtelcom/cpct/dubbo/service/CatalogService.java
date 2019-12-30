@@ -11,4 +11,5 @@ public interface CatalogService {
 
     Map<String,Object> syncLabelCatalog(LabelCatalog req);
 
+
 }

@@ -1,6 +1,5 @@
-package com.zjtelcom.cpct.dubbo.service.dubboThreadPool.impl;
+package com.zjtelcom.cpct.dubbo.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -20,8 +19,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dubbo.service.dubboThreadPool.DubboThreadPoolService;
-import com.zjtelcom.cpct.dubbo.service.dubboThreadPool.ListMapLabelTaskService;
+import com.zjtelcom.cpct.dubbo.service.CpcService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
@@ -32,20 +30,24 @@ import com.zjtelcom.cpct.util.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 @Transactional
-public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
+public class CpcServiceImpl implements CpcService {
 
-    private static final Logger log = LoggerFactory.getLogger(DubboThreadPoolServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CpcServiceImpl.class);
 
     @Autowired
     private RedisUtils redisUtils;  // redis方法
@@ -76,8 +78,6 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
 
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
-    @Autowired
-    ListMapLabelTaskService listMapLabelTaskService;
 
 
     @Autowired

@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.service.dubboThreadPool.impl;
+package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.ql.util.express.DefaultContext;
 import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
