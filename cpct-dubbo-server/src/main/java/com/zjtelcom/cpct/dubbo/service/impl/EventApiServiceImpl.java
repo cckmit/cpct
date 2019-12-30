@@ -18,8 +18,9 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.dubbo.service.dubboThreadPool.DubboThreadPoolService;
+import com.zjtelcom.cpct.dubbo.service.CatalogService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
+import com.zjtelcom.cpct.dubbo.service.CpcService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -92,8 +93,11 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
-    @Autowired(required = false)
-    private DubboThreadPoolService dubboThreadPoolService;
+    @Autowired
+    private CpcService cpcService;
+
+
+
 
 
     @Override
@@ -188,7 +192,10 @@ public class EventApiServiceImpl implements EventApiService {
 
             //初始化返回结果
             Map<String, Object> result = new HashMap();
-            result = dubboThreadPoolService.cpc(params);
+//            CpcService cpcService =(CpcService) SpringUtil.getBean("cpcService");
+//            log.info("dubboThreadPoolService:"+JSON.toJSONString(cpcService));
+            result = cpcService.cpc(params);
+            log.info("222222222");
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
@@ -266,7 +273,10 @@ public class EventApiServiceImpl implements EventApiService {
 
         //调用计算方法
         try {
-            result = dubboThreadPoolService.cpc(params);
+//            CpcService cpcService =(CpcService) SpringUtil.getBean("dubboThreadPoolService");
+//            log.info("dubboThreadPoolService:"+JSON.toJSONString(cpcService));
+            result = cpcService.cpc(params);
+            log.info("222222222");
         } catch (Exception e) {
             e.printStackTrace();
             log.error("同步事件返回失败:" + map.get("reqId"), e.getMessage());
