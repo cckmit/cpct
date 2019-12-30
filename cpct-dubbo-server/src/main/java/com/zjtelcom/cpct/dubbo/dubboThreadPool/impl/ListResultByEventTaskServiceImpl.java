@@ -23,74 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Calendar.MONTH;
 
-public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskService,Callable {
+public class ListResultByEventTaskServiceImpl implements Callable {
     private static final Logger log = LoggerFactory.getLogger(ListResultByEventTaskServiceImpl.class);
-
-
-    private String lanId;
-    private String channel;
-    private String reqId;
-    private String accNbr;
-    private Map<String, Object> act;
-    private String c4;
-    private String custId;
-
-
-    public String getLanId() {
-        return lanId;
-    }
-
-    public void setLanId(String lanId) {
-        this.lanId = lanId;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
-    }
-
-    public String getReqId() {
-        return reqId;
-    }
-
-    public void setReqId(String reqId) {
-        this.reqId = reqId;
-    }
-
-    public String getAccNbr() {
-        return accNbr;
-    }
-
-    public void setAccNbr(String accNbr) {
-        this.accNbr = accNbr;
-    }
-
-    public Map<String, Object> getAct() {
-        return act;
-    }
-
-    public void setAct(Map<String, Object> act) {
-        this.act = act;
-    }
-
-    public String getC4() {
-        return c4;
-    }
-
-    public void setC4(String c4) {
-        this.c4 = c4;
-    }
-
-    public String getCustId() {
-        return custId;
-    }
-
-    public void setCustId(String custId) {
-        this.custId = custId;
-    }
 
     @Autowired
     private EsHitsService esHitService;  //es存储
@@ -101,14 +35,24 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
     @Autowired
     private EventRedisService eventRedisService;
 
-    public ListResultByEventTaskServiceImpl(String lanId, String channel, String reqId, String accNbr, Map<String, Object> act, String c4, String custId) {
-        this.lanId = lanId;
-        this.channel = channel;
-        this.reqId = reqId;
-        this.accNbr = accNbr;
-        this.act = act;
-        this.c4 = c4;
-        this.custId = custId;
+    private String lanId;
+    private String channel;
+    private String reqId;
+    private String accNbr;
+    private Map<String, Object> act;
+    private String c4;
+    private String custId;
+
+
+
+    public ListResultByEventTaskServiceImpl(HashMap<String, Object> hashMap) {
+        this.lanId = (String)hashMap.get("lanId");
+        this.channel = (String)hashMap.get("channel");
+        this.reqId = (String)hashMap.get("reqId");
+        this.accNbr = (String)hashMap.get("accNbr");
+        this.act = (Map<String, Object>)hashMap.get("act");
+        this.c4 = (String)hashMap.get("c4");
+        this.custId = (String)hashMap.get("custId");
     }
 
     @Override
