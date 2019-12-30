@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ql.util.express.DefaultContext;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.dubbo.service.ListMapLabelTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
-public class ListMapLabelTaskServiceImpl implements Callable {
+public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Callable {
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
 
     @Autowired

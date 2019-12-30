@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dubbo.service.ListResultByEventTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -26,7 +27,7 @@ import static java.util.Calendar.MONTH;
 
 @Service
 @Transactional
-public class ListResultByEventTaskServiceImpl implements Callable {
+public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskService,Callable {
     private static final Logger log = LoggerFactory.getLogger(ListResultByEventTaskServiceImpl.class);
 
     @Autowired

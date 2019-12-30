@@ -21,6 +21,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
+import com.zjtelcom.cpct.dubbo.service.CustListTaskService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
@@ -37,7 +38,7 @@ import java.util.concurrent.Callable;
 
 @Service
 @Transactional
-public class CustListTaskServiceImpl implements Callable {
+public class CustListTaskServiceImpl implements CustListTaskService,Callable {
 
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
 
