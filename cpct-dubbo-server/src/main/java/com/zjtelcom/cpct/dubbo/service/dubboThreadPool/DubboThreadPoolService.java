@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.dubboThreadPool;
+package com.zjtelcom.cpct.dubbo.service.dubboThreadPool;
 
 import java.util.Map;
 

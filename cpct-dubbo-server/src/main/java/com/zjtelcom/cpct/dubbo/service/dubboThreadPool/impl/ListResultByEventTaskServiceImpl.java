@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.dubboThreadPool.impl;
+package com.zjtelcom.cpct.dubbo.service.dubboThreadPool.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -8,7 +8,6 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.ListResultByEventTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.es.EsHitsService;

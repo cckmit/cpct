@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.dubboThreadPool.impl;
+package com.zjtelcom.cpct.dubbo.service.dubboThreadPool.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

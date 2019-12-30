@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.dubboThreadPool;
+package com.zjtelcom.cpct.dubbo.service.dubboThreadPool;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ql.util.express.DefaultContext;
