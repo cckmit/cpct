@@ -103,9 +103,7 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
 
 
 
-    /**
-     * 事件验证模块公共方法
-     */
+
     @Override
     public Map<String, Object> cpc(Map<String, String> map) {
         //记录开始时间
@@ -584,8 +582,6 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                     param.put("queryFields", "");
                     param.put("type", "4");
                     param.put("centerType", "00");
-                    ExecutorService executorService = Executors.newCachedThreadPool();
-                    ThreadPoolExecutor threadPool = ThreadPool.getThreadPool();
                     try {
                         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                         if ("0".equals(dubboResult.get("result_code").toString())) {
@@ -606,7 +602,14 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accArray) {
                             // todo 12.23 线程优化方法提取 待完成！ x
-                            Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(o, mktAllLabel, map, context, esJson, labelItems));
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("o",o);
+                            hashMap.put("mktAllLabel",mktAllLabel);
+                            hashMap.put("map",map);
+                            hashMap.put("context",context);
+                            hashMap.put("esJson",esJson);
+                            hashMap.put("labelItems",labelItems);
+                            Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
 //                                Future<DefaultContext<String, Object>> future = executorService.submit(new getListMapLabelTask(o, mktAllLabel, map, context, esJson, labelItems));
                             futureList.add(future);
                         }
@@ -621,7 +624,6 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                     } catch (Exception e) {
                         log.error("Exception = " + e);
                     } finally {
-                        executorService.shutdown();
                     }
                     // 判断是否存在套餐级
                     if (hasPackage) {
@@ -640,7 +642,14 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
 
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accNbrMapList) {
-                            Future<DefaultContext<String, Object>> future = executorService.submit(new ListMapLabelTaskServiceImpl(o, mktAllLabel, map, context, esJson, labelItems));
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("o",o);
+                            hashMap.put("mktAllLabel",mktAllLabel);
+                            hashMap.put("map",map);
+                            hashMap.put("context",context);
+                            hashMap.put("esJson",esJson);
+                            hashMap.put("labelItems",labelItems);
+                            Future<DefaultContext<String, Object>> future = executorService.submit(new ListMapLabelTaskServiceImpl(hashMap));
                             futureList.add(future);
                         }
 
@@ -691,7 +700,16 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                 }
             }
             if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
-                Future<Map<String, Object>> f = ThreadPool.submit(new CustListTaskServiceImpl(mktCampaginIdList, initIdList, eventId, map.get("lanId"), custId, map, evtTriggers));
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("mktCampaginIdList",mktCampaginIdList);
+                hashMap.put("initIdList",initIdList);
+                hashMap.put("eventId",eventId);
+                String lanId = map.get("lanId");
+                hashMap.put("lanId",lanId);
+                hashMap.put("custId",custId);
+                hashMap.put("map",map);
+                hashMap.put("evtTriggers",evtTriggers);
+                Future<Map<String, Object>> f = ThreadPool.submit(new CustListTaskServiceImpl(hashMap));
                 threadList.add(f);
             }
 
@@ -708,6 +726,13 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                     }
                 }
             }
+            //ActivityTaskServiceImpl 线程参数 拼接
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("map",map);
+            hashMap.put("labelItems",labelItems);
+            hashMap.put("evtTriggers",evtTriggers);
+
+
             // 全部为资产级时直接遍历活动
             if (isAllAsset) {
                 for (Map<String, Object> resultMap : resultByEvent) {
@@ -721,7 +746,17 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                         privateParams.put("custId", map.get("custId"));
                         privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                         //资产级
-                        Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), resultMapList.get(0)));
+                        Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
+                        String type =(String) activeMap.get("type");
+                        List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                        DefaultContext<String, Object> defaultContext = resultMapList.get(0);
+                        //线程参数
+                        hashMap.put("mktCampaginId",mktCampaginId);
+                        hashMap.put("type",type);
+                        hashMap.put("privateParams",privateParams);
+                        hashMap.put("strategyMapList",strategyMapList);
+                        hashMap.put("defaultContext",defaultContext);
+                        Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                         //将线程处理结果添加到结果集
                         threadList.add(f);
                     }
@@ -744,7 +779,17 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                                     privateParams.put("custId", map.get("custId"));
                                     //活动优先级为空的时候默认0
                                     privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                    Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+
+                                    Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
+                                    String type =(String) activeMap.get("type");
+                                    List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                                    //线程参数
+                                    hashMap.put("mktCampaginId",mktCampaginId);
+                                    hashMap.put("type",type);
+                                    hashMap.put("privateParams",privateParams);
+                                    hashMap.put("strategyMapList",strategyMapList);
+                                    hashMap.put("defaultContext",o);
+                                    Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                     //将线程处理结果添加到结果集
                                     threadList.add(f);
                                 }
@@ -771,7 +816,17 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                                             privateParams.put("custId", map.get("custId"));
                                             //活动优先级为空的时候默认0
                                             privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                            Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                            //线程参数
+                                            Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
+                                            String type =(String) activeMap.get("type");
+                                            List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                                            //线程参数
+                                            hashMap.put("mktCampaginId",mktCampaginId);
+                                            hashMap.put("type",type);
+                                            hashMap.put("privateParams",privateParams);
+                                            hashMap.put("strategyMapList",strategyMapList);
+                                            hashMap.put("defaultContext",o);
+                                            Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                             //将线程处理结果添加到结果集
                                             threadList.add(f);
                                         }
@@ -799,8 +854,18 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
                                     privateParams.put("integrationId", map.get("integrationId"));
                                     privateParams.put("custId", map.get("custId"));
                                     privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                    //线程参数
+                                    Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
+                                    String type =(String) activeMap.get("type");
+                                    List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                                    //线程参数
+                                    hashMap.put("mktCampaginId",mktCampaginId);
+                                    hashMap.put("type",type);
+                                    hashMap.put("privateParams",privateParams);
+                                    hashMap.put("strategyMapList",strategyMapList);
+                                    hashMap.put("defaultContext",o);
                                     //资产级
-                                    Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(map, (Long) activeMap.get("mktCampaginId"), (String) activeMap.get("type"), privateParams, labelItems, evtTriggers, (List<Map<String, Object>>) activeMap.get("strategyMapList"), o));
+                                    Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                     //将线程处理结果添加到结果集
                                     threadList.add(f);
                                 }
@@ -1115,9 +1180,17 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
         List<Future<Map<String, Object>>> futureList = new ArrayList<>();
         List<Map<String, Object>> resultMapList = new ArrayList<>();
         try {
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("lanId",lanId);
+            hashMap.put("channel",channel);
+            hashMap.put("reqId",reqId);
+            hashMap.put("accNbr",accNbr);
+            hashMap.put("c4",c4);
+            hashMap.put("custId",custId);
             for (Map<String, Object> act : mktCampaginIdList) {
                 act.put("eventCode", eventCode);
-                Future<Map<String, Object>> future = ThreadPool.submit(new ListResultByEventTaskServiceImpl(lanId, channel, reqId, accNbr, act, c4, custId));
+                hashMap.put("act",act);
+                Future<Map<String, Object>> future = ThreadPool.submit(new ListResultByEventTaskServiceImpl(hashMap));
                 futureList.add(future);
             }
             if (futureList != null && futureList.size() > 0) {

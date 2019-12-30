@@ -13,38 +13,17 @@ import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryServi
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
-import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
 import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
-import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
-import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.CustListTaskService;
-import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
-import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
-import com.zjtelcom.cpct.service.channel.SearchLabelService;
-import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.es.es.service.EsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,84 +37,9 @@ import java.util.concurrent.Callable;
 
 @Service
 @Transactional
-public class CustListTaskServiceImpl implements CustListTaskService,Callable {
+public class CustListTaskServiceImpl implements Callable {
 
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
-
-    private List<String> campaignList;
-    private List<String> initIdList;
-    private Long eventId;
-    private String landId;
-    private String custId;
-    private Map<String, String> map;
-    private List<Map<String, Object>> evtTriggers;
-
-    public List<String> getCampaignList() {
-        return campaignList;
-    }
-
-    public void setCampaignList(List<String> campaignList) {
-        this.campaignList = campaignList;
-    }
-
-    public List<String> getInitIdList() {
-        return initIdList;
-    }
-
-    public void setInitIdList(List<String> initIdList) {
-        this.initIdList = initIdList;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }
-
-    public String getLandId() {
-        return landId;
-    }
-
-    public void setLandId(String landId) {
-        this.landId = landId;
-    }
-
-    public String getCustId() {
-        return custId;
-    }
-
-    public void setCustId(String custId) {
-        this.custId = custId;
-    }
-
-    public Map<String, String> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, String> map) {
-        this.map = map;
-    }
-
-    public List<Map<String, Object>> getEvtTriggers() {
-        return evtTriggers;
-    }
-
-    public void setEvtTriggers(List<Map<String, Object>> evtTriggers) {
-        this.evtTriggers = evtTriggers;
-    }
-
-
-    public CustListTaskServiceImpl(List<String> campaignList, List<String> initIdList, Long eventId, String landId, String custId, Map<String, String> map, List<Map<String, Object>> evtTriggers) {
-        this.campaignList = campaignList;
-        this.initIdList = initIdList;
-        this.eventId = eventId;
-        this.landId = landId;
-        this.custId = custId;
-        this.map = map;
-        this.evtTriggers = evtTriggers;
-    }
 
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
@@ -166,6 +70,28 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
 
     @Autowired
     private EventRedisService eventRedisService;
+
+
+    private List<String> campaignList;
+    private List<String> initIdList;
+    private Long eventId;
+    private String landId;
+    private String custId;
+    private Map<String, String> map;
+    private List<Map<String, Object>> evtTriggers;
+
+
+    public CustListTaskServiceImpl( HashMap<String, Object> hashMap) {
+        this.campaignList = (List<String>) hashMap.get("campaignList");
+        this.initIdList = (List<String>) hashMap.get("initIdList");
+        this.eventId = (Long ) hashMap.get("eventId");
+        this.landId = (String) hashMap.get("landId");
+        this.custId = (String) hashMap.get("custId");
+        this.map = (Map<String, String>) hashMap.get("map");
+        this.evtTriggers = (List<Map<String, Object>>) hashMap.get("evtTriggers");
+    }
+
+
     /**
      * 获取客户清单 Task
      */

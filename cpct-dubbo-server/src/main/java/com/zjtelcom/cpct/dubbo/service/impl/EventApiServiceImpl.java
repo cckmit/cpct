@@ -3,71 +3,28 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.biz.asset.model.dto.AssetDto;
-import com.ctzj.biz.asset.model.dto.AssetPromDto;
-import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
-import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
-import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
-import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
-import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
-import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
-import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
-import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
-import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
-import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
-import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
-import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.Operator;
-import com.ql.util.express.rule.RuleResult;
-import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
-import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.*;
-import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.domain.channel.CamScript;
+import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.channel.Label;
+import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
-import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.event.ContactEvtMatchRul;
-import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.dubboThreadPool.DubboThreadPoolService;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.impl.ActivityTaskServiceImpl;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.impl.CustListTaskServiceImpl;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.impl.ListMapLabelTaskServiceImpl;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.impl.ListResultByEventTaskServiceImpl;
-import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
-import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
-import com.zjtelcom.cpct.service.event.EventRedisService;
-import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.ThreadPool;
-import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,14 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.util.Calendar.MONTH;
 
 @Service
 public class EventApiServiceImpl implements EventApiService {
@@ -139,7 +92,7 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired(required = false)
     private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private DubboThreadPoolService dubboThreadPoolService;
 
 

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ql.util.express.DefaultContext;
 import com.zjpii.biz.serv.YzServ;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.ListMapLabelTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
-public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Callable {
+public class ListMapLabelTaskServiceImpl implements Callable {
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
 
     @Autowired
@@ -36,54 +35,6 @@ public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Call
     private JSONObject esJson;
     Map<String, String> labelItems;
 
-
-    public Object getO() {
-        return o;
-    }
-
-    public void setO(Object o) {
-        this.o = o;
-    }
-
-    public Map<String, String> getMktAllLabel() {
-        return mktAllLabel;
-    }
-
-    public void setMktAllLabel(Map<String, String> mktAllLabel) {
-        this.mktAllLabel = mktAllLabel;
-    }
-
-    public Map<String, String> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, String> map) {
-        this.map = map;
-    }
-
-    public DefaultContext<String, Object> getContext() {
-        return context;
-    }
-
-    public void setContext(DefaultContext<String, Object> context) {
-        this.context = context;
-    }
-
-    public JSONObject getEsJson() {
-        return esJson;
-    }
-
-    public void setEsJson(JSONObject esJson) {
-        this.esJson = esJson;
-    }
-
-    public Map<String, String> getLabelItems() {
-        return labelItems;
-    }
-
-    public void setLabelItems(Map<String, String> labelItems) {
-        this.labelItems = labelItems;
-    }
 
     // 处理资产级标签和销售品级标签
     private DefaultContext<String, Object> getAssetAndPromLabel(
@@ -128,13 +79,13 @@ public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Call
 
 
 
-    public ListMapLabelTaskServiceImpl(Object o, Map<String, String> mktAllLabel, Map<String, String> map, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
-        this.o = o;
-        this.mktAllLabel = mktAllLabel;
-        this.map = map;
-        this.context = context;
-        this.esJson = esJson;
-        this.labelItems = labelItems;
+    public ListMapLabelTaskServiceImpl(HashMap<String, Object> hashMap) {
+        this.o = hashMap.get("o");
+        this.mktAllLabel =(Map<String, String>) hashMap.get("mktAllLabel");
+        this.map = ( Map<String, String>)hashMap.get("map");
+        this.context =(DefaultContext<String, Object>) hashMap.get("context");
+        this.esJson = (JSONObject)hashMap.get("esJson");
+        this.labelItems =( Map<String, String>) hashMap.get("labelItems");
     }
     @Override
     public Object call() throws Exception {
