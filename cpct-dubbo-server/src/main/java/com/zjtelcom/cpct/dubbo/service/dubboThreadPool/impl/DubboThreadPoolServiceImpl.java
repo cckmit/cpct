@@ -1,13 +1,9 @@
-package com.zjtelcom.cpct.dubbo.dubboThreadPool.impl;
+package com.zjtelcom.cpct.dubbo.service.dubboThreadPool.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.biz.asset.model.dto.AssetDto;
-import com.ctzj.biz.asset.model.dto.AssetPromDto;
-import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
-import com.ctzj.bss.customer.data.carrier.outbound.model.ResponseResult;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
@@ -20,29 +16,19 @@ import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
 import com.ql.util.express.DefaultContext;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
-import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dto.filter.FilterRule;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.DubboThreadPoolService;
-import com.zjtelcom.cpct.dubbo.dubboThreadPool.ListMapLabelTaskService;
-import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
-import com.zjtelcom.cpct.dubbo.service.CamApiService;
-import com.zjtelcom.cpct.dubbo.service.impl.EventApiServiceImpl;
+import com.zjtelcom.cpct.dubbo.service.dubboThreadPool.DubboThreadPoolService;
+import com.zjtelcom.cpct.dubbo.service.dubboThreadPool.ListMapLabelTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.enums.AreaNameEnum;
-import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.ThreadPool;
-import com.zjtelcom.es.es.service.EsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -731,7 +717,6 @@ public class DubboThreadPoolServiceImpl implements DubboThreadPoolService {
             hashMap.put("map",map);
             hashMap.put("labelItems",labelItems);
             hashMap.put("evtTriggers",evtTriggers);
-
 
             // 全部为资产级时直接遍历活动
             if (isAllAsset) {
