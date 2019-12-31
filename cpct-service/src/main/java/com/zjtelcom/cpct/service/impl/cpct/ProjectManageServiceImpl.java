@@ -57,7 +57,7 @@ public class ProjectManageServiceImpl implements ProjectManageService{
      */
     @Override
     public Map<String, Object> updateProjectStateTime(Map<String, Object> params) {
-        Long id = (Long) params.get("id");
+        Long id = ((Integer) params.get("id")).longValue();
         if (id != null) {
             TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
             if (trialOperation != null) {

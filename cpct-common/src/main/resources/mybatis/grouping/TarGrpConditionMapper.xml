@@ -246,5 +246,13 @@
     where camrel.MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
   </select>
 
+    <select id="selectAllByUpdateStaff" parameterType="string" resultMap="BaseResultMap">
+      SELECT CONDITION_ID, TAR_GRP_ID, ROOT_FLAG, LEFT_PARAM, LEFT_PARAM_TYPE, OPER_TYPE,
+        RIGHT_PARAM, RIGHT_PARAM_TYPE, CONDITION_TEXT, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+        CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+      FROM tar_grp_condition
+      WHERE UPDATE_STAFF = #{updateStaff}
+      GROUP BY TAR_GRP_ID
+    </select>
 
 </mapper>

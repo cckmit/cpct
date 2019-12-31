@@ -438,6 +438,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             condition.setOperType(map.get("operType").toString());
             condition.setLeftParam(map.get("leftParam").toString());
             condition.setRightParam(map.get("rightParam").toString());
+            condition.setUpdateStaff(Long.valueOf(map.get("updateStaff").toString()));
             conditions.add(condition);
         }
         String strategyArea = MapUtil.getString(params.get("strategyArea"));
@@ -855,6 +856,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未找到有效的活动策略或规则");
             return result;
         }
+        campaign.setBatchType("1000");
+        campaignMapper.updateByPrimaryKey(campaign);
         TrialOperation op = null;
         try {
             //添加红黑名单列表
@@ -1909,6 +1912,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "抽样试算失败，无法全量试算");
             return result;
         }
+        campaignDO.setBatchType("2000");
+        campaignMapper.updateByPrimaryKey(campaignDO);
         List<MktStrategyCloseRuleRelDO> closeRuleRelDOS = strategyCloseRuleRelMapper.selectRuleByStrategyId(campaignDO.getMktCampaignId());
         //todo 关单规则配置信息
         if (closeRuleRelDOS!=null && !closeRuleRelDOS.isEmpty()){
@@ -2140,6 +2145,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(attr, new MktCamChlConfAttrDO());
                                     mktCamChlConfAttrDO.setRemark(servicePackage.getLabel());
                                     mktCamChlConfAttrMapper.updateByPrimaryKey(mktCamChlConfAttrDO);
+                                    //redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfAttrDO.getEvtContactConfId());
                                 }
                             }
                         }
@@ -2316,22 +2322,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         } else if ("7100".equals(type)) {
                             express.append("notIn");
                         }
-                        if (tarGrpConditionDOs.get(i).getUpdateStaff()==null && label.getLabelDataType().equals("1100")){
-                            if (tarGrpConditionDOs.get(i).getRightParam().contains("-")){
-                                tarGrpConditionDOs.get(i).setUpdateStaff(0L);
-                            }else {
-                                tarGrpConditionDOs.get(i).setUpdateStaff(200L);
-                            }
-                        }
-                        if (label.getLabelDataType().equals("1100") && tarGrpConditionDOs.get(i).getUpdateStaff()==200L){
+
+                        if (label.getLabelDataType().equals("1100") && "200".equals(String.valueOf(tarGrpConditionDOs.get(i).getUpdateStaff()))){
                             String date = tarGrpConditionDOs.get(i).getRightParam();
-                            if (!tarGrpConditionDOs.get(i).getRightParam().contains("-")){
-                                if (Operator.BETWEEN.getValue().toString().equals(tarGrpConditionDOs.get(i).getOperType())){
-                                    String[] conditions = tarGrpConditionDOs.get(i).getRightParam().split(",");
-                                    date = DateUtil.getPreDay(Integer.valueOf(conditions[0])) +","+DateUtil.getPreDay(Integer.valueOf(conditions[1]));
-                                }else {
-                                    date =  DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
-                                }
+                            if (Operator.BETWEEN.getValue().toString().equals(tarGrpConditionDOs.get(i).getOperType())) {
+                                String[] conditions = tarGrpConditionDOs.get(i).getRightParam().split(",");
+                                date = DateUtil.getPreDay(Integer.valueOf(conditions[0])) + "," + DateUtil.getPreDay(Integer.valueOf(conditions[1]));
+                            } else {
+                                date = DateUtil.getPreDay(Integer.valueOf(tarGrpConditionDOs.get(i).getRightParam()));
                             }
                             express.append(date);
                         }else if (label.getInjectionLabelCode().equals("PROM_LIST")){

@@ -937,7 +937,7 @@ public class MktCampaingReportServiceImpl implements MktCampaingReportService {
         Map<String, Object> countMapOff = new HashMap<>();
         Map<String, Object> offLineParam = new HashMap<>();
         offLineParam.putAll(headParam);
-        offLineParam.put("statusCd", "(2010)"); // 在线的
+        offLineParam.put("statusCd", "(2010,2006)"); // 在线的
         int offCount = mktCampaignReportMapper.countByStatus(offLineParam);
         countMapOff.put("type", "下线");
         countMapOff.put("num", offCount);

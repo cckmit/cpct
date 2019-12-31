@@ -347,6 +347,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 mktCamEvtRelDO.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
                 mktCamEvtRelMapper.insert(mktCamEvtRelDO);
             }
+            redisUtils.del("CAM_IDS_EVT_REL_" + evtDetail.getContactEvtId());
 
 //            List<EvtSceneCamRel> evtSceneCamRels = evtDetail.getEvtSceneCamRels();
 //            for (EvtSceneCamRel evtSceneCamRel : evtSceneCamRels) {
@@ -456,6 +457,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         //删除事件
         contactEvtMapper.delEvent(contactEvtId);
         contactEvtItemMapper.deleteByEventId(contactEvtId);
+        redisUtils.del("CAM_IDS_EVT_REL_" + contactEvtId);
+        redisUtils.del("EVENT_ITEM_" + contactEvtId);
+        redisUtils.del("CAM_EVT_REL_" + contactEvtId);
+        redisUtils.del("CHANNEL_CODE_LIST_"+ evt.getContactEvtCode());
         EventMatchRulDTO eventMatchRulDTO = eventMatchRulMapper.listEventMatchRul(contactEvtId);
         if(eventMatchRulDTO != null) {
             eventMatchRulMapper.delEventMatchRul(eventMatchRulDTO);
@@ -605,6 +610,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         viewContactEvtRsp.setContactEvtDetail(contactEventDetail);
         // 删除事件接入缓存
         redisUtils.del("EVENT_ITEM_" + contactEvtId);
+        redisUtils.del("CAM_EVT_REL_" + contactEvtId);
+        redisUtils.del("CHANNEL_CODE_LIST_"+ contactEvt.getContactEvtCode());
+        redisUtils.del("CAM_IDS_EVT_REL_" + contactEvtId);
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
         map.put("viewContactEvtRsp", viewContactEvtRsp);
@@ -644,6 +652,9 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             }
             // 删除事件接入缓存
             redisUtils.del("EVENT_ITEM_" + evtDetail.getContactEvtId());
+            redisUtils.del("CAM_EVT_REL_" + evtDetail.getContactEvtId());
+            redisUtils.del("CHANNEL_CODE_LIST_"+evtDetail.getContactEvtCode());
+            redisUtils.del("CAM_IDS_EVT_REL_" + evtDetail.getContactEvtId());
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);
         map.put("resultMsg", StringUtils.EMPTY);
@@ -761,8 +772,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                     mktCamEvtRelMapper.insert(mktCamEvtRelDO);
                 }
             }
-            redisUtils.del("CAM_EVT_REL_" +evtDetail.getContactEvtId());
+            redisUtils.del("EVENT_ITEM_" + evtDetail.getContactEvtId());
+            redisUtils.del("CAM_EVT_REL_" + evtDetail.getContactEvtId());
             redisUtils.del("CHANNEL_CODE_LIST_"+evtDetail.getContactEvtCode());
+            redisUtils.del("CAM_IDS_EVT_REL_" + evtDetail.getContactEvtId());
             //删除不存在的关联关系
             for (MktCamEvtRel evtRel : oldRelList){
                 if (!relIdList.contains(evtRel.getMktCampEvtRelId())){
@@ -780,19 +793,17 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
                 Map<String, Object> eventMatchRulMap = eventMatchRulService.listEventMatchRul(evtDetail.getContactEvtId());
                 if (eventMatchRulMap != null) {
                     EventMatchRulDTO eventMatchRulDTO = (EventMatchRulDTO) eventMatchRulMap.get("listEventMatchRul");
-                    if (eventMatchRulDTO != null) {
-                        Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
-                        if (eventMatchRulConditionMap != null ) {
-                            // List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+                    Map<String, Object> eventMatchRulConditionMap = eventMatchRulService.listEventMatchRulCondition(eventMatchRulDTO.getEvtMatchRulId());
+                    if (eventMatchRulConditionMap != null ) {
+                        // List<EventMatchRulConditionVO> rulConditionList = (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
 
-                            List<EventMatchRulConditionVO> rulConditionList =  eventMatchRulConditionMap.get("listEventMatchRulCondition") == null ? new ArrayList<>() : (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
-                            if (!rulConditionList.isEmpty()) {
-                                //删除多余的事件规则条件
-                                for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
-                                    if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
-                                        EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
-                                        eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
-                                    }
+                        List<EventMatchRulConditionVO> rulConditionList =  eventMatchRulConditionMap.get("listEventMatchRulCondition") == null ? new ArrayList<>() : (List<EventMatchRulConditionVO>) eventMatchRulConditionMap.get("listEventMatchRulCondition");
+                        if (!rulConditionList.isEmpty()) {
+                            //删除多余的事件规则条件
+                            for (EventMatchRulConditionVO eventMatchRulConditionVO : rulConditionList) {
+                                if (!list.contains(eventMatchRulConditionVO.getConditionId())) {
+                                    EventMatchRulCondition eventMatchRulCondition = BeanUtil.create(eventMatchRulConditionVO, new EventMatchRulCondition());
+                                    eventMatchRulService.delEventMatchRulCondition(eventMatchRulCondition.getConditionId());
                                 }
                             }
                         }

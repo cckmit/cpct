@@ -410,8 +410,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<TarGrpCondition> tarGrpConditions = tarGrpDetail.getTarGrpConditions();
             List<TarGrpCondition> conditionList = new ArrayList<>();
             if(tarGrpConditions!=null && tarGrpConditions.size()>0){
+                Long updateStaff = 200L;
                 for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
-                    if (tarGrpCondition.getUpdateStaff().equals(200L)) {
+                    if (updateStaff.equals(tarGrpCondition.getUpdateStaff())) {
                         flag = true;
                     }
                     if (tarGrpCondition.getOperType()==null || tarGrpCondition.getOperType().equals("")){
@@ -448,9 +449,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             if (flag) {
                 Object o = redisUtils.get("DATETYPE_TARGOUID_LIST");
                 if (o == null) {
-                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp1);
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", tarGrp.getTarGrpId());
                 } else {
-                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp1);
+                    redisUtils.set("DATETYPE_TARGOUID_LIST", o.toString() + "," + tarGrp.getTarGrpId());
                 }
             }
             redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
@@ -654,9 +655,9 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             List<TarGrpCondition> allCondition = new ArrayList<>();
             List<TarGrpCondition> oldConditionList = tarGrpConditionMapper.listTarGrpCondition(tarGrp.getTarGrpId());
             List<Long> delList = new ArrayList<>();
-
+            Long updateStaff = 200L;
             for (TarGrpCondition tarGrpCondition : tarGrpConditions) {
-                if (tarGrpCondition.getUpdateStaff().equals(200L)) {
+                if (updateStaff.equals(tarGrpCondition.getUpdateStaff())) {
                     flag = true;
                 }
                 TarGrpCondition tarGrpCondition1 = tarGrpConditionMapper.selectByPrimaryKey(tarGrpCondition.getConditionId());

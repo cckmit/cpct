@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.open.serviceImpl.mktCampaign;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -48,6 +49,7 @@ import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.open.service.mktCampaign.MktDttsLogService;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,6 +134,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private MktDttsLogService mktDttsLogService;
     @Autowired
     private UCCPService uccpService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 查询营销活动详情
@@ -832,20 +836,24 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
-        }
-        try {
-            List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
-            for (Map<String, String> stringStringMap : group_campaign_recipient) {
-                String value = stringStringMap.get("value");
-                JSONObject jsonObject = JSONObject.parseObject(value);
-                Object phone = jsonObject.get("phone");
-                Object lanId = jsonObject.get("lanId");
-                String content = "集团活动已下发，请尽快登陆系统处理。";
-                String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+            try {
+                List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
+                logger.info("【获取承接人信息】"+JSON.toJSONString(group_campaign_recipient));
+                for (Map<String, String> stringStringMap : group_campaign_recipient) {
+                    String value = stringStringMap.get("value");
+                    JSONArray jsonArray = JSONArray.parseArray(value);
+                    //for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(0)));
+                    String content = "营销活动：[" + mktCampaignDO.getMktCampaignName() + "]集团活动已下发，请尽快登陆系统处理。";
+                    String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                    logger.info("uccp=======================================");
+                    logger.info(resultMsg);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        }catch (Exception e){
-            e.printStackTrace();
         }
+
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
         resultMap.put("resultMsg","处理成功");
@@ -1020,11 +1028,13 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                         MktCamChlConfDO mktCamChlConfDO = BeanUtil.create(openMktCamChlConfEntity, new MktCamChlConfDO());
                         mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                         mktCamChlConfMapper.updateByPrimaryKey(mktCamChlConfDO);
+                        redisUtils.del("CHL_CONF_DETAIL_" + mktCamChlConfDO.getEvtContactConfId());
                         //修改调查问卷
                         List<OpenMktCamQuestEntity> mktCamQuests = openMktCamChlConfEntity.getMktCamQuests();
                         //修改营服活动执行渠道配置属性
                         if(mktCamChlConfAttrs.size() > 0 ) {
                             mktCamChlConfAttrMapper.deleteByEvtContactConfId(openMktCamChlConfEntity.getEvtContactConfId());
+                            redisUtils.del("CHL_CONF_DETAIL_" + openMktCamChlConfEntity.getEvtContactConfId());
                             for (OpenMktCamChlConfAttrEntity openMktCamChlConfAttrEntity : mktCamChlConfAttrs) {
                                 MktCamChlConfAttrDO mktCamChlConfAttrDO = BeanUtil.create(openMktCamChlConfAttrEntity, new MktCamChlConfAttrDO());
                                 mktCamChlConfAttrDO.setEvtContactConfId(mktCamChlConfDO.getEvtContactConfId());
@@ -1035,6 +1045,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     }else if(openMktCamChlConfEntity.getActType().equals("DEL")) {
                         mktCamChlConfMapper.deleteByPrimaryKey(openMktCamChlConfEntity.getEvtContactConfId());
                         mktCamChlConfAttrMapper.deleteByEvtContactConfId(openMktCamChlConfEntity.getEvtContactConfId());
+                        redisUtils.del("CHL_CONF_DETAIL_" + openMktCamChlConfEntity.getEvtContactConfId());
                     }
                     //修改营服活动脚本
                     List<OpenMktCamScriptEntity> mktCamScripts = openMktCamChlConfEntity.getMktCamScripts();
@@ -1060,8 +1071,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                 }
                                 camScript.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                                 mktCamScriptMapper.updateByPrimaryKey(camScript);
+                                redisUtils.del("MKT_CAM_SCRIPT_" + openMktCamScriptEntity.getMktCampaignScptId());
                             }else if(openMktCamScriptEntity.getActType().equals("DEL")) {
                                 mktCamScriptMapper.deleteByPrimaryKey(openMktCamScriptEntity.getMktCampaignScptId());
+                                redisUtils.del("MKT_CAM_SCRIPT_" + openMktCamScriptEntity.getMktCampaignScptId());
                             }
                         }
                     }

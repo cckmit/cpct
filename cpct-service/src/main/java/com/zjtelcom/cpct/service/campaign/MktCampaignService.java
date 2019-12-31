@@ -83,4 +83,7 @@ public interface MktCampaignService {
     void acceptGroupCampaign(MktCampaignDO mktCampaignDO);
 
     void notAcceptGroupCampaign(MktCampaignDO mktCampaignDO);
+
+    Map<String,Object> saveMktCamDesc();
+
 }
