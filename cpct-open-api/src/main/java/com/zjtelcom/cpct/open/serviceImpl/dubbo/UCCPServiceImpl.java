@@ -1,14 +1,19 @@
 package com.zjtelcom.cpct.open.serviceImpl.dubbo;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.open.base.service.BaseService;
 import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,12 +22,14 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class UCCPServiceImpl implements UCCPService {
+public class UCCPServiceImpl extends BaseService implements UCCPService {
 
     @Autowired(required = false)
     private UCCPSendService uCCPSendService;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
     @Value("${uccp.userAcct}")
     private String userAcct;
@@ -30,6 +37,28 @@ public class UCCPServiceImpl implements UCCPService {
     private String password;
     @Value("${uccp.sceneId}")
     private String sceneId;
+
+    // 发送短信给集团活动承接人、业务负责人员以及运维人员
+    @Override
+    public void sendShortMessage4GroupCampaignRecipient(MktCampaignDO mktCampaignDO) {
+        try {
+            List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
+            logger.info("【获取承接人信息】"+JSON.toJSONString(group_campaign_recipient));
+            for (Map<String, String> stringStringMap : group_campaign_recipient) {
+                String value = stringStringMap.get("value");
+                JSONArray jsonArray = JSONArray.parseArray(value);
+                for (Object array : jsonArray) {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(array));
+                    String content = "营销活动：[" + mktCampaignDO.getMktCampaignName() + "]集团活动已下发，请尽快登陆系统处理。";
+                    String resultMsg = sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                    logger.info("uccp=======================================");
+                    logger.info(resultMsg);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     // 通过活动获取创建人，给活动创建人发送通知短信
     @Override
