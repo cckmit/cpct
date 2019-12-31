@@ -47,6 +47,10 @@ public class labelResultServiceImpl implements labelResultService,Runnable {
     private SysParams sysParams;
     private ExpressRunner runner;
     private List<LabelResult> labelResultList;
+    private EsHitsService esHitService;  //es存储
+    private SysParamsService sysParamsService;
+    private EventRedisService eventRedisService;
+
 
     public labelResultServiceImpl(HashMap<String, Object> hashMap) {
         this.esJson = (JSONObject)hashMap.get("esJson");
@@ -55,20 +59,23 @@ public class labelResultServiceImpl implements labelResultService,Runnable {
         this.sysParams = (SysParams)hashMap.get("sysParams");
         this.runner = (ExpressRunner)hashMap.get("runner");
         this.labelResultList = (List<LabelResult>)hashMap.get("labelResultList");
+        this.sysParamsService = (SysParamsService)hashMap.get("sysParamsService");
+        this.esHitService = (EsHitsService)hashMap.get("esHitService");
+        this.eventRedisService = (EventRedisService)hashMap.get("eventRedisService");
     }
 
 
 
-    @Autowired
-    private EsHitsService esHitService;  //es存储
-
-
-    @Autowired
-    private SysParamsService sysParamsService;
-
-
-    @Autowired
-    private EventRedisService eventRedisService;
+//    @Autowired
+//    private EsHitsService esHitService;  //es存储
+//
+//
+//    @Autowired
+//    private SysParamsService sysParamsService;
+//
+//
+//    @Autowired
+//    private EventRedisService eventRedisService;
 
 
     /**

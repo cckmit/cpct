@@ -42,35 +42,35 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
 
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
 
-    @Autowired(required = false)
-    private YzServ yzServ; //因子实时查询dubbo服务
-
-    @Autowired
-    private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
-
-    @Autowired(required = false)
-    private EsService esService;
-
-    @Autowired(required = false)
-    private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
-
-    @Autowired(required = false)
-    private ICacheProdIndexQryService iCacheProdIndexQryService;
-
-    @Autowired(required = false)
-    private ICacheProdEntityQryService iCacheProdEntityQryService;
-
-    @Autowired(required = false)
-    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService;
-
-    @Autowired(required = false)
-    private ICacheRelEntityQryService iCacheRelEntityQryService;
-
-    @Autowired(required = false)
-    private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
-
-    @Autowired
-    private EventRedisService eventRedisService;
+//    @Autowired(required = false)
+//    private YzServ yzServ; //因子实时查询dubbo服务
+//
+//    @Autowired
+//    private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
+//
+//    @Autowired(required = false)
+//    private EsService esService;
+//
+//    @Autowired(required = false)
+//    private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
+//
+//    @Autowired(required = false)
+//    private ICacheProdIndexQryService iCacheProdIndexQryService;
+//
+//    @Autowired(required = false)
+//    private ICacheProdEntityQryService iCacheProdEntityQryService;
+//
+//    @Autowired(required = false)
+//    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService;
+//
+//    @Autowired(required = false)
+//    private ICacheRelEntityQryService iCacheRelEntityQryService;
+//
+//    @Autowired(required = false)
+//    private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
+//
+//    @Autowired
+//    private EventRedisService eventRedisService;
 
 
     private List<String> campaignList;
@@ -80,6 +80,16 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
     private String custId;
     private Map<String, String> map;
     private List<Map<String, Object>> evtTriggers;
+    private YzServ yzServ;
+    private MktCamEvtRelMapper mktCamEvtRelMapper;
+    private EsService esService;
+    private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
+    private ICacheProdIndexQryService iCacheProdIndexQryService;
+    private ICacheProdEntityQryService iCacheProdEntityQryService;
+    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService;
+    private ICacheRelEntityQryService iCacheRelEntityQryService;
+    private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
+    private EventRedisService eventRedisService;
 
 
     public CustListTaskServiceImpl( HashMap<String, Object> hashMap) {
@@ -90,6 +100,16 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
         this.custId = (String) hashMap.get("custId");
         this.map = (Map<String, String>) hashMap.get("map");
         this.evtTriggers = (List<Map<String, Object>>) hashMap.get("evtTriggers");
+        this.yzServ = (YzServ) hashMap.get("yzServ");
+        this.mktCamEvtRelMapper = (MktCamEvtRelMapper) hashMap.get("mktCamEvtRelMapper");
+        this.esService = (EsService) hashMap.get("esService");
+        this.ctgCacheAssetService = (CtgCacheAssetService) hashMap.get("ctgCacheAssetService");
+        this.iCacheProdIndexQryService = (ICacheProdIndexQryService) hashMap.get("iCacheProdIndexQryService");
+        this.iCacheProdEntityQryService = (ICacheProdEntityQryService) hashMap.get("iCacheProdEntityQryService");
+        this.iCacheOfferRelIndexQryService = (ICacheOfferRelIndexQryService) hashMap.get("iCacheOfferRelIndexQryService");
+        this.iCacheRelEntityQryService = (ICacheRelEntityQryService) hashMap.get("iCacheRelEntityQryService");
+        this.iCacheIdMappingEntityQryService = (ICacheIdMappingEntityQryService) hashMap.get("iCacheIdMappingEntityQryService");
+        this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
     }
 
 

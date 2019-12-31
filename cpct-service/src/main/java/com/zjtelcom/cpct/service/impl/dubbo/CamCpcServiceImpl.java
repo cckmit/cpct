@@ -86,6 +86,12 @@ public class CamCpcServiceImpl implements CamCpcService {
     @Autowired
     private EventRedisService eventRedisService;
 
+    @Autowired
+    private CoopruleService coopruleService;
+
+    @Autowired(required = false)
+    private YzServ yzServ; //因子实时查询dubbo服务
+
     Map<String, Boolean> flagMap = new ConcurrentHashMap();
 
     /**
@@ -374,6 +380,16 @@ public class CamCpcServiceImpl implements CamCpcService {
         hashMap.put("privateParams",privateParams);
         hashMap.put("context",context);
         hashMap.put("lanId",lanId);
+        hashMap.put("esHitService",esHitService);
+        hashMap.put("redisUtils",redisUtils);
+        hashMap.put("yzServ",yzServ);
+        hashMap.put("iCacheOfferEntityQryService",iCacheOfferEntityQryService);
+        hashMap.put("iCacheOfferRelIndexQryService",iCacheOfferRelIndexQryService);
+        hashMap.put("iCacheRelEntityQryService",iCacheRelEntityQryService);
+        hashMap.put("iCacheProdIndexQryService",iCacheProdIndexQryService);
+        hashMap.put("sysParamsService",sysParamsService);
+        hashMap.put("coopruleService",coopruleService);
+        hashMap.put("eventRedisService",eventRedisService);
         //初始化结果集
         List<Future<Map<String, Object>>> threadList = new ArrayList<>();
         //初始化线程池
