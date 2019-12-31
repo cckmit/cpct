@@ -37,6 +37,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.CpcService;
+import com.zjtelcom.cpct.dubbo.service.ListResultByEventTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -177,6 +178,8 @@ public class CpcServiceImpl implements CpcService {
 
     private final static String TOTAL_FLOW = "total_flow";
 
+    @Autowired
+    private ListResultByEventTaskService listResultByEventTaskService;
 
 
 
@@ -1277,8 +1280,8 @@ public class CpcServiceImpl implements CpcService {
             hashMap.put("c4",c4);
             hashMap.put("custId",custId);
             hashMap.put("eventRedisService",eventRedisService);
-            hashMap.put("esHitService",esHitService);
             hashMap.put("yzServ",yzServ);
+            hashMap.put("esHitService",esHitService);
 
             for (Map<String, Object> act : mktCampaginIdList) {
                 act.put("eventCode", eventCode);

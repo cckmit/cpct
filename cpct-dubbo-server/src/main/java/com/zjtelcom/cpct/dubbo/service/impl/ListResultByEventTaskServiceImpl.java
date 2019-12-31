@@ -34,8 +34,6 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 //
 //    @Autowired(required = false)
 //    private YzServ yzServ; //因子实时查询dubbo服务
-
-
 //    @Autowired
 //    private EventRedisService eventRedisService;
 
@@ -48,7 +46,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
     private String custId;
     private EventRedisService eventRedisService;
     private YzServ yzServ;
-    private EsHitService esHitService;
+//    private EsHitService esHitService;
 
 
 
@@ -62,7 +60,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
         this.custId = (String)hashMap.get("custId");
         this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
         this.yzServ = (YzServ) hashMap.get("yzServ");
-        this.esHitService = (EsHitService) hashMap.get("esHitService");
+//        this.esHitService = (EsHitService)hashMap.get("esHitService");
     }
 
     @Override
@@ -145,7 +143,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                                     if (index >= 0) {
                                         esJson.put("hit", false);
                                         esJson.put("msg", "红黑名单过滤规则验证被拦截");
-                                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                         return Collections.EMPTY_MAP;
                                     }
                                 }
@@ -156,7 +154,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                                 log.info("过滤时间段验证被拦截");
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -189,7 +187,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                                 if (index >= 0) {
                                     esJson.put("hit", false);
                                     esJson.put("msg", "红黑名单过滤规则验证被拦截");
-                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                     return Collections.EMPTY_MAP;
                                 }
                             }
@@ -199,7 +197,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                                 log.info("过滤时间段验证被拦截");
                                 esJson.put("hit", false);
                                 esJson.put("msg", "过滤时间段验证被拦截");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                                 return Collections.EMPTY_MAP;
                             }
                         }
@@ -229,7 +227,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                     esJson.put("hit", false);
                     esJson.put("msg", "当前时间不在活动生效时间内");
                     log.info("当前时间不在活动生效时间内");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
             } catch (Exception e) {
@@ -247,7 +245,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                 esJson.put("hit", false);
                 esJson.put("msg", "活动状态未发布");
 //                log.info("活动状态未发布");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                 return Collections.EMPTY_MAP;
             }
 
@@ -258,7 +256,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                 esJson.put("hit", false);
                 esJson.put("msg", "活动触发类型不符");
                 log.info("活动触发类型不符");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                 return Collections.EMPTY_MAP;
             }
 
@@ -267,7 +265,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                 esJson.put("hit", false);
                 esJson.put("msg", "活动类型不符");
                 log.info("活动类型不符");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                 return Collections.EMPTY_MAP;
             }
 
@@ -282,7 +280,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
                 esJson.put("hit", false);
                 esJson.put("msg", "策略查询失败");
                 log.info("策略查询失败");
-                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
+//                esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                 return Collections.EMPTY_MAP;
             }
             List<Map<String, Object>> strategyMapList = new ArrayList<>();
@@ -304,11 +302,11 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 
                     esJson.put("hit", false);
                     esJson.put("msg", "策略未命中");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+//                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                     esJsonStrategy.put("hit", false);
                     esJsonStrategy.put("msg", "当前时间不在策略生效时间内");
-                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+//                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                     continue;
                 }
                 //适用地市校验
@@ -330,24 +328,24 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 
                             esJson.put("hit", false);
                             esJson.put("msg", "策略未命中");
-                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+//                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                             strategyMap.put("msg", "适用地市获取异常");
                             esJsonStrategy.put("hit", "false");
                             esJsonStrategy.put("msg", "适用地市获取异常");
-                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+//                            esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         }
                     }
                     if (areaCheck) {
 
                         esJson.put("hit", false);
                         esJson.put("msg", "策略未命中");
-                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+//                        esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                         strategyMap.put("msg", "适用地市不符");
                         esJsonStrategy.put("hit", "false");
                         esJsonStrategy.put("msg", "适用地市不符");
-                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+//                        esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                         continue;
                     }
                 } else {
@@ -356,12 +354,12 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 
                     esJson.put("hit", false);
                     esJson.put("msg", "策略未命中");
-                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
+//                    esHitService.save(esJson, IndexList.ACTIVITY_MODULE, reqId + mktCampaginId + accNbr);
 
                     strategyMap.put("msg", "适用地市数据异常");
                     esJsonStrategy.put("hit", "false");
                     esJsonStrategy.put("msg", "适用地市数据异常");
-                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
+//                    esHitService.save(esJsonStrategy, IndexList.STRATEGY_MODULE);
                     continue;
                 }
                 log.info("预校验还没出错1");

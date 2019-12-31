@@ -195,7 +195,6 @@ public class EventApiServiceImpl implements EventApiService {
 //            CpcService cpcService =(CpcService) SpringUtil.getBean("cpcService");
 //            log.info("dubboThreadPoolService:"+JSON.toJSONString(cpcService));
             result = cpcService.cpc(params);
-            log.info("222222222");
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
