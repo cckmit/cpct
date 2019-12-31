@@ -29,6 +29,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
+import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.service.dubbo.RuleTaskService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -41,7 +42,6 @@ import com.zjtelcom.cpct.util.ThreadPool;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +72,16 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
     private Map<String, String> privateParams;
     private DefaultContext<String, Object> context;
     private String lanId;
+    private EsHitsService esHitService;  //es存储
+    private RedisUtils redisUtils;  // redis方法
+    private YzServ yzServ; //因子实时查询dubbo服务
+    private ICacheOfferEntityQryService iCacheOfferEntityQryService; // 查询销售品实例缓存实体
+    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService;
+    private ICacheRelEntityQryService iCacheRelEntityQryService;
+    private ICacheProdIndexQryService iCacheProdIndexQryService;
+    private SysParamsService sysParamsService;
+    private CoopruleService coopruleService;
+    private EventRedisService eventRedisService;
 
 
     /**
@@ -90,41 +100,50 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
         this.privateParams = (Map<String, String>)hashMap.get("privateParams");
         this.context = (DefaultContext<String, Object>)hashMap.get("context");
         this.lanId = (String) hashMap.get("lanId");
+        this.redisUtils = (RedisUtils) hashMap.get("redisUtils");
+        this.yzServ = (YzServ) hashMap.get("yzServ");
+        this.iCacheOfferEntityQryService = (ICacheOfferEntityQryService) hashMap.get("iCacheOfferEntityQryService");
+        this.iCacheOfferRelIndexQryService = (ICacheOfferRelIndexQryService) hashMap.get("iCacheOfferRelIndexQryService");
+        this.iCacheRelEntityQryService = (ICacheRelEntityQryService) hashMap.get("iCacheRelEntityQryService");
+        this.iCacheProdIndexQryService = (ICacheProdIndexQryService) hashMap.get("iCacheProdIndexQryService");
+        this.sysParamsService = (SysParamsService) hashMap.get("sysParamsService");
+        this.coopruleService = (CoopruleService) hashMap.get("coopruleService");
+        this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
     }
 
 
     @Value("${table.infallible}")
     private String defaultInfallibleTable;
 
-    @Autowired
-    private EsHitsService esHitService;  //es存储
-
-    @Autowired
-    private RedisUtils redisUtils;  // redis方法
-
-    @Autowired(required = false)
-    private YzServ yzServ; //因子实时查询dubbo服务
-
-    @Autowired(required = false)
-    private ICacheOfferEntityQryService iCacheOfferEntityQryService; // 查询销售品实例缓存实体
-
-    @Autowired(required = false)
-    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService; // 根据offerInstId和statusCd(1000-有效)查询offerProdInstRelId
-
-    @Autowired(required = false)
-    private ICacheRelEntityQryService iCacheRelEntityQryService;
-
-    @Autowired(required = false)
-    private ICacheProdIndexQryService iCacheProdIndexQryService;
-
-    @Autowired
-    private SysParamsService sysParamsService;
-
-    @Autowired
-    private CoopruleService coopruleService;
-
-    @Autowired
-    private EventRedisService eventRedisService;
+//    @Autowired
+//    private EsHitsService esHitService;  //es存储
+//
+//    @Autowired
+//    private RedisUtils redisUtils;  // redis方法
+//
+//    @Autowired(required = false)
+//    private YzServ yzServ; //因子实时查询dubbo服务
+//
+//    @Autowired(required = false)
+//    private ICacheOfferEntityQryService iCacheOfferEntityQryService; // 查询销售品实例缓存实体
+//
+//    @Autowired(required = false)
+//    private ICacheOfferRelIndexQryService iCacheOfferRelIndexQryService; // 根据offerInstId和statusCd(1000-有效)查询offerProdInstRelId
+//
+//    @Autowired(required = false)
+//    private ICacheRelEntityQryService iCacheRelEntityQryService;
+//
+//    @Autowired(required = false)
+//    private ICacheProdIndexQryService iCacheProdIndexQryService;
+//
+//    @Autowired
+//    private SysParamsService sysParamsService;
+//
+//    @Autowired
+//    private CoopruleService coopruleService;
+//
+//    @Autowired
+//    private EventRedisService eventRedisService;
 
     Map<String, Boolean> flagMap = new ConcurrentHashMap();
 
@@ -458,6 +477,9 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                 hashMap.put("sysParams",sysParams);
                 hashMap.put("runner",runner);
                 hashMap.put("labelResultList",labelResultList);
+                hashMap.put("sysParamsService",sysParamsService);
+                hashMap.put("esHitService",esHitService);
+                hashMap.put("eventRedisService",eventRedisService);
                 // 异步执行当个标签比较结果
 //                new CamCpcServiceImpl.labelResultThread(esJson, labelMapList, context, sysParams, runner, labelResultList).run();
                  ThreadPool.execute(new labelResultServiceImpl(hashMap));

@@ -10,12 +10,11 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.ListResultByEventTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
+import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +29,15 @@ import static java.util.Calendar.MONTH;
 public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskService,Callable {
     private static final Logger log = LoggerFactory.getLogger(ListResultByEventTaskServiceImpl.class);
 
-    @Autowired
-    private EsHitsService esHitService;  //es存储
+//    @Autowired
+//    private EsHitsService esHitService;  //es存储
+//
+//    @Autowired(required = false)
+//    private YzServ yzServ; //因子实时查询dubbo服务
 
-    @Autowired(required = false)
-    private YzServ yzServ; //因子实时查询dubbo服务
 
-    @Autowired
-    private EventRedisService eventRedisService;
+//    @Autowired
+//    private EventRedisService eventRedisService;
 
     private String lanId;
     private String channel;
@@ -46,6 +46,9 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
     private Map<String, Object> act;
     private String c4;
     private String custId;
+    private EventRedisService eventRedisService;
+    private YzServ yzServ;
+    private EsHitService esHitService;
 
 
 
@@ -57,15 +60,15 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
         this.act = (Map<String, Object>)hashMap.get("act");
         this.c4 = (String)hashMap.get("c4");
         this.custId = (String)hashMap.get("custId");
+        this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
+        this.yzServ = (YzServ) hashMap.get("yzServ");
+        this.esHitService = (EsHitService) hashMap.get("esHitService");
     }
 
     @Override
     public Object call() throws Exception {
-
         Map<String, Object> resultMap = new ConcurrentHashMap<>();
-
         Map<String, Object> mktCampaignMap = new ConcurrentHashMap<>();
-
         Map<String, Object> mktCampaignCustMap = new ConcurrentHashMap<>();
         log.info("活动预校验开始************");
 
