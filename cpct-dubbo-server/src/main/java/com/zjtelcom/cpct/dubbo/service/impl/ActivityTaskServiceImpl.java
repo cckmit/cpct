@@ -30,8 +30,8 @@ public class ActivityTaskServiceImpl implements ActivityTaskService,Callable {
     private List<Map<String, Object>> evtTriggers;
     private List<Map<String, Object>> strategyMapList;
     private DefaultContext<String, Object> context;
-
-
+    private CamApiService camApiService; // 活动任务
+    private CamApiSerService camApiSerService; // 服务活动任务
 
     public ActivityTaskServiceImpl(HashMap<String, Object> hashMap) {
         this.activityId = (Long)hashMap.get("mktCampaginId");
@@ -43,13 +43,15 @@ public class ActivityTaskServiceImpl implements ActivityTaskService,Callable {
         this.strategyMapList = (List<Map<String, Object>>)hashMap.get("strategyMapList");
 //        this.reqId = params.get("reqId");
         this.context = (DefaultContext<String, Object>)hashMap.get("defaultContext");
+        this.camApiService = (CamApiService)hashMap.get("camApiService");
+        this.camApiSerService = (CamApiSerService)hashMap.get("camApiSerService");
     }
 
-    @Autowired(required = false)
-    private CamApiService camApiService; // 活动任务
-
-    @Autowired(required = false)
-    private CamApiSerService camApiSerService; // 服务活动任务
+//    @Autowired(required = false)
+//    private CamApiService camApiService; // 活动任务
+//
+//    @Autowired(required = false)
+//    private CamApiSerService camApiSerService; // 服务活动任务
 
     @Override
     public Object call() throws Exception {

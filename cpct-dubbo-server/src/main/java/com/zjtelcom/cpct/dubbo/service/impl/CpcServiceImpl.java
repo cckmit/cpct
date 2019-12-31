@@ -3,30 +3,50 @@ package com.zjtelcom.cpct.dubbo.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
+import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
 import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
 import com.ql.util.express.DefaultContext;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.dao.campaign.*;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
+import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
+import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.EventItem;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
+import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
+import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.dubbo.service.CpcService;
+import com.zjtelcom.cpct.dubbo.service.ListResultByEventTaskService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
+import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.ThreadPool;
+import com.zjtelcom.es.es.service.EsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,16 +70,88 @@ public class CpcServiceImpl implements CpcService {
     private static final Logger log = LoggerFactory.getLogger(CpcServiceImpl.class);
 
     @Autowired
-    private RedisUtils redisUtils;  // redis方法
+    private ContactEvtMapper contactEvtMapper; //事件总表
+
+    @Autowired
+    private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
+
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper; //活动基本信息
+
+    @Autowired
+    private MktStrategyConfMapper mktStrategyConfMapper; //策略基本信息
+
+    @Autowired
+    private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;//策略规则
+
+    @Autowired
+    private FilterRuleMapper filterRuleMapper; //过滤规则
+
+    @Autowired
+    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
+
+    @Autowired
+    private MktCamChlConfMapper mktCamChlConfMapper; //协同渠道配置的渠道
+
+    @Autowired
+    private MktCamScriptMapper mktCamScriptMapper; //营销脚本
+
+    @Autowired
+    private MktVerbalMapper mktVerbalMapper; //话术
+
+    @Autowired
+    private InjectionLabelMapper injectionLabelMapper; //标签因子
 
     @Autowired
     private EsHitsService esHitService;  //es存储
+
+    @Autowired
+    private RedisUtils redisUtils;  // redis方法
+
+    @Autowired
+    private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
+
+    @Autowired(required = false)
+    private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
 
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
 
     @Autowired(required = false)
+    private ContactChannelMapper contactChannelMapper; //渠道信息
+
+    @Autowired(required = false)
+    private MktCamChlResultMapper mktCamChlResultMapper;
+
+    @Autowired(required = false)
+    private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
+
+    @Autowired(required = false)
+    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
+
+    @Autowired
+    private ContactEvtMatchRulMapper contactEvtMatchRulMapper; //事件规则
+
+    @Autowired
+    private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
+
+    @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;  //查询系统参数
+
+    @Autowired(required = false)
+    private SearchLabelService searchLabelService;  //查询活动下使用的所有标签
+
+    @Autowired(required = false)
+    private CamApiService camApiService; // 活动任务
+
+    @Autowired(required = false)
+    private CamApiSerService camApiSerService; // 服务活动任务
+
+    @Autowired(required = false)
+    private EsService esService;
+
+    @Autowired(required = false)
+    private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
 
     @Autowired(required = false)
     private QueryBindByAccCardService queryBindByAccCardService; // 通过号码查询绑定状态
@@ -79,7 +171,6 @@ public class CpcServiceImpl implements CpcService {
     @Autowired(required = false)
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
-
     @Autowired
     private EventRedisService eventRedisService;
 
@@ -87,6 +178,8 @@ public class CpcServiceImpl implements CpcService {
 
     private final static String TOTAL_FLOW = "total_flow";
 
+    @Autowired
+    private ListResultByEventTaskService listResultByEventTaskService;
 
 
 
@@ -584,17 +677,17 @@ public class CpcServiceImpl implements CpcService {
 
                         // 客户级
                         List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
-
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("mktAllLabel",mktAllLabel);
+                        hashMap.put("map",map);
+                        hashMap.put("context",context);
+                        hashMap.put("esJson",esJson);
+                        hashMap.put("esHitService",esHitService);
+                        hashMap.put("yzServ",yzServ);
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accArray) {
                             // todo 12.23 线程优化方法提取 待完成！ x
-                            HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("o",o);
-                            hashMap.put("mktAllLabel",mktAllLabel);
-                            hashMap.put("map",map);
-                            hashMap.put("context",context);
-                            hashMap.put("esJson",esJson);
-                            hashMap.put("labelItems",labelItems);
                             Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
 //                                Future<DefaultContext<String, Object>> future = executorService.submit(new getListMapLabelTask(o, mktAllLabel, map, context, esJson, labelItems));
                             futureList.add(future);
@@ -625,16 +718,17 @@ public class CpcServiceImpl implements CpcService {
                     try {
                         // 客户级
                         List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
-
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("mktAllLabel",mktAllLabel);
+                        hashMap.put("map",map);
+                        hashMap.put("context",context);
+                        hashMap.put("esJson",esJson);
+                        hashMap.put("labelItems",labelItems);
+                        hashMap.put("esHitService",esHitService);
+                        hashMap.put("yzServ",yzServ);
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accNbrMapList) {
-                            HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("o",o);
-                            hashMap.put("mktAllLabel",mktAllLabel);
-                            hashMap.put("map",map);
-                            hashMap.put("context",context);
-                            hashMap.put("esJson",esJson);
-                            hashMap.put("labelItems",labelItems);
                             Future<DefaultContext<String, Object>> future = executorService.submit(new ListMapLabelTaskServiceImpl(hashMap));
                             futureList.add(future);
                         }
@@ -695,6 +789,17 @@ public class CpcServiceImpl implements CpcService {
                 hashMap.put("custId",custId);
                 hashMap.put("map",map);
                 hashMap.put("evtTriggers",evtTriggers);
+                hashMap.put("yzServ",yzServ);
+                hashMap.put("mktCamEvtRelMapper",mktCamEvtRelMapper);
+                hashMap.put("esService",esService);
+                hashMap.put("ctgCacheAssetService",ctgCacheAssetService);
+                hashMap.put("iCacheProdIndexQryService",iCacheProdIndexQryService);
+                hashMap.put("iCacheProdEntityQryService",iCacheProdEntityQryService);
+                hashMap.put("iCacheOfferRelIndexQryService",iCacheOfferRelIndexQryService);
+                hashMap.put("iCacheRelEntityQryService",iCacheRelEntityQryService);
+                hashMap.put("iCacheIdMappingEntityQryService",iCacheIdMappingEntityQryService);
+                hashMap.put("eventRedisService",eventRedisService);
+
                 Future<Map<String, Object>> f = ThreadPool.submit(new CustListTaskServiceImpl(hashMap));
                 threadList.add(f);
             }
@@ -717,6 +822,8 @@ public class CpcServiceImpl implements CpcService {
             hashMap.put("map",map);
             hashMap.put("labelItems",labelItems);
             hashMap.put("evtTriggers",evtTriggers);
+            hashMap.put("camApiService",camApiService);
+            hashMap.put("camApiSerService",camApiSerService);
 
             // 全部为资产级时直接遍历活动
             if (isAllAsset) {
@@ -1172,6 +1279,10 @@ public class CpcServiceImpl implements CpcService {
             hashMap.put("accNbr",accNbr);
             hashMap.put("c4",c4);
             hashMap.put("custId",custId);
+            hashMap.put("eventRedisService",eventRedisService);
+            hashMap.put("yzServ",yzServ);
+            hashMap.put("esHitService",esHitService);
+
             for (Map<String, Object> act : mktCampaginIdList) {
                 act.put("eventCode", eventCode);
                 hashMap.put("act",act);
