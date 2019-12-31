@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Callable {
     private static final Logger log = LoggerFactory.getLogger(ListMapLabelTaskServiceImpl.class);
 
-    @Autowired
-    private EsHitsService esHitService;  //es存储
-
-    @Autowired(required = false)
-    private YzServ yzServ; //因子实时查询dubbo服务
+//    @Autowired
+//    private EsHitsService esHitService;  //es存储
+//
+//    @Autowired(required = false)
+//    private YzServ yzServ; //因子实时查询dubbo服务
 
     private Object o;
     private Map<String, String> mktAllLabel;
@@ -35,7 +35,8 @@ public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Call
     private DefaultContext<String, Object> context;
     private JSONObject esJson;
     Map<String, String> labelItems;
-
+    private EsHitsService esHitService;
+    private YzServ yzServ;
 
     // 处理资产级标签和销售品级标签
     private DefaultContext<String, Object> getAssetAndPromLabel(
@@ -87,6 +88,8 @@ public class ListMapLabelTaskServiceImpl implements ListMapLabelTaskService,Call
         this.context =(DefaultContext<String, Object>) hashMap.get("context");
         this.esJson = (JSONObject)hashMap.get("esJson");
         this.labelItems =( Map<String, String>) hashMap.get("labelItems");
+        this.esHitService =(EsHitsService) hashMap.get("esHitService");
+        this.yzServ =(YzServ) hashMap.get("yzServ");
     }
     @Override
     public Object call() throws Exception {
