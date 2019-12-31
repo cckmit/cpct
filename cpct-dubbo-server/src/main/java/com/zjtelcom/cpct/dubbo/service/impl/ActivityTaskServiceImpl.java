@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
 import com.ql.util.express.DefaultContext;
+import com.zjtelcom.cpct.dubbo.service.ActivityTaskService;
 import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -17,7 +18,7 @@ import java.util.concurrent.Callable;
 
 @Service
 @Transactional
-public class ActivityTaskServiceImpl implements Callable {
+public class ActivityTaskServiceImpl implements ActivityTaskService,Callable {
     private static final Logger log = LoggerFactory.getLogger(ActivityTaskServiceImpl.class);
 
     private Long activityId;
