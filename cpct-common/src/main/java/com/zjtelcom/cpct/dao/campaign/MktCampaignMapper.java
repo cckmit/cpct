@@ -112,4 +112,6 @@ public interface MktCampaignMapper {
 
     List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
 
+    String getCloseRuleNameFromMktCamId(Long mktCampaignId);
+
 }
