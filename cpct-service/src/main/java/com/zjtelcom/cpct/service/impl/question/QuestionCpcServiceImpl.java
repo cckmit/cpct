@@ -66,8 +66,11 @@ public class QuestionCpcServiceImpl implements QuestionService {
             if( pageSysmgrResultObject.getResultObject()!=null){
                 List<SystemPost> dataList = (List<SystemPost>) pageSysmgrResultObject.getResultObject().getDataList();
                 if(dataList!=null){
-                    if(dataList.get(0)!=null){
-                        postName = dataList.get(0).getSysPostName();
+                    for (SystemPost post : dataList){
+                        if (post.getStatusCd().equals("1000")){
+                            postName = post.getSysPostName();
+                        }
+                        break;
                     }
                 }
             }
