@@ -229,6 +229,8 @@ public class TrialLabelServiceImpl implements TrialLabelService {
 
                 map.put("total", Long.valueOf(totalHits));
                 map.put("expression2", expression2);
+                map.put("left", expression2.split("==")[0]);
+                map.put("right", expression2.split("==")[2]);
                 expressionList.add(map);
 //                arrayList.add(map);
                 logger.info("expression2:"+JSON.toJSONString(expression2));
@@ -262,6 +264,11 @@ public class TrialLabelServiceImpl implements TrialLabelService {
             LabelResultES label = new LabelResultES();
             label.setLabelCode(code);
             label.setLabelDataType(label1.getLabelDataType() == null ? "" : label1.getLabelDataType());
+            label.setLabelName(label1.getInjectionLabelName() == null ? "" : label1.getInjectionLabelName());
+            if (label1.getLabelValueType().toString().equals("2000")){
+
+            }
+            label.setOperType(label1.getLabelValueType() == null ? "" : label1.getLabelValueType());
             labelList.add(label);
         }
         params.put("expressions", expressions);
