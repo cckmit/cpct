@@ -214,10 +214,10 @@ public class TrialLabelServiceImpl implements TrialLabelService {
             logger.info("indexs=>:" + indexs);
             SearchResponse myresponse = null;
             Long totalHits = null;
-            for (String expression2 : expressions2) {
+            for (int j = 0; j < expressions2.size(); j++) {
                 BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
                 HashMap<String, Object> map = new HashMap<>();
-                buildQuery(boolQuery, expression2, labelDataList2, null, null);
+                buildQuery(boolQuery, expressions2.get(j), labelDataList2, null, null);
 
                 for (String expression : expressions) {
                     buildQuery(boolQuery, expression, labelDataList, null, null);
@@ -234,17 +234,48 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 logger.info("totalHits=>" + totalHits.toString());
 
                 map.put("total", Long.valueOf(totalHits));
-                map.put("expression2", expression2);
-                map.put("left", expression2.split("==")[0]);
-                map.put("right", expression2.split("==")[1]);
+                map.put("expression2", expressions2.get(j));
+                map.put("left", expressions2.get(j).split("==")[0]);
+                map.put("right", expressions2.get(j).split("==")[1]);
                 List<LabelResultES> labelLists = (List<LabelResultES>)result.get("labelList");
                 if (StringUtils.isNotBlank(labelLists.get(i).getRightParam())){
                     map.put("rightName", labelLists.get(i).getRightParam());
                 }
                 expressionList.add(map);
 //                arrayList.add(map);
-                logger.info("expression2:"+JSON.toJSONString(expression2));
+                logger.info("expression2:"+JSON.toJSONString(expressions2.get(j)));
             }
+//            for (String expression2 : expressions2) {
+//                BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+//                HashMap<String, Object> map = new HashMap<>();
+//                buildQuery(boolQuery, expression2, labelDataList2, null, null);
+//
+//                for (String expression : expressions) {
+//                    buildQuery(boolQuery, expression, labelDataList, null, null);
+//                }
+//                myresponse = client.prepareSearch(indexs)
+//                        .setTypes(esType)
+//                        .setQuery(boolQuery)
+//                        .setFetchSource("ASSET_NUMBER", null)
+//                        .setExplain(false)
+//                        .execute().actionGet();
+//
+//                SearchHits hits = myresponse.getHits();
+//                totalHits = hits.totalHits;
+//                logger.info("totalHits=>" + totalHits.toString());
+//
+//                map.put("total", Long.valueOf(totalHits));
+//                map.put("expression2", expression2);
+//                map.put("left", expression2.split("==")[0]);
+//                map.put("right", expression2.split("==")[1]);
+//                List<LabelResultES> labelLists = (List<LabelResultES>)result.get("labelList");
+//                if (StringUtils.isNotBlank(labelLists.get(i).getRightParam())){
+//                    map.put("rightName", labelLists.get(i).getRightParam());
+//                }
+//                expressionList.add(map);
+////                arrayList.add(map);
+//                logger.info("expression2:"+JSON.toJSONString(expression2));
+//            }
             // 遍历ES查询
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(mktStrategyConfRuleRelDOS.get(i).getMktStrategyConfRuleId());
             data.put("name", mktStrategyConfRuleDO.getMktStrategyConfRuleName());
