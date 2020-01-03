@@ -702,7 +702,7 @@
             AND LAN_ID IN #{lanId}
         </if>
         <if test="theMe != null and theMe != '' ">
-            AND THE_ME  #{theMe}
+            AND THE_ME  = #{theMe}
         </if>
         ORDER BY CREATE_DATE DESC
     </select>
