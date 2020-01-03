@@ -499,7 +499,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("theMe", theMe);
         }
         List<String> campaignIdLists =mktCampaignMapper.selectByMktCampaingIDFromTrial(paramMap);
-        if (campaignIdLists==null || campaignIdLists.size()<0) {
+        if (campaignIdLists==null || campaignIdLists.size()<=0) {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "无区间段派单活动!");
             return paramMap;
