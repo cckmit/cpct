@@ -1270,7 +1270,7 @@
         GROUP BY CAMPAIGN_ID )
     </select>
 
-    <select id="getCloseRuleNameFromMktCamId" parameterType="java.lang.Long">
+    <select id="getCloseRuleNameFromMktCamId" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT c.CLOSE_NAME FROM mkt_campaign m LEFT JOIN mkt_strategy_close_rule_rel ms ON m.MKT_CAMPAIGN_ID = ms.STRATEGY_ID
             LEFT JOIN close_rule c ON ms.RULE_ID = c.RULE_ID WHERE m.MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
