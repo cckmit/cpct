@@ -626,6 +626,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
+                        //活动名称
+                        resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
+                        //活动开始是时间和结束时间
+                        resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
+                        resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
+                        resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
                         String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
                         resultMap.put("mktCloseRuleName", CloseRuleName);
@@ -642,14 +650,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }else {
                             resultMap.put("area", sysArea.getName());
                         }
-                        //活动id
-                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
-                        //活动名称
-                        resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
-                        //活动开始是时间和结束时间
-                        resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
-                        resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
-                        resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //渠道编码
                         Object channel = map.get("channel");
                         if (channel== null || "" == channel || "null" == channel){
@@ -784,6 +784,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 continue;
                             }
                         }
+                        //活动id
+                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
+                        //活动名称
+                        resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
+                        //活动开始是时间和结束时间
+                        resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
+                        resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
+                        resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
                         String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
                         resultMap.put("mktCloseRuleName", CloseRuleName);
@@ -800,14 +808,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         }else {
                             resultMap.put("area", sysArea.getName());
                         }
-                        //活动id
-                        resultMap.put("mktCampaignId", mktCampaignDO.getMktCampaignId());
-                        //活动名称
-                        resultMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName());
-                        //活动开始是时间和结束时间
-                        resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
-                        resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
-                        resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //渠道编码
                         Object channel = map.get("channel");
                         if (channel== null || "" == channel || "null" == channel){
