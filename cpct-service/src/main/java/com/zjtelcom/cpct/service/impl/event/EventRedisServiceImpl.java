@@ -309,14 +309,14 @@ public class EventRedisServiceImpl implements EventRedisService {
             }
             redisUtils.set(key, mktCamCodeList);
             resutlt.put(key, mktCamCodeList);
-        } else if ("CUST_PROD_FILTER".equals(key)) { // 清单销售品过滤
+        } else if ("CUST_PROD_FILTER".equals(key)) { // 清单销售品过滤开关
             List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
             if (sysParamsList != null && sysParamsList.size() > 0) {
                 String custProdFilter = sysParamsList.get(0).getParamValue();
                 redisUtils.set(key, custProdFilter);
                 resutlt.put(key, custProdFilter);
             }
-        } else if ("REAL_PROD_FILTER".equals(key)) { // 清单销售品过滤
+        } else if ("REAL_PROD_FILTER".equals(key)) { // 实时销售品过滤开关
             List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
             if (sysParamsList != null && sysParamsList.size() > 0) {
                 String realProdFilter = sysParamsList.get(0).getParamValue();
@@ -500,10 +500,10 @@ public class EventRedisServiceImpl implements EventRedisService {
             Object o = redisUtils.get(key);
             result.put("object", o);
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
-            result.put("resultMsg", "删除缓存成功！");
+            result.put("resultMsg", "获取缓存成功！");
         } catch (Exception e) {
             result.put("resultCode", CommonConstant.CODE_FAIL);
-            result.put("resultMsg", "删除缓存失败！" + e);
+            result.put("resultMsg", "获取缓存失败！" + e);
         }
         return result;
     }
