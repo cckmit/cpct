@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.es;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.annotation.SysLog;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.dubbo.service.MqProducerService;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
@@ -33,6 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.NORMAL_SERVICE;
 import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
 @Service
@@ -64,6 +66,14 @@ public class EsHitsServiceImpl implements EsHitsService {
 
     @Autowired(required = false)
     private MqProducerService mqProducerService;
+
+    @SysLog(serviceId = NORMAL_SERVICE,actionName = "插入日志",moduleName = "匹配校验")
+    @Override
+    public JSONObject save(JSONObject jsonObject, String indexName, String hit, String msg) {
+        jsonObject.put("hit",hit);
+        jsonObject.put("msg",msg);
+        return jsonObject;
+    }
 
     @Override
     public List<Map<String, Object> >search(List<String> assetList) {
