@@ -10,41 +10,22 @@ import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryServi
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService;
 import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
-import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
 import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
 import com.ql.util.express.DefaultContext;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
-import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
-import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.channel.EventItem;
-import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
-import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
-import com.zjtelcom.cpct.dubbo.service.CamApiService;
-import com.zjtelcom.cpct.dubbo.service.CpcService;
-import com.zjtelcom.cpct.dubbo.service.ListResultByEventTaskService;
+import com.zjtelcom.cpct.dubbo.service.*;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.ThreadPool;
 import com.zjtelcom.es.es.service.EsService;
 import org.slf4j.Logger;
@@ -53,93 +34,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @Transactional
 public class CpcServiceImpl implements CpcService {
 
     private static final Logger log = LoggerFactory.getLogger(CpcServiceImpl.class);
-
-    @Autowired
-    private ContactEvtMapper contactEvtMapper; //事件总表
-
     @Autowired
     private MktCamEvtRelMapper mktCamEvtRelMapper; //事件与活动关联表
 
     @Autowired
-    private MktCampaignMapper mktCampaignMapper; //活动基本信息
-
-    @Autowired
-    private MktStrategyConfMapper mktStrategyConfMapper; //策略基本信息
-
-    @Autowired
-    private MktStrategyConfRuleMapper mktStrategyConfRuleMapper;//策略规则
-
-    @Autowired
-    private FilterRuleMapper filterRuleMapper; //过滤规则
-
-    @Autowired
-    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper; //协同渠道配置基本信息
-
-    @Autowired
-    private MktCamChlConfMapper mktCamChlConfMapper; //协同渠道配置的渠道
-
-    @Autowired
-    private MktCamScriptMapper mktCamScriptMapper; //营销脚本
-
-    @Autowired
-    private MktVerbalMapper mktVerbalMapper; //话术
-
-    @Autowired
-    private InjectionLabelMapper injectionLabelMapper; //标签因子
-
-    @Autowired
     private EsHitsService esHitService;  //es存储
-
-    @Autowired
-    private RedisUtils redisUtils;  // redis方法
-
-    @Autowired
-    private ContactEvtItemMapper contactEvtItemMapper;  // 事件采集项
-
-    @Autowired(required = false)
-    private IContactTaskReceiptService iContactTaskReceiptService; //协同中心dubbo
 
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
-
-    @Autowired(required = false)
-    private ContactChannelMapper contactChannelMapper; //渠道信息
-
-    @Autowired(required = false)
-    private MktCamChlResultMapper mktCamChlResultMapper;
-
-    @Autowired(required = false)
-    private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
-
-    @Autowired(required = false)
-    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
-
-    @Autowired
-    private ContactEvtMatchRulMapper contactEvtMatchRulMapper; //事件规则
-
-    @Autowired
-    private EventMatchRulConditionMapper eventMatchRulConditionMapper;  //事件规则条件
-
-    @Autowired(required = false)
-    private SysParamsMapper sysParamsMapper;  //查询系统参数
-
-    @Autowired(required = false)
-    private SearchLabelService searchLabelService;  //查询活动下使用的所有标签
 
     @Autowired(required = false)
     private CamApiService camApiService; // 活动任务
@@ -152,9 +64,6 @@ public class CpcServiceImpl implements CpcService {
 
     @Autowired(required = false)
     private CtgCacheAssetService ctgCacheAssetService;// 销售品过滤方法
-
-    @Autowired(required = false)
-    private QueryBindByAccCardService queryBindByAccCardService; // 通过号码查询绑定状态
 
     @Autowired(required = false)
     private ICacheProdIndexQryService iCacheProdIndexQryService;
@@ -172,15 +81,10 @@ public class CpcServiceImpl implements CpcService {
     private ICacheIdMappingEntityQryService iCacheIdMappingEntityQryService;
 
     @Autowired
-    private EventRedisService eventRedisService;
-
-    private final static String USED_FLOW = "used_flow";
-
-    private final static String TOTAL_FLOW = "total_flow";
+    private SpecialService specialService;
 
     @Autowired
-    private ListResultByEventTaskService listResultByEventTaskService;
-
+    private EventRedisService eventRedisService;
 
 
     @Override
@@ -215,20 +119,12 @@ public class CpcServiceImpl implements CpcService {
         //初始化es log
         JSONObject esJson = new JSONObject();
         esJson.put("reqId", map.get("reqId"));
-
         //初始化入参出参的es log
         JSONObject paramsJson = new JSONObject();
         paramsJson.put("reqId", map.get("reqId"));
         paramsJson.put("intoParams", map);  //保存入参
-
         //es log
-        esJson.put("reqId", map.get("reqId"));
-        esJson.put("eventCode", map.get("eventCode"));
-        esJson.put("integrationId", map.get("integrationId"));
-        esJson.put("accNbr", map.get("accNbr"));
-        esJson.put("custId", map.get("custId"));
-        esJson.put("channel", map.get("channelCode"));
-        esJson.put("lanId", map.get("lanId"));
+        esJson.putAll(map);
         //如果没有接入时间  自己补上
         try {
             if (map.get("evtCollectTime") == null || "".equals(map.get("evtCollectTime"))) {
@@ -243,38 +139,9 @@ public class CpcServiceImpl implements CpcService {
             esJson.put("evtCollectTime", simpleDateFormat.format(new Date()));
         }
 
-
         try {
-            // List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
-            List<String> list =new ArrayList<>();
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("eventCode", map.get("eventCode"));
-            Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", paramMap);
-            if(channelCodeRedis!=null){
-                list = (List<String>) channelCodeRedis.get("CHANNEL_CODE_LIST_" + map.get("eventCode"));
-            }
-
-            if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
-                esJson.put("hit", false);
-                esJson.put("success", true);
-                esJson.put("msg", "接入渠道不符");
-                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-                log.info("接入渠道不符:" + map.get("reqId"));
-                result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "接入渠道不符");
-                return result;
-            }
-        }catch (Exception e){
-            esJson.put("hit", false);
-            esJson.put("success", true);
-            esJson.put("msg", "接入渠道查询异常");
-            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-            e.printStackTrace();
-            return result;
-        }
-
-        try {
-            //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓l
+            //事件采集项标签集合(事件采集项标签优先规则)
+            Map<String, String> labelItems = new HashMap<>();
             //解析事件采集项
             JSONObject evtParams = JSONObject.parseObject(map.get("evtContent"));
             //获取C4的数据用于过滤
@@ -282,230 +149,35 @@ public class CpcServiceImpl implements CpcService {
             if (evtParams != null) {
                 c4 = (String) evtParams.get("C4");
             }
+            // 事件验证
+            Map<String, Object> eventResult = eventVerify(result, map, esJson, labelItems, evtParams, begin);
 
-            //根据事件code查询事件信息
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("eventCode", map.get("eventCode"));
-            Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", paramMap);
-            ContactEvt event = new ContactEvt();
-            if(eventRedis!=null){
-                event = (ContactEvt) eventRedis.get("EVENT_" + map.get("eventCode"));
-            }
-            if (event == null) {
-                esJson.put("hit", false);
-                esJson.put("success", true);
-                esJson.put("msg", "未找到相关事件");
-                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
-                log.error("未找到相关事件:" + map.get("reqId"));
-
-                result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "未找到相关事件");
+            if (eventResult != null && CommonConstant.DUBBO_FAILURE.equals(eventResult.get("CPCResultCode"))) {
                 return result;
             }
-            //获取事件id
+            ContactEvt event = (ContactEvt) eventResult.get("event");
+            List<Map<String, Object>> evtTriggers = (List<Map<String, Object>>) eventResult.get("evtTriggers");
             Long eventId = event.getContactEvtId();
 
-            esJson.put("eventId", eventId);
-
-            //验证事件状态
-            if (!"1000".equals(event.getStatusCd())) {
-                esJson.put("hit", false);
-                esJson.put("success", true);
-                esJson.put("msg", "事件已关闭");
-                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
-                log.info("事件已关闭:" + map.get("reqId"));
-
-                result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "事件已关闭");
-                return result;
+            //获取事件推荐活动数
+            int recCampaignAmount = 0;
+            String recCampaignAmountStr = event.getRecCampaignAmount();
+            if (recCampaignAmountStr != null && !"".equals(recCampaignAmountStr)) {
+                recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
             }
-
-            //验证事件采集项
-            List<EventItem> contactEvtItems = new ArrayList<>();
-            Map<String, Object> evtItemsRedis = eventRedisService.getRedis("EVENT_ITEM_", eventId);
-            if (evtItemsRedis != null) {
-                contactEvtItems = (List<EventItem>) evtItemsRedis.get("EVENT_ITEM_" + eventId);
-            }
-
-            List<Map<String, Object>> evtTriggers = new ArrayList<>();
-            Map<String, Object> trigger;
-            //事件采集项标签集合(事件采集项标签优先规则)
-            Map<String, String> labelItems = new HashMap<>();
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for (EventItem contactEvtItem : contactEvtItems) {
-                if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
-                    //筛选出作为标签使用的事件采集项
-                    if ("0".equals(contactEvtItem.getIsLabel())) {
-                        labelItems.put(contactEvtItem.getEvtItemCode(), evtParams.getString(contactEvtItem.getEvtItemCode()));
-                    }
-
-                    trigger = new HashMap<>();
-                    trigger.put("key", contactEvtItem.getEvtItemCode());
-                    trigger.put("value", evtParams.get(contactEvtItem.getEvtItemCode()));
-                    evtTriggers.add(trigger);
-                } else {
-                    //记录缺少的事件采集项
-                    stringBuilder.append(contactEvtItem.getEvtItemCode()).append("、");
-                }
-            }
-
-            if (stringBuilder.length() > 0) {
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            }
-
-            //事件采集项返回参数
-            if (stringBuilder.length() > 0) {
-
-                //保存es log
-                long cost = System.currentTimeMillis() - begin;
-                esJson.put("timeCost", cost);
-                esJson.put("hit", false);
-                esJson.put("success", true);
-                esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
-                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
-                log.error(map.get("reqId") + "事件采集项验证失败:" + map.get("reqId"));
-
-                result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
-                return result;
-            }
-
-            //!!!验证事件规则命中 todo 12.23 无用修改为注释
-//                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
-//                if (!stringObjectMap.get("code").equals("success")) {
-//
-//                    log.error("事件规则未命中:" + map.get("reqId"));
-//
-//                    //判断不符合条件 直接返回不命中
-//                    result.put("CPCResultMsg", stringObjectMap.get("result"));
-//                    result.put("CPCResultCode", "1000");
-//                    esJson.put("hit", false);
-//                    esJson.put("success", true);
-//                    esJson.put("msg", stringObjectMap.get("result"));
-//                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-//                    return result;
-//                }
 
             //添加内置标签
             setInlayLabel(labelItems);
 
-            //判断是否有流量事件,EVTS000001001,EVTS000001002
-            // CPCP_USED_FLOW为已使用流量， CPCP_LEFT_FLOW为剩余流量, CPCP_NEED_FLOW 需要流量
-            String eventCode = (String) map.get("eventCode");
-            if ("EVTS000001001".equals(eventCode) || "EVTS000001002".equals(eventCode) && evtParams != null && evtParams.get("CPCP_USED_FLOW") != null && evtParams.get("CPCP_LEFT_FLOW") != null) {
-                String cpcpNeedFlow = getCpcpNeedFlow((String) evtParams.get("CPCP_USED_FLOW"), (String) evtParams.get("CPCP_LEFT_FLOW"));
-                labelItems.put("CPCP_NEED_FLOW", cpcpNeedFlow);
+            Map<String, Object> params = new HashMap<>();
+            params.put("eventCode", map.get("eventCode"));
+            params.put("labelItems", labelItems);
+            params.put("inParams", map);
 
-            }
+            // 根据事件编码进行特殊业务处理代码
+            specialService.deal(params);
 
-            // 满意度调查事件，定义采集项
-            if ("EVTD000000091".equals(eventCode)) {
-                // 联系号码-事件采集项
-                String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
-                Map<String, Object> paramsMap = new HashMap<>();
-                paramsMap.put("phone", contactNumber);
-                paramsMap.put("type", "1");
-                labelItems.put("CPCP_PUSH_NUMBER", contactNumber);
-                // 判断该联系号码是否绑定微厅
-                Map<String, Object> resultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
-                if (resultMap != null && resultMap.get("data") != null && ((List<Map>) resultMap.get("data")).size() > 0) {
-                    // 绑定微厅
-                    List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) resultMap.get("data");
-                    for (Map dataMap : dataMapList) {
-                        if (dataMap.get("tel_status") != null && (Integer) dataMap.get("tel_status") == 0) {
-                            labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
-                            break;
-                        }
-                    }
-
-                } else {
-                    // 判断资产号码是否绑定微厅
-                    paramsMap.put("phone", map.get("accNbr"));
-                    Map<String, Object> accResultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
-                    if (accResultMap != null && accResultMap.get("data") != null && ((List<Map>) accResultMap.get("data")).size() > 0) {
-                        // 绑定微厅
-                        List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) accResultMap.get("data");
-                        for (Map dataMap : dataMapList) {
-                            if (dataMap.get("tel_status") != null && (Integer) dataMap.get("tel_status") == 0) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
-                                break;
-                            }
-                        }
-                    } else {
-                        // 若未绑定微厅，查看联系号码是否为C网用户
-                        // 价格判断是否为手机号码
-                        //    log.info("111---contactNumber --->" + contactNumber);
-                        boolean isMobile = isMobile(contactNumber);
-                        boolean isCUser = false;
-                        //    log.info("222---isMobile --->" + isMobile);
-                        if (isMobile) {
-                            CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                            //        log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
-                            if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                isCUser = true;
-                            }
-                        }
-                        if (!isCUser) {
-                            //查看资产号码是否为C网用户
-                            JSONObject param = new JSONObject();
-                            //查询标识
-                            param.put("queryNum", map.get("accNbr"));
-                            param.put("c3", map.get("lanId"));
-                            param.put("queryId", map.get("integrationId"));
-                            param.put("type", "1");
-                            param.put("queryFields", "PRD_NAME");
-                            param.put("centerType", "00");
-
-                            //因子查询-----------------------------------------------------
-                            boolean isCdma = false;
-                            Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-                            if ("0".equals(dubboResult.get("result_code").toString())) {
-                                JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
-                                //           log.info("444---body --->" + JSON.toJSONString(body));
-                                //ES log 标签实例
-                                for (Map.Entry<String, Object> entry : body.entrySet()) {
-                                    if ("PRD_NAME".equals(entry.getKey()) && "CDMA".equals(entry.getValue().toString())) {
-                                        labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                        isCdma = true;
-                                    }
-                                }
-                            } else {
-                                log.info("查询资产标签失败-判断C网用户");
-                                esJson.put("hit", "false");
-                                esJson.put("msg", "查询资产标签失败-判断C网用户");
-                                return null;
-                            }
-                            // 若不为C网用户，则“推送渠道”为IVR外呼
-                            if (!isCdma) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
-                            }
-                        }
-                    }
-                }
-                //  log.info("555---labelItems --->" + JSON.toJSONString(labelItems));
-            }
-
-            // 计费短信合并功能 CPCP_JIFEI_CONTENT
-            if (evtParams != null) {
-                cpcpJifeiContent(labelItems, evtParams);
-            }
-
-            //获取事件推荐活动数
-            int recCampaignAmount;
-            String recCampaignAmountStr = event.getRecCampaignAmount();
-            if (recCampaignAmountStr == null || "".equals(recCampaignAmountStr)) {
-                recCampaignAmount = 0;
-            } else {
-                recCampaignAmount = Integer.parseInt(recCampaignAmountStr);
-            }
             List<Map<String, Object>> resultByEvent = null;
-
-
             try {
                 //事件下所有活动的规则预校验，返回初步可命中活动
                 resultByEvent = getResultByEvent(eventId, map.get("eventCode"), map.get("lanId"), map.get("channelCode"), map.get("reqId"), map.get("accNbr"), c4, map.get("custId"));
@@ -516,9 +188,6 @@ public class CpcServiceImpl implements CpcService {
                 esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                 e.printStackTrace();
             }
-
-            // 固定必中规则提取
-            // List<Map<String, Object>> resultByEvent2 = getBitslapByEvent(eventId, resultByEvent);
 
             if (resultByEvent == null || resultByEvent.size() <= 0) {
                 log.info("预校验为空");
@@ -533,15 +202,27 @@ public class CpcServiceImpl implements CpcService {
                 result.put("CPCResultCode", "1000");
                 result.put("CPCResultMsg", "succes 预校验为空");
                 result.put("taskList", activityList);
-
                 paramsJson.put("backParams", result);
                 esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
-
                 log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
-
                 return result;
             }
 
+            //查询事件下使用的所有标签
+            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
+            Map<String, String> mktAllLabels = new HashMap<>();
+            Map<String, Object> eventLabelRedis = eventRedisService.getRedis("EVT_ALL_LABEL_", eventId);
+            if (eventLabelRedis != null) {
+                mktAllLabels = (Map<String, String>) eventLabelRedis.get("EVT_ALL_LABEL_" + eventId);
+                if (mktAllLabels == null) {
+                    esJson.put("hit", false);
+                    esJson.put("msg", "获取事件下所有标签异常");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    return Collections.EMPTY_MAP;
+                }
+            }
+            // 过滤事件采集项中的标签
+            Map<String, String> mktAllLabel = filterLabel(labelItems, mktAllLabels);
 
             //判断有没有客户级活动
             Boolean hasCust = false;  //是否有客户级
@@ -556,79 +237,6 @@ public class CpcServiceImpl implements CpcService {
                         hasPackage = true;
                     }
                 }
-            }
-
-            //查询事件下使用的所有标签
-            DefaultContext<String, Object> context = new DefaultContext<String, Object>();
-            Map<String, String> mktAllLabels = new HashMap<>();
-            Map<String, Object> eventLabelRedis = eventRedisService.getRedis("EVT_ALL_LABEL_", eventId);
-            if(eventLabelRedis!=null){
-                mktAllLabels = (Map<String, String>) eventLabelRedis.get("EVT_ALL_LABEL_" + eventId);
-            }
-
-            //      Map<String, String> mktAllLabels = (Map<String, String>) redisUtils.get("EVT_ALL_LABEL_" + eventId);
-            if (mktAllLabels == null) {
-                try {
-
-                    mktAllLabels = new HashMap<>();
-
-//                        mktAllLabels = searchLabelService.labelListByEventId(eventId);  //查询事件下使用的所有标签
-//                        if (null != mktAllLabels) {
-//                            redisUtils.set("EVT_ALL_LABEL_" + eventId, mktAllLabels);
-//                        } else {
-//                            log.info("获取事件下所有标签失败");
-//                            esJson.put("hit", false);
-//                            esJson.put("msg", "获取事件下所有标签失败");
-//                            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-//                            return Collections.EMPTY_MAP;
-//                        }
-                } catch (Exception e) {
-                    esJson.put("hit", false);
-                    esJson.put("msg", "获取事件下所有标签异常");
-                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-                    return Collections.EMPTY_MAP;
-                }
-            }
-
-            // 过滤事件采集项中的标签
-            Map<String, String> mktAllLabel = new HashMap<>();
-            Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
-            List<String> assetLabelList = new ArrayList<>();
-            List<String> promLabelList = new ArrayList<>();
-            List<String> custLabelList = new ArrayList<>();
-            if (mktAllLabels.get("assetLabels") != null && !"".equals(mktAllLabels.get("assetLabels"))) {
-                assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
-                // ASSI_PROM_INTEG_ID标签
-                assetLabelList.add("ASSI_PROM_INTEG_ID");
-            }
-            if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
-                promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
-            }
-            if (mktAllLabels.get("custLabels") != null && !"".equals(mktAllLabels.get("custLabels"))) {
-                custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
-            }
-
-            while (iterator.hasNext()) {
-                Map.Entry<String, String> entry = iterator.next();
-                if (assetLabelList.contains(entry.getKey())) {
-                    assetLabelList.remove(entry.getKey());
-                } else if (promLabelList.contains(entry.getKey())) {
-                    promLabelList.remove(entry.getKey());
-                } else if (custLabelList.contains(entry.getKey())) {
-                    custLabelList.remove(entry.getKey());
-                }
-            }
-
-            List<String> labelList = new ArrayList<>();
-            labelList.addAll(assetLabelList);
-            labelList.addAll(promLabelList);
-            labelList.addAll(custLabelList);
-            // 添加落地网格AREA_ID标签
-            labelList.add("AREA_ID");
-
-
-            if (assetLabelList != null && assetLabelList.size() > 0) {
-                mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
             }
 
             List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
@@ -678,18 +286,16 @@ public class CpcServiceImpl implements CpcService {
                         // 客户级
                         List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("mktAllLabel",mktAllLabel);
-                        hashMap.put("map",map);
-                        hashMap.put("context",context);
-                        hashMap.put("esJson",esJson);
-                        hashMap.put("esHitService",esHitService);
-                        hashMap.put("yzServ",yzServ);
+                        hashMap.put("mktAllLabel", mktAllLabel);
+                        hashMap.put("map", map);
+                        hashMap.put("context", context);
+                        hashMap.put("esJson", esJson);
+                        hashMap.put("esHitService", esHitService);
+                        hashMap.put("yzServ", yzServ);
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accArray) {
-                            // todo 12.23 线程优化方法提取 待完成！ x
-                            hashMap.put("o",o);
+                            hashMap.put("o", o);
                             Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
-//                                Future<DefaultContext<String, Object>> future = executorService.submit(new getListMapLabelTask(o, mktAllLabel, map, context, esJson, labelItems));
                             futureList.add(future);
                         }
 
@@ -702,34 +308,31 @@ public class CpcServiceImpl implements CpcService {
 
                     } catch (Exception e) {
                         log.error("Exception = " + e);
-                    } finally {
                     }
                     // 判断是否存在套餐级
                     if (hasPackage) {
                         accNbrMapList = getAccNbrList(map.get("accNbr"));
                         successPackage = true;
                     }
-
                 } else if (hasPackage) {
                     accNbrMapList = getAccNbrList(map.get("accNbr"));
                     successPackage = true;
                     // 查询标签
-                    ExecutorService executorService = Executors.newCachedThreadPool();
                     try {
                         // 客户级
                         List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("mktAllLabel",mktAllLabel);
-                        hashMap.put("map",map);
-                        hashMap.put("context",context);
-                        hashMap.put("esJson",esJson);
-                        hashMap.put("labelItems",labelItems);
-                        hashMap.put("esHitService",esHitService);
-                        hashMap.put("yzServ",yzServ);
+                        hashMap.put("mktAllLabel", mktAllLabel);
+                        hashMap.put("map", map);
+                        hashMap.put("context", context);
+                        hashMap.put("esJson", esJson);
+                        hashMap.put("labelItems", labelItems);
+                        hashMap.put("esHitService", esHitService);
+                        hashMap.put("yzServ", yzServ);
                         //多线程获取资产级标签，并加上客户级标签
                         for (Object o : accNbrMapList) {
-                            hashMap.put("o",o);
-                            Future<DefaultContext<String, Object>> future = executorService.submit(new ListMapLabelTaskServiceImpl(hashMap));
+                            hashMap.put("o", o);
+                            Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
                             futureList.add(future);
                         }
 
@@ -741,8 +344,6 @@ public class CpcServiceImpl implements CpcService {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        executorService.shutdown();
                     }
                 }
             } else {
@@ -766,13 +367,9 @@ public class CpcServiceImpl implements CpcService {
 
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
-            //初始化线程池
-//                ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT_ACTIVE);
-//                ExecutorService executorService = Executors.newCachedThreadPool();
-
             // 启动线程走清单流程
             List<String> mktCampaginIdList = new ArrayList<>();
-            List<String>initIdList = new ArrayList<>();
+            List<String> initIdList = new ArrayList<>();
             for (Map<String, Object> activeMap : resultByEvent) {
                 if (activeMap.get("mktCampaignCustMap") != null && !((Map<String, Object>) activeMap.get("mktCampaignCustMap")).isEmpty()) {
                     mktCampaginIdList.add(((Map<String, Object>) activeMap.get("mktCampaignCustMap")).get("mktCampaginId").toString());
@@ -781,29 +378,27 @@ public class CpcServiceImpl implements CpcService {
             }
             if (mktCampaginIdList != null && mktCampaginIdList.size() > 0) {
                 HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("mktCampaginIdList",mktCampaginIdList);
-                hashMap.put("initIdList",initIdList);
-                hashMap.put("eventId",eventId);
+                hashMap.put("mktCampaginIdList", mktCampaginIdList);
+                hashMap.put("initIdList", initIdList);
+                hashMap.put("eventId", eventId);
                 String lanId = map.get("lanId");
-                hashMap.put("lanId",lanId);
-                hashMap.put("custId",custId);
-                hashMap.put("map",map);
-                hashMap.put("evtTriggers",evtTriggers);
-                hashMap.put("yzServ",yzServ);
-                hashMap.put("mktCamEvtRelMapper",mktCamEvtRelMapper);
-                hashMap.put("esService",esService);
-                hashMap.put("ctgCacheAssetService",ctgCacheAssetService);
-                hashMap.put("iCacheProdIndexQryService",iCacheProdIndexQryService);
-                hashMap.put("iCacheProdEntityQryService",iCacheProdEntityQryService);
-                hashMap.put("iCacheOfferRelIndexQryService",iCacheOfferRelIndexQryService);
-                hashMap.put("iCacheRelEntityQryService",iCacheRelEntityQryService);
-                hashMap.put("iCacheIdMappingEntityQryService",iCacheIdMappingEntityQryService);
-                hashMap.put("eventRedisService",eventRedisService);
-
+                hashMap.put("lanId", lanId);
+                hashMap.put("custId", custId);
+                hashMap.put("map", map);
+                hashMap.put("evtTriggers", evtTriggers);
+                hashMap.put("yzServ", yzServ);
+                hashMap.put("mktCamEvtRelMapper", mktCamEvtRelMapper);
+                hashMap.put("esService", esService);
+                hashMap.put("ctgCacheAssetService", ctgCacheAssetService);
+                hashMap.put("iCacheProdIndexQryService", iCacheProdIndexQryService);
+                hashMap.put("iCacheProdEntityQryService", iCacheProdEntityQryService);
+                hashMap.put("iCacheOfferRelIndexQryService", iCacheOfferRelIndexQryService);
+                hashMap.put("iCacheRelEntityQryService", iCacheRelEntityQryService);
+                hashMap.put("iCacheIdMappingEntityQryService", iCacheIdMappingEntityQryService);
+                hashMap.put("eventRedisService", eventRedisService);
                 Future<Map<String, Object>> f = ThreadPool.submit(new CustListTaskServiceImpl(hashMap));
                 threadList.add(f);
             }
-
 
             //判断是否全部为资产级
             boolean isAllAsset = false;
@@ -819,11 +414,11 @@ public class CpcServiceImpl implements CpcService {
             }
             //ActivityTaskServiceImpl 线程参数 拼接
             HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("map",map);
-            hashMap.put("labelItems",labelItems);
-            hashMap.put("evtTriggers",evtTriggers);
-            hashMap.put("camApiService",camApiService);
-            hashMap.put("camApiSerService",camApiSerService);
+            hashMap.put("map", map);
+            hashMap.put("labelItems", labelItems);
+            hashMap.put("evtTriggers", evtTriggers);
+            hashMap.put("camApiService", camApiService);
+            hashMap.put("camApiSerService", camApiSerService);
 
             // 全部为资产级时直接遍历活动
             if (isAllAsset) {
@@ -838,16 +433,16 @@ public class CpcServiceImpl implements CpcService {
                         privateParams.put("custId", map.get("custId"));
                         privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                         //资产级
-                        Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
-                        String type =(String) activeMap.get("type");
+                        Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                        String type = (String) activeMap.get("type");
                         List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                         DefaultContext<String, Object> defaultContext = resultMapList.get(0);
                         //线程参数
-                        hashMap.put("mktCampaginId",mktCampaginId);
-                        hashMap.put("type",type);
-                        hashMap.put("privateParams",privateParams);
-                        hashMap.put("strategyMapList",strategyMapList);
-                        hashMap.put("defaultContext",defaultContext);
+                        hashMap.put("mktCampaginId", mktCampaginId);
+                        hashMap.put("type", type);
+                        hashMap.put("privateParams", privateParams);
+                        hashMap.put("strategyMapList", strategyMapList);
+                        hashMap.put("defaultContext", defaultContext);
                         Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                         //将线程处理结果添加到结果集
                         threadList.add(f);
@@ -872,15 +467,15 @@ public class CpcServiceImpl implements CpcService {
                                     //活动优先级为空的时候默认0
                                     privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
 
-                                    Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
-                                    String type =(String) activeMap.get("type");
+                                    Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                                    String type = (String) activeMap.get("type");
                                     List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                                     //线程参数
-                                    hashMap.put("mktCampaginId",mktCampaginId);
-                                    hashMap.put("type",type);
-                                    hashMap.put("privateParams",privateParams);
-                                    hashMap.put("strategyMapList",strategyMapList);
-                                    hashMap.put("defaultContext",o);
+                                    hashMap.put("mktCampaginId", mktCampaginId);
+                                    hashMap.put("type", type);
+                                    hashMap.put("privateParams", privateParams);
+                                    hashMap.put("strategyMapList", strategyMapList);
+                                    hashMap.put("defaultContext", o);
                                     Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                     //将线程处理结果添加到结果集
                                     threadList.add(f);
@@ -909,15 +504,15 @@ public class CpcServiceImpl implements CpcService {
                                             //活动优先级为空的时候默认0
                                             privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                                             //线程参数
-                                            Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
-                                            String type =(String) activeMap.get("type");
+                                            Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                                            String type = (String) activeMap.get("type");
                                             List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                                             //线程参数
-                                            hashMap.put("mktCampaginId",mktCampaginId);
-                                            hashMap.put("type",type);
-                                            hashMap.put("privateParams",privateParams);
-                                            hashMap.put("strategyMapList",strategyMapList);
-                                            hashMap.put("defaultContext",o);
+                                            hashMap.put("mktCampaginId", mktCampaginId);
+                                            hashMap.put("type", type);
+                                            hashMap.put("privateParams", privateParams);
+                                            hashMap.put("strategyMapList", strategyMapList);
+                                            hashMap.put("defaultContext", o);
                                             Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                             //将线程处理结果添加到结果集
                                             threadList.add(f);
@@ -947,15 +542,15 @@ public class CpcServiceImpl implements CpcService {
                                     privateParams.put("custId", map.get("custId"));
                                     privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                                     //线程参数
-                                    Long mktCampaginId =(Long) activeMap.get("mktCampaginId");
-                                    String type =(String) activeMap.get("type");
+                                    Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                                    String type = (String) activeMap.get("type");
                                     List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                                     //线程参数
-                                    hashMap.put("mktCampaginId",mktCampaginId);
-                                    hashMap.put("type",type);
-                                    hashMap.put("privateParams",privateParams);
-                                    hashMap.put("strategyMapList",strategyMapList);
-                                    hashMap.put("defaultContext",o);
+                                    hashMap.put("mktCampaginId", mktCampaginId);
+                                    hashMap.put("type", type);
+                                    hashMap.put("privateParams", privateParams);
+                                    hashMap.put("strategyMapList", strategyMapList);
+                                    hashMap.put("defaultContext", o);
                                     //资产级
                                     Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                     //将线程处理结果添加到结果集
@@ -972,9 +567,6 @@ public class CpcServiceImpl implements CpcService {
             try {
                 Map<String, Object> nonPassedMsg = new HashMap<>();
                 for (Future<Map<String, Object>> future : threadList) {
-                        /*if (future.get() != null && !future.get().isEmpty()) {
-                            activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
-                        }*/
                     Boolean flag = true;
                     if (future.get() != null && !future.get().isEmpty()) {
                         Map<String, Object> map1 = future.get();
@@ -986,36 +578,22 @@ public class CpcServiceImpl implements CpcService {
                         }
                         if (map1.get("nonPassedMsg") != null) {
                             Object nonPassedMsg1 = map1.get("nonPassedMsg");
-                            nonPassedMsg.putAll((Map<String, Object>)nonPassedMsg1);
+                            nonPassedMsg.putAll((Map<String, Object>) nonPassedMsg1);
                             // flag = false;
                         }
                         if (flag) {
                             // 命中活动
-                            if (future.get() != null && future.get().get("ruleList") != null ) {
+                            if (future.get() != null && future.get().get("ruleList") != null) {
                                 activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                             }
                         }
                     }
-                        /*else {
-                            // 翼支付未命中原因
-                            nonPassedMsg.putAll(future.get());
-                        }*/
                 }
                 result.put("nonPassedMsg", JSON.toJSONString(nonPassedMsg));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                //发生异常关闭线程池
-//                    executorService.shutdown();
             } catch (ExecutionException e) {
                 e.printStackTrace();
-                //发生异常关闭线程池
-//                    executorService.shutdown();
                 return Collections.EMPTY_MAP;
-            } finally {
-                //关闭线程池
-//                    executorService.shutdown();
             }
-
 
             // 判断事件推荐活动数，按照优先级排序
             if (activityList.size() > 0 && recCampaignAmount > 0 && recCampaignAmount < activityList.size()) {
@@ -1048,7 +626,7 @@ public class CpcServiceImpl implements CpcService {
 
             if (activityList.size() > 0) {
                 //构造返回参数
-                result.put("CPCResultCode", "1");
+                result.put("CPCResultCode", CommonConstant.DUBBO_SUCCESS);
                 result.put("CPCResultMsg", "success");
 
                 StringBuilder actStr = new StringBuilder();
@@ -1057,17 +635,13 @@ public class CpcServiceImpl implements CpcService {
                 }
                 esJson.put("hit", true);
                 esJson.put("hitDetail", actStr.toString());
-
             } else {
-                result.put("CPCResultCode", "1000");
+                result.put("CPCResultCode", CommonConstant.DUBBO_FAILURE);
                 result.put("CPCResultMsg", "success");
-
                 esJson.put("hit", false);
-
             }
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
-
             paramsJson.put("backParams", result);
             esHitService.save(paramsJson, IndexList.PARAMS_MODULE, map.get("reqId"));
 
@@ -1076,7 +650,6 @@ public class CpcServiceImpl implements CpcService {
             esJson.put("timeCost", cost);
             esJson.put("success", true);
             esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
         } catch (Exception e) {
             log.info("策略中心计算异常");
             log.error("Exception = ", e);
@@ -1087,12 +660,12 @@ public class CpcServiceImpl implements CpcService {
             esJson.put("timeCost", cost);
             esJson.put("hit", false);
             esJson.put("success", true);
-            esJson.put("msg", "策略中心计算异常"+e.getMessage()+e.toString());
+            esJson.put("msg", "策略中心计算异常" + e.getMessage() + e.toString());
             esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
             //构造返回参数
             result.put("CPCResultCode", "1000");
-            result.put("CPCResultMsg", "策略中心计算异常"+e.getMessage()+e.toString());
+            result.put("CPCResultMsg", "策略中心计算异常" + e.getMessage() + e.toString());
             result.put("reqId", map.get("reqId"));
             result.put("custId", custId);
             return result;
@@ -1102,7 +675,58 @@ public class CpcServiceImpl implements CpcService {
     }
 
 
-    /** todo 以下方法 可抽 业务工具方法
+    /**
+     * 过滤事件采集项中的标签
+     *
+     * @param labelItems  事件采集项标签集合
+     * @param mktAllLabels  事件下所有的标签
+     * @return
+     */
+    private Map<String, String> filterLabel(Map<String, String> labelItems, Map<String, String> mktAllLabels) {
+        Map<String, String> mktAllLabel = new HashMap<>();
+        Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
+        List<String> assetLabelList = new ArrayList<>();
+        List<String> promLabelList = new ArrayList<>();
+        List<String> custLabelList = new ArrayList<>();
+        if (mktAllLabels.get("assetLabels") != null && !"".equals(mktAllLabels.get("assetLabels"))) {
+            assetLabelList = ChannelUtil.StringToList(mktAllLabels.get("assetLabels"));
+            // ASSI_PROM_INTEG_ID标签
+            assetLabelList.add("ASSI_PROM_INTEG_ID");
+        }
+        if (mktAllLabels.get("promLabels") != null && !"".equals(mktAllLabels.get("promLabels"))) {
+            promLabelList = ChannelUtil.StringToList(mktAllLabels.get("promLabels"));
+        }
+        if (mktAllLabels.get("custLabels") != null && !"".equals(mktAllLabels.get("custLabels"))) {
+            custLabelList = ChannelUtil.StringToList(mktAllLabels.get("custLabels"));
+        }
+
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            if (assetLabelList.contains(entry.getKey())) {
+                assetLabelList.remove(entry.getKey());
+            } else if (promLabelList.contains(entry.getKey())) {
+                promLabelList.remove(entry.getKey());
+            } else if (custLabelList.contains(entry.getKey())) {
+                custLabelList.remove(entry.getKey());
+            }
+        }
+
+        List<String> labelList = new ArrayList<>();
+        labelList.addAll(assetLabelList);
+        labelList.addAll(promLabelList);
+        labelList.addAll(custLabelList);
+        // 添加落地网格AREA_ID标签
+        labelList.add("AREA_ID");
+
+        if (assetLabelList != null && assetLabelList.size() > 0) {
+            mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
+        }
+        return mktAllLabel;
+    }
+
+
+    /**
+     * todo 以下方法 可抽 业务工具方法
      * 添加内置的标签并赋值
      *
      * @param map
@@ -1114,98 +738,11 @@ public class CpcServiceImpl implements CpcService {
         map.put("CPCP_IN_EVENT_DAY", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
     }
 
-    // 计算剩余需要的流量
-    private String getCpcpNeedFlow(String cpcpUsedFlow, String cpcpLeftFlow) {
-        // 获取当天
-        int currentDay = DateUtil.getCurrentDay();
-        // 当前月的天数
-        int lastDay = DateUtil.getLastDayForCurrentMonth();
-        // 已用的流量数
-        double cpcpUsedFlowDouble = Double.valueOf(cpcpUsedFlow.replace("GB", ""));
-        // 剩余的流量数
-        double cpcpLeftFlowDouble = Double.valueOf(cpcpLeftFlow.replace("GB", ""));
-        // 这个月到currentDay过的日均用量
-        double userAvg = cpcpUsedFlowDouble / currentDay;
-        // 需要流量
-        double needFlow = 0;
-        if (userAvg * (lastDay - currentDay) > cpcpLeftFlowDouble) {
-            needFlow = (userAvg * (lastDay - currentDay) - cpcpLeftFlowDouble) * 1024;
-        }
-        DecimalFormat df = new DecimalFormat("#.##");
-        return String.valueOf(df.format(needFlow));
-    }
-
 
     /**
-     * 正则判断是否为手机号码
+     * 判断是否存在套餐级
      *
-     * @param phone
-     * @return
-     */
-    private static boolean isMobile(String phone) {
-        Pattern p = null;
-        Matcher m = null;
-        boolean isMatch = false;
-        //制定验证条件
-        String regex1 = "^[1][3,4,5,7,8][0-9]{9}$";
-        String regex2 = "^((13[0-9])|(14[579])|(15([0-3,5-9]))|(16[6])|(17[0135678])|(18[0-9]|19[89]))\\d{8}$";
-
-        p = Pattern.compile(regex2);
-        m = p.matcher(phone);
-        isMatch = m.matches();
-        return isMatch;
-    }
-
-    /**
-     * 计费短信合并功能 CPCP_JIFEI_CONTENT
-     * @param labelItems
-     */
-    private void cpcpJifeiContent(Map<String, String> labelItems, JSONObject evtParams){
-        StringBuilder content = new StringBuilder();
-        String usedFlow = "";
-        String totalFlow = "";
-
-        usedFlow = (String) redisUtils.get(USED_FLOW);
-        if (usedFlow == null || "".equals(usedFlow)) {
-            List<SysParams> usedFlowList = sysParamsMapper.listParamsByKeyForCampaign(USED_FLOW);
-            if (usedFlowList != null && usedFlowList.size() > 0) {
-                SysParams usedFlowParams = usedFlowList.get(0);
-                if (usedFlowParams != null) {
-                    usedFlow = usedFlowParams.getParamValue();
-                    redisUtils.set(USED_FLOW, usedFlow);
-                }
-            }
-        }
-
-        totalFlow = (String) redisUtils.get(TOTAL_FLOW);
-        if (totalFlow == null || "".equals(totalFlow)) {
-            List<SysParams> totalFlowList = sysParamsMapper.listParamsByKeyForCampaign(TOTAL_FLOW);
-            if (totalFlowList != null && totalFlowList.size() > 0) {
-                SysParams totalFlowParams = totalFlowList.get(0);
-                if (totalFlowParams != null) {
-                    totalFlow = totalFlowParams.getParamValue();
-                    redisUtils.set(TOTAL_FLOW, totalFlow);
-                }
-            }
-        }
-
-        if (evtParams.get("CPCP_JIFEI_CONTENT") != null) {
-            List<Map<String, String>> contentMapList = (List<Map<String, String>>) evtParams.get("CPCP_JIFEI_CONTENT");
-            for (int i = 0; i < contentMapList.size(); i++) {
-                if (i > 0) {
-                    content.append("，");
-                }
-                content.append(contentMapList.get(i).get("message_name").toString());
-                content.append(usedFlow + contentMapList.get(i).get(USED_FLOW) + "，");
-                content.append(totalFlow + contentMapList.get(i).get(TOTAL_FLOW));
-            }
-        }
-        labelItems.put("CPCP_JIFEI_MESSAGE", content.toString());
-    }
-
-    /**
-     *
-     * @param accNbr
+     * @param accNbr 资产号码
      * @return
      */
     private List<Map<String, Object>> getAccNbrList(String accNbr) {
@@ -1225,7 +762,7 @@ public class CpcServiceImpl implements CpcService {
                 }
             }
             // 根据offerInstId和statusCd查询offerProdInstRelId
-            if (mainOfferInstId!=null){
+            if (mainOfferInstId != null) {
                 CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
                 if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
                     Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
@@ -1267,25 +804,23 @@ public class CpcServiceImpl implements CpcService {
             mktCampaginIdList = (List<Map<String, Object>>) redis.get("CAM_IDS_EVT_REL_" + eventId);
 
         }
-        // 初始化线程
-//        ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);
         List<Future<Map<String, Object>>> futureList = new ArrayList<>();
         List<Map<String, Object>> resultMapList = new ArrayList<>();
         try {
             HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("lanId",lanId);
-            hashMap.put("channel",channel);
-            hashMap.put("reqId",reqId);
-            hashMap.put("accNbr",accNbr);
-            hashMap.put("c4",c4);
-            hashMap.put("custId",custId);
-            hashMap.put("eventRedisService",eventRedisService);
-            hashMap.put("yzServ",yzServ);
-            hashMap.put("esHitService",esHitService);
+            hashMap.put("lanId", lanId);
+            hashMap.put("channel", channel);
+            hashMap.put("reqId", reqId);
+            hashMap.put("accNbr", accNbr);
+            hashMap.put("c4", c4);
+            hashMap.put("custId", custId);
+            hashMap.put("eventRedisService", eventRedisService);
+            hashMap.put("yzServ", yzServ);
+            hashMap.put("esHitService", esHitService);
 
             for (Map<String, Object> act : mktCampaginIdList) {
                 act.put("eventCode", eventCode);
-                hashMap.put("act",act);
+                hashMap.put("act", act);
                 Future<Map<String, Object>> future = ThreadPool.submit(new ListResultByEventTaskServiceImpl(hashMap));
                 futureList.add(future);
             }
@@ -1305,16 +840,12 @@ public class CpcServiceImpl implements CpcService {
             }
         } catch (Exception e) {
             log.error("[op:getResultByEvent] failed to getResultByEvent by eventId = {}, lanId = {}, channel = {}, Expection = ", eventId, lanId, channel, e);
-        } finally {
-//            fixThreadPool.shutdown();
         }
         return resultMapList;
     }
 
     // 处理资产级标签和销售品级标签
-    private DefaultContext<String, Object> getAssetAndPromLabel(
-            Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams,
-            DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
+    private DefaultContext<String, Object> getAssetAndPromLabel(Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
         //资产级标签
         DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
         if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
@@ -1351,4 +882,185 @@ public class CpcServiceImpl implements CpcService {
         contextNew.put("accNbr", privateParams.get("accNbr"));
         return contextNew;
     }
+
+
+    /**
+     * 事件验证
+     *
+     * @param result     结果
+     * @param map        入参map
+     * @param esJson     日志
+     * @param labelItems 采集项标签集合
+     * @param evtParams  事件采集项
+     * @param begin      开始时间
+     * @return
+     */
+    private Map<String, Object> eventVerify(Map<String, Object> result, Map<String, String> map, JSONObject esJson, Map<String, String> labelItems, JSONObject evtParams, long begin) {
+        //事件验证开始↓↓↓↓↓↓↓↓↓↓↓↓↓l
+        Map<String, Object> eventResult = new HashMap<>();
+        //根据事件code查询事件信息
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("eventCode", map.get("eventCode"));
+        Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", paramMap);
+        ContactEvt event = new ContactEvt();
+        if (eventRedis != null) {
+            event = (ContactEvt) eventRedis.get("EVENT_" + map.get("eventCode"));
+        }
+        if (event == null) {
+            esJson.put("hit", false);
+            esJson.put("success", true);
+            esJson.put("msg", "未找到相关事件");
+            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+            log.error("未找到相关事件:" + map.get("reqId"));
+            result.put("CPCResultCode", "1000");
+            result.put("CPCResultMsg", "未找到相关事件");
+            eventResult.putAll(result);
+            return eventResult;
+        }
+        //获取事件id
+        Long eventId = event.getContactEvtId();
+        esJson.put("eventId", eventId);
+        //验证事件状态
+        if (!"1000".equals(event.getStatusCd())) {
+            esJson.put("hit", false);
+            esJson.put("success", true);
+            esJson.put("msg", "事件已关闭");
+            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+            log.info("事件已关闭:" + map.get("reqId"));
+            result.put("CPCResultCode", "1000");
+            result.put("CPCResultMsg", "事件已关闭");
+            eventResult.putAll(result);
+            return eventResult;
+        }
+        //验证事件渠道
+        Map<String, Object> eventChannelMap = eventChannelVerify(result, map, esJson);
+        if (eventChannelMap != null) {
+            if (CommonConstant.DUBBO_FAILURE.equals(eventChannelMap.get("CPCResultCode"))) {
+                return eventChannelMap;
+            }
+        }
+
+        //验证事件采集项
+        List<Map<String, Object>> evtTriggers = new ArrayList<>();
+        Map<String, Object> eventItemsMap = eventItemsVerify(result, eventId, evtParams, labelItems, evtTriggers, begin, esJson, map);
+        if (eventItemsMap != null) {
+            if (CommonConstant.DUBBO_FAILURE.equals(eventItemsMap.get("CPCResultCode"))) {
+                return eventItemsMap;
+            }
+        }
+        eventResult.put("event", event);
+        eventResult.put("evtTriggers", evtTriggers);
+        return eventResult;
+
+        //!!!验证事件规则命中 todo 12.23 无用修改为注释
+//                Map<String, Object> stringObjectMap = matchRulCondition(eventId, labelItems, map);
+//                if (!stringObjectMap.get("code").equals("success")) {
+//
+//                    log.error("事件规则未命中:" + map.get("reqId"));
+//
+//                    //判断不符合条件 直接返回不命中
+//                    result.put("CPCResultMsg", stringObjectMap.get("result"));
+//                    result.put("CPCResultCode", "1000");
+//                    esJson.put("hit", false);
+//                    esJson.put("success", true);
+//                    esJson.put("msg", stringObjectMap.get("result"));
+//                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+//                    return result;
+//                }
+    }
+
+    /**
+     * 事件渠道验证
+     *
+     * @param map
+     * @param esJson
+     * @return
+     */
+    private Map<String, Object> eventChannelVerify(Map<String, Object> result, Map<String, String> map, JSONObject esJson) {
+        try {
+            List<String> list = new ArrayList<>();
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("eventCode", map.get("eventCode"));
+            Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", paramMap);
+            if (channelCodeRedis != null) {
+                list = (List<String>) channelCodeRedis.get("CHANNEL_CODE_LIST_" + map.get("eventCode"));
+            }
+            if (list.isEmpty() || !list.contains(map.get("channelCode"))) {
+                esJson.put("hit", false);
+                esJson.put("success", true);
+                esJson.put("msg", "接入渠道不符");
+                esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                log.info("接入渠道不符:" + map.get("reqId"));
+                result.put("CPCResultCode", "1000");
+                result.put("CPCResultMsg", "接入渠道不符");
+                return result;
+            }
+        } catch (Exception e) {
+            esJson.put("hit", false);
+            esJson.put("success", true);
+            esJson.put("msg", "接入渠道查询异常");
+            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+            e.printStackTrace();
+            return result;
+        }
+        return result;
+    }
+
+
+    /**
+     * 事件采集项验证
+     *
+     * @param eventId     事件Id
+     * @param evtParams   事件采集项
+     * @param labelItems  采集项标签集合
+     * @param evtTriggers 事件采集项
+     * @param begin       开始时间
+     * @param esJson      日志
+     * @param map
+     * @return
+     */
+    private Map<String, Object> eventItemsVerify(Map<String, Object> result, Long eventId, JSONObject evtParams, Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, Long begin, JSONObject esJson, Map<String, String> map) {
+        List<EventItem> contactEvtItems = new ArrayList<>();
+        Map<String, Object> evtItemsRedis = eventRedisService.getRedis("EVENT_ITEM_", eventId);
+        if (evtItemsRedis != null) {
+            contactEvtItems = (List<EventItem>) evtItemsRedis.get("EVENT_ITEM_" + eventId);
+        }
+        Map<String, Object> trigger;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (EventItem contactEvtItem : contactEvtItems) {
+            if (evtParams != null && evtParams.containsKey(contactEvtItem.getEvtItemCode())) {
+                //筛选出作为标签使用的事件采集项
+                if ("0".equals(contactEvtItem.getIsLabel())) {
+                    labelItems.put(contactEvtItem.getEvtItemCode(), evtParams.getString(contactEvtItem.getEvtItemCode()));
+                }
+                trigger = new HashMap<>();
+                trigger.put("key", contactEvtItem.getEvtItemCode());
+                trigger.put("value", evtParams.get(contactEvtItem.getEvtItemCode()));
+                evtTriggers.add(trigger);
+            } else {
+                //记录缺少的事件采集项
+                stringBuilder.append(contactEvtItem.getEvtItemCode()).append("、");
+            }
+        }
+
+        if (stringBuilder.length() > 0) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
+        //事件采集项返回参数
+        if (stringBuilder.length() > 0) {
+            //保存es log
+            long cost = System.currentTimeMillis() - begin;
+            esJson.put("timeCost", cost);
+            esJson.put("hit", false);
+            esJson.put("success", true);
+            esJson.put("msg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
+            esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+            log.error(map.get("reqId") + "事件采集项验证失败:" + map.get("reqId"));
+            result.put("CPCResultCode", "1000");
+            result.put("CPCResultMsg", "事件采集项验证失败，缺少：" + stringBuilder.toString());
+            return result;
+        }
+        return result;
+    }
+
 }
