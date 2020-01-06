@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
@@ -73,6 +74,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private UCCPService uccpService;
     @Autowired
     private SysAreaMapper sysAreaMapper;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
 
     /**
@@ -762,7 +765,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
                             }
                             if (key.equals("closeNumber")){
-                                resultMap.put("mktCloseRuleName", o.toString());
+                                if (!o.toString().equals("0")){
+                                    String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
+                                    resultMap.put("mktCloseRuleName", closeRuleName);
+                                }else {
+                                    resultMap.put("mktCloseRuleName", "空");
+                                }
                             }
                         }
                         resultMap.put("statistics", statisicts);
@@ -897,7 +905,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 }
                             }
                             if (key.equals("closeNumber")){
-                                resultMap.put("mktCloseRuleName", o.toString());
+                                if (!o.toString().equals("0")){
+                                    String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
+                                    resultMap.put("mktCloseRuleName", closeRuleName);
+                                }else {
+                                    resultMap.put("mktCloseRuleName", "空");
+                                }
                             }
                         }
                         resultMap.put("statistics", statisicts);

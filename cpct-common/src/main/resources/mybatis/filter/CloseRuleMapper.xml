@@ -320,4 +320,8 @@
     <select id="getCloseNameCount" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT COUNT(0) FROM close_rule where CLOSE_NAME = #{closeName}
     </select>
+
+    <select id="getNameByCloseNumber" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT CLOSE_NAME from close_rule WHERE EXPRESSION = #{s}
+    </select>
 </mapper>
