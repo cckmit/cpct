@@ -11,12 +11,15 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.impl.querySaturation.QuerySaturationCpcServiceImpl;
@@ -68,6 +71,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private TrialOperationMapper trialOperationMapper;
     @Autowired
     private UCCPService uccpService;
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
 
 
     /**
@@ -334,6 +339,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         } else {
             paramMap.put("channelCode", channelCode);
         }
+        // 添加主题过滤 todo 2020 / 1/2 x
+        Object theMe = params.get("theMe");
+        if (theMe != "" && theMe != null) {
+            paramMap.put("theMe", theMe);
+        }
         StringBuilder stringBuilder = new StringBuilder();
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
         //todo 修改为 init_id 原 getMktCampaignId
@@ -483,8 +493,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             paramMap.put("activeDate", activeDate.toString());
             paramMap.put("overDate", overDate.toString());
         }
+        // 添加主题过滤 todo 2020 / 1/2 x
+        Object theMe = params.get("theMe");
+        if (theMe != "" && theMe != null) {
+            paramMap.put("theMe", theMe);
+        }
         List<String> campaignIdLists =mktCampaignMapper.selectByMktCampaingIDFromTrial(paramMap);
-        if (campaignIdLists==null || campaignIdLists.size()<0) {
+        if (campaignIdLists==null || campaignIdLists.size()<=0) {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "无区间段派单活动!");
             return paramMap;
@@ -591,7 +606,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Map<String, Object>> data = new ArrayList<>();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            //event 解析 判断
+            //event 解析                                          派单
             Object rptBatchOrderList1 = stringObjectMap.get("rptBatchOrderList");
             if (rptBatchOrderList1 != null && rptBatchOrderList1 != "") {
                 data = (List<Map<String, Object>>) stringObjectMap.get("rptBatchOrderList");
@@ -619,6 +634,22 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+                        //关单规则名称
+                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+                        resultMap.put("mktCloseRuleName", CloseRuleName);
+                        //所属地市
+                        Long lanId = mktCampaignDO.getLanId();
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
+                        if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
+                            if (mktCampaignDO.getLanIdFour()!=null){
+                                SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
+                                resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
+                            }else {
+                                resultMap.put("area", sysArea.getName());
+                            }
+                        }else {
+                            resultMap.put("area", sysArea.getName());
+                        }
                         //渠道编码
                         Object channel = map.get("channel");
                         if (channel== null || "" == channel || "null" == channel){
@@ -715,6 +746,21 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     statisicts.add(msgMap);
                                 }
                             }
+                            // todo 新加关单编码 2020 1/2 x
+                            if (key.equals("batchNbr")){
+                                msgMap.put("name", "批次编码");
+                                msgMap.put("nub", o);
+                            }
+                            if (key.equals("batchNbr")){
+                                msgMap.put("name", "派单方式");
+                                TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(o.toString());
+                                if (trialOperation.getCreateStaff().toString().equals("1000")){
+                                    msgMap.put("nub", "标签取数");
+                                }else {
+                                    msgMap.put("nub", "清单导入");
+                                }
+
+                            }
                         }
                         resultMap.put("statistics", statisicts);
                         hashMaps.add(resultMap);
@@ -746,6 +792,22 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+                        //关单规则名称
+                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+                        resultMap.put("mktCloseRuleName", CloseRuleName);
+                        //所属地市
+                        Long lanId = mktCampaignDO.getLanId();
+                        SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
+                        if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
+                            if (mktCampaignDO.getLanIdFour()!=null){
+                                SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
+                                resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
+                            }else {
+                                resultMap.put("area", sysArea.getName());
+                            }
+                        }else {
+                            resultMap.put("area", sysArea.getName());
+                        }
                         //渠道编码
                         Object channel = map.get("channel");
                         if (channel== null || "" == channel || "null" == channel){
