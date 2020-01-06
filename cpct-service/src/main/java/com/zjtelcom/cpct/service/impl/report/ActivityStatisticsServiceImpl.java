@@ -799,7 +799,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
                         if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null){
+                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
                                 SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
                                 resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
                             }else {
