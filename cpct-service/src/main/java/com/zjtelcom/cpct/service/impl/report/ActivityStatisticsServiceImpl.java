@@ -635,13 +635,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
-                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
-                        resultMap.put("mktCloseRuleName", CloseRuleName);
+//                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+//                        resultMap.put("mktCloseRuleName", CloseRuleName);
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
                         if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null){
+                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
                                 SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
                                 resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
                             }else {
@@ -761,6 +761,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 }
 
                             }
+                            if (key.equals("closeNumber")){
+                                resultMap.put("mktCloseRuleName", o.toString());
+                            }
                         }
                         resultMap.put("statistics", statisicts);
                         hashMaps.add(resultMap);
@@ -793,8 +796,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
-                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
-                        resultMap.put("mktCloseRuleName", CloseRuleName);
+//                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+//                        resultMap.put("mktCloseRuleName", CloseRuleName);
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
@@ -892,6 +895,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", "否");
                                     statisicts.add(msgMap);
                                 }
+                            }
+                            if (key.equals("closeNumber")){
+                                resultMap.put("mktCloseRuleName", o.toString());
                             }
                         }
                         resultMap.put("statistics", statisicts);
