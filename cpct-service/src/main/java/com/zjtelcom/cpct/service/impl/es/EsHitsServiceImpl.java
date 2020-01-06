@@ -136,9 +136,9 @@ public class EsHitsServiceImpl implements EsHitsService {
         executor.execute(() -> {
             try {
                 if (id == null) {
-                    String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
+                    //String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType, null);
                 } else {
-                    String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
+                    //String result = mqProducerService.msg2ESLogProducer(jsonObject, cpctEsLogTopic, indexName + "," + esType + "," + id, null);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
