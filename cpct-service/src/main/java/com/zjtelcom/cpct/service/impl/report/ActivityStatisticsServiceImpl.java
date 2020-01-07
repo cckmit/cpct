@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.filter.CloseRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
@@ -73,6 +74,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private UCCPService uccpService;
     @Autowired
     private SysAreaMapper sysAreaMapper;
+    @Autowired
+    private CloseRuleMapper closeRuleMapper;
 
 
     /**
@@ -635,13 +638,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
-                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
-                        resultMap.put("mktCloseRuleName", CloseRuleName);
+//                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+//                        resultMap.put("mktCloseRuleName", CloseRuleName);
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
                         if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null){
+                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
                                 SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
                                 resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
                             }else {
@@ -761,6 +764,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 }
 
                             }
+                            if (key.equals("closeNumber")){
+                                if (!o.toString().equals("0")){
+                                    String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
+                                    resultMap.put("mktCloseRuleName", closeRuleName);
+                                }else {
+                                    resultMap.put("mktCloseRuleName", "空");
+                                }
+                            }
                         }
                         resultMap.put("statistics", statisicts);
                         hashMaps.add(resultMap);
@@ -793,13 +804,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                         resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
                         //关单规则名称
-                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
-                        resultMap.put("mktCloseRuleName", CloseRuleName);
+//                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
+//                        resultMap.put("mktCloseRuleName", CloseRuleName);
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
                         if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null){
+                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
                                 SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
                                 resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
                             }else {
@@ -891,6 +902,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("name", "是否框架子活动");
                                     msgMap.put("nub", "否");
                                     statisicts.add(msgMap);
+                                }
+                            }
+                            if (key.equals("closeNumber")){
+                                if (!o.toString().equals("0")){
+                                    String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
+                                    resultMap.put("mktCloseRuleName", closeRuleName);
+                                }else {
+                                    resultMap.put("mktCloseRuleName", "空");
                                 }
                             }
                         }
