@@ -2298,9 +2298,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
                         labelResultList.add(labelResult);
                         codeList.add(label.getInjectionLabelCode());
-                        if ("7100".equals(type)) {
-                            express.append("!");
-                        }
                         express.append("(");
                         express.append(label.getInjectionLabelCode());
                         if ("1000".equals(type)) {
