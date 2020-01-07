@@ -18,7 +18,6 @@ import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
-import com.zjtelcom.cpct.dubbo.service.CatalogService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.CpcService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
@@ -30,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Transactional
 public class EventApiServiceImpl implements EventApiService {
 
     @Value("${thread.maxPoolSize}")
@@ -189,10 +190,7 @@ public class EventApiServiceImpl implements EventApiService {
         public Map async() {
 
             //初始化返回结果
-            Map<String, Object> result = new HashMap();
-//            CpcService cpcService =(CpcService) SpringUtil.getBean("cpcService");
-//            log.info("dubboThreadPoolService:"+JSON.toJSONString(cpcService));
-            result = cpcService.cpc(params);
+            Map<String, Object> result = cpcService.cpc(params);
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
@@ -270,10 +268,7 @@ public class EventApiServiceImpl implements EventApiService {
 
         //调用计算方法
         try {
-//            CpcService cpcService =(CpcService) SpringUtil.getBean("dubboThreadPoolService");
-//            log.info("dubboThreadPoolService:"+JSON.toJSONString(cpcService));
             result = cpcService.cpc(params);
-            log.info("222222222");
         } catch (Exception e) {
             e.printStackTrace();
             log.error("同步事件返回失败:" + map.get("reqId"), e.getMessage());

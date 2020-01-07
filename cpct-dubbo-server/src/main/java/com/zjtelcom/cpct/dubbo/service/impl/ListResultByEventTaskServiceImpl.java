@@ -34,8 +34,6 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 //
 //    @Autowired(required = false)
 //    private YzServ yzServ; //因子实时查询dubbo服务
-
-
 //    @Autowired
 //    private EventRedisService eventRedisService;
 
@@ -62,7 +60,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
         this.custId = (String)hashMap.get("custId");
         this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
         this.yzServ = (YzServ) hashMap.get("yzServ");
-//        this.esHitService = (EsHitService) hashMap.get("esHitService");
+//        this.esHitService = (EsHitService)hashMap.get("esHitService");
     }
 
     @Override

@@ -238,8 +238,8 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                 map.put("left", expressions2.get(j).split("==")[0]);
                 map.put("right", expressions2.get(j).split("==")[1]);
                 List<LabelResultES> labelLists = (List<LabelResultES>)result.get("labelList");
-                if (StringUtils.isNotBlank(labelLists.get(i).getRightParam())){
-                    map.put("rightName", labelLists.get(i).getRightParam());
+                if (StringUtils.isNotBlank(labelLists.get(j).getRightParam())){
+                    map.put("rightName", labelLists.get(j).getRightParam());
                 }
                 expressionList.add(map);
 //                arrayList.add(map);
