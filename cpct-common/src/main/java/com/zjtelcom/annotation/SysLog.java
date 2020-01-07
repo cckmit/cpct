@@ -8,8 +8,7 @@ import java.lang.annotation.*;
 public @interface SysLog {
 
     /**
-     * 服务id
-     * @return
+     *服务id
      */
     String serviceId();
 
@@ -24,13 +23,5 @@ public @interface SysLog {
      * @return
      */
     String actionName();
-
-    /**
-     * 索引名
-     * @return
-     */
-    String indexName();
-
-
 
 }

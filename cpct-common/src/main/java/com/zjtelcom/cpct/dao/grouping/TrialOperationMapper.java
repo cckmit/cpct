@@ -38,7 +38,5 @@ public interface TrialOperationMapper {
 
     TrialOperation selectByBatchNum(@Param("batchNum") String batchNum);
 
-    List<String> selectByMktCampaingIDFromTrial(HashMap<String, Object> paramMap);
-
     List<TrialOperation> listOperationByCamIdAndStatusCd(@Param("campaignId")Long campaignId, @Param("statusCd")String statusCd);
 }

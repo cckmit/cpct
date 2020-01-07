@@ -176,8 +176,9 @@ public class ActivityStatisticsController extends BaseController {
 //                HSSFWorkbook wb = new HSSFWorkbook(); //创建excel
 //                Sheet sheetName = wb.createSheet("明知山有虎，知难而退？");//新建表 数据随销报表
                 String sheetName = "随销报表";
-                String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间","客户接触数",
-                        "商机推荐数","商机成功数","客触转化率","商机转化率","收入低迁数","收入低迁率","门店有销率","是否框架子活动"};
+                String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
+                        "关单规则名称", "所属地市","客户接触数", "商机推荐数","商机成功数","客触转化率","商机转化率",
+                        "收入低迁数","收入低迁率", "门店有销率","是否框架子活动"};
                 String fileName = "随销报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -193,31 +194,31 @@ public class ActivityStatisticsController extends BaseController {
                                 String name = map3.get("name").toString();
                                 if (name.equals("客户接触数")){
                                     //客户接触数 contactNum
-                                    content[i][7] = String.valueOf(map3.get("nub"));
+                                    content[i][9] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("商机推荐数")){
                                     //商机推荐数 orderNum
-                                    content[i][8] = String.valueOf(map3.get("nub"));
+                                    content[i][10] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("商机成功数")){
                                     //商机成功数 orderSuccessNum
-                                    content[i][9] = String.valueOf(map3.get("nub"));
+                                    content[i][11] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("商机转化率")){
                                     //商机转化率 orderRate
-                                    content[i][10] = String.valueOf(map3.get("nub"));
+                                    content[i][12] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("客触转化率")){
                                     //客触转化率 contactRate
-                                    content[i][11] = String.valueOf(map3.get("nub"));
+                                    content[i][13] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("收入低迁数")){
                                     //收入低迁数 revenueReduceNum
-                                    content[i][12] = String.valueOf(map3.get("nub"));
+                                    content[i][14] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("收入低迁率")){
                                     //收入低迁率 revenueReduceRate
-                                    content[i][13] = String.valueOf(map3.get("nub"));
+                                    content[i][15] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("门店有销率")){
                                     //门店有销率 orgChannelRate
-                                    content[i][14] = String.valueOf(map3.get("nub"));
+                                    content[i][16] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("是否框架子活动")){
                                     //是否框架子活动 yesOrNo
-                                    content[i][15] = String.valueOf(map3.get("nub"));
+                                    content[i][17] = String.valueOf(map3.get("nub"));
                                 }
                             }
                         }
@@ -238,8 +239,9 @@ public class ActivityStatisticsController extends BaseController {
                     logger.error("活动报表查询异常", e);
                 }
                 String sheetName = "派单报表";
-                String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间","派单数",
-                        "接单数","外呼数","成功数","接单率","外呼率","转化率","收入低迁数","收入低迁率","门店有销率","是否框架子活动"};
+                String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
+                        "关单规则名称","所属地市","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
+                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","批次编码","派单方式","处理数","处理率"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -256,27 +258,35 @@ public class ActivityStatisticsController extends BaseController {
                                 HashMap<String, Object> map3 = statisicts.get(j);
                                 String name = map3.get("name").toString();
                                 if (name.equals("派单数")){
-                                    content[i][7] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("接单数")){
-                                    content[i][8] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("外呼数")){
                                     content[i][9] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("成功数")){
+                                }else if (name.equals("接单数")){
                                     content[i][10] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("接单率")){
+                                }else if (name.equals("外呼数")){
                                     content[i][11] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("外呼率")){
+                                }else if (name.equals("成功数")){
                                     content[i][12] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("转化率")){
+                                }else if (name.equals("接单率")){
                                     content[i][13] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("收入低迁数")){
+                                }else if (name.equals("外呼率")){
                                     content[i][14] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("收入低迁率")){
+                                }else if (name.equals("转化率")){
                                     content[i][15] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("门店有销率")){
+                                }else if (name.equals("收入低迁数")){
                                     content[i][16] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("是否框架子活动")){
+                                }else if (name.equals("收入低迁率")){
                                     content[i][17] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("门店有销率")){
+                                    content[i][18] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("是否框架子活动")){
+                                    content[i][19] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("批次编码")){
+                                    content[i][20] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("派单方式")){
+                                    content[i][21] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("处理数")){
+                                    content[i][22] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("处理率")){
+                                    content[i][23] = String.valueOf(map3.get("nub"));
                                 }
                             }
                         }
@@ -325,6 +335,8 @@ public class ActivityStatisticsController extends BaseController {
         content[i][5] = String.valueOf(stringObjectHashMap.get("beginTime").toString());
         //活动失效时间 endTime
         content[i][6] = String.valueOf(stringObjectHashMap.get("endTime").toString());
+        content[i][7] = String.valueOf(stringObjectHashMap.get("mktCloseRuleName").toString());
+        content[i][8] = String.valueOf(stringObjectHashMap.get("area").toString());
         return stringObjectHashMap;
     }
 

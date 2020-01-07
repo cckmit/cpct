@@ -701,6 +701,9 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID IN #{lanId}
         </if>
+        <if test="theMe != null and theMe != '' ">
+            AND THE_ME  = #{theMe}
+        </if>
         ORDER BY CREATE_DATE DESC
     </select>
 
@@ -995,7 +998,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID = #{lanId}
         </if>
-          AND MKT_CAMPAIGN_ID IN
+          AND INIT_ID IN
         <foreach item="item" index="index" collection="campaignIdLists"
                  open="(" separator="," close=")">
             #{item}
@@ -1248,5 +1251,27 @@
         order by t.UPDATE_DATE desc
     </select>
 
+    <update id="saveMktCamDesc" parameterType="java.util.List" >
+        UPDATE mkt_campaign SET MKT_CAMPAIGN_DESC = #{mktCampaignName} WHERE MKT_CAMPAIGN_ID = #{mktCampaignId}
+    </update>
 
+    <select id="selectByMktCampaingIDFromTrial" parameterType="java.util.Map" resultType="java.lang.String">
+        SELECT INIT_ID FROM mkt_campaign WHERE MKT_CAMPAIGN_ID IN (
+        SELECT CAMPAIGN_ID FROM trial_operation WHERE STATUS_CD IN (7300,8100,8000)
+        <if test="activeDate != null and activeDate != ''">
+            AND CREATE_DATE > #{activeDate}
+        </if>
+        <if test="overDate != null and overDate != ''">
+            AND  #{overDate} > CREATE_DATE
+        </if>
+        <if test="theMe != null and theMe != ''">
+            AND THE_ME = #{theMe}
+        </if>
+        GROUP BY CAMPAIGN_ID )
+    </select>
+
+    <select id="getCloseRuleNameFromMktCamId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT c.CLOSE_NAME FROM mkt_campaign m LEFT JOIN mkt_strategy_close_rule_rel ms ON m.MKT_CAMPAIGN_ID = ms.STRATEGY_ID
+            LEFT JOIN close_rule c ON ms.RULE_ID = c.RULE_ID WHERE m.MKT_CAMPAIGN_ID = #{mktCampaignId}
+    </select>
 </mapper>

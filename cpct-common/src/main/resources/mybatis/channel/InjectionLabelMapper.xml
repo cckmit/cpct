@@ -526,4 +526,9 @@
     where LAB_TAG_CODE = #{labTagCode,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByScopeLikeName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="selectLabelField"/>
+    from injection_label
+    where SCOPE = '0' AND  INJECTION_LABEL_NAME LIKE  CONCAT(CONCAT('%',#{name}),'%')
+  </select>
 </mapper>
