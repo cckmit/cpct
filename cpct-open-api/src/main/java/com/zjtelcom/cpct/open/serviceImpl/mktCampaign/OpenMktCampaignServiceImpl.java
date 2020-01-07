@@ -836,24 +836,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 mktCampaignComplete.setRemark(JSON.toJSONString(requestTemplateInst));
                 mktCampaignCompleteMapper.insert(mktCampaignComplete);
             }
-            try {
-                List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
-                logger.info("【获取承接人信息】"+JSON.toJSONString(group_campaign_recipient));
-                for (Map<String, String> stringStringMap : group_campaign_recipient) {
-                    String value = stringStringMap.get("value");
-                    JSONArray jsonArray = JSONArray.parseArray(value);
-                    //for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(jsonArray.get(0)));
-                    String content = "营销活动：[" + mktCampaignDO.getMktCampaignName() + "]集团活动已下发，请尽快登陆系统处理。";
-                    String resultMsg = uccpService.sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
-                    logger.info("uccp=======================================");
-                    logger.info(resultMsg);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            uccpService.sendShortMessage4GroupCampaignRecipient(mktCampaignDO);
         }
-
         resultObject.put("mktCampaigns",mktCampaigns);
         resultMap.put("resultCode","0");
         resultMap.put("resultMsg","处理成功");

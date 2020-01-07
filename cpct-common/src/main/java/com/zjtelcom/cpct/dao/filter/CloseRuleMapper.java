@@ -48,4 +48,6 @@ public interface CloseRuleMapper {
     List<CloseRule> getCloseRuleOut(CloseRule closeRule);
 
     Integer getCloseNameCount(@Param("closeName")String closeName);
+
+    String getNameByCloseNumber(String s);
 }
