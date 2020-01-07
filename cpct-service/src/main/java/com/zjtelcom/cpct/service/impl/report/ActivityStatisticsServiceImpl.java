@@ -905,6 +905,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 }
                             }
                             if (key.equals("closeNumber")){
+                                logger.info("查看closeNumber的值："+o.toString());
                                 if (!o.toString().equals("0")){
                                     String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
                                     resultMap.put("mktCloseRuleName", closeRuleName);

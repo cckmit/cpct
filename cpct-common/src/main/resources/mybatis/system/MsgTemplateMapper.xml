@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.system.MsgTemplateMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.system.MsgTemplateDO">
+        <id column="MSG_ID" jdbcType="BIGINT" property="msgId" />
+        <result column="TYPE" jdbcType="VARCHAR" property="type" />
+        <result column="MSG_TYPE" jdbcType="VARCHAR" property="msgType" />
+        <result column="CONTENT" jdbcType="VARCHAR" property="content" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+
+    <!--    <sql id="xxx">-->
+    <!--        -->
+    <!--    </sql>-->
+
+    <!--   insert短信模板 -->
+    <insert id="insertMsgTemplate"   useGeneratedKeys="true" keyProperty="msgId" parameterType="com.zjtelcom.cpct.domain.system.MsgTemplateDO">
+        insert into mkt_msg_template
+        (type,msg_type,content, create_staff, create_date, update_staff,update_date)
+        values
+        (#{type,jdbcType=VARCHAR},
+        #{msgType,jdbcType=VARCHAR},
+        #{content,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{updateStaff,jdbcType=BIGINT},
+        #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <!--更新短信模板-->
+    <update id="updateMsgTemplate" useGeneratedKeys="true" keyProperty="msgId" parameterType="com.zjtelcom.cpct.domain.system.MsgTemplateDO" >
+        update mkt_msg_template
+        set
+        TYPE = #{type,jdbcType=VARCHAR},
+        MSG_TYPE= #{msgType,jdbcType=VARCHAR},
+        CONTENT = #{content,jdbcType=VARCHAR},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+        where MSG_ID = #{msgId,jdbcType=BIGINT}
+
+    </update>
+
+    <!--根据id删除短信-->
+    <delete id="delMsgTemplate" parameterType="java.lang.Integer">
+        delete from mkt_msg_template
+        where MSG_ID = #{msgId,jdbcType=BIGINT}
+    </delete>
+    <!--根据id选择短信-->
+    <select id="selectTemplateById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select msg_id,type,msg_type,content,create_staff, create_date, update_staff,update_date
+        from mkt_msg_template
+        where msg_id = #{msgId,jdbcType=BIGINT}
+    </select>
+    <!--返回所有短信列表-->
+    <select id="selectAllMsgTemplate"  resultMap="BaseResultMap">
+        select msg_id,type,msg_type,content,create_staff, create_date, update_staff,update_date
+        from mkt_msg_template
+    </select>
+    <!--    分页获取短信列表模糊搜索-->
+    <select id="selectPageMsgTemplate" resultMap="BaseResultMap">
+        select msg_id,type,msg_type,content,create_staff, create_date, update_staff,update_date
+        from mkt_msg_template
+        <where>
+            <if test = "type != null and type != ''">
+                TYPE = #{type}
+            </if>
+            <if test = "msgType != null and msgType != ''">
+                AND  MSG_TYPE= #{msgType}
+            </if>
+            <if test = "content != null and content != ''">
+                AND CONTENT = #{content}
+            </if>
+        </where>
+
+    </select>
+</mapper>
