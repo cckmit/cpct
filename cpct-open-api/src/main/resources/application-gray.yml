@@ -19,9 +19,6 @@ spring:
     username: cpct_prod
     password: DWdtV7Wy
 
-#是否同步  0不开启  1开启
-sync:
-   value: 1
 
   redis:
       host: 47.94.168.117
@@ -35,6 +32,9 @@ sync:
       timeout: 30000
 
 
+#是否同步  0不开启  1开启
+sync:
+   value: 1
 #调用统一平台的参数 生产环境
 platformConfig:
    channel: CLZX

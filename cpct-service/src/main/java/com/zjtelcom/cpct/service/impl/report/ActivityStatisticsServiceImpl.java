@@ -772,6 +772,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     resultMap.put("mktCloseRuleName", "空");
                                 }
                             }
+                            if (key.equals("handleNum")){
+                                msgMap.put("name", "处理数");
+                                msgMap.put("nub", o);
+                            }
+                            if (key.equals("handleRate")){
+                                msgMap.put("name", "处理率");
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                msgMap.put("nub", percentFormat);
+                            }
                         }
                         resultMap.put("statistics", statisicts);
                         hashMaps.add(resultMap);

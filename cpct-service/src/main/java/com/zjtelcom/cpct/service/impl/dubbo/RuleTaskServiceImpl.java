@@ -109,11 +109,12 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
         this.sysParamsService = (SysParamsService) hashMap.get("sysParamsService");
         this.coopruleService = (CoopruleService) hashMap.get("coopruleService");
         this.eventRedisService = (EventRedisService) hashMap.get("eventRedisService");
+        this.esHitService = (EsHitsService) hashMap.get("esHitService");
     }
 
 
-    @Value("${table.infallible}")
-    private String defaultInfallibleTable;
+//    @Value("${table.infallible}")
+    private String defaultInfallibleTable = "CPCP_CAM_DEFAULT";
 
 //    @Autowired
 //    private EsHitsService esHitService;  //es存储

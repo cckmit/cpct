@@ -2090,6 +2090,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 获取生失效时间
             Date effDate = mktCampaignDO.getPlanBeginTime();
             Date expDate = mktCampaignDO.getPlanEndTime();
+            // 刷活动数据
+            campaignConfig(parentMktCampaignId);
             // 获取活动与事件的关系
             List<MktCamEvtRelDO> MktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(parentMktCampaignId);
             // 获取当前活动的下发城市集合
@@ -2140,6 +2142,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     //事件与新活动建立关联
                     for (MktCamEvtRelDO mktCamEvtRelDO : MktCamEvtRelDOList) {
                         MktCamEvtRelDO childMktCamEvtRelDO = new MktCamEvtRelDO();
+
                         childMktCamEvtRelDO.setMktCampaignId(childMktCampaignId);
                         childMktCamEvtRelDO.setEventId(mktCamEvtRelDO.getEventId());
                         childMktCamEvtRelDO.setCampaignSeq(mktCamEvtRelDO.getCampaignSeq());
