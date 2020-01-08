@@ -93,7 +93,7 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
 
 
     public CustListTaskServiceImpl( HashMap<String, Object> hashMap) {
-        this.campaignList = (List<String>) hashMap.get("campaignList");
+        this.campaignList = (List<String>) hashMap.get("mktCampaginIdList");
         this.initIdList = (List<String>) hashMap.get("initIdList");
         this.eventId = (Long ) hashMap.get("eventId");
         this.landId = (String) hashMap.get("landId");

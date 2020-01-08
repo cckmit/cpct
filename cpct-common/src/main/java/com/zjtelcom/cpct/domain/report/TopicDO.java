@@ -2,10 +2,6 @@ package com.zjtelcom.cpct.domain.report;
 
 import com.zjtelcom.cpct.BaseEntity;
 
-import java.io.Serializable;
-import java.util.Date;
-
-
 
 public class TopicDO extends BaseEntity {
     private int topicId;   //主题id

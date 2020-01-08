@@ -9,7 +9,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.MsgTemplateMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.MsgTemplateDO;
-
 import com.zjtelcom.cpct.service.system.MsgTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,7 +100,7 @@ public class MsgTemplateServiceImpl implements MsgTemplateService {
             throw e;
         }
         Map<String,Object> result = new HashMap<>();
-        result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("content",doToResult(msgTemplateDO));
 
         return result;
@@ -145,7 +144,7 @@ public class MsgTemplateServiceImpl implements MsgTemplateService {
             throw e;
         }
         Map<String,Object> result = new HashMap<>();
-        result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("content",doToResult(msgTemplateDO));
 
         return result;

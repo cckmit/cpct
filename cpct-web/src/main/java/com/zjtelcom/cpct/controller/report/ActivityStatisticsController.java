@@ -241,7 +241,7 @@ public class ActivityStatisticsController extends BaseController {
                 String sheetName = "派单报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
                         "关单规则名称","所属地市","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
-                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","批次编码","派单方式"};
+                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","批次编码","派单方式","处理数","处理率"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -283,6 +283,10 @@ public class ActivityStatisticsController extends BaseController {
                                     content[i][20] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("派单方式")){
                                     content[i][21] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("处理数")){
+                                    content[i][22] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("处理率")){
+                                    content[i][23] = String.valueOf(map3.get("nub"));
                                 }
                             }
                         }

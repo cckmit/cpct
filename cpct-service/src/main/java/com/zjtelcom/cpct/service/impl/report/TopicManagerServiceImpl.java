@@ -2,7 +2,6 @@ package com.zjtelcom.cpct.service.impl.report;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_OUTPeer;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
@@ -10,13 +9,10 @@ import com.zjtelcom.cpct.domain.report.TopicDO;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.report.TopicManagerService;
 import com.zjtelcom.cpct.util.EsUtil;
-import net.sf.ehcache.transaction.xa.EhcacheXAException;
-import org.apache.commons.net.util.SSLSocketUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.*;
 
 @Service
@@ -60,12 +56,12 @@ public class TopicManagerServiceImpl implements TopicManagerService {
 
         }catch (Exception e){
             e.printStackTrace();
-            result.put("resultCode",CommonConstant.CODE_FAIL);
+            result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg","添加失败，请重新操作");
             return result;
         }
 
-        result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
 
         Map<String,Object> seasonTranfer = new HashMap<>();
         seasonTranfer.put("1000","一季度");
@@ -133,11 +129,11 @@ public class TopicManagerServiceImpl implements TopicManagerService {
 
         }catch (Exception e){
             e.printStackTrace();
-            result.put("resultCode",CommonConstant.CODE_FAIL);
+            result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg","更新失败");
             return result;
         }
-        result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         topicDO.setSeason(sesonInChinese(topicDO));
         result.put("conntent",topicDO);
         return result;
@@ -155,11 +151,11 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             mktCamTopicMapper.updateTopicState(topicDO);
         }catch (Exception e){
             e.printStackTrace();
-            result.put("stateCode",CommonConstant.CODE_FAIL);
+            result.put("stateCode", CommonConstant.CODE_FAIL);
             result.put("stateMsg","状态更新失败");
         }
 
-        result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("conntent",topicDO);
         return result;
     }
@@ -179,7 +175,7 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             result.put("isSuccess",0);
             return result;
         }else {
-            result.put("resultCode",CommonConstant.CODE_SUCCESS);
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
             result.put("content","删除成功");
             return result;
         }
@@ -196,7 +192,7 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             e.printStackTrace();
         }
         if (topicDO == null){
-            result.put("resultCode",CommonConstant.CODE_FAIL);
+            result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg","id不存在");
             return result;
         }else{
@@ -211,7 +207,7 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             tmp.put("state",topicDO.getStatusCd());
             contentList.add(tmp);
 
-            result.put("resultCode",CommonConstant.CODE_SUCCESS);
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
             result.put("content",contentList);
             return result;
         }
@@ -268,7 +264,7 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             result.put("pageInfo",new Page(new PageInfo<>(topicLists)));
 
         }catch (Exception e){
-            result.put("resultCode",CommonConstant.CODE_FAIL);
+            result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg","请求失败");
             e.printStackTrace();
         }finally {
