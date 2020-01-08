@@ -400,6 +400,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     hashMap.put("evtContactConfId",evtContactConfId);
                     hashMap.put("ruleId",ruleId);
                     hashMap.put("ruleName",ruleName);
+                    hashMap.put("flagMap",flagMap);
 
                     Future<Map<String, Object>> f = ThreadPool.submit(new RuleTaskServiceImpl(hashMap));
                     //将线程处理结果添加到结果集
