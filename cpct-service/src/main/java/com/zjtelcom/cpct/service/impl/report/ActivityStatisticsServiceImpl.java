@@ -27,6 +27,8 @@ import com.zjtelcom.cpct.service.impl.querySaturation.QuerySaturationCpcServiceI
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.jdbc.Null;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -703,20 +705,20 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             }
                             if (key.equals("acceptOrderRate")) {
                                 //转换成百分比 保留二位小数位
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("name", "接单率");
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
                             if (key.equals("outBoundRate")) {
                                 msgMap.put("name", "外呼率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
                             if (key.equals("orderSuccessRate")) {
                                 msgMap.put("name", "转化率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
@@ -727,13 +729,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             }
                             if (key.equals("revenueReduceRate")) {
                                 msgMap.put("name", "收入低迁率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
                             if (key.equals("orgChannelRate")) {
                                 msgMap.put("name", "门店有销率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
@@ -753,14 +755,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             if (key.equals("batchNbr")){
                                 msgMap.put("name", "批次编码");
                                 msgMap.put("nub", o);
+                                statisicts.add(msgMap);
                             }
                             if (key.equals("batchNbr")){
                                 msgMap.put("name", "派单方式");
                                 TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(o.toString());
                                 if (trialOperation.getCreateStaff().toString().equals("1000")){
                                     msgMap.put("nub", "标签取数");
+                                    statisicts.add(msgMap);
                                 }else {
                                     msgMap.put("nub", "清单导入");
+                                    statisicts.add(msgMap);
                                 }
 
                             }
@@ -775,11 +780,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             if (key.equals("handleNum")){
                                 msgMap.put("name", "处理数");
                                 msgMap.put("nub", o);
+                                statisicts.add(msgMap);
                             }
                             if (key.equals("handleRate")){
                                 msgMap.put("name", "处理率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
+                                statisicts.add(msgMap);
                             }
                         }
                         resultMap.put("statistics", statisicts);
@@ -818,15 +825,19 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
-                        if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
-                                SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
-                                resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
+                        if (StringUtils.isNotBlank(mktCampaignDO.getRegionFlg())){
+                            if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
+                                if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
+                                    SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
+                                    resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
+                                }else {
+                                    resultMap.put("area", sysArea.getName());
+                                }
                             }else {
                                 resultMap.put("area", sysArea.getName());
                             }
                         }else {
-                            resultMap.put("area", sysArea.getName());
+                            resultMap.put("area", "空");
                         }
                         //渠道编码
                         Object channel = map.get("channel");
@@ -873,13 +884,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             }
                             if (key.equals("contactRate")) {
                                 msgMap.put("name", "客触转化率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
                             if (key.equals("orderRate")) {
                                 //转换成百分比 保留二位小数位
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("name", "商机转化率");
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
@@ -891,13 +902,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             }
                             if (key.equals("revenueReduceRate")) {
                                 msgMap.put("name", "收入低迁率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
                             if (key.equals("orgChannelRate")) {
                                 msgMap.put("name", "门店有销率");
-                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 2, 2);
+                                String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
                                 statisicts.add(msgMap);
                             }
