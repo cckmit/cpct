@@ -556,10 +556,15 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                     mktCamChlConfDO.setMktCampaignId(mktCampaignDO.getMktCampaignId());
                     Channel channel = contactChannelMapper.selectByCode(mktCamChlConfDO.getContactChlId().toString());
                     if(channel != null) {
-                        mktCamChlConfDO.setContactChlId(channel.getContactChlId());
+                        // 集团渠道映射省触点渠道
+                        if (40007L == mktCamChlConfDO.getContactChlId() || 40008L == mktCamChlConfDO.getContactChlId() || 40009L == mktCamChlConfDO.getContactChlId() || 40010L == mktCamChlConfDO.getContactChlId()) {
+                            mktCamChlConfDO.setContactChlId(Long.valueOf(channel.getContactChlDesc()));
+                        } else {
+                            mktCamChlConfDO.setContactChlId(channel.getContactChlId());
+                        }
                         mktCamChlConfDO.setEvtContactConfName(channel.getContactChlName());
                     }
-                    mktCamChlConfDO.setPushType("1000");
+                    // mktCamChlConfDO.setPushType("1000");
                     mktCamChlConfMapper.insert(mktCamChlConfDO);
                     if(i == 0) {
                         channelList = channelList + mktCamChlConfDO.getEvtContactConfId();

@@ -7,7 +7,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 30811
-    nodePort: 30811
+  - port: 30815
+    nodePort: 30815
   selector:
     name: bss-cpct-label-statistic

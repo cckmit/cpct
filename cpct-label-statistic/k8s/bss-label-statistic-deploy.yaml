@@ -50,10 +50,10 @@ spec:
         - name: app-log
           mountPath: /app/logs
         ports:
-        - containerPort: 30811    #修改端口号
+        - containerPort: 30815    #修改端口号
         readinessProbe:
           tcpSocket:
-            port: 30811   #修改端口号
+            port: 30815   #修改端口号
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 3
