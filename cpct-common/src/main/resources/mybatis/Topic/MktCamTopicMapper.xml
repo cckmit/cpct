@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.report.MktCamTopicMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.report.TopicDO">
+        <id column="TOPIC_ID" jdbcType="BIGINT" property="topicId" />
+        <result column="YEAR" jdbcType="VARCHAR" property="year" />
+        <result column="SEASON" jdbcType="VARCHAR" property="season" />
+        <result column="TOPIC_NAME" jdbcType="VARCHAR" property="topicName" />
+        <result column="TOPIC_CODE" jdbcType="VARCHAR" property="topicCode" />
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+
+    <!--    <sql id="xxx">-->
+    <!--        -->
+    <!--    </sql>-->
+
+    <!--   insert主题 -->
+    <insert id="insertTopic"   useGeneratedKeys="true" keyProperty="topicId" parameterType="com.zjtelcom.cpct.domain.report.TopicDO">
+        insert into mkt_cam_topic
+        (year, season, topic_name, topic_code, description, status_cd, status_date, create_staff, create_date, update_staff,update_date)
+        values
+        (#{year,jdbcType=VARCHAR},
+        #{season,jdbcType=VARCHAR},
+        #{topicName,jdbcType=VARCHAR},
+        #{topicCode,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{statusCd,jdbcType=VARCHAR},
+        #{statusDate,jdbcType=TIMESTAMP},
+        #{createStaff,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{updateStaff,jdbcType=BIGINT},
+        #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <!--更新主题-->
+    <update id="updateTopic" useGeneratedKeys="true" keyProperty="id" parameterType="com.zjtelcom.cpct.domain.report.TopicDO" >
+        update mkt_cam_topic
+        set
+        year = #{year,jdbcType=VARCHAR},
+        season = #{season,jdbcType=VARCHAR},
+        topic_name = #{topicName,jdbcType=VARCHAR},
+        description = #{description,jdbcType=VARCHAR},
+        status_cd = #{statusCd,jdbcType=VARCHAR},
+        status_date = #{statusDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+        where topic_id = #{topicId,jdbcType=BIGINT}
+
+    </update>
+    <!--更新主题状态-->
+    <update id="updateTopicState" useGeneratedKeys="true" keyProperty="id" parameterType="com.zjtelcom.cpct.domain.report.TopicDO" >
+        update mkt_cam_topic
+        set
+        status_cd = #{statusCd,jdbcType=VARCHAR},
+        status_date = #{statusDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+        where topic_id = #{topicId,jdbcType=BIGINT}
+
+    </update>
+    <!--根据id删除主题-->
+    <delete id="deleteTopicById" parameterType="java.lang.Integer">
+        delete from mkt_cam_topic
+        where topic_id = #{topicId,jdbcType=BIGINT}
+    </delete>
+    <!--根据id选择主题-->
+    <select id="selectTopicInfoById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select topic_id, year, season, topic_name, topic_code, status_cd, status_date, description, create_staff, create_date, update_staff,update_date
+        from mkt_cam_topic
+        where topic_id = #{topicId,jdbcType=BIGINT}
+    </select>
+    <!--返回主题列表-->
+    <select id="selectAllTopicInfo"  resultMap="BaseResultMap">
+        select topic_id, year, season, topic_name, topic_code, status_cd, status_date, description, create_staff, create_date, update_staff,update_date
+        from mkt_cam_topic
+    </select>
+    <!--    分页获取主题列表模糊搜索-->
+    <select id="selectByKey" resultMap="BaseResultMap">
+        select topic_id, year, season, topic_name, topic_code, status_cd, status_date, description, create_staff, create_date, update_staff,update_date
+        from mkt_cam_topic
+        <where>
+            <if test = "year != null and year != ''">
+                year = #{year}
+            </if>
+            <if test = "season != null and season != ''">
+                AND season = #{season}
+            </if>
+            <if test = "topicName != null and topicName != ''">
+                AND TOPIC_NAME = #{topicName}
+            </if>
+            <if test = "topicCode != null and topicCode != ''">
+                AND topic_code = #{topicCode}
+            </if>
+        </where>
+
+    </select>
+</mapper>

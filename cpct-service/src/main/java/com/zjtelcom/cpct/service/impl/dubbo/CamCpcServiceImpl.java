@@ -11,20 +11,8 @@ import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferInst;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ql.util.express.DefaultContext;
-import com.ql.util.express.ExpressRunner;
-import com.ql.util.express.Operator;
-import com.ql.util.express.rule.RuleResult;
 import com.zjpii.biz.serv.YzServ;
-import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
-import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.*;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
-import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
-import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
@@ -34,10 +22,8 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.ThreadPool;
-import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +32,9 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.zjtelcom.cpct.enums.Operator.BETWEEN;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Service
 public class CamCpcServiceImpl implements CamCpcService {
@@ -416,6 +400,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     hashMap.put("evtContactConfId",evtContactConfId);
                     hashMap.put("ruleId",ruleId);
                     hashMap.put("ruleName",ruleName);
+                    hashMap.put("flagMap",flagMap);
 
                     Future<Map<String, Object>> f = ThreadPool.submit(new RuleTaskServiceImpl(hashMap));
                     //将线程处理结果添加到结果集
