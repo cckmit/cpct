@@ -155,7 +155,7 @@ public class EventApiCountServiceImpl implements EventApiCountService {
             Map<String, Object> eventCountMap = new HashMap<>();
             if (eventCount.get("mktCampaignId") != null) {
                 Long initId = Long.valueOf(eventCount.get("mktCampaignId"));
-                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectCampaignByInitId(initId);
+                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(initId);
                 if (mktCampaignDO != null) {
                     eventCountMap.put("mktCampaignNbr", mktCampaignDO.getMktActivityNbr());    //活动编码
                     eventCountMap.put("mktCampaignName", mktCampaignDO.getMktCampaignName()); //活动名称
