@@ -532,16 +532,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(operationVO.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(operationVO,Long.valueOf(batchNumSt), ruleRelDO.getMktStrategyConfRuleId(),true,null);
-            List<LabelResultES> labelResultList = param.getLabelResultList();
-            List<String> labelTypeList = new ArrayList<>();
-            for (LabelResultES la : labelResultList){
-                labelTypeList.add(la.getRightOperand());
-            }
-            if (!labelTypeList.contains("2000")){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "规则："+param.getRuleName()+"不满足查询条件，请至少配置一条用户级标签查询条件！");
-                return result;
-            }
             paramList.add(param);
           Map<String,Object> stringObjectMap =  getProductAndChannelByRuleId(ruleRelDO.getMktStrategyConfRuleId());
           List<String> stringList = (List<String>) stringObjectMap.get("scriptLabel");
@@ -817,6 +807,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
             label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
+            label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
         return labelList;
@@ -956,7 +947,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","SALE_EMP_NBR");
                     label.put("name","接单人号码");
-                    label.put("labelType","1200");
+                    label.put("labelDataType","1200");
                     labelList.add(label);
                 }
             }
@@ -965,7 +956,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","AREA");
                     label.put("name","派单区域");
-                    label.put("labelType","1200");
+                    label.put("labelDataType","1200");
                     labelList.add(label);
                 }
             }
@@ -1278,7 +1269,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","SALE_EMP_NBR");
                     label.put("name","接单人号码");
-                    label.put("labelType","1200");
+                    label.put("labelDataType","1200");
                     labelList.add(label);
                 }
             }
@@ -1287,7 +1278,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     Map<String,Object> label = new HashMap<>();
                     label.put("code","AREA");
                     label.put("name","派单区域");
-                    label.put("labelType","1200");
+                    label.put("labelDataType","1200");
                     labelList.add(label);
                 }
             }
@@ -1950,6 +1941,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("name",labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType",labelDTOList.get(i).getLabelType());
             label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
+            label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
 
@@ -1961,14 +1953,14 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             Map<String,Object> label = new HashMap<>();
             label.put("code","SALE_EMP_NBR");
             label.put("name","接单人号码");
-            label.put("labelType","1200");
+            label.put("labelDataType","1200");
             labelList.add(label);
         }
         if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId()) ){
             Map<String,Object> label = new HashMap<>();
             label.put("code","AREA");
             label.put("name","派单区域");
-            label.put("labelType","1200");
+            label.put("labelDataType","1200");
             labelList.add(label);
         }
 
@@ -2298,9 +2290,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
                         labelResultList.add(labelResult);
                         codeList.add(label.getInjectionLabelCode());
-                        if ("7100".equals(type)) {
-                            express.append("!");
-                        }
                         express.append("(");
                         express.append(label.getInjectionLabelCode());
                         if ("1000".equals(type)) {

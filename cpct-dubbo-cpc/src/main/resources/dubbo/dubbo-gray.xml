@@ -66,4 +66,9 @@
         <dubbo:method name="beforehandValidate" servicecode="33.1001.tradeOrderBusinessAcceptanceValidate" timeout="10000"/>
     </dubbo:reference>
 
+    <!-- eslog -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="2.0" check="false">
+        <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>
