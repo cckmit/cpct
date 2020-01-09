@@ -430,6 +430,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                 }
 //            }
+
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
