@@ -297,7 +297,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(object));
             String provincial = (String) jsonObject.get("provincial");
             logger.info("groupAndProvincialChannelMapping->provincial:" + provincial);
-            if (provincial.equals(mktCamChlConfDO.getContactChlId())) {
+            if (provincial.equals(String.valueOf(mktCamChlConfDO.getContactChlId()))) {
                 logger.info("groupAndProvincialChannelMapping->group:" + jsonObject.get("group"));
                 return (String) jsonObject.get("group");
             }
