@@ -51,6 +51,7 @@ import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -288,6 +289,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     }
 
     public String groupAndProvincialChannelMapping(MktCamChlConfDO mktCamChlConfDO) {
+        logger.info("groupAndProvincialChannelMapping->ContactChlId:" + mktCamChlConfDO.getContactChlId());
         List<Map<String, String>> list = sysParamsMapper.listParamsByKey(GROUP_PROVINCIAL_CHANNEL_MAPPING);
         String sysParamsValue = list.get(0).get("value");
         JSONArray array = JSONArray.parseArray(sysParamsValue);
