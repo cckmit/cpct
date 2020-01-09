@@ -206,6 +206,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                         if(camScript != null) {
                                             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(camScript.getEvtContactConfId());
                                             String mapping = groupAndProvincialChannelMapping(mktCamChlConfDO);
+                                            logger.info("groupAndProvincialChannelMapping->mapping:" + mapping);
                                             Channel channel = null;
                                             if (mapping == null) {
                                                 channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
@@ -293,7 +294,9 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         for (Object object : array) {
             JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(object));
             String provincial = (String) jsonObject.get("provincial");
+            logger.info("groupAndProvincialChannelMapping->provincial:" + provincial);
             if (provincial.equals(mktCamChlConfDO.getContactChlId())) {
+                logger.info("groupAndProvincialChannelMapping->group:" + jsonObject.get("group"));
                 return (String) jsonObject.get("group");
             }
         }
