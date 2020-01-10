@@ -373,7 +373,7 @@ public class ListResultByEventTaskServiceImpl implements ListResultByEventTaskSe
 
                 try {
                     for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleList) {
-                        Map<String, Object> ruleMap = new ConcurrentHashMap<>();
+                        Map<String, Object> ruleMap = new HashMap<>();
                         String evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId();
                         //                    if (evtContactConfMapList != null && evtContactConfMapList.size() > 0) {
                         ruleMap.put("ruleId", mktStrategyConfRuleDO.getMktStrategyConfRuleId());

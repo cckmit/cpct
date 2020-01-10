@@ -114,7 +114,7 @@
 	p2.INJECTION_LABEL_NAME AS injectionLabelName,
 	p2.LABEL_TYPE AS labelType,
 	p1.LABEL_DISPLAY_TYPE as labelDisplayType,
-	p1.LABEL_DATA_TYPE as labelDataType
+	p2.LABEL_DATA_TYPE as labelDataType
 FROM
 	mkt_cam_display_column_rel p1
 INNER JOIN injection_label p2 ON p1.INJECTION_LABEL_ID = p2.INJECTION_LABEL_ID

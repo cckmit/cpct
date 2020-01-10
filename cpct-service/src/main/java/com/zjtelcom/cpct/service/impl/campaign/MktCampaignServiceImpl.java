@@ -2292,7 +2292,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
-        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setStartDate(new Date());
         requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
         requestInfo.setStatusCd("1000");
         requestInfo.setStatusDate(new Date());
@@ -2347,7 +2347,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
-        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setStartDate(new Date());
         requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
         requestInfo.setStatusCd("1000");
         requestInfo.setStatusDate(new Date());

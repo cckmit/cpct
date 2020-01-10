@@ -255,7 +255,8 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             pageSize = pageParams.get("pageSize").toString();
         }
         try {
-            PageHelper.startPage(Integer.parseInt(pageParams.get("page").toString()),Integer.parseInt(pageSize));
+            String orderBy = "topic_id desc";
+            PageHelper.startPage(Integer.parseInt(pageParams.get("page").toString()),Integer.parseInt(pageSize),orderBy);
 //            模糊搜索
             topicLists =  mktCamTopicMapper.selectByKey((String)pageParams.get("year"),(String)pageParams.get("season"),(String)pageParams.get("topicName"),(String)pageParams.get("topicCode"));
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
