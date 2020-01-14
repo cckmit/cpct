@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.report;
 
+import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -20,6 +21,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.OrgRel;
 import com.zjtelcom.cpct.domain.channel.Organization;
+import com.zjtelcom.cpct.domain.channel.StaffOrgRel;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
@@ -78,6 +80,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private SysAreaMapper sysAreaMapper;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
+    @Autowired(required = false)
+    private StaffOrgRelMapper staffOrgRelMapper;
 
 
     /**
@@ -284,6 +288,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (type != null && "batch".equals(type.toString())) {
             channelList = contactChannelMapper.getBatchChannel();
         }
+        if (type != null && type.toString().equals("")) {
+            channelList = contactChannelMapper.getRealTimeChannelAndBatchChannel();
+        }
         hashMap.put("resultMsg", channelList);
         hashMap.put("resultCode", CODE_SUCCESS);
         return hashMap;
@@ -307,7 +314,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);
             paramMap.put("mktCampaignName", "");
-        }else {
+        } else {
             paramMap.put("mktCampaignName", mktCampaignName);
         }
         //统计日期 必填字段
@@ -409,20 +416,20 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.info("销报表查询接口:stringObjectMap"+stringObjectMap);
+        logger.info("销报表查询接口:stringObjectMap" + stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            stringObjectMap = addParams(stringObjectMap, page, pageSize, mktCampaignType);
             Object reqId = stringObjectMap.get("reqId");
             Object total = stringObjectMap.get("total");
-            paramMap.put("pageSize",total);
-            paramMap.put("page","1");
-            if (reqId!=null && reqId!=""){
-                redisUtils.set(reqId.toString(),paramMap);
+            paramMap.put("pageSize", total);
+            paramMap.put("page", "1");
+            if (reqId != null && reqId != "") {
+                redisUtils.set(reqId.toString(), paramMap);
             }
         } else {
             Object reqId = stringObjectMap.get("reqId");
             stringObjectMap.put("resultCode", CODE_FAIL);
-            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error:"+reqId.toString());
+            stringObjectMap.put("resultMsg", "查询无结果 queryRptEventOrder error:" + reqId.toString());
         }
         return stringObjectMap;
     }
@@ -447,7 +454,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (mktCampaignId != null && mktCampaignId != "") {
             paramMap.put("mktCampaignId", mktCampaignId);
             paramMap.put("mktCampaignName", "");
-        }else {
+        } else {
             paramMap.put("mktCampaignName", mktCampaignName);
         }
         //统计日期 必填字段
@@ -493,7 +500,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //派单增加派单时间段过滤
         Object activeDate = params.get("activeDate");
         Object overDate = params.get("overDate");
-        if (activeDate != null && activeDate != "" &&  overDate !=null && overDate!="") {
+        if (activeDate != null && activeDate != "" && overDate != null && overDate != "") {
             //类型转换 YYYYMMMDD YYYY-MM-DD
             paramMap.put("activeDate", activeDate.toString());
             paramMap.put("overDate", overDate.toString());
@@ -503,13 +510,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (theMe != "" && theMe != null) {
             paramMap.put("theMe", theMe);
         }
-        List<String> campaignIdLists =mktCampaignMapper.selectByMktCampaingIDFromTrial(paramMap);
-        if (campaignIdLists==null || campaignIdLists.size()<=0) {
+        List<String> campaignIdLists = mktCampaignMapper.selectByMktCampaingIDFromTrial(paramMap);
+        if (campaignIdLists == null || campaignIdLists.size() <= 0) {
             paramMap.put("resultCode", CODE_FAIL);
             paramMap.put("resultMsg", "无区间段派单活动!");
             return paramMap;
         }
-        paramMap.put("campaignIdLists",campaignIdLists);
+        paramMap.put("campaignIdLists", campaignIdLists);
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaignFromDate(paramMap);
         //todo 修改为 init_id 原 getMktCampaignId
         if (mktCampaignList.size() > 0 && mktCampaignList != null) {
@@ -576,15 +583,15 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.info("活动报表查询接口:queryRptBatchOrder"+stringObjectMap);
+        logger.info("活动报表查询接口:queryRptBatchOrder" + stringObjectMap);
         if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
-            stringObjectMap = addParams(stringObjectMap, page, pageSize,mktCampaignType);
+            stringObjectMap = addParams(stringObjectMap, page, pageSize, mktCampaignType);
             Object reqId = stringObjectMap.get("reqId");
             Object total = stringObjectMap.get("total");
-            paramMap.put("pageSize",total);
-            paramMap.put("page","1");
-            if (reqId!=null && reqId!=""){
-                redisUtils.set(reqId.toString(),paramMap);
+            paramMap.put("pageSize", total);
+            paramMap.put("page", "1");
+            if (reqId != null && reqId != "") {
+                redisUtils.set(reqId.toString(), paramMap);
             }
         } else {
             Object reqId = stringObjectMap.get("reqId");
@@ -599,13 +606,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         Map<String, Object> stringObjectMap = (Map<String, Object>) params.get("key");
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
-        Object mktCampaignType =params.get("mktCampaignType");
-        return addParams(stringObjectMap, page, pageSize,mktCampaignType);
+        Object mktCampaignType = params.get("mktCampaignType");
+        return addParams(stringObjectMap, page, pageSize, mktCampaignType);
     }
 
 
-
-    private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize,Object ymktCampaignType) {
+    private Map<String, Object> addParams(Map<String, Object> stringObjectMap, Integer page, Integer pageSize, Object ymktCampaignType) {
         Map<String, Object> maps = new HashMap<>();
         List<HashMap<String, Object>> hashMaps = new ArrayList<>();
         List<Map<String, Object>> data = new ArrayList<>();
@@ -620,14 +626,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         HashMap<String, Object> resultMap = new HashMap<>();
                         String mktCampaignId1 = map.get("mktCampaignId").toString();
                         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
-                        if (mktCampaignDO == null){
+                        if (mktCampaignDO == null) {
                             // 如果有为空 跳过
                             continue;
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
-                            if (!mktCampaignType.equals(ymktCampaignType.toString())){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())) {
+                            if (!mktCampaignType.equals(ymktCampaignType.toString())) {
                                 continue;
                             }
                         }
@@ -646,20 +652,20 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
                         if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                            if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
+                            if (mktCampaignDO.getLanIdFour() != null && mktCampaignDO.getLanIdFour().toString().length() < 6) {
                                 SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
-                                resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
-                            }else {
+                                resultMap.put("area", sysArea.getName() + "-" + sysAreaFour.getName());
+                            } else {
                                 resultMap.put("area", sysArea.getName());
                             }
-                        }else {
+                        } else {
                             resultMap.put("area", sysArea.getName());
                         }
                         //渠道编码
                         Object channel = map.get("channel");
-                        if (channel== null || "" == channel || "null" == channel){
+                        if (channel == null || "" == channel || "null" == channel) {
                             resultMap.put("channel", "");
-                        }else {
+                        } else {
                             // todo 渠道编码展示
                             Channel channel1 = contactChannelMapper.selectByCode(channel.toString());
                             resultMap.put("channel", channel1.getContactChlName());
@@ -680,8 +686,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             HashMap<String, Object> msgMap = new HashMap<>();
                             String key = iter.next();
                             Object o = map.get(key);
-                            if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0+"";
+                            if ("".equals(o) || "null".equals(o) || null == o) {
+                                o = 0 + "";
                             }
                             if (key.equals("orderNum")) {
                                 msgMap.put("name", "派单数");
@@ -752,37 +758,32 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 }
                             }
                             // todo 新加关单编码 2020 1/2 x
-                            if (key.equals("batchNbr")){
-                                msgMap.put("name", "批次编码");
-                                msgMap.put("nub", o);
-                                statisicts.add(msgMap);
+                            if (key.equals("batchNbr")) {
+                                resultMap.put("batchNum", o.toString());
                             }
-                            if (key.equals("batchNbr")){
-                                msgMap.put("name", "派单方式");
+                            if (key.equals("batchNbr")) {
                                 TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(o.toString());
-                                if (trialOperation.getCreateStaff().toString().equals("1000")){
-                                    msgMap.put("nub", "标签取数");
-                                    statisicts.add(msgMap);
-                                }else {
-                                    msgMap.put("nub", "清单导入");
-                                    statisicts.add(msgMap);
+                                if (trialOperation.getCreateStaff().toString().equals("1000")) {
+                                    resultMap.put("dispatchForm", "标签取数");
+                                } else {
+                                    resultMap.put("dispatchForm", "清单导入");
                                 }
 
                             }
-                            if (key.equals("closeNumber")){
-                                if (!o.toString().equals("0")){
+                            if (key.equals("closeNumber")) {
+                                if (!o.toString().equals("0")) {
                                     String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
                                     resultMap.put("mktCloseRuleName", closeRuleName);
-                                }else {
+                                } else {
                                     resultMap.put("mktCloseRuleName", "空");
                                 }
                             }
-                            if (key.equals("handleNum")){
+                            if (key.equals("handleNum")) {
                                 msgMap.put("name", "处理数");
                                 msgMap.put("nub", o);
                                 statisicts.add(msgMap);
                             }
-                            if (key.equals("handleRate")){
+                            if (key.equals("handleRate")) {
                                 msgMap.put("name", "处理率");
                                 String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                 msgMap.put("nub", percentFormat);
@@ -800,14 +801,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         HashMap<String, Object> resultMap = new HashMap<>();
                         String mktCampaignId1 = map.get("mktCampaignId").toString();
                         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
-                        if (mktCampaignDO == null){
+                        if (mktCampaignDO == null) {
                             // 如果有为空 跳过
                             continue;
                         }
                         //活动类型 过滤页面筛选条件
                         String mktCampaignType = mktCampaignDO.getMktCampaignType();
-                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())){
-                            if (!mktCampaignType.equals(ymktCampaignType.toString())){
+                        if (!ymktCampaignType.toString().equals("") && !"all".equals(ymktCampaignType.toString())) {
+                            if (!mktCampaignType.equals(ymktCampaignType.toString())) {
                                 continue;
                             }
                         }
@@ -825,25 +826,25 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         //所属地市
                         Long lanId = mktCampaignDO.getLanId();
                         SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
-                        if (StringUtils.isNotBlank(mktCampaignDO.getRegionFlg())){
+                        if (StringUtils.isNotBlank(mktCampaignDO.getRegionFlg())) {
                             if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                                if (mktCampaignDO.getLanIdFour()!=null && mktCampaignDO.getLanIdFour().toString().length()< 6){
+                                if (mktCampaignDO.getLanIdFour() != null && mktCampaignDO.getLanIdFour().toString().length() < 6) {
                                     SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
-                                    resultMap.put("area", sysArea.getName()+"-"+sysAreaFour.getName());
-                                }else {
+                                    resultMap.put("area", sysArea.getName() + "-" + sysAreaFour.getName());
+                                } else {
                                     resultMap.put("area", sysArea.getName());
                                 }
-                            }else {
+                            } else {
                                 resultMap.put("area", sysArea.getName());
                             }
-                        }else {
+                        } else {
                             resultMap.put("area", "空");
                         }
                         //渠道编码
                         Object channel = map.get("channel");
-                        if (channel== null || "" == channel || "null" == channel){
+                        if (channel == null || "" == channel || "null" == channel) {
                             resultMap.put("channel", "");
-                        }else {
+                        } else {
                             // todo 渠道编码展示
                             Channel channel1 = contactChannelMapper.selectByCode(channel.toString());
                             resultMap.put("channel", channel1.getContactChlName());
@@ -864,8 +865,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             HashMap<String, Object> msgMap = new HashMap<>();
                             String key = iter.next();
                             Object o = map.get(key);
-                            if ("".equals(o) || "null".equals(o) || null == o){
-                                o = 0+"";
+                            if ("".equals(o) || "null".equals(o) || null == o) {
+                                o = 0 + "";
                             }
                             if (key.equals("contactNum")) {
                                 msgMap.put("name", "客户接触数");
@@ -924,12 +925,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     statisicts.add(msgMap);
                                 }
                             }
-                            if (key.equals("closeNumber")){
-                                logger.info("查看closeNumber的值："+o.toString());
-                                if (!o.toString().equals("0")){
+                            if (key.equals("closeNumber")) {
+                                logger.info("查看closeNumber的值：" + o.toString());
+                                if (!o.toString().equals("0")) {
                                     String closeRuleName = closeRuleMapper.getNameByCloseNumber(o.toString());
                                     resultMap.put("mktCloseRuleName", closeRuleName);
-                                }else {
+                                } else {
                                     resultMap.put("mktCloseRuleName", "空");
                                 }
                             }
@@ -945,7 +946,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         maps.put("total", stringObjectMap.get("total"));
         maps.put("resultMsg", hashMaps);
         maps.put("resultCode", CODE_SUCCESS);
-        maps.put("reqId",  stringObjectMap.get("reqId"));
+        maps.put("reqId", stringObjectMap.get("reqId"));
         return maps;
     }
 
@@ -989,6 +990,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
     /**
      * 不活跃表表   // 2000-实时, 1000-批量
+     *
      * @param params
      * @return
      */
@@ -998,76 +1000,76 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         HashMap<String, Object> hashMap = new HashMap<>();
         //TIGGER_TYPE = '1000' # 2000-实时, 1000-批量
         Object tiggerType = params.get("tiggerType");
-        if ("".equals(tiggerType.toString()) || tiggerType == null){
+        if ("".equals(tiggerType.toString()) || tiggerType == null) {
             resultMap.put("resultMsg", "实时或批量请传入类型！");
             resultMap.put("resultCode", CODE_FAIL);
             return resultMap;
-        }else {
+        } else {
             // 2000-实时, 1000-批量
-            hashMap.put("tiggerType",tiggerType);
+            hashMap.put("tiggerType", tiggerType);
         }
         //类型 1000（当前时间提前一个月） 2000（当前时间提前二个月） 3000 （当前时间提前三个月）
         Object createDate = params.get("createDate");
-        if ("".equals(createDate.toString()) || createDate == null){
+        if ("".equals(createDate.toString()) || createDate == null) {
             resultMap.put("resultMsg", "时间类型不能为空！");
             resultMap.put("resultCode", CODE_FAIL);
             return resultMap;
-        }else {
+        } else {
             String s = DateToString(createDate.toString());
-            hashMap.put("createDate",s);
+            hashMap.put("createDate", s);
         }
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         //分页参数
         Integer page = Integer.valueOf(params.get("page").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize").toString());
-        if ("1000".equals(tiggerType.toString())){
+        if ("1000".equals(tiggerType.toString())) {
             PageHelper.startPage(page, pageSize);
             List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getMktCampaignDetails(hashMap);
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
-            if (!mktCampaignList.isEmpty()){
+            if (!mktCampaignList.isEmpty()) {
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    if (mktCampaignDO.getCreateDate()!=null){
+                    if (mktCampaignDO.getCreateDate() != null) {
                         mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
                     }
                 }
             }
-            resultMap.put("pageInfo",pageInfo);
+            resultMap.put("pageInfo", pageInfo);
             resultMap.put("resultMsg", mktCampaignList);
             resultMap.put("resultCode", CODE_SUCCESS);
-        }else if("2000".equals(tiggerType)){
+        } else if ("2000".equals(tiggerType)) {
             Object o = null;
             Map<String, Object> stringObjectMap = iReportService.queryValidCampaign();
-            logger.info("查看dubbo返回活动返回结果"+stringObjectMap);
-            if (stringObjectMap.get("resultCode")!=null && "1".equals(stringObjectMap.get("resultCode").toString())){
-                if ("1000".equals(createDate.toString())){
+            logger.info("查看dubbo返回活动返回结果" + stringObjectMap);
+            if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
+                if ("1000".equals(createDate.toString())) {
                     //30Ds 30天有效活动
                     o = stringObjectMap.get("30Ds");
-                }else if ("2000".equals(createDate.toString())){
+                } else if ("2000".equals(createDate.toString())) {
                     //60Ds 60天有效活动
                     o = stringObjectMap.get("60Ds");
-                }else if ("3000".equals(createDate.toString())){
+                } else if ("3000".equals(createDate.toString())) {
                     //90Ds 90天有效活动
                     o = stringObjectMap.get("90Ds");
                 }
             }
             String[] split = o.toString().split(",");
-            logger.info("查看活动有效时间的长度！@#￥%"+split.length+"和参数!@#$%"+split);
+            logger.info("查看活动有效时间的长度！@#￥%" + split.length + "和参数!@#$%" + split);
             List<String> userList = new ArrayList<String>();
             Collections.addAll(userList, split);
-            logger.info("查看dubbo返回活动天数是啥！！！！！@#￥"+userList);
+            logger.info("查看dubbo返回活动天数是啥！！！！！@#￥" + userList);
             PageHelper.startPage(page, pageSize);
-            List<MktCampaignDO> mktCampaignList =  mktCampaignMapper.getMktCampaignDetailsForDate(userList);
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getMktCampaignDetailsForDate(userList);
             Page pageInfo = new Page(new PageInfo(mktCampaignList));
-            if (!mktCampaignList.isEmpty()){
+            if (!mktCampaignList.isEmpty()) {
                 //添加时间格式
                 for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                    if (mktCampaignDO.getCreateDate()!=null){
+                    if (mktCampaignDO.getCreateDate() != null) {
                         mktCampaignDO.setStrBeginTime(fmt.format(mktCampaignDO.getCreateDate()));
                     }
                 }
             }
-            resultMap.put("pageInfo",pageInfo);
+            resultMap.put("pageInfo", pageInfo);
             resultMap.put("resultMsg", mktCampaignList);
             resultMap.put("resultCode", CODE_SUCCESS);
         }
@@ -1079,30 +1081,30 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     public Map<String, Object> getActivityStatisticsByName(Map<String, Object> params) {
         HashMap<String, Object> result = new HashMap<>();
         Object name = params.get("name");
-        if (name!=null){
+        if (name != null) {
             List<MktCampaignDO> mktCampaignList = mktCampaignMapper.getActivityStatisticsByName(name.toString());
-            result.put("resultMsg",mktCampaignList);
-            result.put("resultCode","200");
-        }else {
-            result.put("resultMsg","name为空");
-            result.put("resultCode","500");
+            result.put("resultMsg", mktCampaignList);
+            result.put("resultCode", "200");
+        } else {
+            result.put("resultMsg", "name为空");
+            result.put("resultCode", "500");
         }
         return result;
     }
 
 
-    public static String DateToString(String s){
+    public static String DateToString(String s) {
         Date date = new Date();//当前日期
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//格式化对象
         Calendar calendar = Calendar.getInstance();//日历对象
         calendar.setTime(date);//设置当前日期
-        if (s.equals("1000")){
+        if (s.equals("1000")) {
             calendar.add(Calendar.MONTH, -1);//月份减一
             return sdf.format(calendar.getTime());
-        }else if ("2000".equals(s)){
+        } else if ("2000".equals(s)) {
             calendar.add(Calendar.MONTH, -2);//月份减二
             return sdf.format(calendar.getTime());
-        }else if ("3000".equals(s)){
+        } else if ("3000".equals(s)) {
             calendar.add(Calendar.MONTH, -3);//月份减三
             return sdf.format(calendar.getTime());
         }
@@ -1133,12 +1135,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                     String sendContent = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "满足不活跃活动条件，当前活动已被自动过期。";
                     uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, sendContent);
                     sb.append(mktCampaignDO.getMktCampaignId());
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             redisUtils.set("OFFLINE_" + DateUtil.date2String(new Date()), sb);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1148,14 +1150,197 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         HashMap<String, Object> map = new HashMap<>();
         Object createDate = params.get("createDate");
         int result = sysParamsMapper.delectConsumerlogByDate(createDate.toString());
-        if (result>0){
-            map.put("code","200");
-            map.put("msg","成功");
-        }else {
-            map.put("code","500");
-            map.put("msg","失败");
+        if (result > 0) {
+            map.put("code", "200");
+            map.put("msg", "成功");
+        } else {
+            map.put("code", "500");
+            map.put("msg", "失败");
         }
         return map;
+    }
+
+    @Override
+    public Map<String, Object> getSalesClerk(Map<String, Object> params) {
+        HashMap<String, Object> map = new HashMap<>();
+        List<Channel> channelList = new ArrayList<>();
+        List<Organization> organizations = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
+        Object level5OrgId = params.get("level5OrgId");
+        Object level6OrgId = params.get("level6OrgId");
+        if (level5OrgId == null && level6OrgId == null) {
+            map.put("resultMsg", "请传入orgId");
+            map.put("resultCode", CODE_FAIL);
+            return map;
+        }
+        if (level5OrgId != null) {
+            Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(level5OrgId.toString()));
+            if (organization == null) {
+                map.put("resultMsg", "请传入正确的参数");
+            }
+            List<String> strings = areaList(organization.getOrgId(), resultList, organizations);
+            strings.add(organization.getOrgId().toString());
+            if (strings != null && strings.size() > 0) {
+                for (String string : strings) {
+                    List<OrgRel> orgRels = orgRelMapper.selectByAOrgId(string);
+                    if (orgRels.size() > 0 && orgRels != null) {
+                        for (OrgRel orgRel : orgRels) {
+                            //查询实体门店
+                            Channel channel = channelMapper.selectByPrimaryKeyFromShiTi(orgRel.getzOrgId());
+                            channelList.add(channel);
+                        }
+                    }
+                }
+            }
+            map.put("resultMsg", channelList);
+            map.put("size", channelList.size());
+            map.put("resultCode", CODE_SUCCESS);
+        } else {
+            List<StaffOrgRel> staffOrgRelList = staffOrgRelMapper.selectByOrgId(Long.valueOf(level6OrgId.toString()));
+            if (staffOrgRelList == null) {
+                map.put("resultMsg", "无符合门店信息");
+            }
+            for (StaffOrgRel staffOrgRel : staffOrgRelList) {
+                if (staffOrgRel.getStaffId() != null) {
+                    List<Map<String, Object>> staff = staffOrgRelMapper.getStaffName(staffOrgRel.getStaffId());
+                    if (staff != null && staff.size() > 0) {
+                        for (Map<String, Object> stringObjectMap : staff) {
+                            String staffName = stringObjectMap.get("staffName").toString();
+                            String salesStaffCode = stringObjectMap.get("salesStaffCode").toString();
+                            resultList.add(staffName);
+                            resultList.add(salesStaffCode);
+                        }
+                    }
+                }
+            }
+            map.put("resultMsg", resultList);
+            map.put("size", resultList.size());
+            map.put("resultCode", CODE_SUCCESS);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> queryEventOrderByReport(Map<String, String> params) {
+        HashMap<String, String> paramMap = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>();
+        //统计日期 必填字段
+        Object endDate = params.get("endDate");
+        if (endDate != null && endDate != "") {
+            //类型转换 YYYYMMMDD YYYY-MM-DD
+//            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
+            //起始统计日期(YYYYMMDD)必填 dubbo接口用
+            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
+        } else {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "时间是必填字段");
+            return result;
+        }
+        //渠道编码(必填,ALL表示所有,多个用逗号隔开)
+        Object channelCode = params.get("channelCode");
+        if (channelCode == "" || channelCode == null) {
+            paramMap.put("channelCode", "all");
+        } else {
+            paramMap.put("channelCode", channelCode.toString());
+        }
+        // 添加主题过滤
+        Object theMe = params.get("theMe");
+        if (theMe != "" && theMe != null) {
+            paramMap.put("theMe", theMe.toString());
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(paramMap);
+        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(hashMap);
+        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
+            for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+            }
+        } else {
+            result.put("resultMsg", "没有找到对应的活动方案");
+            result.put("resultCode", CODE_FAIL);
+            return result;
+        }
+        //多个id  “，”拼接 去除最后的一个 ，
+        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        paramMap.put("mktCampaignId", substring);
+
+        if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
+            //地市(ALL表示所有,多个用逗号隔开)
+            String orglevel2 = params.get("orglevel2").toString();
+            paramMap.put("orglevel2", orglevel2);
+        }
+        if (params.get("orglevel3") != null && params.get("orglevel3") != "") {
+            //分局(ALL表示所有,多个用逗号隔开)
+            String orglevel3 = params.get("orglevel3").toString();
+            paramMap.put("orglevel3", orglevel3);
+        }
+        if (params.get("orglevel4") != null && params.get("orglevel4") != "") {
+            //支局(ALL表示所有,多个用逗号隔开)
+            String orglevel4 = params.get("orglevel4").toString();
+            paramMap.put("orglevel4", orglevel4);
+        }
+        if (params.get("orglevel5") != null && params.get("orglevel5") != "") {
+            //网格(ALL表示所有,多个用逗号隔开)
+            String orglevel5 = params.get("orglevel5").toString();
+            paramMap.put("orglevel5", orglevel5);
+        }
+        if (params.get("ChannelOrgId") != null && params.get("ChannelOrgId") != "") {
+            //门店(ALL表示所有,多个用逗号隔开)
+            String ChannelOrgId = params.get("ChannelOrgId").toString();
+            paramMap.put("ChannelOrgId", ChannelOrgId);
+        }
+        if (params.get("salesStaffCode") != null && params.get("salesStaffCode") != "") {
+            //销售员编码
+            String salesStaffCode = params.get("salesStaffCode").toString();
+            paramMap.put("salesStaffCode", salesStaffCode);
+        }
+        if (params.get("idcardScanFlag") != null && params.get("idcardScanFlag") != "") {
+            //是否身份证读卡(0:未读，1:读过;默认否)
+            String idcardScanFlag = params.get("idcardScanFlag").toString();
+            paramMap.put("idcardScanFlag", idcardScanFlag);
+        }
+        if (params.get("channelType") != null && params.get("channelType") != "") {
+            //网点类型
+            String channelType = params.get("channelType").toString();
+            paramMap.put("channelType", channelType);
+        }
+        String page = params.get("page");
+        String pageSize = params.get("pageSize");
+        paramMap.put("currenPage", page);
+        paramMap.put("pageSize", pageSize);
+        Map<String, Object> stringObjectMap = new HashMap<>();
+        try {
+            stringObjectMap = iReportService.queryEventOrder(paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Map<String, Object>> hashMaps = new ArrayList<>();
+        logger.info("stringObjectMap:" + JSON.toJSONString(stringObjectMap));
+        if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
+            List<Map<String, Object>> data = new ArrayList<>();
+            Object contactOrderEventList = stringObjectMap.get("contactOrderEventList");
+            if (contactOrderEventList != null && contactOrderEventList != "") {
+                data = (List<Map<String, Object>>) stringObjectMap.get("contactOrderEventList");
+                if (data.size() > 0 && data != null) {
+                    for (Map<String, Object> map : data) {
+                        hashMaps.add(map);
+                    }
+                }
+                result.put("pageSize", stringObjectMap.get("pageSize").toString());
+                result.put("page", stringObjectMap.get("currenPage").toString());
+                result.put("total", stringObjectMap.get("total").toString());
+                result.put("resultMsg", hashMaps);
+                result.put("resultCode", CODE_SUCCESS);
+                result.put("reqId", stringObjectMap.get("reqId").toString());
+            }
+        } else {
+            Object reqId = stringObjectMap.get("reqId");
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "查询无结果 queryRptEventOrder error:" + reqId.toString());
+        }
+        return result;
     }
 
 }

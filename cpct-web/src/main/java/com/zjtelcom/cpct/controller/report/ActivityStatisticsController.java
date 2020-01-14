@@ -240,8 +240,8 @@ public class ActivityStatisticsController extends BaseController {
                 }
                 String sheetName = "派单报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
-                        "关单规则名称","所属地市","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
-                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","批次编码","派单方式","处理数","处理率"};
+                        "关单规则名称","所属地市","批次编码","派单方式","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
+                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","处理数","处理率"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -258,30 +258,26 @@ public class ActivityStatisticsController extends BaseController {
                                 HashMap<String, Object> map3 = statisicts.get(j);
                                 String name = map3.get("name").toString();
                                 if (name.equals("派单数")){
-                                    content[i][9] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("接单数")){
-                                    content[i][10] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("外呼数")){
                                     content[i][11] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("成功数")){
+                                }else if (name.equals("接单数")){
                                     content[i][12] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("接单率")){
+                                }else if (name.equals("外呼数")){
                                     content[i][13] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("外呼率")){
+                                }else if (name.equals("成功数")){
                                     content[i][14] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("转化率")){
+                                }else if (name.equals("接单率")){
                                     content[i][15] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("收入低迁数")){
+                                }else if (name.equals("外呼率")){
                                     content[i][16] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("收入低迁率")){
+                                }else if (name.equals("转化率")){
                                     content[i][17] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("门店有销率")){
+                                }else if (name.equals("收入低迁数")){
                                     content[i][18] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("是否框架子活动")){
+                                }else if (name.equals("收入低迁率")){
                                     content[i][19] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("批次编码")){
+                                }else if (name.equals("门店有销率")){
                                     content[i][20] = String.valueOf(map3.get("nub"));
-                                }else if (name.equals("派单方式")){
+                                }else if (name.equals("是否框架子活动")){
                                     content[i][21] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("处理数")){
                                     content[i][22] = String.valueOf(map3.get("nub"));
@@ -337,6 +333,14 @@ public class ActivityStatisticsController extends BaseController {
         content[i][6] = String.valueOf(stringObjectHashMap.get("endTime").toString());
         content[i][7] = String.valueOf(stringObjectHashMap.get("mktCloseRuleName").toString());
         content[i][8] = String.valueOf(stringObjectHashMap.get("area").toString());
+        Object batchNum = stringObjectHashMap.get("batchNum");
+        if ( batchNum!= null && "" != batchNum){
+            content[i][9] = String.valueOf(stringObjectHashMap.get("batchNum").toString());
+        }
+        Object dispatchForm = stringObjectHashMap.get("dispatchForm");
+        if (dispatchForm!=null && "" != dispatchForm){
+            content[i][10] = String.valueOf(stringObjectHashMap.get("dispatchForm").toString());
+        }
         return stringObjectHashMap;
     }
 
@@ -405,6 +409,34 @@ public class ActivityStatisticsController extends BaseController {
             map = activityStatisticsService.delectConsumerlogByDate(params);
         } catch (Exception e) {
             logger.error("[op:ActivityStatisticsController] fail to listEvents for delectConsumerlogByDate = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+
+    //Level 6 7 选择实体门店和营业员 传level 5 6
+    @PostMapping("/getSalesClerk")
+    @CrossOrigin
+    public Map<String,Object> getSalesClerk(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.getSalesClerk(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getSalesClerk = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    @PostMapping("/queryEventOrderByReport")
+    @CrossOrigin
+    public Map<String,Object> queryEventOrderByReport(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.queryEventOrderByReport(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryEventOrderByReport = {}! Exception: ", JSONArray.toJSON(params), e);
             return map;
         }
         return map;

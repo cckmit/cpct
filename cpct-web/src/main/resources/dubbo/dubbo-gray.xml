@@ -124,4 +124,10 @@
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
     </dubbo:reference>
 
+    <!-- 统计分析 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService"
+                     id="trialLabelServiceImpl" version="2.0" check="false">
+        <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="120000"/>
+    </dubbo:reference>
+
 </beans>

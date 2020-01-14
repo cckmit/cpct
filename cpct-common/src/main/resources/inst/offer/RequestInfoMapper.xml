@@ -47,7 +47,7 @@
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.RequestInfo"
           useGeneratedKeys="true" keyProperty="requestTemplateInstId" keyColumn="REQUEST_TEMPLATE_INST_ID">
     <selectKey keyColumn="requestTemplateInstId" keyProperty="requestTemplateInstId" order="BEFORE" resultType="Long">
-      select max(REQUEST_TEMPLATE_INST_ID)+1 as requestTemplateInstId from request_info
+      select smt_bss_cpc_sftt_sequence.nextval
     </selectKey>
     insert into request_info (REQUEST_TEMPLATE_INST_ID, BATCH_NO, `NAME`,
       `DESC`, DEPT_CODE, CONT_NAME,

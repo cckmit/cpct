@@ -262,6 +262,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             label.put("code", labelDTOList.get(i).getLabelCode());
             label.put("name", labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType", labelDTOList.get(i).getLabelType());
+            label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
 
@@ -273,14 +274,14 @@ public class TrialProdServiceImpl implements TrialProdService {
             Map<String, Object> label = new HashMap<>();
             label.put("code", "SALE_EMP_NBR");
             label.put("name", "接单人号码");
-            label.put("labelType", "1200");
+            label.put("labelDataType", "1200");
             labelList.add(label);
         }
         if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId())) {
             Map<String, Object> label = new HashMap<>();
             label.put("code", "AREA");
             label.put("name", "派单区域");
-            label.put("labelType", "1200");
+            label.put("labelDataType", "1200");
             labelList.add(label);
         }
 
