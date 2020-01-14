@@ -414,4 +414,32 @@ public class ActivityStatisticsController extends BaseController {
         return map;
     }
 
+
+    //Level 6 7 选择实体门店和营业员 传level 5 6
+    @PostMapping("/getSalesClerk")
+    @CrossOrigin
+    public Map<String,Object> getSalesClerk(@RequestBody Map<String, Object> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.getSalesClerk(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for getSalesClerk = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
+    @PostMapping("/queryEventOrderByReport")
+    @CrossOrigin
+    public Map<String,Object> queryEventOrderByReport(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.queryEventOrderByReport(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryEventOrderByReport = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
 }
