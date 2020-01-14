@@ -436,7 +436,10 @@ public class CpcServiceImpl implements CpcService {
                         Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
                         String type = (String) activeMap.get("type");
                         List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
-                        DefaultContext<String, Object> defaultContext = resultMapList.get(0);
+                        DefaultContext<String, Object> defaultContext = new DefaultContext<>();
+                        if (resultMapList != null && resultMapList.size() > 0) {
+                            resultMapList.get(0);
+                        }
                         //线程参数
                         hashMap.put("mktCampaginId", mktCampaginId);
                         hashMap.put("type", type);
