@@ -78,6 +78,6 @@
 
   <select id="getStaffName" parameterType="java.lang.Long" resultMap="getStaffNameByStaff">
     SELECT STAFF_ID,STAFF_CODE,ORG_ID,STAFF_NAME,SALESSTAFF_CODE FROM staff WHERE
-      STATUS_CD =1000 AND STAFF_TYPE =1100 AND STAFF_ID = #{staffId ,jdbcType=BIGINT}
+      STATUS_CD =1000  AND STAFF_ID = #{staffId ,jdbcType=BIGINT}
   </select>
 </mapper>

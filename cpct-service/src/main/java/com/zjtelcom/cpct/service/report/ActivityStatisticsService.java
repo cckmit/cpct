@@ -27,4 +27,6 @@ public interface ActivityStatisticsService {
     Map<String,Object> getSalesClerk(Map<String, Object> params);
 
     Map<String,Object> queryEventOrderByReport(Map<String, String> params);
+
+    Map<String,Object> queryEventOrderChlListByReport(Map<String, String> params);
 }

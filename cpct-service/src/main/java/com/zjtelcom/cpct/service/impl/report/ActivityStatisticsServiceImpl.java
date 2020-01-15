@@ -1166,6 +1166,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         List<Channel> channelList = new ArrayList<>();
         List<Organization> organizations = new ArrayList<>();
         List<String> resultList = new ArrayList<>();
+        List<Map<String,Object>> staffList = new ArrayList<>();
         Object level5OrgId = params.get("level5OrgId");
         Object level6OrgId = params.get("level6OrgId");
         if (level5OrgId == null && level6OrgId == null) {
@@ -1187,7 +1188,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         for (OrgRel orgRel : orgRels) {
                             //查询实体门店
                             Channel channel = channelMapper.selectByPrimaryKeyFromShiTi(orgRel.getzOrgId());
-                            channelList.add(channel);
+                            if (channel!=null) {
+                                channelList.add(channel);
+                            }
                         }
                     }
                 }
@@ -1205,16 +1208,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                     List<Map<String, Object>> staff = staffOrgRelMapper.getStaffName(staffOrgRel.getStaffId());
                     if (staff != null && staff.size() > 0) {
                         for (Map<String, Object> stringObjectMap : staff) {
-                            String staffName = stringObjectMap.get("staffName").toString();
-                            String salesStaffCode = stringObjectMap.get("salesStaffCode").toString();
-                            resultList.add(staffName);
-                            resultList.add(salesStaffCode);
+//                            String staffName = stringObjectMap.get("staffName").toString();
+//                            String salesStaffCode = stringObjectMap.get("salesStaffCode").toString();
+//                            resultList.add(staffName);
+//                            resultList.add(salesStaffCode);
+                            staffList.add(stringObjectMap);
                         }
                     }
                 }
             }
-            map.put("resultMsg", resultList);
-            map.put("size", resultList.size());
+            map.put("resultMsg", staffList);
+            map.put("size", staffList.size());
             map.put("resultCode", CODE_SUCCESS);
         }
         return map;
@@ -1224,78 +1228,9 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     public Map<String, Object> queryEventOrderByReport(Map<String, String> params) {
         HashMap<String, String> paramMap = new HashMap<>();
         HashMap<String, Object> result = new HashMap<>();
-        //统计日期 必填字段
-        Object endDate = params.get("endDate");
-        if (endDate != null && endDate != "") {
-            //类型转换 YYYYMMMDD YYYY-MM-DD
-//            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
-            paramMap.put("endDate", endDate.toString().replaceAll("-", ""));
-            //起始统计日期(YYYYMMDD)必填 dubbo接口用
-            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
-        } else {
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "时间是必填字段");
-            return result;
-        }
-        //渠道编码(必填,ALL表示所有,多个用逗号隔开)
-        Object channelCode = params.get("channelCode");
-        if (channelCode == "" || channelCode == null) {
-            paramMap.put("channelCode", "all");
-        } else {
-            paramMap.put("channelCode", channelCode.toString());
-        }
-        // 添加主题过滤
-        Object theMe = params.get("theMe");
-        if (theMe != "" && theMe != null) {
-            paramMap.put("theMe", theMe.toString());
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(paramMap);
-        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(hashMap);
-        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
-            for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
-            }
-        } else {
-            result.put("resultMsg", "没有找到对应的活动方案");
-            result.put("resultCode", CODE_FAIL);
-            return result;
-        }
-        //多个id  “，”拼接 去除最后的一个 ，
-        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-        paramMap.put("mktCampaignId", substring);
+        String strDataName = "endDate";
+        if (channelStaffParams(params, paramMap, result,strDataName)) return result;
 
-        if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
-            //地市(ALL表示所有,多个用逗号隔开)
-            String orglevel2 = params.get("orglevel2").toString();
-            paramMap.put("orglevel2", orglevel2);
-        }
-        if (params.get("orglevel3") != null && params.get("orglevel3") != "") {
-            //分局(ALL表示所有,多个用逗号隔开)
-            String orglevel3 = params.get("orglevel3").toString();
-            paramMap.put("orglevel3", orglevel3);
-        }
-        if (params.get("orglevel4") != null && params.get("orglevel4") != "") {
-            //支局(ALL表示所有,多个用逗号隔开)
-            String orglevel4 = params.get("orglevel4").toString();
-            paramMap.put("orglevel4", orglevel4);
-        }
-        if (params.get("orglevel5") != null && params.get("orglevel5") != "") {
-            //网格(ALL表示所有,多个用逗号隔开)
-            String orglevel5 = params.get("orglevel5").toString();
-            paramMap.put("orglevel5", orglevel5);
-        }
-        if (params.get("ChannelOrgId") != null && params.get("ChannelOrgId") != "") {
-            //门店(ALL表示所有,多个用逗号隔开)
-            String ChannelOrgId = params.get("ChannelOrgId").toString();
-            paramMap.put("ChannelOrgId", ChannelOrgId);
-        }
-        if (params.get("salesStaffCode") != null && params.get("salesStaffCode") != "") {
-            //销售员编码
-            String salesStaffCode = params.get("salesStaffCode").toString();
-            paramMap.put("salesStaffCode", salesStaffCode);
-        }
         if (params.get("idcardScanFlag") != null && params.get("idcardScanFlag") != "") {
             //是否身份证读卡(0:未读，1:读过;默认否)
             String idcardScanFlag = params.get("idcardScanFlag").toString();
@@ -1306,10 +1241,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             String channelType = params.get("channelType").toString();
             paramMap.put("channelType", channelType);
         }
-        String page = params.get("page");
-        String pageSize = params.get("pageSize");
-        paramMap.put("currenPage", page);
-        paramMap.put("pageSize", pageSize);
+
         Map<String, Object> stringObjectMap = new HashMap<>();
         try {
             stringObjectMap = iReportService.queryEventOrder(paramMap);
@@ -1341,6 +1273,138 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             result.put("resultMsg", "查询无结果 queryRptEventOrder error:" + reqId.toString());
         }
         return result;
+    }
+
+    @Override
+    public Map<String, Object> queryEventOrderChlListByReport(Map<String, String> params) {
+        HashMap<String, String> paramMap = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>();
+        String strDataName = "dayKey";
+        if (channelStaffParams(params, paramMap, result,strDataName)) return result;
+
+        if (params.get("statType")!=null && params.get("statType")!=""){
+            paramMap.put("statType",params.get("statType").toString());
+        }
+        Map<String, Object> stringObjectMap = new HashMap<>();
+        try {
+            stringObjectMap = iReportService.queryEventOrder(paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Map<String, Object>> hashMaps = new ArrayList<>();
+        logger.info("stringObjectMap:" + JSON.toJSONString(stringObjectMap));
+        if (stringObjectMap.get("resultCode") != null && "1".equals(stringObjectMap.get("resultCode").toString())) {
+            List<Map<String, Object>> data = new ArrayList<>();
+            Object rptEventOrderChlList = stringObjectMap.get("rptEventOrderChlList");
+            if (rptEventOrderChlList != null && rptEventOrderChlList != "") {
+                data = (List<Map<String, Object>>) stringObjectMap.get("rptEventOrderChlList");
+                if (data.size() > 0 && data != null) {
+                    for (Map<String, Object> map : data) {
+                        hashMaps.add(map);
+                    }
+                }
+            }
+            result.put("pageSize", stringObjectMap.get("pageSize").toString());
+            result.put("page", stringObjectMap.get("currenPage").toString());
+            result.put("total", stringObjectMap.get("total").toString());
+            result.put("resultMsg", hashMaps);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("reqId", stringObjectMap.get("reqId").toString());
+        }else {
+            Object reqId = stringObjectMap.get("reqId");
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "查询无结果 queryRptEventOrder error:" + reqId.toString());
+        }
+
+        return result;
+    }
+
+
+    private boolean channelStaffParams(Map<String, String> params, HashMap<String, String> paramMap, HashMap<String, Object> result,String strDataName) {
+        //统计日期 必填字段
+        Object endDate = params.get("endDate");
+        if (endDate != null && endDate != "") {
+            //类型转换 YYYYMMMDD YYYY-MM-DD
+//            Date date = DateUtil.parseDate(endDate.toString(), "YYYY-MM-DD");
+            paramMap.put(strDataName, endDate.toString().replaceAll("-", ""));
+            //起始统计日期(YYYYMMDD)必填 dubbo接口用
+            paramMap.put("startDate", endDate.toString().replaceAll("-", ""));
+        } else {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "时间是必填字段");
+            return true;
+        }
+        //渠道编码(必填,ALL表示所有,多个用逗号隔开)
+        Object channelCode = params.get("channelCode");
+        if (channelCode == "" || channelCode == null) {
+            paramMap.put("channelCode", "all");
+        } else {
+            paramMap.put("channelCode", channelCode.toString());
+        }
+        // 添加主题过滤
+        Object theMe = params.get("theMe");
+        if (theMe != "" && theMe != null) {
+            paramMap.put("theMe", theMe.toString());
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(paramMap);
+        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(hashMap);
+        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
+            for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+            }
+        } else {
+            result.put("resultMsg", "没有找到对应的活动方案");
+            result.put("resultCode", CODE_FAIL);
+            return true;
+        }
+        //多个id  “，”拼接 去除最后的一个 ，
+        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        paramMap.put("mktCampaignId", substring);
+
+        if (params.get("orglevel1") != null && params.get("orglevel1") != "") {
+            //地市(ALL表示所有,多个用逗号隔开)
+            String orglevel1 = params.get("orglevel1").toString();
+            paramMap.put("orglevel1", orglevel1);
+        }else {
+            paramMap.put("orglevel1", "800000000004");
+        }
+        if (params.get("orglevel2") != null && params.get("orglevel2") != "") {
+            //地市(ALL表示所有,多个用逗号隔开)
+            String orglevel2 = params.get("orglevel2").toString();
+            paramMap.put("orglevel2", orglevel2);
+        }
+        if (params.get("orglevel3") != null && params.get("orglevel3") != "") {
+            //分局(ALL表示所有,多个用逗号隔开)
+            String orglevel3 = params.get("orglevel3").toString();
+            paramMap.put("orglevel3", orglevel3);
+        }
+        if (params.get("orglevel4") != null && params.get("orglevel4") != "") {
+            //支局(ALL表示所有,多个用逗号隔开)
+            String orglevel4 = params.get("orglevel4").toString();
+            paramMap.put("orglevel4", orglevel4);
+        }
+        if (params.get("orglevel5") != null && params.get("orglevel5") != "") {
+            //网格(ALL表示所有,多个用逗号隔开)
+            String orglevel5 = params.get("orglevel5").toString();
+            paramMap.put("orglevel5", orglevel5);
+        }
+        if (params.get("ChannelOrgId") != null && params.get("ChannelOrgId") != "") {
+            //门店(ALL表示所有,多个用逗号隔开)
+            String ChannelOrgId = params.get("ChannelOrgId").toString();
+            paramMap.put("ChannelOrgId", ChannelOrgId);
+        }
+        if (params.get("salesStaffCode") != null && params.get("salesStaffCode") != "") {
+            //销售员编码
+            String salesStaffCode = params.get("salesStaffCode").toString();
+            paramMap.put("salesStaffCode", salesStaffCode);
+        }
+        String page = params.get("page");
+        String pageSize = params.get("pageSize");
+        paramMap.put("currenPage", page);
+        paramMap.put("pageSize", pageSize);
+        return false;
     }
 
 }
