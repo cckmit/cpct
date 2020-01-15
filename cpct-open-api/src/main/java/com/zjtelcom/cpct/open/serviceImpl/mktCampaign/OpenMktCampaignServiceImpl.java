@@ -51,6 +51,7 @@ import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,6 +138,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     @Autowired
     private RedisUtils redisUtils;
 
+    String GROUP_PROVINCIAL_CHANNEL_MAPPING = "GROUP_PROVINCIAL_CHANNEL_MAPPING";
     /**
      * 查询营销活动详情
      *
@@ -204,7 +206,14 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                         CamScript camScript = mktCamScriptMapper.selectByConfId(Long.valueOf(splits[i]));
                                         if(camScript != null) {
                                             MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(camScript.getEvtContactConfId());
-                                            Channel channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                                            String mapping = groupAndProvincialChannelMapping(mktCamChlConfDO);
+                                            logger.info("groupAndProvincialChannelMapping->mapping:" + mapping);
+                                            Channel channel = null;
+                                            if (mapping == null) {
+                                                channel = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDO.getContactChlId());
+                                            } else {
+                                                channel = contactChannelMapper.selectByPrimaryKey(Long.valueOf(mapping));
+                                            }
                                             OpenScript openScript = new OpenScript();
                                             openScript.setScriptId(Integer.parseInt(camScript.getMktCampaignScptId().toString()));
                                             openScript.setScriptName(mktCamChlConfDO.getEvtContactConfName() + "脚本");
@@ -277,6 +286,23 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             resultMap.put("params", json);
         }
         return resultMap;
+    }
+
+    public String groupAndProvincialChannelMapping(MktCamChlConfDO mktCamChlConfDO) {
+        logger.info("groupAndProvincialChannelMapping->ContactChlId:" + mktCamChlConfDO.getContactChlId());
+        List<Map<String, String>> list = sysParamsMapper.listParamsByKey(GROUP_PROVINCIAL_CHANNEL_MAPPING);
+        String sysParamsValue = list.get(0).get("value");
+        JSONArray array = JSONArray.parseArray(sysParamsValue);
+        for (Object object : array) {
+            JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(object));
+            String provincial = (String) jsonObject.get("provincial");
+            logger.info("groupAndProvincialChannelMapping->provincial:" + provincial);
+            if (provincial.equals(String.valueOf(mktCamChlConfDO.getContactChlId()))) {
+                logger.info("groupAndProvincialChannelMapping->group:" + jsonObject.get("group"));
+                return (String) jsonObject.get("group");
+            }
+        }
+        return null;
     }
 
     @Override

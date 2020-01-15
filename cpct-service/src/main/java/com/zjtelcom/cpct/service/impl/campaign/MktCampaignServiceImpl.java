@@ -430,6 +430,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                 }
 //            }
+
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","校验通过");
@@ -2291,7 +2292,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
-        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setStartDate(new Date());
         requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
         requestInfo.setStatusCd("1000");
         requestInfo.setStatusDate(new Date());
@@ -2337,6 +2338,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     }
 
+    //集团活动创建需求函
     public void generateRequest(MktCampaignDO mktCampaignDO) {
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setRequestType("mkt");
@@ -2345,14 +2347,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         requestInfo.setName(mktCampaignDO.getMktCampaignName());
         requestInfo.setDesc(mktCampaignDO.getMktCampaignName());
         requestInfo.setReason(mktCampaignDO.getMktCampaignName());
-        requestInfo.setStartDate(mktCampaignDO.getPlanBeginTime());
+        requestInfo.setStartDate(new Date());
         requestInfo.setExpectFinishDate(mktCampaignDO.getPlanEndTime());
         requestInfo.setStatusCd("1000");
         requestInfo.setStatusDate(new Date());
         requestInfo.setCreateDate(new Date());
         requestInfo.setUpdateDate(new Date());
         requestInfo.setActionType("add");
-        requestInfo.setActivitiKey("mkt_force_province");  //需求函活动类型
+        requestInfo.setActivitiKey("mkt_group_process");  //需求函活动类型
         requestInfo.setRequestUrgentType("一般");
         requestInfo.setProcessType("0");
         requestInfo.setReportTag("0");

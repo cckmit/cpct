@@ -788,8 +788,11 @@ public class DateUtil {
      * @return
      */
     public static String getDatetime(Date time){
-        SimpleDateFormat sf=new SimpleDateFormat("yyyyMMddHHmmss");
-        return  sf.format(time);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+//        SimpleDateFormat sf=new SimpleDateFormat("yyyyMMddHHmmss");
+        return  sdf.format(time);
     }
 
 
