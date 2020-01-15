@@ -14,8 +14,6 @@ public interface EsHitsService {
 
     void save(JSONObject jsonObject, String indexName, String _id);
 
-    JSONObject save(JSONObject jsonObject, String indexName,String hit,String msg);
-
     Map<String,Object> searchCampaignHitsInfo(CampaignHitParam param);
 
     Map<String,Object> searchCampaignHitsTotal(CampaignHitParam param);

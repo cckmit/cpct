@@ -53,7 +53,7 @@ public class OpenMktCampaignController extends BaseController {
      * @return
      */
     @CrossOrigin
-    @RequestMapping(value = "/mktCampaign/{mktCampaignId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/campaign/mktCampaign/{mktCampaignId}", method = RequestMethod.POST)
     public String getMktCampaignDetail(@PathVariable String mktCampaignId, HttpServletResponse response) {
         try {
             Map<String, Object> map = openMktCampaignService.getMktCampaignDetail(mktCampaignId);

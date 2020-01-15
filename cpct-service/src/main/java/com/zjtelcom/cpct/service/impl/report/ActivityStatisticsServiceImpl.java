@@ -753,19 +753,14 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             }
                             // todo 新加关单编码 2020 1/2 x
                             if (key.equals("batchNbr")){
-                                msgMap.put("name", "批次编码");
-                                msgMap.put("nub", o);
-                                statisicts.add(msgMap);
+                                resultMap.put("batchNum", o.toString());
                             }
                             if (key.equals("batchNbr")){
-                                msgMap.put("name", "派单方式");
                                 TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(o.toString());
                                 if (trialOperation.getCreateStaff().toString().equals("1000")){
-                                    msgMap.put("nub", "标签取数");
-                                    statisicts.add(msgMap);
+                                    resultMap.put("dispatchForm", "标签取数");
                                 }else {
-                                    msgMap.put("nub", "清单导入");
-                                    statisicts.add(msgMap);
+                                    resultMap.put("dispatchForm", "清单导入");
                                 }
 
                             }
