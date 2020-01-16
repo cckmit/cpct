@@ -1287,7 +1287,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         Map<String, Object> stringObjectMap = new HashMap<>();
         try {
-            stringObjectMap = iReportService.queryEventOrder(paramMap);
+            stringObjectMap = iReportService.queryRptEventOrderChl(paramMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1300,6 +1300,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 data = (List<Map<String, Object>>) stringObjectMap.get("rptEventOrderChlList");
                 if (data.size() > 0 && data != null) {
                     for (Map<String, Object> map : data) {
+                        if (map.get("channelCode")!=null) {
+                            String channelCode = map.get("channelCode").toString();
+                            Channel channel = contactChannelMapper.selectByCode(channelCode);
+                            map.put("channelName", channel.getContactChlName());
+                        }
                         hashMaps.add(map);
                     }
                 }
@@ -1309,7 +1314,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             result.put("total", stringObjectMap.get("total").toString());
             result.put("resultMsg", hashMaps);
             result.put("resultCode", CODE_SUCCESS);
-            result.put("reqId", stringObjectMap.get("reqId").toString());
+            String reqId = stringObjectMap.get("reqId").toString();
+            result.put("reqId", reqId);
+            if (reqId != null && reqId != "") {
+                redisUtils.set(reqId.toString(), paramMap);
+            }
         }else {
             Object reqId = stringObjectMap.get("reqId");
             result.put("resultCode", CODE_FAIL);
@@ -1346,23 +1355,24 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (theMe != "" && theMe != null) {
             paramMap.put("theMe", theMe.toString());
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(paramMap);
-        List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(hashMap);
-        if (mktCampaignList.size() > 0 && mktCampaignList != null) {
-            for (MktCampaignDO mktCampaignDO : mktCampaignList) {
-                stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+        if (!strDataName.equals("dayKey")){
+            StringBuilder stringBuilder = new StringBuilder();
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.putAll(paramMap);
+            List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(hashMap);
+            if (mktCampaignList.size() > 0 && mktCampaignList != null) {
+                for (MktCampaignDO mktCampaignDO : mktCampaignList) {
+                    stringBuilder.append(mktCampaignDO.getInitId()).append(",");
+                }
+            } else {
+                result.put("resultMsg", "没有找到对应的活动方案");
+                result.put("resultCode", CODE_FAIL);
+                return true;
             }
-        } else {
-            result.put("resultMsg", "没有找到对应的活动方案");
-            result.put("resultCode", CODE_FAIL);
-            return true;
+            //多个id  “，”拼接 去除最后的一个 ，
+            String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+            paramMap.put("mktCampaignId", substring);
         }
-        //多个id  “，”拼接 去除最后的一个 ，
-        String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
-        paramMap.put("mktCampaignId", substring);
-
         if (params.get("orglevel1") != null && params.get("orglevel1") != "") {
             //地市(ALL表示所有,多个用逗号隔开)
             String orglevel1 = params.get("orglevel1").toString();
