@@ -1373,7 +1373,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         // 添加主题过滤
         Object theMe = params.get("theMe");
         if (theMe != "" && theMe != null) {
+            paramMap.put("theme", theMe.toString());
             paramMap.put("theMe", theMe.toString());
+        }else {
+            paramMap.put("theme", "all");
         }
         if (!strDataName.equals("dayKey")){
             StringBuilder stringBuilder = new StringBuilder();
