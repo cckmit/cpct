@@ -96,7 +96,7 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
         this.campaignList = (List<String>) hashMap.get("mktCampaginIdList");
         this.initIdList = (List<String>) hashMap.get("initIdList");
         this.eventId = (Long ) hashMap.get("eventId");
-        this.landId = (String) hashMap.get("landId");
+        this.landId = (String) hashMap.get("lanId");
         this.custId = (String) hashMap.get("custId");
         this.map = (Map<String, String>) hashMap.get("map");
         this.evtTriggers = (List<Map<String, Object>>) hashMap.get("evtTriggers");

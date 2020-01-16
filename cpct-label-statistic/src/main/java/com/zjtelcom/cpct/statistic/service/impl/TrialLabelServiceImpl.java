@@ -124,6 +124,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
                         }
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     logger.error("标签入es库失败：" + e);
                 }
             }
@@ -185,7 +186,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     public Map<String, Object> statisticalAnalysts(Map<String, Object> param) {
         HashMap<String, Object> result = new HashMap<>();
         ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
-        List<Map<String, String>> list1 = (List<Map<String, String>>) param.get("list");
+        List<Map<String, Object>> list1 = (List<Map<String, Object>>) param.get("list");
         logger.info("list1:"+JSON.toJSONString(list1));
         Map<String, Object> stringObjectMap = commonTarGrpTemplateCount(list1, result);
         Object list = stringObjectMap.get("expressions");
@@ -193,7 +194,7 @@ public class TrialLabelServiceImpl implements TrialLabelService {
         Object labelList = stringObjectMap.get("labelList");
         List<LabelResultES> labelDataList = labelList == null ? new ArrayList<>() : (ArrayList) labelList;
         // 二次搜索条件 查询拼接
-        List<Map<String, String>> analustList = (List<Map<String, String>>) param.get("analustList");
+        List<Map<String, Object>> analustList = (List<Map<String, Object>>) param.get("analustList");
         logger.info("analustList:"+JSON.toJSONString(analustList));
         Map<String, Object> stringObjectMap2 = commonTarGrpTemplateCount(analustList, result);
         Object list2 = stringObjectMap2.get("expressions");
@@ -290,16 +291,19 @@ public class TrialLabelServiceImpl implements TrialLabelService {
     }
 
 
-    public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, String>> tarGrplist, Map<String, Object> params) {
+    public Map<String, Object> commonTarGrpTemplateCount(List<Map<String, Object>> tarGrplist, Map<String, Object> params) {
         List<String> expressions = new ArrayList<>();
         List<LabelResultES> labelList = new ArrayList<>();
-        for (Map<String, String> tarGrpCondition : tarGrplist) {
-            String leftParam = String.valueOf(tarGrpCondition.get("leftParam"));
+        for (Map<String, Object> tarGrpCondition : tarGrplist) {
+//            String leftParam = String.valueOf(tarGrpCondition.get("leftParam"));
+//            Label label1 = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(leftParam));
+            String leftParam = tarGrpCondition.get("leftParam").toString();
             Label label1 = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(leftParam));
+            logger.info("label1:"+label1);
             String code = label1.getInjectionLabelCode();
             String operType = String.valueOf(tarGrpCondition.get("operType"));
             operType = equationSymbolConversion(operType);
-            String rightParam = tarGrpCondition.get("rightParam");
+            String rightParam = String.valueOf(tarGrpCondition.get("rightParam"));
             String expression = code + operType + rightParam;
             expressions.add(expression);
             LabelResultES label = new LabelResultES();
