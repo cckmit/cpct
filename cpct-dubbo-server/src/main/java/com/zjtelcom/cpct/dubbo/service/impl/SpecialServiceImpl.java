@@ -95,7 +95,9 @@ public class SpecialServiceImpl implements SpecialService {
             paramsMap.put("type", "1");
             labelItems.put("CPCP_PUSH_NUMBER", contactNumber);
             // 判断该联系号码是否绑定微厅
+            log.info("paramsMap1 --->" + JSON.toJSONString(paramsMap));
             Map<String, Object> resultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
+            log.info("resultMap --->" + JSON.toJSONString(resultMap));
             if (resultMap != null && resultMap.get("data") != null && ((List<Map>) resultMap.get("data")).size() > 0) {
                 // 绑定微厅
                 List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) resultMap.get("data");
@@ -109,7 +111,9 @@ public class SpecialServiceImpl implements SpecialService {
             } else {
                 // 判断资产号码是否绑定微厅
                 paramsMap.put("phone", map.get("accNbr"));
+                log.info("paramsMap2 --->" + JSON.toJSONString(paramsMap));
                 Map<String, Object> accResultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
+                log.info("accResultMap --->" + JSON.toJSONString(accResultMap));
                 if (accResultMap != null && accResultMap.get("data") != null && ((List<Map>) accResultMap.get("data")).size() > 0) {
                     // 绑定微厅
                     List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) accResultMap.get("data");
