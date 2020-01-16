@@ -442,4 +442,18 @@ public class ActivityStatisticsController extends BaseController {
         return map;
     }
 
+
+    @PostMapping("/queryEventOrderChlListByReport")
+    @CrossOrigin
+    public Map<String,Object> queryEventOrderChlListByReport(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = activityStatisticsService.queryEventOrderChlListByReport(params);
+        } catch (Exception e) {
+            logger.error("[op:ActivityStatisticsController] fail to listEvents for queryEventOrderChlListByReport = {}! Exception: ", JSONArray.toJSON(params), e);
+            return map;
+        }
+        return map;
+    }
+
 }
