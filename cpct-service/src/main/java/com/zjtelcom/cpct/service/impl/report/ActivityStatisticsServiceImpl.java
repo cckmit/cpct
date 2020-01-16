@@ -102,9 +102,29 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 //        //组织树控制权限
         List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
         String sysPostCode = null;
-        sysPostCode = systemPostDtoList.get(0).getSysPostCode();
-//        Long staffId = Long.valueOf(params.get("staffId").toString());
-//        String sysPostCode = params.get("sysPostCode").toString();
+//        sysPostCode = systemPostDtoList.get(0).getSysPostCode();
+        ArrayList<String> arrayLists = new ArrayList<>();
+        //岗位信息查看最大权限作为岗位信息
+        if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
+            for (SystemPostDto systemPostDto : systemPostDtoList) {
+                arrayLists.add(systemPostDto.getSysPostCode());
+            }
+        }
+        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        }else {
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }
+
+
         Object areaId = params.get("areaId");
         if (areaId != null && areaId != "") {
             arrayList = organizationMapper.selectByParentId(Long.valueOf(areaId.toString()));
@@ -1281,7 +1301,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         HashMap<String, Object> result = new HashMap<>();
         String strDataName = "dayKey";
         if (channelStaffParams(params, paramMap, result,strDataName)) return result;
-
+        //是否沙盘(0:所有，1:是)
         if (params.get("statType")!=null && params.get("statType")!=""){
             paramMap.put("statType",params.get("statType").toString());
         }
