@@ -15,6 +15,8 @@ import com.zjtelcom.cpct.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +26,8 @@ import java.util.Map;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.enums.DateUnit.DAY;
 
+@Service
+@Transactional
 public class ScheduledTaskServiceImpl implements ScheduledTaskService {
 
     public static final Logger logger = LoggerFactory.getLogger(ScheduledTaskServiceImpl.class);
