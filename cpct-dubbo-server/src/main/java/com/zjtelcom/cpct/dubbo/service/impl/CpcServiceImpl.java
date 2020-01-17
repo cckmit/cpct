@@ -240,6 +240,10 @@ public class CpcServiceImpl implements CpcService {
             }
 
             List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
+            // 客户级
+            List<DefaultContext<String, Object>> custResultMapList = new ArrayList<>();
+            // 套餐级
+            List<DefaultContext<String, Object>> packResultMapList = new ArrayList<>();
             List<Map<String, Object>> accNbrMapList = new ArrayList<>();
             JSONArray accArray = new JSONArray();
             // 是客户级的
@@ -260,7 +264,9 @@ public class CpcServiceImpl implements CpcService {
                     result.put("CPCResultMsg", "采集项未包含客户编码");
                     return result;
 
-                } else if (hasCust) {
+                }
+
+                if (hasCust) {
                     JSONObject param = new JSONObject();
                     //查询标识
                     param.put("c3", map.get("lanId"));
@@ -302,7 +308,7 @@ public class CpcServiceImpl implements CpcService {
                         for (Future<DefaultContext<String, Object>> future : futureList) {
                             if (future.get() != null && !future.get().isEmpty()) {
                                 DefaultContext<String, Object> reultMap = future.get();
-                                resultMapList.add(reultMap);
+                                custResultMapList.add(reultMap);
                             }
                         }
 
@@ -314,7 +320,8 @@ public class CpcServiceImpl implements CpcService {
                         accNbrMapList = getAccNbrList(map.get("accNbr"));
                         successPackage = true;
                     }
-                } else if (hasPackage) {
+                }
+                if (hasPackage) {
                     accNbrMapList = getAccNbrList(map.get("accNbr"));
                     successPackage = true;
                     // 查询标签
@@ -339,7 +346,7 @@ public class CpcServiceImpl implements CpcService {
                         for (Future<DefaultContext<String, Object>> future : futureList) {
                             if (future.get() != null && !future.get().isEmpty()) {
                                 DefaultContext<String, Object> reultMap = future.get();
-                                resultMapList.add(reultMap);
+                                packResultMapList.add(reultMap);
                             }
                         }
                     } catch (Exception e) {
@@ -460,7 +467,7 @@ public class CpcServiceImpl implements CpcService {
                         if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级
                             //客户级
                             if (successCust) {
-                                for (DefaultContext<String, Object> o : resultMapList) {
+                                for (DefaultContext<String, Object> o : custResultMapList) {
                                     //客户级下，循环资产级
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "0"); //是客户级
@@ -495,7 +502,7 @@ public class CpcServiceImpl implements CpcService {
                         } else if ((Integer) activeMap.get("levelConfig") == 2) { // 判断是套餐级别
                             //套餐级
                             if (successPackage) {
-                                for (DefaultContext<String, Object> o : resultMapList) {
+                                for (DefaultContext<String, Object> o : packResultMapList) {
                                     for (Map<String, Object> accNbrMap : accNbrMapList) {
                                         if (o.get("accNbr").toString().equals(accNbrMap.get("ACC_NBR"))) {
                                             //客户级下，循环资产级
