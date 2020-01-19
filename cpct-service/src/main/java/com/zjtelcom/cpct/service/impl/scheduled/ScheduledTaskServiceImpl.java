@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.scheduled;
 
 import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -46,6 +47,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     private SysParamsMapper SysParamsMapper;
     @Autowired(required = false)
     private IReportService iReportService;
+    @Autowired(required = false)
+    private ICpcAPIService iCpcAPIService;
 
     // 批次下发时间最大允许时间
     public static final String maxDays = "BATCH_ISSUED_TIME";
@@ -75,11 +78,11 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                             Double handleRate = Double.valueOf(handleRateString);
                             if (handleRate * 100 < rate) {
                                 // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
-                                Map map = modifyCampaignBatchFailureTime(batchNum);
-                                logger.info("调用营服调整批次生失效时间:->" + JSON.toJSONString(map));
-                                MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
-                                String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
-                                uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+                                if (modifyCampaignBatchFailureTime(batchNum)) {
+                                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+                                    String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
+                                    uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+                                }
                             }
                         }
                     }
@@ -89,16 +92,25 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     }
 
     // 修改派单到营服的批次的失效时间
-    public Map modifyCampaignBatchFailureTime(String batchNum) {
-        String date = DateUtil.date2StringDate(DateUtil.addDate(new Date(), -1, DAY));
-        Map map = new HashMap();
-        map.put("workFlowId", batchNum);
-        map.put("invalidDate", date);
-        map.put("updateLoginname", "18957181789");
-        map.put("updateLoginWorkNo", "Y33000063714");
-        map.put("updateUsername", "解晓强");
-        Map resultMap = projectManageService.updateProjectStateTime(map);
-        return resultMap;
+    public boolean modifyCampaignBatchFailureTime(String batchNum) {
+        boolean result = false;
+        try {
+            String date = DateUtil.date2StringDate(DateUtil.addDate(new Date(), -1, DAY));
+            Map map = new HashMap();
+            map.put("workFlowId", batchNum);
+            map.put("invalidDate", date);
+            map.put("updateLoginname", "18957181789");
+            map.put("updateLoginWorkNo", "Y33000063714");
+            map.put("updateUsername", "解晓强");
+            Map resultMap = iCpcAPIService.updateProjectStateTime(map);
+            logger.info("修改派单到营服的批次的失效时间->:" + JSON.toJSONString(resultMap));
+            if (resultMap != null && resultMap.get("resultCode").equals("1")) {
+                result = true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public Integer getSysParamsIntegerValue(String key) {
