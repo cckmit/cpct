@@ -131,6 +131,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 stringObjectMap.put("resultCode", CODE_FAIL);
                 stringObjectMap.put("resultMsg", "查询无结果 queryRptBatchOrder error :" + reqId.toString());
             }
+            logger.info("getRptBatchOrder->:" + JSON.toJSONString(stringObjectMap));
         } catch (Exception e) {
             e.printStackTrace();
         }
