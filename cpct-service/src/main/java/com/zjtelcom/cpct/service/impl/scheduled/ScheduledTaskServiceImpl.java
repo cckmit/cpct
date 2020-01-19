@@ -66,14 +66,13 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             if (daysBetween > days) {
                 // TODO 调用营服查询处理率
                 List<Map<String, String>> rptBatchOrder = getRptBatchOrder(campaignId.toString(), DateUtil.date2String(createDate));
-                Double handleRate = null;
                 if (rptBatchOrder != null) {
                     logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
                     for (Map<String, String> stringStringMap : rptBatchOrder) {
                         String batchNbr = stringStringMap.get("batchNbr");
                         if (trialOperation.getBatchNum().equals(batchNbr)) {
-                            String handleRateRe = stringStringMap.get("handleRate");
-                            handleRate = Double.valueOf(handleRateRe);
+                            String handleRateString = stringStringMap.get("handleRate");
+                            Double handleRate = Double.valueOf(handleRateString);
                             if (handleRate * 100 < rate) {
                                 // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
                                 Map map = modifyCampaignBatchFailureTime(batchNum);
