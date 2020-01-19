@@ -62,31 +62,37 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         Integer days = getSysParamsIntegerValue(maxDays);
         Integer rate = getSysParamsIntegerValue(minRate);
         for (TrialOperation trialOperation : trialOperations) {
-            Date createDate = trialOperation.getCreateDate();
-            String batchNum = String.valueOf(trialOperation.getBatchNum());
-            Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
-            Long campaignId = trialOperation.getCampaignId();
-            if (daysBetween > days) {
-                // TODO 调用营服查询处理率
-                List<Map<String, String>> rptBatchOrder = getRptBatchOrder(campaignId.toString(), DateUtil.date2String(createDate));
-                if (rptBatchOrder != null) {
-                    logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
-                    for (Map<String, String> stringStringMap : rptBatchOrder) {
-                        String batchNbr = stringStringMap.get("batchNbr");
-                        if (trialOperation.getBatchNum().equals(batchNbr)) {
-                            String handleRateString = stringStringMap.get("handleRate");
-                            Double handleRate = Double.valueOf(handleRateString);
-                            if (handleRate * 100 < rate) {
-                                // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
-                                if (modifyCampaignBatchFailureTime(batchNum)) {
-                                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
-                                    String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
-                                    uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+            try {
+                Date createDate = trialOperation.getCreateDate();
+                String batchNum = String.valueOf(trialOperation.getBatchNum());
+                Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
+                Long campaignId = trialOperation.getCampaignId();
+                if (daysBetween > days) {
+                    // TODO 调用营服查询处理率
+                    List<Map<String, String>> rptBatchOrder = getRptBatchOrder(campaignId.toString(), DateUtil.date2String(createDate));
+                    if (rptBatchOrder != null) {
+                        logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
+                        for (Map<String, String> stringStringMap : rptBatchOrder) {
+                            String batchNbr = stringStringMap.get("batchNbr");
+                            if (trialOperation.getBatchNum().equals(batchNbr)) {
+                                String handleRateString = stringStringMap.get("handleRate");
+                                Double handleRate = Double.valueOf(handleRateString);
+                                boolean handleRateFlag = handleRate * 100 < rate;
+                                logger.info("handleRate:->" + handleRate + ",handleRateFlag:->" + handleRateFlag);
+                                if (handleRate * 100 < rate) {
+                                    // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
+                                    if (modifyCampaignBatchFailureTime(batchNum)) {
+                                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+                                        String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
+                                        uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
