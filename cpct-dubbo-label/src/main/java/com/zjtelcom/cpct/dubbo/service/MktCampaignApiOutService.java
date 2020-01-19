@@ -12,7 +12,7 @@ import java.util.Map;
  * version: V1.0
  */
 
-public interface MktCampaignApiService {
+public interface MktCampaignApiOutService {
 
     RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception;
 

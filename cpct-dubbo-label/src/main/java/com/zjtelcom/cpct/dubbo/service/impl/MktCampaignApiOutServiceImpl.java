@@ -22,7 +22,7 @@ import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
-import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
+import com.zjtelcom.cpct.dubbo.service.MktCampaignApiOutService;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
@@ -49,9 +49,9 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 @Transactional
-public class MktCampaignApiServiceImpl implements MktCampaignApiService {
+public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MktCampaignApiServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MktCampaignApiOutServiceImpl.class);
     /**
      * 营销活动
      */
