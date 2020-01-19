@@ -120,7 +120,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         map.put("mktCampaignId", mktCampaignId);
         map.put("orglevel1", "800000000004");
         map.put("flag", "1");
-        map.put("currenPage", "0");
+        map.put("currenPage", "1");
         map.put("pageSize", "999");
         List<Map<String,String>> rptBatchOrderList = null;
         try {
