@@ -85,7 +85,7 @@
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
 
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
         <!-- 营销活动详情服务 -->
         <dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetailApi" timeout="10000"/>
     </dubbo:service>
