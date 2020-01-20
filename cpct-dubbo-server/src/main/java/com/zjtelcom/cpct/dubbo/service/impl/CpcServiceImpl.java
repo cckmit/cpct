@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ctzj.bss.customer.data.carrier.outbound.api.CtgCacheAssetService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService;
+import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheOfferEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheProdEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheRelEntityQryService;
 import com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheOfferRelIndexQryService;
@@ -13,6 +14,7 @@ import com.ctzj.smt.bss.cache.service.api.model.CacheResultObject;
 import com.ctzj.smt.bss.customer.model.dataobject.OfferProdInstRel;
 import com.ctzj.smt.bss.customer.model.dataobject.ProdInst;
 import com.ctzj.smt.bss.customer.model.dataobject.RowIdMapping;
+import com.google.common.collect.Sets;
 import com.ql.util.express.DefaultContext;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -224,154 +227,8 @@ public class CpcServiceImpl implements CpcService {
             // 过滤事件采集项中的标签
             Map<String, String> mktAllLabel = filterLabel(labelItems, mktAllLabels);
 
-            //判断有没有客户级活动
-            Boolean hasCust = false;  //是否有客户级
-            Boolean hasPackage = false;  //是否有套餐
-            Boolean successCust = false;  //客户级查询是否成功
-            Boolean successPackage = false;  //套餐级查询是否成功
-            for (Map<String, Object> activeMap : resultByEvent) {
-                if (((Map) activeMap.get("mktCampaignMap")) != null && !((Map) activeMap.get("mktCampaignMap")).isEmpty()) {
-                    if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 1) {  // 客户级
-                        hasCust = true;
-                    } else if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 2) { // 套餐级
-                        hasPackage = true;
-                    }
-                }
-            }
 
-            List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
-            // 客户级
-            List<DefaultContext<String, Object>> custResultMapList = new ArrayList<>();
-            // 套餐级
-            List<DefaultContext<String, Object>> packResultMapList = new ArrayList<>();
-            List<Map<String, Object>> accNbrMapList = new ArrayList<>();
-            JSONArray accArray = new JSONArray();
-            // 是客户级的
-            if (hasCust || hasPackage) {
-                if (custId == null || "".equals(custId)) {
-                    //保存es log
-                    long cost = System.currentTimeMillis() - begin;
-                    esJson.put("timeCost", cost);
-                    esJson.put("hit", false);
-                    esJson.put("success", true);
-                    esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
-                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
-
-                    log.error("采集项未包含客户编码:" + map.get("reqId"));
-
-                    //事件采集项没有客户编码
-                    result.put("CPCResultCode", "1000");
-                    result.put("CPCResultMsg", "采集项未包含客户编码");
-                    return result;
-
-                }
-
-                if (hasCust) {
-                    JSONObject param = new JSONObject();
-                    //查询标识
-                    param.put("c3", map.get("lanId"));
-                    param.put("queryId", map.get("custId"));
-                    param.put("queryNum", "");
-                    param.put("queryFields", "");
-                    param.put("type", "4");
-                    param.put("centerType", "00");
-                    try {
-                        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
-                        if ("0".equals(dubboResult.get("result_code").toString())) {
-                            accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
-                            successCust = true;
-                        }
-
-                        // 查询客户级的标签
-                        Map<String, String> privateParams = new HashMap<>();
-                        privateParams.put("isCust", "1");
-                        privateParams.put("accNbr", map.get("accNbr"));
-                        privateParams.put("integrationId", map.get("integrationId"));
-                        privateParams.put("custId", map.get("custId"));
-
-                        // 客户级
-                        List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("mktAllLabel", mktAllLabel);
-                        hashMap.put("map", map);
-                        hashMap.put("context", context);
-                        hashMap.put("esJson", esJson);
-                        hashMap.put("esHitService", esHitService);
-                        hashMap.put("yzServ", yzServ);
-                        //多线程获取资产级标签，并加上客户级标签
-                        for (Object o : accArray) {
-                            hashMap.put("o", o);
-                            Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
-                            futureList.add(future);
-                        }
-
-                        for (Future<DefaultContext<String, Object>> future : futureList) {
-                            if (future.get() != null && !future.get().isEmpty()) {
-                                DefaultContext<String, Object> reultMap = future.get();
-                                custResultMapList.add(reultMap);
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        log.error("Exception = " + e);
-                    }
-                    // 判断是否存在套餐级
-                    if (hasPackage) {
-                        accNbrMapList = getAccNbrList(map.get("accNbr"));
-                        successPackage = true;
-                    }
-                }
-                if (hasPackage) {
-                    accNbrMapList = getAccNbrList(map.get("accNbr"));
-                    successPackage = true;
-                    // 查询标签
-                    try {
-                        // 客户级
-                        List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("mktAllLabel", mktAllLabel);
-                        hashMap.put("map", map);
-                        hashMap.put("context", context);
-                        hashMap.put("esJson", esJson);
-                        hashMap.put("labelItems", labelItems);
-                        hashMap.put("esHitService", esHitService);
-                        hashMap.put("yzServ", yzServ);
-                        //多线程获取资产级标签，并加上客户级标签
-                        for (Object o : accNbrMapList) {
-                            hashMap.put("o", o);
-                            Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
-                            futureList.add(future);
-                        }
-
-                        for (Future<DefaultContext<String, Object>> future : futureList) {
-                            if (future.get() != null && !future.get().isEmpty()) {
-                                DefaultContext<String, Object> reultMap = future.get();
-                                packResultMapList.add(reultMap);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                //资产级
-                Map<String, String> privateParams = new HashMap<>();
-                privateParams.put("isCust", "1"); //资产级
-                privateParams.put("accNbr", map.get("accNbr"));
-                privateParams.put("integrationId", map.get("integrationId"));// 资产集成编码
-                privateParams.put("custId", map.get("custId"));
-
-                DefaultContext<String, Object> reultMap = new DefaultContext<>();
-                Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
-                if (assetLabelMap != null) {
-                    reultMap.putAll(assetLabelMap);
-                } else {
-                    return null;
-                }
-                resultMapList.add(reultMap);
-            }
-
-
+            /***********************清单方案流程***************************/
             //初始化结果集
             List<Future<Map<String, Object>>> threadList = new ArrayList<>();
             // 启动线程走清单流程
@@ -406,19 +263,149 @@ public class CpcServiceImpl implements CpcService {
                 Future<Map<String, Object>> f = ThreadPool.submit(new CustListTaskServiceImpl(hashMap));
                 threadList.add(f);
             }
+            /***********************************************************/
 
-            //判断是否全部为资产级
-            boolean isAllAsset = false;
+
+            //
+            Boolean hasAsset = false;  //是否都是资产级活动
+            Boolean hasCust = false;  //是否有客户级
+            Boolean hasPackage = false;  //是否有套餐
             for (Map<String, Object> activeMap : resultByEvent) {
-                if (((Map<String, Object>) activeMap.get("mktCampaignMap")) != null && !((Map<String, Object>) activeMap.get("mktCampaignMap")).isEmpty()) {
-                    if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 1) { // 1为客户级
-                        isAllAsset = false;
-                        break;
-                    } else if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 0) {  // 0为资产级
-                        isAllAsset = true;
+                if (((Map) activeMap.get("mktCampaignMap")) != null && !((Map) activeMap.get("mktCampaignMap")).isEmpty()) {
+                    if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 1) {  // 客户级
+                        hasCust = true;
+                    } else if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 2) { // 套餐级
+                        hasPackage = true;
+                    } else if ((Integer) ((Map<String, Object>) activeMap.get("mktCampaignMap")).get("levelConfig") == 0) { // 套餐级
+                        hasAsset = true;
                     }
                 }
             }
+
+            // 资产级
+            List<DefaultContext<String, Object>> resultMapList = new ArrayList<>();
+            // 客户级
+            List<DefaultContext<String, Object>> custResultMapList = new ArrayList<>();
+            // 套餐级
+            List<DefaultContext<String, Object>> packResultMapList = new ArrayList<>();
+            List<Map<String, Object>> accNbrMapList = new ArrayList<>();
+            JSONArray accArray = new JSONArray();
+
+            if (hasAsset) {
+                //资产级
+                Map<String, String> privateParams = new HashMap<>();
+                privateParams.put("isCust", "1"); //资产级
+                privateParams.put("accNbr", map.get("accNbr"));
+                privateParams.put("integrationId", map.get("integrationId"));// 资产集成编码
+                privateParams.put("custId", map.get("custId"));
+
+                DefaultContext<String, Object> reultMap = new DefaultContext<>();
+                Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
+                if (assetLabelMap != null) {
+                    reultMap.putAll(assetLabelMap);
+                } else {
+                    return null;
+                }
+                resultMapList.add(reultMap);
+            }
+            // 是客户级的
+            if (hasCust) {
+                if (custId == null || "".equals(custId)) {
+                    //保存es log
+                    long cost = System.currentTimeMillis() - begin;
+                    esJson.put("timeCost", cost);
+                    esJson.put("hit", false);
+                    esJson.put("success", true);
+                    esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
+                    esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
+                    log.error("采集项未包含客户编码:" + map.get("reqId"));
+                    //事件采集项没有客户编码
+                    result.put("CPCResultCode", "1000");
+                    result.put("CPCResultMsg", "采集项未包含客户编码");
+                    return result;
+
+                }
+                JSONObject param = new JSONObject();
+                //查询标识
+                param.put("c3", map.get("lanId"));
+                param.put("queryId", map.get("custId"));
+                param.put("queryNum", "");
+                param.put("queryFields", "");
+                param.put("type", "4");
+                param.put("centerType", "00");
+                try {
+                    Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+                    if ("0".equals(dubboResult.get("result_code").toString())) {
+                        accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
+                        //successCust = true;
+                    }
+
+                    // 查询客户级的标签
+                    Map<String, String> privateParams = new HashMap<>();
+                    privateParams.put("isCust", "1");
+                    privateParams.put("accNbr", map.get("accNbr"));
+                    privateParams.put("integrationId", map.get("integrationId"));
+                    privateParams.put("custId", map.get("custId"));
+
+                    // 客户级
+                    List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("mktAllLabel", mktAllLabel);
+                    hashMap.put("map", map);
+                    hashMap.put("context", context);
+                    hashMap.put("esJson", esJson);
+                    hashMap.put("esHitService", esHitService);
+                    hashMap.put("yzServ", yzServ);
+                    //多线程获取资产级标签，并加上客户级标签
+                    for (Object o : accArray) {
+                        hashMap.put("o", o);
+                        Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
+                        futureList.add(future);
+                    }
+
+                    for (Future<DefaultContext<String, Object>> future : futureList) {
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            DefaultContext<String, Object> reultMap = future.get();
+                            custResultMapList.add(reultMap);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Exception = " + e);
+                }
+            }
+            if (hasPackage) {
+                accNbrMapList = getAccNbrList(map.get("accNbr"));
+                //successPackage = true;
+                // 查询标签
+                try {
+                    // 客户级
+                    List<Future<DefaultContext<String, Object>>> futureList = new ArrayList<>();
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("mktAllLabel", mktAllLabel);
+                    hashMap.put("map", map);
+                    hashMap.put("context", context);
+                    hashMap.put("esJson", esJson);
+                    hashMap.put("labelItems", labelItems);
+                    hashMap.put("esHitService", esHitService);
+                    hashMap.put("yzServ", yzServ);
+                    //多线程获取资产级标签，并加上客户级标签
+                    for (Object o : accNbrMapList) {
+                        hashMap.put("o", o);
+                        Future<DefaultContext<String, Object>> future = ThreadPool.submit(new ListMapLabelTaskServiceImpl(hashMap));
+                        futureList.add(future);
+                    }
+
+                    for (Future<DefaultContext<String, Object>> future : futureList) {
+                        if (future.get() != null && !future.get().isEmpty()) {
+                            DefaultContext<String, Object> reultMap = future.get();
+                            packResultMapList.add(reultMap);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             //ActivityTaskServiceImpl 线程参数 拼接
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("map", map);
@@ -427,47 +414,42 @@ public class CpcServiceImpl implements CpcService {
             hashMap.put("camApiService", camApiService);
             hashMap.put("camApiSerService", camApiSerService);
 
-            // 全部为资产级时直接遍历活动
-            if (isAllAsset) {
-                for (Map<String, Object> resultMap : resultByEvent) {
-                    //资产级
-                    Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
-                    if (activeMap != null && !activeMap.isEmpty()) {
-                        Map<String, String> privateParams = new HashMap<>();
-                        privateParams.put("isCust", "1"); //是否是客户级
-                        privateParams.put("accNbr", map.get("accNbr"));
-                        privateParams.put("integrationId", map.get("integrationId"));
-                        privateParams.put("custId", map.get("custId"));
-                        privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                        //资产级
-                        Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
-                        String type = (String) activeMap.get("type");
-                        List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
-                        DefaultContext<String, Object> defaultContext = new DefaultContext<>();
-                        if (resultMapList != null && resultMapList.size() > 0) {
-                            defaultContext = resultMapList.get(0);
+            //遍历活动
+            for (Map<String, Object> resultMap : resultByEvent) {
+                //提交线程
+                Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
+                if (activeMap != null && !activeMap.isEmpty()) {
+                    if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级
+                        //客户级
+                        for (DefaultContext<String, Object> o : custResultMapList) {
+                            //客户级下，循环资产级
+                            Map<String, String> privateParams = new HashMap<>();
+                            privateParams.put("isCust", "0"); //是客户级
+                            privateParams.put("accNbr", o.get("accNbr").toString());
+                            privateParams.put("integrationId", o.get("integrationId").toString());
+                            privateParams.put("custId", map.get("custId"));
+                            //活动优先级为空的时候默认0
+                            privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+
+                            Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                            String type = (String) activeMap.get("type");
+                            List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                            //线程参数
+                            hashMap.put("mktCampaginId", mktCampaginId);
+                            hashMap.put("type", type);
+                            hashMap.put("privateParams", privateParams);
+                            hashMap.put("strategyMapList", strategyMapList);
+                            hashMap.put("defaultContext", o);
+                            Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
+                            //将线程处理结果添加到结果集
+                            threadList.add(f);
                         }
-                        //线程参数
-                        hashMap.put("mktCampaginId", mktCampaginId);
-                        hashMap.put("type", type);
-                        hashMap.put("privateParams", privateParams);
-                        hashMap.put("strategyMapList", strategyMapList);
-                        hashMap.put("defaultContext", defaultContext);
-                        Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
-                        //将线程处理结果添加到结果集
-                        threadList.add(f);
-                    }
-                }
-            } else {
-                //遍历活动
-                for (Map<String, Object> resultMap : resultByEvent) {
-                    //提交线程
-                    Map<String, Object> activeMap = (Map<String, Object>) resultMap.get("mktCampaignMap");
-                    if (activeMap != null && !activeMap.isEmpty()) {
-                        if ((Integer) activeMap.get("levelConfig") == 1) { //判断是客户级
-                            //客户级
-                            if (successCust) {
-                                for (DefaultContext<String, Object> o : custResultMapList) {
+
+                    } else if ((Integer) activeMap.get("levelConfig") == 2) { // 判断是套餐级别
+                        //套餐级
+                        for (DefaultContext<String, Object> o : packResultMapList) {
+                            for (Map<String, Object> accNbrMap : accNbrMapList) {
+                                if (o.get("accNbr").toString().equals(accNbrMap.get("ACC_NBR"))) {
                                     //客户级下，循环资产级
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "0"); //是客户级
@@ -476,81 +458,6 @@ public class CpcServiceImpl implements CpcService {
                                     privateParams.put("custId", map.get("custId"));
                                     //活动优先级为空的时候默认0
                                     privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-
-                                    Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
-                                    String type = (String) activeMap.get("type");
-                                    List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
-                                    //线程参数
-                                    hashMap.put("mktCampaginId", mktCampaginId);
-                                    hashMap.put("type", type);
-                                    hashMap.put("privateParams", privateParams);
-                                    hashMap.put("strategyMapList", strategyMapList);
-                                    hashMap.put("defaultContext", o);
-                                    Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
-                                    //将线程处理结果添加到结果集
-                                    threadList.add(f);
-                                }
-                            } else {
-                                log.error("客户级资产查询出错:" + map.get("reqId"));
-                                esJson.put("reqId", map.get("reqId"));
-                                esJson.put("activityId", activeMap.get("mktCampaginId"));
-                                esJson.put("hitEntity", map.get("accNbr")); //命中对象
-                                esJson.put("hit", false);
-                                esJson.put("msg", "客户级资产查询出错");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
-                            }
-                        } else if ((Integer) activeMap.get("levelConfig") == 2) { // 判断是套餐级别
-                            //套餐级
-                            if (successPackage) {
-                                for (DefaultContext<String, Object> o : packResultMapList) {
-                                    for (Map<String, Object> accNbrMap : accNbrMapList) {
-                                        if (o.get("accNbr").toString().equals(accNbrMap.get("ACC_NBR"))) {
-                                            //客户级下，循环资产级
-                                            Map<String, String> privateParams = new HashMap<>();
-                                            privateParams.put("isCust", "0"); //是客户级
-                                            privateParams.put("accNbr", o.get("accNbr").toString());
-                                            privateParams.put("integrationId", o.get("integrationId").toString());
-                                            privateParams.put("custId", map.get("custId"));
-                                            //活动优先级为空的时候默认0
-                                            privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
-                                            //线程参数
-                                            Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
-                                            String type = (String) activeMap.get("type");
-                                            List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
-                                            //线程参数
-                                            hashMap.put("mktCampaginId", mktCampaginId);
-                                            hashMap.put("type", type);
-                                            hashMap.put("privateParams", privateParams);
-                                            hashMap.put("strategyMapList", strategyMapList);
-                                            hashMap.put("defaultContext", o);
-                                            Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
-                                            //将线程处理结果添加到结果集
-                                            threadList.add(f);
-                                        }
-                                    }
-                                }
-                            } else {
-                                log.error("套餐级资产查询出错:" + map.get("reqId"));
-                                esJson.put("reqId", map.get("reqId"));
-                                esJson.put("activityId", activeMap.get("mktCampaginId"));
-                                esJson.put("hitEntity", map.get("accNbr"));  //命中对象
-                                esJson.put("hit", false);
-                                esJson.put("msg", "客户级资产查询出错");
-                                esHitService.save(esJson, IndexList.ACTIVITY_MODULE, map.get("reqId") + activeMap.get("mktCampaginId") + map.get("accNbr"));
-
-                            }
-                        } else {
-                            //资产级
-                            for (DefaultContext<String, Object> o : resultMapList) {
-                                String assetId = o.get("integrationId").toString();
-                                // 判断资产编码是否与接入的一致
-                                if (assetId.equals(map.get("integrationId"))) {
-                                    Map<String, String> privateParams = new HashMap<>();
-                                    privateParams.put("isCust", "1"); //是否是客户级
-                                    privateParams.put("accNbr", map.get("accNbr"));
-                                    privateParams.put("integrationId", map.get("integrationId"));
-                                    privateParams.put("custId", map.get("custId"));
-                                    privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
                                     //线程参数
                                     Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
                                     String type = (String) activeMap.get("type");
@@ -561,17 +468,43 @@ public class CpcServiceImpl implements CpcService {
                                     hashMap.put("privateParams", privateParams);
                                     hashMap.put("strategyMapList", strategyMapList);
                                     hashMap.put("defaultContext", o);
-                                    //资产级
                                     Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
                                     //将线程处理结果添加到结果集
                                     threadList.add(f);
                                 }
                             }
                         }
+                    } else {
+                        //资产级
+                        for (DefaultContext<String, Object> o : resultMapList) {
+                            String assetId = o.get("integrationId").toString();
+                            // 判断资产编码是否与接入的一致
+                            if (assetId.equals(map.get("integrationId"))) {
+                                Map<String, String> privateParams = new HashMap<>();
+                                privateParams.put("isCust", "1"); //是否是客户级
+                                privateParams.put("accNbr", map.get("accNbr"));
+                                privateParams.put("integrationId", map.get("integrationId"));
+                                privateParams.put("custId", map.get("custId"));
+                                privateParams.put("orderPriority", activeMap.get("campaignSeq") == null ? "0" : activeMap.get("campaignSeq").toString());
+                                //线程参数
+                                Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
+                                String type = (String) activeMap.get("type");
+                                List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
+                                //线程参数
+                                hashMap.put("mktCampaginId", mktCampaginId);
+                                hashMap.put("type", type);
+                                hashMap.put("privateParams", privateParams);
+                                hashMap.put("strategyMapList", strategyMapList);
+                                hashMap.put("defaultContext", o);
+                                //资产级
+                                Future<Map<String, Object>> f = ThreadPool.submit(new ActivityTaskServiceImpl(hashMap));
+                                //将线程处理结果添加到结果集
+                                threadList.add(f);
+                            }
+                        }
                     }
                 }
             }
-
 
             //获取结果
             try {
@@ -688,8 +621,8 @@ public class CpcServiceImpl implements CpcService {
     /**
      * 过滤事件采集项中的标签
      *
-     * @param labelItems  事件采集项标签集合
-     * @param mktAllLabels  事件下所有的标签
+     * @param labelItems   事件采集项标签集合
+     * @param mktAllLabels 事件下所有的标签
      * @return
      */
     private Map<String, String> filterLabel(Map<String, String> labelItems, Map<String, String> mktAllLabels) {
@@ -756,10 +689,11 @@ public class CpcServiceImpl implements CpcService {
      * @return
      */
     private List<Map<String, Object>> getAccNbrList(String accNbr) {
-        List<String> accNbrList = new ArrayList<>();
+        log.info("11111------accNbr --->" + accNbr);
         List<Map<String, Object>> accNbrMapList = new ArrayList<>();
         // 根据accNum查询prodInstId
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
+        log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
             Long mainOfferInstId = null;
             Set<String> prodInstIds = prodInstIdsObject.getResultObject();
@@ -772,30 +706,63 @@ public class CpcServiceImpl implements CpcService {
                 }
             }
             // 根据offerInstId和statusCd查询offerProdInstRelId
+            log.info("33333------mainOfferInstId --->" + mainOfferInstId);
             if (mainOfferInstId != null) {
-                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
-                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
-                    Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
-                    for (String offerProdInstRelId : offerProdInstRelIds) {
-                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                            Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
-                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
-                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
-                                if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
-                                    Map<String, Object> accNbrMap = new HashMap<>();
-                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                    accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
-                                    accNbrMapList.add(accNbrMap);
-                                }
+                Set<String> allProdInstId = Sets.newHashSet();
+                //查询同套餐下的在用主产品Id
+                CacheResultObject<Set<String>> setCacheResultObjectOn = iCacheProdIndexQryService.qryProdInstIndex4(mainOfferInstId.toString(), "100000");
+                log.info("44444------setCacheResultObjectOn --->" + JSON.toJSONString(setCacheResultObjectOn));
+                //查询同套餐下的停机主产品Id
+                CacheResultObject<Set<String>> setCacheResultObjectOff = iCacheProdIndexQryService.qryProdInstIndex4(mainOfferInstId.toString(), "100000");
+                log.info("55555------setCacheResultObjectOff --->" + JSON.toJSONString(setCacheResultObjectOn));
+                if(setCacheResultObjectOn!=null&& !CollectionUtils.isEmpty(setCacheResultObjectOn.getResultObject())){
+                    allProdInstId.addAll(setCacheResultObjectOn.getResultObject());
+                }
+                if(setCacheResultObjectOff!=null&& !CollectionUtils.isEmpty(setCacheResultObjectOff.getResultObject())){
+                    allProdInstId.addAll(setCacheResultObjectOff.getResultObject());
+                }
+                log.info("66666------allProdInstId --->" + JSON.toJSONString(allProdInstId));
+                if(!CollectionUtils.isEmpty(allProdInstId)){
+                    for (String prodInstId : prodInstIds) {
+                        // 查询产品实例实体缓存 取主产品（1000）的一个
+                        CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
+                        log.info("77777------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
+                        if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
+                            CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstId);
+                            log.info("88888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+                            if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
+                                Map<String, Object> accNbrMap = new HashMap<>();
+                                accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+                                accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                accNbrMapList.add(accNbrMap);
                             }
                         }
                     }
                 }
+
+//                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
+//                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
+//                    Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
+//                    for (String offerProdInstRelId : offerProdInstRelIds) {
+//                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+//                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+//                            Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
+//                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
+//                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
+//                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+//                                if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
+//                                    Map<String, Object> accNbrMap = new HashMap<>();
+//                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
+//                                    accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+//                                    accNbrMapList.add(accNbrMap);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
-        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
+        log.info("99999------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
     }
 
