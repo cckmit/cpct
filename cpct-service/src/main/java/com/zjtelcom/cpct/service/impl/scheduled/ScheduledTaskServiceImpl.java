@@ -94,6 +94,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                     }
                 }
             }catch (Exception e) {
+                logger.info(e.getMessage());
                 e.printStackTrace();
             }
         }
