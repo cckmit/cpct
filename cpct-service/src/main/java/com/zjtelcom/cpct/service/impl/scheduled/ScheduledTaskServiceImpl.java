@@ -83,6 +83,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                                 if (handleRate * 100 < rate) {
                                     // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
                                     if (modifyCampaignBatchFailureTime(batchNum)) {
+                                        logger.info("批次失效短信通知");
                                         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
                                         String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
                                         uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
