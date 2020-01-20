@@ -1,4 +1,4 @@
-package com.zjtelcom.cpct.dubbo.service.impl;
+package com.zjtelcom.cpct.dubbo.out.impl;
 
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
