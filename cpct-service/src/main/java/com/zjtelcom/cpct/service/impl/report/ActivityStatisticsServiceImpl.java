@@ -1251,13 +1251,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         String strDataName = "endDate";
         if (channelStaffParams(params, paramMap, result,strDataName)) return result;
 
+        //是否身份证读卡(0:未读，1:读过;默认否)
         if (params.get("idcardScanFlag") != null && params.get("idcardScanFlag") != "") {
-            //是否身份证读卡(0:未读，1:读过;默认否)
             String idcardScanFlag = params.get("idcardScanFlag").toString();
             paramMap.put("idcardScanFlag", idcardScanFlag);
         }
+        //网点类型
         if (params.get("channelType") != null && params.get("channelType") != "") {
-            //网点类型
             String channelType = params.get("channelType").toString();
             paramMap.put("channelType", channelType);
         }
@@ -1299,6 +1299,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     public Map<String, Object> queryEventOrderChlListByReport(Map<String, String> params) {
         HashMap<String, String> paramMap = new HashMap<>();
         HashMap<String, Object> result = new HashMap<>();
+        //协议入参字段不同
         String strDataName = "dayKey";
         if (channelStaffParams(params, paramMap, result,strDataName)) return result;
         //是否沙盘(0:所有，1:是)
