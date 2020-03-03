@@ -1415,7 +1415,7 @@ public class EventApiServiceImpl implements EventApiService {
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
-                    if (mktCamChlResultDO==null || !mktCamChlResultDO.getSourceChannelId().equals(sourceChannel)){
+                    if (mktCamChlResultDO==null || !sourceChannel.equals(mktCamChlResultDO.getSourceChannelId()==null ? "" : mktCamChlResultDO.getSourceChannelId())){
                         continue;
                     }
                     if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
