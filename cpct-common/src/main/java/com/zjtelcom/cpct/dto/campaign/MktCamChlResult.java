@@ -31,9 +31,22 @@ public class MktCamChlResult implements Serializable {
     private Long mktCampaignId;
 
     /**
+     * 来源渠道编码
+     */
+    private String sourceChannelId;
+
+    /**
      * 推送渠道集合
      */
     List<MktCamChlConfDetail> mktCamChlConfDetailList;
+
+    public String getSourceChannelId() {
+        return sourceChannelId;
+    }
+
+    public void setSourceChannelId(String sourceChannelId) {
+        this.sourceChannelId = sourceChannelId;
+    }
 
     public String getResultType() {
         return resultType;
