@@ -19,6 +19,7 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
+import com.zjtelcom.cpct.service.scheduled.ScheduledTaskService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -275,6 +276,15 @@ public class TestController extends BaseController {
     public String saveMktCamDesc() {
         Map<String, Object> map = mktCampaignService.saveMktCamDesc();
         return JSON.toJSONString(map);
+    }
+
+    @Autowired
+    private ScheduledTaskService scheduledTaskService;
+
+    @PostMapping(value = "/testIssuedSuccessMktCheck")
+    @CrossOrigin
+    public void testIssuedSuccessMktCheck() {
+        scheduledTaskService.issuedSuccessMktCheck();
     }
 }
 

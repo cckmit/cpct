@@ -23,4 +23,10 @@ public interface ActivityStatisticsService {
     void MoreThan3MonthsOffline();
 
     Map<String,Object> delectConsumerlogByDate(Map<String, Object> params);
+
+    Map<String,Object> getSalesClerk(Map<String, Object> params);
+
+    Map<String,Object> queryEventOrderByReport(Map<String, String> params);
+
+    Map<String,Object> queryEventOrderChlListByReport(Map<String, String> params);
 }

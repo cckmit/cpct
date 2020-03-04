@@ -701,7 +701,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID IN #{lanId}
         </if>
-        <if test="theMe != null and theMe != '' ">
+        <if test="theMe != null and theMe != '' and theMe !='all' ">
             AND THE_ME  = #{theMe}
         </if>
         ORDER BY CREATE_DATE DESC
