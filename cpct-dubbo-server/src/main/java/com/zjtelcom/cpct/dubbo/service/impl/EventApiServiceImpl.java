@@ -924,7 +924,10 @@ public class EventApiServiceImpl implements EventApiService {
                         // 若未绑定微厅，查看联系号码是否为C网用户
                         // 价格判断是否为手机号码
                         log.info("111---contactNumber --->" + contactNumber);
-                        boolean isMobile = isMobile(contactNumber);
+                        boolean isMobile = false;
+                        if(contactNumber!=null){
+                            isMobile = isMobile(contactNumber);
+                        }
                         boolean isCUser = false;
                         log.info("222---isMobile --->" + isMobile);
                         if (isMobile) {
