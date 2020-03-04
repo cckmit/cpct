@@ -788,13 +788,13 @@ public class DateUtil {
      * @return
      */
     public static String getDatetime(Date time){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(time);
-        cal.add(Calendar.HOUR, -8);
 
-        return  sdf.format(cal.getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+//        SimpleDateFormat sf=new SimpleDateFormat("yyyyMMddHHmmss");
+        return  sdf.format(time);
     }
+
 
     /**
      * 时间戳转数字格式时间
