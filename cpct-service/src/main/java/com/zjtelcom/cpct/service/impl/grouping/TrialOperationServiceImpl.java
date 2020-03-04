@@ -67,6 +67,9 @@ import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.apache.http.entity.ContentType;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
@@ -200,6 +203,145 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private OrganizationMapper organizationMapper;
     @Autowired
     private SysAreaMapper sysAreaMapper;
+
+
+    @Override
+    public Map<String, Object> importUserList4File(MultipartFile multipartFile) {
+        XlsxProcessAbstract xlsxProcess = new XlsxProcessAbstract();
+        Map<String,Object> result = new HashMap<>();
+        try {
+            TransDetailDataVO dataVO;
+            List<Map<String, Object>> labelList = new ArrayList<>();
+            dataVO = xlsxProcess.processAllSheet(multipartFile);
+
+            List<String> idList = new ArrayList<>();
+            int i =0;
+            int j = dataVO.contentList.size();
+            for (String content : dataVO.getContentList()){
+                Map<String,Object> flg = new HashMap<>();
+//                String[] codeList = content.split("\\|@\\|");
+                idList.add(content);
+                j--;
+                if (i==100000 || j ==0){
+                    System.out.println("第几次："+j);
+                    final List<String> list1 = idList;
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("stringList",list1);
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            TrialResponseES responseES = restTemplate.postForObject("http://localhost:30313/es/search", map, TrialResponseES.class);
+                            List<Map<String,Object>> list = (List<Map<String,Object>>) responseES.getHitsList().get("result");
+                            write(ChannelUtil.getRandomStr(5),list);
+                            System.out.println("写文件成功");
+                        }
+                    }.start();
+                    idList = new ArrayList<>();
+                    i = 0;
+                }
+                i++;
+            }
+            result.put("re","成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+//        try {
+//            SftpUtils sftpUtils = new SftpUtils();
+//            String file = "list.dat";
+////            File userListTempFile = new File(file);
+//            try {
+//                createFileAndWrite(file, userListSt.toString());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        return result;
+    }
+
+    public static  void write(String fileName ,List<Map<String,Object>> list){
+//创建excel工作簿
+        HSSFWorkbook workbook=new HSSFWorkbook();
+//创建工作表sheet
+        HSSFSheet sheet=workbook.createSheet();
+        HSSFRow row=sheet.createRow(0);
+        int index = 0;//记录额外创建的sheet数量
+        for (int i = 0; i < list.size(); i++) {
+            if ((i + 1) % 65535 == 0) {
+                sheet = workbook.createSheet("stud"+i);
+                row = sheet.createRow(0);
+                row.createCell(0).setCellValue("身份");
+                row.createCell(1).setCellValue("信用");
+                row.createCell(2).setCellValue("信用2");
+                index++;
+            }
+            row = sheet.createRow((i + 1) - (index * 65535));
+// 第四步，创建单元格，并设置值
+            row.createCell((short) 0).setCellValue(list.get(i).get("ASSET_INTEG_ID").toString());
+            row.createCell((short) 1).setCellValue(list.get(i).get("PROM_AGREE_EXP_TYPE").toString());
+            row.createCell((short) 2).setCellValue(list.get(i).get("LATN_NAME").toString());
+        }
+//写入数据
+//        for (int i=0;i<list.size();i++){
+//            if (list.get(i).isEmpty()){
+//                continue;
+//            }
+//            HSSFRow nrow=sheet.createRow(i);
+//            HSSFCell ncell=nrow.createCell(0);
+//            ncell.setCellValue(list.get(i).get("ASSET_INTEG_ID").toString());
+//            ncell=nrow.createCell(1);
+//            ncell.setCellValue(list.get(i).get("AREA_ID").toString());
+//        }
+//创建excel文件
+        File file=new File("D://"+fileName+".xls");
+        try {
+            file.createNewFile();
+            //将excel写入
+            FileOutputStream stream= new FileOutputStream(file);
+            workbook.write(stream);
+            stream.flush();
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void createFileAndWrite(String fileName, String fileContent) {
+        File taskTempFile = new File(fileName);
+        if (!taskTempFile.exists()) {
+            // 如果文件不存在，则创建新的文件
+            try {
+                taskTempFile.createNewFile();
+            } catch (Exception e) {
+                logger.error("创建文件失败!");
+                e.printStackTrace();
+            }
+        }
+        try {
+            writeFileContent(fileName, fileContent);
+        } catch (IOException e) {
+            logger.error("写入文件失败!");
+            e.printStackTrace();
+        }
+    }
+    public boolean writeFileContent(String filepath, String newstr) throws IOException {
+        File file = new File(filepath);
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try {
+            fw = new FileWriter(file, true);
+            bw = new BufferedWriter(fw);
+            bw.write(newstr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            bw.close();
+            fw.close();
+        }
+        return true;
+    }
 
     //抽样展示全量试算记录
     @Override

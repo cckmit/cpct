@@ -70,6 +70,12 @@ ctg:
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
 
+
+
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_prod
+  cpctEsLogGroup: cpct_eslog_group_prod
+
   pushGroupName : cpct_file_import
   pushGroupName2 : cpct_file_import2
   pushTopic : cpct_push_end_topic
