@@ -1,7 +1,10 @@
 package com.zjtelcom.cpct.dubbo.out.impl;
 
-import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -22,7 +25,7 @@ import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
-import com.zjtelcom.cpct.dubbo.service.MktCampaignApiOutService;
+import com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;

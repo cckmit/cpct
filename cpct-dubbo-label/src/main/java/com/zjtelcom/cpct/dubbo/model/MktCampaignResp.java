@@ -6,7 +6,7 @@ import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import java.util.ArrayList;
 
 
-public class MktCampaignResp extends MktCampaign{
+public class MktCampaignResp extends MktCampaign {
 
     /**
      * 营销活动分类value

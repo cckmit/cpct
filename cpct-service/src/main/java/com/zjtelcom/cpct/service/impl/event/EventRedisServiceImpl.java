@@ -355,20 +355,6 @@ public class EventRedisServiceImpl implements EventRedisService {
                 redisUtils.set(key, systemParamList.get(0));
                 resutlt.put(key, systemParamList.get(0));
             }
-        } else if ("SATISFACTION_SURVEY".equals(key)){  // 满意度调查事件(用,分隔)
-            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign(key);
-            if (sysParamsList != null && sysParamsList.size() > 0) {
-                String eventCodeStr = sysParamsList.get(0).getParamValue();
-                redisUtils.set(key, eventCodeStr);
-                resutlt.put(key, eventCodeStr);
-            }
-        } else if ("CPCP_PRODUCT_TYPE".equals(key)){  // 满意度调查--手机号的资产类型
-            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign(key);
-            if (sysParamsList != null && sysParamsList.size() > 0) {
-                String cpcpProductType = sysParamsList.get(0).getParamValue();
-                redisUtils.set(key, cpcpProductType);
-                resutlt.put(key, cpcpProductType);
-            }
         }
 
         if ("EVENT_".equals(key)) {  // 事件

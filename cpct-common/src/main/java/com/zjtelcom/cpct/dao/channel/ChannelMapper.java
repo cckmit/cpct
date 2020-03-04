@@ -16,5 +16,4 @@ public interface ChannelMapper {
 
     int updateByPrimaryKey(Channel record);
 
-    Channel selectByPrimaryKeyFromShiTi(Long aLong);
 }
