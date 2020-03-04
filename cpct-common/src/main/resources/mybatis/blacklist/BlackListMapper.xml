@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.blacklist.BlackListMapper">
+
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.blacklist.BlackListDO">
+        <id column="BLACK_ID" jdbcType="BIGINT" property="blackId" />
+        <result column="ASSET_PHONE" jdbcType="VARCHAR" property="assetPhone" />
+        <result column="SERVICE_CATE" jdbcType="VARCHAR" property="serviceCate" />
+        <result column="MARKETING_CATE" jdbcType="VARCHAR" property="maketingCate" />
+        <result column="PUBLIC_BENEFIT_CATE" jdbcType="VARCHAR" property="publicBenefitCate" />
+        <result column="CHANNEL" jdbcType="VARCHAR" property="channel" />
+        <result column="STAFF_ID" jdbcType="VARCHAR" property="staffId"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="operType" jdbcType="VARCHAR" property="operType"/>
+    </resultMap>
+
+<!--添加黑名单-->
+    <insert id="addBlackList"   useGeneratedKeys="true" keyProperty="blackId" parameterType="com.zjtelcom.cpct.domain.blacklist.BlackListDO">
+
+            insert into mkt_blacklist (asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id,
+                                        create_staff, create_date, update_staff,update_date,operType )
+            values
+            (#{assetPhone, jdbcType = VARCHAR},
+            #{serviceCate, jdbcType = VARCHAR},
+            #{maketingCate, jdbcType = VARCHAR},
+            #{publicBenefitCate, jdbcType = VARCHAR},
+            #{channel, jdbcType = VARCHAR},
+            #{staffId, jdbcType = VARCHAR},
+            #{createStaff, jdbcType = VARCHAR},
+            #{createDate, jdbcType = TIMESTAMP},
+            #{updateStaff, jdbcType = VARCHAR},
+            #{updateDate, jdbcType = TIMESTAMP},
+            #{operType, jdbcType = VARCHAR}
+            )
+
+    </insert>
+
+    <!--更新黑名单-->
+    <update id="updateBlackList" useGeneratedKeys="true" keyProperty="blackId" parameterType="com.zjtelcom.cpct.domain.blacklist.BlackListDO" >
+            update mkt_blacklist
+            set
+            asset_phone = #{assetPhone,jdbcType=VARCHAR},
+            service_cate = #{serviceCate,jdbcType=VARCHAR},
+            marketing_cate = #{maketingCate,jdbcType=VARCHAR},
+            public_benefit_cate = #{publicBenefitCate,jdbcType=VARCHAR},
+            channel = #{channel,jdbcType=VARCHAR},
+            staff_id = #{staffId,jdbcType=VARCHAR},
+            operType = #{operType,jdbcType=VARCHAR},
+            update_date = #{updateDate,jdbcType=TIMESTAMP}
+            where asset_phone = #{assetPhone,jdbcType=VARCHAR}
+    </update>
+
+    <!--根据业务号码删除黑名单-->
+    <delete id="deleteBlackListById" parameterType="java.util.List">
+        delete from mkt_blacklist where asset_phone in
+        <foreach collection="list" item = "item" index = "index" open="(" separator="," close=")">
+           #{item, jdbcType = VARCHAR}
+        </foreach>
+    </delete>
+
+    <!--根据选业务号码获取黑名单-->
+    <select id="getBlackListById" parameterType="java.util.List" resultMap="BaseResultMap">
+        select * from mkt_blacklist where asset_phone in
+            <foreach collection="list" index="index" item = "item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
+
+    <!--返回所有黑名单-->
+    <select id="getAllBlackList"  resultMap="BaseResultMap">
+        select * from mkt_blacklist
+    </select>
+
+    <!--    分页获取主题列表模糊搜索-->
+    <select id="getBlackListPageByKey" resultMap="BaseResultMap">
+        select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id, create_staff, create_date, update_staff,update_date
+        from mkt_blacklist
+        <where>
+            <if test = "assetPhone != null and assetPhone != ''">
+                asset_phone = #{assetPhone}
+            </if>
+            <if test = "serviceCate != null and serviceCate != ''">
+                AND service_cate = #{serviceCate}
+            </if>
+            <if test = "maketingCate != null and maketingCate != ''">
+                AND marketing_cate = #{maketingCate}
+            </if>
+            <if test = "publicBenefitCate != null and publicBenefitCate != ''">
+                AND public_benefit_cate = #{publicBenefitCate}
+            </if>
+            <if test = "channel != null and channel != ''">
+                AND channel = #{channel}
+            </if>
+            <if test = "staffId != null and staffId != ''">
+                AND staff_id = #{staffId}
+            </if>
+        </where>
+
+    </select>
+</mapper>

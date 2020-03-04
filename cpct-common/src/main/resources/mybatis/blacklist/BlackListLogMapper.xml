@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.blacklist.BlackListLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.blacklist.BlackListLogDO">
+        <id column="LOG_ID" jdbcType="BIGINT" property="logId" />
+        <result column="method" jdbcType="VARCHAR" property="method"/>
+        <result column="args" jdbcType="VARCHAR" property="args"/>
+        <result column="returnValue" jdbcType="VARCHAR" property="returnValue"/>
+        <result column="ASSET_PHONE" jdbcType="VARCHAR" property="assetPhone" />
+        <result column="SERVICE_CATE" jdbcType="VARCHAR" property="serviceCate" />
+        <result column="MARKETING_CATE" jdbcType="VARCHAR" property="maketingCate" />
+        <result column="PUBLIC_BENEFIT_CATE" jdbcType="VARCHAR" property="publicBenefitCate" />
+        <result column="CHANNEL" jdbcType="VARCHAR" property="channel" />
+        <result column="STAFF_ID" jdbcType="VARCHAR" property="staffId"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="operType" jdbcType="VARCHAR" property="operType"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <select id="getBlackListLog"  resultMap="BaseResultMap">
+        select * from mkt_blacklist_log
+        <where>
+            <if test="assetPhone != null and  assetPhone != ''">
+                assetPhone = #{assetPhone}
+            </if>
+            <if test="serviceCate != null and serviceCate != ''">
+                AND  serviceCate = #{serviceCate}
+            </if>
+            <if test="maketingCate != null and maketingCate != ''">
+                AND  maketingCate = #{maketingCate}
+            </if>
+            <if test="publicBenefitCate != null and publicBenefitCate != ''">
+                AND  publicBenefitCate = #{publicBenefitCate}
+            </if>
+            <if test="channel != null and channel != ''">
+                AND  channel = #{channel}
+            </if>
+            <if test="staffId != null and staffId != ''">
+                AND  staffId = #{staffId}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                AND  create_Date between #{startDate} and #{endDate}
+            </if>
+            <if test="operType != null and operType != ''">
+                AND  operType = #{operType}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="addBlacklistlog" useGeneratedKeys="true" keyProperty="logId" parameterType="com.zjtelcom.cpct.domain.blacklist.BlackListLogDO">
+        insert into mkt_blacklist_log (
+        <if test="method != null and method != ''">
+            method
+        </if>
+        <if test="assetPhone != null and assetPhone != ''">
+            ,assetPhone
+        </if>
+        <if test="serviceCate != null and serviceCate != ''">
+            ,serviceCate
+        </if>
+        <if test="maketingCate != null and maketingCate != ''">
+            ,maketingCate
+        </if>
+        <if test="publicBenefitCate != null and publicBenefitCate != ''">
+            ,publicBenefitCate
+        </if>
+        <if test="channel != null and channel != ''">
+            ,channel
+        </if>
+        <if test="staffId != null and staffId != ''">
+            ,staffId
+        </if>
+        <if test="operType != null and operType != ''">
+            ,operType
+        </if>
+        )
+        values(
+        <if test="method != null and method != ''">
+            #{method, jdbcType = VARCHAR}
+        </if>
+        <if test="assetPhone != null and assetPhone != ''">
+            ,#{assetPhone, jdbcType = VARCHAR}
+        </if>
+        <if test="serviceCate != null and serviceCate != ''">
+            ,#{serviceCate, jdbcType = VARCHAR}
+        </if>
+        <if test="maketingCate != null and maketingCate != ''">
+            ,#{maketingCate, jdbcType = VARCHAR}
+        </if>
+        <if test="publicBenefitCate != null and publicBenefitCate != ''">
+            ,#{publicBenefitCate, jdbcType = VARCHAR}
+        </if>
+        <if test="channel != null and channel != ''">
+            ,#{channel, jdbcType = VARCHAR}
+        </if>
+        <if test="staffId != null and staffId != ''">
+            ,#{staffId, jdbcType = VARCHAR}
+        </if>
+        <if test="operType != null and operType != ''">
+            ,#{operType, jdbcType = VARCHAR}
+        </if>
+        )
+    </insert>
+
+
+
+</mapper>
