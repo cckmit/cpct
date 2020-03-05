@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
@@ -21,6 +22,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
@@ -51,6 +53,9 @@ public class SyncActivityServiceImpl implements SyncActivityService {
 
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
+
+    @Autowired
+    private MktCampaignRelMapper mktCampaignRelMapper;
 
     @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper;
@@ -112,6 +117,20 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         } else {
             activityModel.setMarketingType("3");
         }
+
+        // 同步子活动的initId
+        List<String> childCampaignIdList = new ArrayList<>();
+        List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+        for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
+            if (mktCampaignRelDO != null) {
+                MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getzMktCampaignId());
+                if (mktCampaign != null && mktCampaign.getInitId() != null) {
+                    childCampaignIdList.add(mktCampaign.getInitId().toString());
+                }
+            }
+        }
+        activityModel.setChildCampaignList(childCampaignIdList);
+
         //省份标识
         activityModel.setPrvnceId(AreaCodeEnum.ZHEJIAGN.getRegionId().toString());
         //账期
