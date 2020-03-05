@@ -917,46 +917,39 @@ public class EventApiServiceImpl implements EventApiService {
                     // 联系号码-事件采集项
                     String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
                     // 1为绑定公众号，0 为不绑定公众号
-                    log.info("000---isBind --->" + isBind);
+                    log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
                         labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
                     } else {
-                        // 若未绑定微厅，查看联系号码是否为C网用户
-                        // 价格判断是否为手机号码
-                        log.info("111---contactNumber --->" + contactNumber);
-                        boolean isMobile = false;
-                        if(contactNumber!=null){
-                            isMobile = isMobile(contactNumber);
-                        }
-                        boolean isCUser = false;
-                        log.info("222---isMobile --->" + isMobile);
-                        if (isMobile) {
-                            CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                            log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
-                               if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                labelItems.put("CPCP_ACCS_NBR", contactNumber);
-                                isCUser = true;
+                        // 判断资产类型
+                        boolean isCdma = false;
+                    //    Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
+                    //    String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
+                    //    log.info("444---cpcpProductType --->" + cpcpProductType);
+                    //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
+                        // 判断采集项，资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                        if ("PHY-MAN-0001".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
+                            labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
+                            labelItems.put("CPCP_ACCS_NBR", map.get("accNbr"));
+                        } else {
+                            // 资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                            boolean isMobile = false;
+                            if(contactNumber!=null){
+                                // 判断是否为手机号码
+                                isMobile = isMobile(contactNumber);
                             }
-                        }
-                        if (!isCUser) {
-                            boolean isCdma = false;
-                            //资产类型
-                            Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
-                            String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
-                            log.info("444---cpcpProductType --->" + cpcpProductType);
-                            if (cpcpProductType != null && "PHY-MAN-0001".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                labelItems.put("CPCP_ACCS_NBR", contactNumber);
-                                isCdma = true;
-                            }
-                            // 若不为C网用户，则“推送渠道”为IVR外呼
-                            if (!isCdma) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
+                            log.info("222---isMobile --->" + isMobile);
+                            if (isMobile) {
+                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
+                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
+                                if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
+                                    labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
+                                    labelItems.put("CPCP_ACCS_NBR", contactNumber);
+                                }
                             }
                         }
                     }
-                    log.info("555---labelItems --->" + labelItems);
+                    log.info("444---labelItems --->" + labelItems);
                 }
 
 
