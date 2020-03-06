@@ -940,13 +940,13 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             log.info("222---isMobile --->" + isMobile);
                             if (isMobile) {
-                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
-                                if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
-                                    log.info("444--- "+ isMobile +" 为C网用户");
+                             //   CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
+                             //   log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
+                             //   if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
+                             //       log.info("444--- "+ isMobile +" 为C网用户");
                                     labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                                     labelItems.put("CPCP_ACCS_NBR", contactNumber);
-                                }
+                             //   }
                             }
                         }
                     }
