@@ -121,15 +121,9 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         // 同步子活动的initId
         List<String> childCampaignIdList = new ArrayList<>();
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-        System.out.println("mktCampaignRelDOS->>>>" + JSON.toJSONString(mktCampaignRelDOS) );
         for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
             if (mktCampaignRelDO != null && mktCampaignRelDO.getzMktCampaignId()!=null) {
-                System.out.println("mktCampaignRelDO->>>>" + JSON.toJSONString(mktCampaignRelDO) );
                 childCampaignIdList.add(mktCampaignRelDO.getzMktCampaignId().toString());
-               /* MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getzMktCampaignId());
-                if (mktCampaign != null && mktCampaign.getInitId() != null) {
-                    childCampaignIdList.add(mktCampaign.getInitId().toString());
-                }*/
             }
         }
         activityModel.setChildCampaignList(childCampaignIdList);

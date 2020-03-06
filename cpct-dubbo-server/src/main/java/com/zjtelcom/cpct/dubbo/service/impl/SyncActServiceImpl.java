@@ -97,11 +97,8 @@ public class SyncActServiceImpl implements SyncActService {
         List<String> childCampaignIdList = new ArrayList<>();
         List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
         for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
-            if (mktCampaignRelDO != null) {
-                MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDO.getzMktCampaignId());
-                if (mktCampaign != null && mktCampaign.getInitId() != null) {
-                    childCampaignIdList.add(mktCampaign.getInitId().toString());
-                }
+            if (mktCampaignRelDO != null && mktCampaignRelDO.getzMktCampaignId()!=null) {
+                childCampaignIdList.add(mktCampaignRelDO.getzMktCampaignId().toString());
             }
         }
         activityModel.setChildCampaignList(childCampaignIdList);
