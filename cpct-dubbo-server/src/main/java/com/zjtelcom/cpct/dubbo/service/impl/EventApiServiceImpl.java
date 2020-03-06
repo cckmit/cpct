@@ -823,8 +823,6 @@ public class EventApiServiceImpl implements EventApiService {
                     Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
                     if (assetLabelMap != null) {
                         reultMap.putAll(assetLabelMap);
-                    } else {
-                        return null;
                     }
                     resultMapList.add(reultMap);
                 }

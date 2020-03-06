@@ -1967,10 +1967,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                String roleName = "admin";
-                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
+                                String roleName = "admin";
+                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
