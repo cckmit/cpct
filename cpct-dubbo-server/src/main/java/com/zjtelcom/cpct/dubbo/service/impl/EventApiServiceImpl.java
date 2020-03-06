@@ -837,11 +837,6 @@ public class EventApiServiceImpl implements EventApiService {
                         esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
                         esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                         log.error("采集项未包含客户编码:" + map.get("reqId"));
-                        //事件采集项没有客户编码
-                        result.put("CPCResultCode", "1000");
-                        result.put("CPCResultMsg", "采集项未包含客户编码");
-                        return result;
-
                     }
                     ExecutorService executor = Executors.newCachedThreadPool();
                     JSONObject param = new JSONObject();
