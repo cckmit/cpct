@@ -919,7 +919,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
-                        labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
                     } else {
                         // 判断资产类型
                         boolean isCdma = false;
@@ -929,8 +929,8 @@ public class EventApiServiceImpl implements EventApiService {
                     //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                         // 判断采集项，资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
                         if ("PHY-MAN-0001".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
-                            labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                            labelItems.put("CPCP_ACCS_NBR", map.get("accNbr"));
+                            reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
+                            reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                         } else {
                             // 资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
                             boolean isMobile = false;
@@ -944,13 +944,15 @@ public class EventApiServiceImpl implements EventApiService {
                              //   log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
                              //   if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
                              //       log.info("444--- "+ isMobile +" 为C网用户");
-                                    labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                    labelItems.put("CPCP_ACCS_NBR", contactNumber);
+                                    reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
+                                    reultMap.put("CPCP_ACCS_NBR", contactNumber);
                              //   }
                             }
                         }
                     }
-                    log.info("555---labelItems --->" + labelItems);
+                    log.info("555---reultMap --->" + reultMap);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
                 }
 
 
@@ -974,12 +976,16 @@ public class EventApiServiceImpl implements EventApiService {
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
-                        labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
                     } else {
-                        labelItems.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
                     }
-                    log.info("222---labelItems --->" + labelItems);
+                    log.info("222---reultMap --->" + reultMap);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
                 }
+
+
 
 
 
