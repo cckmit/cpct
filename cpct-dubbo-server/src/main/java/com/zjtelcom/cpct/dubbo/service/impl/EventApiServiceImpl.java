@@ -2624,9 +2624,11 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
+        log.info("contextNew --->>>>" + JSON.toJSONString(contextNew));
         contextNew.putAll(context);      // 客户级标签
         contextNew.put("integrationId", privateParams.get("integrationId"));
         contextNew.put("accNbr", privateParams.get("accNbr"));
+        log.info("contextNew222 --->>>>" + JSON.toJSONString(contextNew));
         return contextNew;
     }
 
