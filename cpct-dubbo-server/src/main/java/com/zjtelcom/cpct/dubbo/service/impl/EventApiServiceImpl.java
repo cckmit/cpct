@@ -958,9 +958,9 @@ public class EventApiServiceImpl implements EventApiService {
                         } else {
                             //资产级
                             for (DefaultContext<String, Object> o : resultMapList) {
-                                String assetId = o.get("integrationId").toString();
+                                String assetId = o.get("integrationId")==null ? "" : o.get("integrationId").toString() ;
                                 // 判断资产编码是否与接入的一致
-                                if (assetId.equals(map.get("integrationId"))) {
+                                if (assetId.equals(map.get("integrationId")==null? "" : map.get("integrationId"))) {
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "1"); //是否是客户级
                                     privateParams.put("accNbr", map.get("accNbr"));
