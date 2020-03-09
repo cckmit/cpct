@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjhcsoft.eagle.main.dubbo.model.policy.*;
 import com.zjhcsoft.eagle.main.dubbo.service.ActivitySyncService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignRelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
@@ -14,6 +15,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.MktVerbal;
@@ -23,6 +25,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dubbo.service.SyncActService;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.enums.TrialCreateType;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,9 @@ public class SyncActServiceImpl implements SyncActService {
 
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
+
+    @Autowired
+    private MktCampaignRelMapper mktCampaignRelMapper;
 
     @Autowired
     private MktStrategyConfMapper mktStrategyConfMapper;
@@ -87,6 +93,16 @@ public class SyncActServiceImpl implements SyncActService {
         } else if ("2000".equals(mktCampaignDO.getTiggerType())) {
             activityModel.setHandoutType("0");
         }
+        // 同步子活动的initId
+        List<String> childCampaignIdList = new ArrayList<>();
+        List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+        for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
+            if (mktCampaignRelDO != null && mktCampaignRelDO.getzMktCampaignId()!=null) {
+                childCampaignIdList.add(mktCampaignRelDO.getzMktCampaignId().toString());
+            }
+        }
+        activityModel.setChildCampaignList(childCampaignIdList);
+
         List<PolicyModel> policyList = new ArrayList<>();
         //获取活动下策略信息
         List<MktStrategyConfDO> strategyConfList = mktStrategyConfMapper.selectByCampaignId(mktCampaignId);

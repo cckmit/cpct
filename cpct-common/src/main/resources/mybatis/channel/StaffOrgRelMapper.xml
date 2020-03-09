@@ -60,4 +60,24 @@
     STATUS_CD, STATUS_DATE, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
     from staff_org_rel
   </select>
+
+  <select id="selectByOrgId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+     select STAFF_ORG_REL_ID, REL_TYPE, ROLE_ID, STAFF_ID, ORG_ID, EFF_DATE, EXP_DATE,
+    STATUS_CD, STATUS_DATE, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
+    from staff_org_rel WHERE  STATUS_CD = 1000 AND REL_TYPE = 1100 AND ORG_ID = #{aLong,jdbcType=BIGINT}
+  </select>
+
+
+  <resultMap id="getStaffNameByStaff" type="java.util.Map">
+    <result property="staffId" column="STAFF_ID"/>
+    <result property="staffCode" column="STAFF_CODE"/>
+    <result property="orgId" column="ORG_ID"/>
+    <result property="staffName" column="STAFF_NAME"/>
+    <result property="salesStaffCode" column="SALESSTAFF_CODE"/>
+  </resultMap>
+
+  <select id="getStaffName" parameterType="java.lang.Long" resultMap="getStaffNameByStaff">
+    SELECT STAFF_ID,STAFF_CODE,ORG_ID,STAFF_NAME,SALESSTAFF_CODE FROM staff WHERE
+      STATUS_CD =1000  AND STAFF_ID = #{staffId ,jdbcType=BIGINT}
+  </select>
 </mapper>
