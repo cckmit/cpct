@@ -369,6 +369,13 @@ public class EventRedisServiceImpl implements EventRedisService {
                 redisUtils.set(key, cpcpProductType);
                 resutlt.put(key, cpcpProductType);
             }
+        } else if("FOLLOW_FLG".equals(key)){
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign(key);
+            if (sysParamsList != null && sysParamsList.size() > 0) {
+                String followFlgType = sysParamsList.get(0).getParamValue();
+                redisUtils.set(key, followFlgType);
+                resutlt.put(key, followFlgType);
+            }
         }
 
         if ("EVENT_".equals(key)) {  // 事件

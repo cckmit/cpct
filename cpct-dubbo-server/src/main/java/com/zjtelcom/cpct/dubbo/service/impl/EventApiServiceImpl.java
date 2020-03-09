@@ -846,7 +846,10 @@ public class EventApiServiceImpl implements EventApiService {
                 //if (eventCode.indexOf(eventCodeStr) >= 0) {
                 if ("EVTS000001120".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    String isBind= (String) reultMap.get("GENDER");
+                    // 判断是否添加是否为微厅的标签
+                    Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
+                    String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
+                    String isBind= (String) reultMap.get(followFlgType);
 /*
 
                     // 联系号码-事件采集项
@@ -970,7 +973,10 @@ public class EventApiServiceImpl implements EventApiService {
              //   if (eventCodeZhuangStr.indexOf(eventCodeStr) >= 0) {
                 if ("EVTD000000091".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    String isBind= (String) reultMap.get("GENDER");
+                    // 判断是否添加是否为微厅的标签
+                    Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
+                    String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
+                    String isBind= (String) reultMap.get(followFlgType);
                     // 联系号码-事件采集项
                     String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     // 1为绑定公众号，0 为不绑定公众号
@@ -1245,7 +1251,9 @@ public class EventApiServiceImpl implements EventApiService {
         labelList.add("AREA_ID");
 
         // 判断是否添加是否为微厅的标签
-        labelList.add("GENDER");
+        Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
+        String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
+        labelList.add(followFlgType);
 
         if (assetLabelList != null && assetLabelList.size() > 0) {
             mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
