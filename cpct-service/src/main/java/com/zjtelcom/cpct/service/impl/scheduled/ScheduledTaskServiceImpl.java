@@ -74,8 +74,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                         logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
                         for (Map<String, String> stringStringMap : rptBatchOrder) {
                             String batchNbr = stringStringMap.get("batchNbr");
-                            logger.info("String batchNbr:" + batchNbr + ",trialOperation.getBatchNum():" + trialOperation.getBatchNum() + ",trialOperation.getBatchNum().equals(batchNbr):" + trialOperation.getBatchNum().equals(batchNbr));
-                            if (trialOperation.getBatchNum().equals(batchNbr)) {
+                            logger.info("String batchNbr:" + batchNbr + ",trialOperation.getBatchNum():" + trialOperation.getBatchNum() + ",trialOperation.getBatchNum().toString().equals(batchNbr):" + trialOperation.getBatchNum().toString().equals(batchNbr));
+                            if (trialOperation.getBatchNum().toString().equals(batchNbr)) {
                                 String handleRateString = stringStringMap.get("handleRate");
                                 Double handleRate = Double.valueOf(handleRateString);
                                 boolean handleRateFlag = handleRate * 100 < rate;
