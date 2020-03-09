@@ -5,11 +5,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -429,6 +432,8 @@ public class ActivityStatisticsController extends BaseController {
         return map;
     }
 
+
+    //随销清单查询接口
     @PostMapping("/queryEventOrderByReport")
     @CrossOrigin
     public Map<String,Object> queryEventOrderByReport(@RequestBody Map<String, String> params){
@@ -443,6 +448,7 @@ public class ActivityStatisticsController extends BaseController {
     }
 
 
+    //渠道报表查询接口
     @PostMapping("/queryEventOrderChlListByReport")
     @CrossOrigin
     public Map<String,Object> queryEventOrderChlListByReport(@RequestBody Map<String, String> params){
@@ -456,4 +462,68 @@ public class ActivityStatisticsController extends BaseController {
         return map;
     }
 
+
+    /**
+     * 分渠道报表导出成excel todo 未测试
+     */
+    @GetMapping("/exportChannelExcel")
+    @CrossOrigin
+    public void exportChannelExcel(HttpServletRequest request, HttpServletResponse response, String reqId)
+            throws UnsupportedEncodingException {
+        //根据reqId获取查询接口参数
+        Map<String, Object> map = new HashMap<>();
+        Object o = redisUtils.get(reqId);
+        if (o != null && o != "") {
+            HashMap<String, String> paramMap = (HashMap<String, String>) o;
+            try {
+                map = activityStatisticsService.queryEventOrderChlListByReport(paramMap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String sheetName = "分渠道报表";
+            String[] title = {"区域名称", "渠道名称", "活动目录", "活动类型", "客触数",
+                    "成功数", "成功率", "商机数", "回单数", "商机回单率"};
+            String fileName = "分渠道报表" + DateUtil.formatDate(new Date()) + ".xls"; //表名
+
+            Object resultMsg = map.get("resultMsg");
+            if (resultMsg != null) {
+                List<Map<String, Object>> hashMaps = (List<Map<String, Object>>) resultMsg;
+                String[][] content = new String[hashMaps.size()][title.length + 1];
+                try {
+                    for (int i = 0; i < hashMaps.size(); i++) {
+                        //区域名称 orgName
+                        content[i][0] = String.valueOf(hashMaps.get(i).get("orgName").toString());
+                        //渠道名称 channelCode
+                        content[i][1] = String.valueOf(hashMaps.get(i).get("channelName").toString());
+                        //活动目录 theme
+                        content[i][2] = String.valueOf(hashMaps.get(i).get("theme").toString());
+                        //活动类型  isee_flg 是否沙盘 statType 这个!
+                        String statType = hashMaps.get(i).get("statType").toString();
+                        if (statType.equals("0")){
+                            content[i][3] = String.valueOf("所有");
+                        }else {
+                            content[i][3] = String.valueOf("是");
+                        }
+
+                        //客触数 contactNum
+                        content[i][4] = String.valueOf(hashMaps.get(i).get("contactNum").toString());
+                        //成功数 orderSuccessNum
+                        content[i][5] = String.valueOf(hashMaps.get(i).get("orderSuccessNum").toString());
+                        //成功率 orderRate
+                        content[i][6] = String.valueOf(hashMaps.get(i).get("orderRate").toString());
+                        //商机数 orderNum
+                        content[i][7] = String.valueOf(hashMaps.get(i).get("orderNum").toString());
+                        //回单数 resultNum
+                        content[i][8] = String.valueOf(hashMaps.get(i).get("resultNum").toString());
+                        //商机回单率 resultRate
+                        content[i][9] = String.valueOf(hashMaps.get(i).get("resultRate").toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("分渠道报表", e);
+                }
+                excelWrite(response, sheetName, title, fileName, content, "分渠道报表导出成excel文件异常");
+            }
+        }
+    }
 }
