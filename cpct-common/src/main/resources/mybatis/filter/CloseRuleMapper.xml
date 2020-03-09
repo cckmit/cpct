@@ -247,7 +247,7 @@
     <resultMap id="MktcloseRuleCampaignMap" type="java.util.Map">
         <result property="closeType" column="CLOSE_TYPE"/>
         <result property="activityNbr" column="MKT_ACTIVITY_NBR"/>
-        <result property="activityId" column="MKT_CAMPAIGN_ID"/>
+        <result property="activityId" column="INIT_ID"/>
         <result property="closeNumber" column="EXPRESSION"/>
         <result property="closeName" column="CLOSE_NAME"/>
         <result property="closeCode" column="CLOSE_CODE"/>
@@ -257,7 +257,7 @@
     </resultMap>
 
     <select id="getCloseCampaign" parameterType="java.util.Map" resultMap="MktcloseRuleCampaignMap">
-        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.MKT_CAMPAIGN_ID,
+        SELECT cr.CLOSE_TYPE,cr.CLOSE_NAME,cr.CLOSE_CODE,cr.EXPRESSION,mc.MKT_ACTIVITY_NBR,mc.INIT_ID,
             cr.NOTE_ONE,cr.NOTE_TWO,cr.NOTE_THREE FROM close_rule cr
             LEFT JOIN mkt_strategy_close_rule_rel ms ON cr.RULE_ID = ms.RULE_ID
             LEFT JOIN mkt_campaign mc ON ms.STRATEGY_ID = mc.MKT_CAMPAIGN_ID
