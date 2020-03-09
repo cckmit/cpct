@@ -647,21 +647,25 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
      */
     public Map<String, Object> copyMktStrategyConfToPrd(Long parentMktStrategyConfId) throws Exception {
         Map<String, Object> mktStrategyConfMap = new HashMap<>();
-        // 通过原策略id 获取原策略基本信息
-        MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
-        // 获取策略下规则信息
-        List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
-        mktStrategyConfPrdMapper.insert(mktStrategyConfDO);
-        Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
-        // 遍历规则
-        for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
-            // 建立策略和规则的关系
-            mktStrategyConfRuleRelPrdMapper.insert(mktStrategyConfRuleRelDO);
-            // 复制获取规则
-            copyMktStrategyConfRuleToPrd(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+        try {
+            // 通过原策略id 获取原策略基本信息
+            MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(parentMktStrategyConfId);
+            // 获取策略下规则信息
+            List<MktStrategyConfRuleRelDO> mktStrategyConfRuleRelDOList = mktStrategyConfRuleRelMapper.selectByMktStrategyConfId(parentMktStrategyConfId);
+            mktStrategyConfPrdMapper.insert(mktStrategyConfDO);
+            Long childMktStrategyConfId = mktStrategyConfDO.getMktStrategyConfId();
+            // 遍历规则
+            for (MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO : mktStrategyConfRuleRelDOList) {
+                // 建立策略和规则的关系
+                mktStrategyConfRuleRelPrdMapper.insert(mktStrategyConfRuleRelDO);
+                // 复制获取规则
+                copyMktStrategyConfRuleToPrd(mktStrategyConfRuleRelDO.getMktStrategyConfRuleId());
+            }
+            mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mktStrategyConfMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-        mktStrategyConfMap.put("childMktStrategyConfId", childMktStrategyConfId);
         return mktStrategyConfMap;
     }
 

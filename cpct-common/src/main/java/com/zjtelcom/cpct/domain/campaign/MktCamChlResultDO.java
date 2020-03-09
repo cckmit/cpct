@@ -16,6 +16,11 @@ public class MktCamChlResultDO  implements Serializable {
      * 结果类型：0-结果， 1-工单
      */
     private String resultType;
+
+    /**
+     * 来源渠道编码
+     */
+    private String sourceChannelId;
     /**
      * 营销结果Id
      */
@@ -40,6 +45,14 @@ public class MktCamChlResultDO  implements Serializable {
      * 更新时间
      */
     private Date updateDate;
+
+    public String getSourceChannelId() {
+        return sourceChannelId;
+    }
+
+    public void setSourceChannelId(String sourceChannelId) {
+        this.sourceChannelId = sourceChannelId;
+    }
 
     public String getResultType() {
         return resultType;

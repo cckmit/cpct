@@ -39,6 +39,7 @@
         <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="5000"/>
         <dubbo:method name="strategyIssure" servicecode="00.1083.strategyIssure" timeout="100000"/>
         <dubbo:method name="esLog2WriteFile" servicecode="00.1083.esLog2WriteFile" timeout="100000"/>
+        <dubbo:method name="queryCustomerByCustId" servicecode="00.1083.queryCustomerByCustId" timeout="100000"/>
     </dubbo:reference>
 
     <!-- 事件外部调用测试 -->
@@ -86,5 +87,32 @@
     <dubbo:reference interface="com.zjtelcom.es.es.service.EsTarGrpTemplate" id="tarGrpTemplateCountAndIssue" version="1.0" check="false">
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
+
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
+        <!-- 营销活动详情服务 -->
+        <dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetailApi" timeout="10000"/>
+    </dubbo:service>
+
+    <!--客户id查询资产信息对外接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.EsSearchService" ref="esSearchServiceImpl"
+                   version="1.0">
+        <dubbo:method name="queryCustomerByCcustId4Out" servicecode="33.1083.queryCustomerByCcustId4Out" timeout="10000"/>
+    </dubbo:service>
+
+    <!--黑名单对外接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.BlackListService" ref="blackListServiceImpl"
+                   version="1.0">
+        <dubbo:method name="addBlackList" servicecode="33.1083.addBlackList" timeout="10000"/>
+        <dubbo:method name="deleteBlackList" servicecode="33.1083.deleteBlackList" timeout="10000"/>
+        <dubbo:method name="getBlackListById" servicecode="33.1083.getBlackListById" timeout="10000"/>
+        <dubbo:method name="getAllBlackList" servicecode="33.1083.getAllBlackList" timeout="10000"/>
+    </dubbo:service>
+
+    <!--黑名单日志查询接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.BlackListLogService" ref="blackListLogServiceImpl"
+                   version="1.0">
+        <dubbo:method name="getBlackListLog" servicecode="33.1083.getBlackListLog" timeout="10000"/>
+    </dubbo:service>
+
 
 </beans>
