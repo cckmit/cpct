@@ -850,7 +850,7 @@ public class EventApiServiceImpl implements EventApiService {
 /*
 
                     // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
+                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     Map<String, Object> paramsMap = new HashMap<>();
                     paramsMap.put("phone", contactNumber);
                     paramsMap.put("type", "1");
@@ -915,7 +915,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
 */
                     // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
+                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
@@ -972,7 +972,7 @@ public class EventApiServiceImpl implements EventApiService {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String isBind= (String) reultMap.get("GENDER");
                     // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
+                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {

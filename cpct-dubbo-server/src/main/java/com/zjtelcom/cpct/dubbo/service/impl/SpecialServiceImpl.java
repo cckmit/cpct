@@ -89,7 +89,7 @@ public class SpecialServiceImpl implements SpecialService {
         String eventCodeStr = (String) surveyMapRedis.get("SATISFACTION_SURVEY");
         if (eventCode.indexOf(eventCodeStr) >= 0) {
             // 联系号码-事件采集项
-            String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
+            String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
             Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("phone", contactNumber);
             paramsMap.put("type", "1");
