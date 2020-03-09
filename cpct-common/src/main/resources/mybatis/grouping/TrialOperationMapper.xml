@@ -175,4 +175,14 @@
   </select>
 
 
+  <select id="queryIssuedSuccess" resultMap="BaseResultMap">
+    SELECT ID, CAMPAIGN_ID, CAMPAIGN_NAME, BATCH_NUM, CREATE_DATE
+    FROM (
+        SELECT *
+        FROM trial_operation
+        WHERE STATUS_CD IN (7300,8100)
+        ORDER BY CREATE_DATE DESC LIMIT 99999
+    ) o
+    GROUP BY o.CAMPAIGN_ID
+  </select>
 </mapper>
