@@ -628,6 +628,14 @@ public class MultiJobRunner {
         methodInvoke(targetGroupService);
     }
 
+    /**
+     * 定时任务：每个派单成功活动取最后一个批次若该批次下发时间超过20天（可变），查询处理率若低于1%（可变)，则自动失效，并短信通知
+     */
+    public void issuedSuccessMktCheck() {
+        methodInvoke(campaignService);
+    }
+
+
     // 调用的方法名和注入要被调用的方法名要保持一致
     public <T> void methodInvoke(T correspondingService) {
         String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();

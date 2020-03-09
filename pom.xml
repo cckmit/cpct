@@ -73,7 +73,7 @@
         <cooperate-service-api.version>1.1</cooperate-service-api.version>
         <cpct-dubbo-log.version>1.0.0</cpct-dubbo-log.version>
         <open-complete.version>1.0.1</open-complete.version>
-        <bss-cooperate-realtime.version>1.4</bss-cooperate-realtime.version>
+        <bss-cooperate-realtime.version>1.5</bss-cooperate-realtime.version>
     </properties>
 
     <parent>
