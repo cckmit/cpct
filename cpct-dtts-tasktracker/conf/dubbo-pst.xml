@@ -31,6 +31,7 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.CampaignService" id="campaignServiceImpl"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
+        <dubbo:method name="issuedSuccessMktCheck" servicecode="33.1083.issuedSuccessMktCheck" timeout="10000"/>
     </dubbo:reference>
 
     <!-- 标签饱和度查询接口 -->
