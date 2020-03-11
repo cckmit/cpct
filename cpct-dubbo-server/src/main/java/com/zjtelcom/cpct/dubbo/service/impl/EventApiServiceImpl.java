@@ -828,7 +828,7 @@ public class EventApiServiceImpl implements EventApiService {
                  *  1、判断联系电话是否绑定微信公众号，是绑定用户则送微厅进行线上测评。
                  *  2、判断业务号码是否绑定微信公众号，是绑定用户则送微厅进行线上测评。
                  *  3、判断联系电话是否电信号码（接一个查询是否c网资产的判断接口），是发短信。
-                 *  4、判断产品类型：PHY-MAN-0001 （移动电话）业务号码是否移动电话，是发短信
+                 *  4、判断产品类型：PHY-MAN-0022 （移动电话）业务号码是否移动电话，是发短信
                  *  5、将来：联系电话推IVR
                  *
                  */
@@ -931,7 +931,7 @@ public class EventApiServiceImpl implements EventApiService {
                     //    log.info("444---cpcpProductType --->" + cpcpProductType);
                     //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                         // 判断采集项，资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                        if ("PHY-MAN-0001".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
+                        if ("PHY-MAN-0022".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                             reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                             reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                         } else {
@@ -2296,6 +2296,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     } catch (Exception e) {
+                        log.info("filterRuleList else ！预校验过滤出错");
                         log.info("filterRuleList else ！预校验过滤出错");
                         e.printStackTrace();
                     }
