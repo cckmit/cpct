@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.campaign;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
@@ -102,6 +103,7 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
+
 
 
     // 集团活动承接接口
@@ -1961,16 +1963,29 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
+                // 对象转换
+                Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
                         @Override
                         public void run() {
                             try {
-                                String roleName = "admin";
-                                synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                try {
+//                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+//                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+                                }catch (Exception e) {
+                                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
+                                }
+
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
+                                String roleName = "admin";
+                                try {
+                                    synchronizeCampaignService.synchronizeCampaign(mktCampaignId, roleName);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);

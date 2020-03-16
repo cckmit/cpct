@@ -12,7 +12,7 @@
     <dubbo:registry protocol="dubbo" address="134.96.249.149:8001"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30824"/>
+    <dubbo:protocol name="dubbo" port="30804"/>
     <dubbo:monitor protocol="registry"/>
 
 
@@ -73,6 +73,7 @@
     <!-- 活动延期短信通知 -->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.CampaignService" ref="campaignServiceImpl" version="2.0" >
         <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
+        <dubbo:method name="issuedSuccessMktCheck" servicecode="33.1083.issuedSuccessMktCheck" timeout="10000"/>
     </dubbo:service>
 
     <!-- UCCP短信发送 -->
