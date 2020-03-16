@@ -36,7 +36,7 @@ public class BlackListServiceImpl implements BlackListService {
 
     @Override
     public boolean exportBlackListFile() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMDD");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         String Date = dateFormat.format(new Date());
         //String headFileName = "BLACK_LIST_HEAD_" + Date + ".dat";     //文件路径+名称+文件类型
         String dataFileName = "BLACK_LIST_" + Date + ".dat";     //文件路径+名称+文件类型
@@ -53,18 +53,55 @@ public class BlackListServiceImpl implements BlackListService {
                 List<BlackListDO> allBlackList = blackListMapper.getAllBlackList();
                 for (BlackListDO blackListDO : allBlackList) {
                     StringBuilder sline = new StringBuilder();
-                    sline.append(blackListDO.getBlackId() + splitMark);
-                    sline.append(blackListDO.getAssetPhone() + splitMark);
-                    sline.append(blackListDO.getServiceCate() + splitMark);
-                    sline.append(blackListDO.getMaketingCate() + splitMark);
-                    sline.append(blackListDO.getPublicBenefitCate() + splitMark);
-                    sline.append(blackListDO.getChannel() + splitMark);
-                    sline.append(blackListDO.getStaffId() + splitMark);
-                    sline.append(blackListDO.getCreateStaff() + splitMark);
-                    sline.append(blackListDO.getCreateDate() + splitMark);
-                    sline.append(blackListDO.getUpdateStaff() + splitMark);
-                    sline.append(blackListDO.getUpdateDate() + splitMark);
-                    sline.append(blackListDO.getOperType());
+                    if (blackListDO.getBlackId() != 0) {
+                        sline.append(blackListDO.getBlackId());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getAssetPhone() != null) {
+                        sline.append(blackListDO.getAssetPhone());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getServiceCate() != null) {
+                        sline.append(blackListDO.getServiceCate());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getMaketingCate() != null) {
+                        sline.append(blackListDO.getMaketingCate());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getPublicBenefitCate() != null) {
+                        sline.append(blackListDO.getPublicBenefitCate());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getChannel() != null) {
+                        sline.append(blackListDO.getChannel());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getStaffId() != null) {
+                        sline.append(blackListDO.getStaffId());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getCreateStaff() != null) {
+                        sline.append(blackListDO.getCreateStaff());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getCreateDate() != null) {
+                        sline.append(blackListDO.getCreateDate());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getUpdateStaff() != null) {
+                        sline.append(blackListDO.getUpdateStaff());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getUpdateDate() != null) {
+                        sline.append(blackListDO.getUpdateDate());
+                    }
+                    sline.append(splitMark);
+                    if (blackListDO.getOperType() != null) {
+                        sline.append(blackListDO.getOperType());
+                    }
+                    sline.append(splitMark);
+
                     SftpUtils sftpUtils = new SftpUtils();
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
