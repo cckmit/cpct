@@ -104,7 +104,6 @@ public class BlackListServiceImpl implements BlackListService {
                     if (blackListDO.getOperType() != null) {
                         sline.append(blackListDO.getOperType());
                     }
-                    sline.append(splitMark);
 
                     SftpUtils sftpUtils = new SftpUtils();
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
