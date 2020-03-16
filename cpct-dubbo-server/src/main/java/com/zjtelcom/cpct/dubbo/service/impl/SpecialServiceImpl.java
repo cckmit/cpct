@@ -79,7 +79,7 @@ public class SpecialServiceImpl implements SpecialService {
         // 满意度调查事件，定义采集项
         if ("EVTD000000091".equals(eventCode)) {
             // 联系号码-事件采集项
-            String contactNumber = (String) evtParams.get("CPCP_CONTACT_NUMBER");
+            String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
             Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("phone", contactNumber);
             paramsMap.put("type", "1");
