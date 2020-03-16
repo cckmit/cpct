@@ -122,8 +122,6 @@
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
         <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
-        <!-- 发布活动的时候调用营服接口传递活动信息 -->
-        <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
     </dubbo:reference>
 
     <!-- 统计分析 -->

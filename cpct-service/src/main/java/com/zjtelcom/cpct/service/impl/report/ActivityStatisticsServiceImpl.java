@@ -110,18 +110,18 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 arrayLists.add(systemPostDto.getSysPostCode());
             }
         }
-        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
-            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
-            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
-            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
-            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
-        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
-            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        if (arrayLists.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode();
+        }else if (arrayLists.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode();
+        }else if (arrayLists.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode();
+        }else if (arrayLists.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode();
+        }else if (arrayLists.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode();
         }else {
-            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode();
         }
 
 
@@ -1263,6 +1263,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
 
         Map<String, Object> stringObjectMap = new HashMap<>();
+        System.out.println(JSON.toJSONString(paramMap));
         try {
             stringObjectMap = iReportService.queryEventOrder(paramMap);
         } catch (Exception e) {
@@ -1327,6 +1328,16 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             map.put("channelName", channel.getContactChlName());
 
                         }
+                        //成功率百分比转换
+                        if (map.get("orderRate")!=null){
+                            String percentFormat = getPercentFormat(Double.valueOf( map.get("orderRate").toString()), 3, 2);
+                            map.put("orderRate",percentFormat);
+                        }
+                        //商机回单率
+                        if (map.get("resultRate")!=null){
+                            String percentFormat = getPercentFormat(Double.valueOf( map.get("resultRate").toString()), 3, 2);
+                            map.put("resultRate",percentFormat);
+                        }
                         hashMaps.add(map);
                     }
                 }
@@ -1368,17 +1379,25 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         //渠道编码(必填,ALL表示所有,多个用逗号隔开)
         Object channelCode = params.get("channelCode");
         if (channelCode == "" || channelCode == null) {
-            paramMap.put("channelCode", "all");
+            if (strDataName.equals("dayKey")){
+                paramMap.put("channelCode", "all");
+            }else {
+                paramMap.put("channelCode", "");
+            }
         } else {
             paramMap.put("channelCode", channelCode.toString());
         }
         // 添加主题过滤
         Object theMe = params.get("theMe");
         if (theMe != "" && theMe != null) {
-            paramMap.put("theme", theMe.toString());
-            paramMap.put("theMe", theMe.toString());
+            paramMap.put("theme", theMe.toString());//协同渠道查询使用这个
+            paramMap.put("theMe", theMe.toString());//本地查询使用这个
         }else {
-            paramMap.put("theme", "all");
+            if (strDataName.equals("dayKey")){
+                paramMap.put("theme", "all");
+            }else {
+                paramMap.put("theme", "");
+            }
         }
         if (!strDataName.equals("dayKey")){
             StringBuilder stringBuilder = new StringBuilder();
