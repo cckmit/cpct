@@ -5,11 +5,14 @@ import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.service.blacklist.BlackListService;
 import com.zjtelcom.cpct.util.SftpUtils;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.MacSpi;
 import java.io.File;
@@ -29,9 +32,9 @@ public class BlackListServiceImpl implements BlackListService {
 
     private String ftpAddress = "134.108.0.92";
     private int ftpPort = 22;
-    private String ftpName= "ftp";
-    private String ftpPassword="V1p9*2_9%3#";
-    private String exportPath="/app/cpcp_cxzx/black_list";
+    private String ftpName = "ftp";
+    private String ftpPassword = "V1p9*2_9%3#";
+    private String exportPath = "/app/cpcp_cxzx/black_list";
 
 
 
@@ -112,9 +115,15 @@ public class BlackListServiceImpl implements BlackListService {
                 SftpUtils sftpUtils = new SftpUtils();
                 final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
                 log.info("sftp已获得连接");
-                //String path = sftpUtils.cd(exportPath, sftp);
+                sftpUtils.cd(exportPath, sftp);
                 boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
-                System.out.println(uploadResult);
+                if (uploadResult) {
+                    log.info("上传成功，开始删除本地文件！");
+                    boolean b1 = dataFile.delete();
+                    if (b1) {
+                        log.info("删除本地文件成功！");
+                    }
+                }
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
@@ -122,6 +131,20 @@ public class BlackListServiceImpl implements BlackListService {
             }
         }
         return resultMap;
+    }
+
+    public static boolean delFile(String path) {
+        Boolean bool = false;
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                file.delete();
+                bool = true;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return bool;
     }
 
 
