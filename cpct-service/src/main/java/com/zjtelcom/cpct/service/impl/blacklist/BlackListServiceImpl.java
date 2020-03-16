@@ -31,7 +31,7 @@ public class BlackListServiceImpl implements BlackListService {
     private int ftpPort = 22;
     private String ftpName= "ftp";
     private String ftpPassword="V1p9*2_9%3#";
-    private String exportPath="/app/cpcp_cxzx/black_list";
+    private String exportPath="/app/cpcp_cxzx/black_list/";
 
 
 
@@ -113,6 +113,7 @@ public class BlackListServiceImpl implements BlackListService {
                 final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
                 log.info("sftp已获得连接");
                 //String path = sftpUtils.cd(exportPath, sftp);
+                sftpUtils.cd(exportPath, sftp);
                 boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
                 System.out.println(uploadResult);
                 resultMap.put("resultMsg", "success");
