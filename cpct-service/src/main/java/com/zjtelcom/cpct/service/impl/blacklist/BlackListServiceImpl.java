@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.blacklist;
 
+import com.jcraft.jsch.ChannelSftp;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.service.blacklist.BlackListService;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.MacSpi;
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,12 +27,11 @@ public class BlackListServiceImpl implements BlackListService {
     private final static Logger log = LoggerFactory.getLogger(BlackListServiceImpl.class);
     private final static String splitMark = "\u0007";
 
-    private String ftpAddress = "134.108.0.93";
+    private String ftpAddress = "134.108.0.92";
     private int ftpPort = 22;
     private String ftpName= "ftp";
     private String ftpPassword="V1p9*2_9%3#";
-    private String excelIssurepath="/app/ftp/msc/userlist/fees";
-    private String uploadExcelPath="/app/ftp/msc/userlist/fees/";
+    private String exportPath="/app/cpcp_cxzx/black_list";
 
 
 
@@ -104,10 +105,16 @@ public class BlackListServiceImpl implements BlackListService {
                     if (blackListDO.getOperType() != null) {
                         sline.append(blackListDO.getOperType());
                     }
-
                     SftpUtils sftpUtils = new SftpUtils();
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
+
+                SftpUtils sftpUtils = new SftpUtils();
+                final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+                log.info("sftp已获得连接");
+                //String path = sftpUtils.cd(exportPath, sftp);
+                boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+                System.out.println(uploadResult);
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
