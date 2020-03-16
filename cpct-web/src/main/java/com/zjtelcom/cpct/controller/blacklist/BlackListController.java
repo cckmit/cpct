@@ -25,9 +25,9 @@ public class BlackListController extends BaseController {
     @PostMapping("/export")
     @CrossOrigin
     public Map<String, Object> export(){
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         try {
-            blackListService.exportBlackListFile();
+            result = blackListService.exportBlackListFile();
         } catch (Exception e) {
             logger.error("[op:BlackListController] fail to exportBlackListFile",e);
         }

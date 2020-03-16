@@ -10,10 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.MacSpi;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -35,7 +38,8 @@ public class BlackListServiceImpl implements BlackListService {
     private BlackListMapper blackListMapper;
 
     @Override
-    public boolean exportBlackListFile() {
+    public Map<String, Object> exportBlackListFile() {
+        Map<String, Object> resultMap = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         String Date = dateFormat.format(new Date());
         //String headFileName = "BLACK_LIST_HEAD_" + Date + ".dat";     //文件路径+名称+文件类型
@@ -105,11 +109,13 @@ public class BlackListServiceImpl implements BlackListService {
                     SftpUtils sftpUtils = new SftpUtils();
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
+                resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
+                resultMap.put("resultMsg", "faile");
             }
         }
-        return true;
+        return resultMap;
     }
 
 
