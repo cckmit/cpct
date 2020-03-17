@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.impl.blacklist;
 
+import com.alibaba.fastjson.JSON;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
@@ -13,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,6 +36,7 @@ public class BlackListServiceImpl implements BlackListService {
     private String ftpPassword = "V1p9*2_9%3#";
     private String exportPath = "/app/cpcp_cxzx/black_list_export/";
     private String importPath = "/app/cpcp_cxzx/black_list_import/";
+    private String localHeadFilePath = this.getClass().getResource("/").getPath();
 
     @Autowired
     private BlackListMapper blackListMapper;
@@ -156,7 +161,7 @@ public class BlackListServiceImpl implements BlackListService {
                         File file = new File(fileName);
                         if (!file.exists()) {
                             log.info("开始下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                            sftpUtils.download(sftp, path + "/", fileName, this.getClass().getResource("/").getPath());
+                            sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
                             log.info("结束下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
                         }
                     }
@@ -166,18 +171,126 @@ public class BlackListServiceImpl implements BlackListService {
                         File file = new File(fileName);
                         if (!file.exists()) {
                             log.info("开始下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                            sftpUtils.download(sftp, path + "/", fileName, this.getClass().getResource("/").getPath());
+                            sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
                             log.info("结束下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
                         }
                     }
             }
 
             // 解析头文件
+            File headFolders = new File(this.getClass().getResource("/").getPath());
+            File[] fileArray = headFolders.listFiles();
+            StringBuilder head = new StringBuilder();
+            String[] headArr = null;
+            String[] dataArr = null;
+            for (File headFile : fileArray) {
+                if (headFile.isFile() && headFile.getName().toUpperCase().contains("HEAD")) {
+                        File file = new File(localHeadFilePath + headFile.getName());
+                        BufferedReader bufferedReader = null;
+                        try {
+                            FileInputStream reader = new FileInputStream(file);
+                            bufferedReader = new BufferedReader(new InputStreamReader(reader, "UTF-8"));
+                            String line = null;
+                            int count = 0;
+                            while ((line = bufferedReader.readLine()) != null) {
+                                headArr = line.split("\u0007");
+                            }
+                        } catch (Exception e) {
+                            log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
+                        }
+                        //删除头文件
+                        headFile.delete();
+                    }
+            }
+
+            // 解析数据文件
+            for (File dataFile : fileArray) {
+                if (dataFile.isFile() && !dataFile.getName().toUpperCase().contains("HEAD")
+                        && dataFile.getName().toUpperCase().contains("BLACK_LIST")) {
+                    File file = new File(localHeadFilePath + dataFile.getName());
+                    BufferedReader bufferedReader = null;
+                    try {
+                        FileInputStream reader = new FileInputStream(file);
+                        bufferedReader = new BufferedReader(new InputStreamReader(reader, "UTF-8"));
+                        String line = null;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            dataArr = line.split("\u0007");
+                            try {
+                                Class<?> c = Class.forName("com.zjtelcom.cpct.domain.blacklist.BlackListDO");
+                                Class<?> superClass = c.getSuperclass();
+                                BlackListDO BlackListDO = (BlackListDO) c.newInstance();
+                                // Field[] declaredFields = c.getDeclaredFields();
+                                for (int i = 0; i < headArr.length; i++) {
+                                    String propName = fieldToProperty(headArr[i]);
+                                    Field field;
+                                    // 判断是否为父类的属性
+                                    if (superfield.indexOf(propName) >= 0) {
+                                        field = superClass.getDeclaredField(propName);
+                                    } else {
+                                        field = c.getDeclaredField(propName);
+                                    }
+
+                                    field.setAccessible(true);
+                                    if(dataArr[i]!=null && !"".equals(dataArr[i])){
+                                        if(field!=null && field.getType()!=null && "int".equals(field.getType().getName())){
+                                            field.set(BlackListDO, Integer.valueOf(dataArr[i]));
+                                        } else if(field!=null && field.getType()!=null && "java.lang.Long".equals(field.getType().getName())){
+                                            field.set(BlackListDO, Long.valueOf(dataArr[i]));
+                                        } else if(field!=null && field.getType()!=null && "java.util.Date".equals(field.getType().getName())){
+                                            field.set(BlackListDO, DateUtil.string2DateTime(dataArr[i]));
+                                        } else if(field!=null && field.getType()!=null && "java.lang.String".equals(field.getType().getName())){
+                                            field.getType().cast(dataArr[i]);
+                                            field.set(BlackListDO, dataArr[i]);
+                                        }
+
+                                    }
+                                }
+                                log.info("BlackListDO--->>>" + JSON.toJSONString(BlackListDO));
+                            } catch (Exception e) {
+                                log.error("解析文件异常：" , e);
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
+                    }
+                    //删除头文件
+                    dataFile.delete();
+                }
+            }
 
         } catch (Exception e) {
             log.error("下载文件失败！", e);
         }
         return resultMap;
+    }
+
+
+
+    /**
+     * 将数据库字段转换为java属性，如user_name-->userName
+     * @param field 字段名
+     * @return
+     */
+    private static String fieldToProperty(String field) {
+        if (null == field) {
+            return "";
+        }
+        char[] chars = field.toCharArray();
+        StringBuffer property = new StringBuffer();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if (c == '_') {
+                int j = i + 1;
+                if (j < chars.length) {
+                    property.append(String.valueOf(chars[j]).toUpperCase());
+                    i++;
+                }
+            } else {
+                property.append(String.valueOf(c).toLowerCase());
+            }
+        }
+        return property.toString();
     }
 
 }
