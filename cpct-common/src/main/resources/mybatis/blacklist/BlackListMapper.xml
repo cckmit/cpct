@@ -108,7 +108,7 @@
          channel, staff_id,create_staff, create_date, update_staff,update_date,operType)
         VALUES
         <foreach collection="list" item="item" separator="," index="i">
-            #{item.assetPhone, jdbcType = VARCHAR},
+        (   #{ item.assetPhone, jdbcType = VARCHAR},
             #{item.serviceCate, jdbcType = VARCHAR},
             #{item.maketingCate, jdbcType = VARCHAR},
             #{item.publicBenefitCate, jdbcType = VARCHAR},
@@ -119,6 +119,7 @@
             #{item.updateStaff, jdbcType = VARCHAR},
             #{item.updateDate, jdbcType = TIMESTAMP},
             #{item.operType, jdbcType = VARCHAR}
+        )
         </foreach>
     </insert>
 </mapper>
