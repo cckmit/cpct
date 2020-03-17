@@ -1,10 +1,13 @@
 package com.zjtelcom.cpct.service.grouping;
 
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TrialOperationVO;
+import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public interface TrialOperationService  {
@@ -48,4 +51,6 @@ public interface TrialOperationService  {
 
     //xyl 修改补全C4 地市编码改为sys_area 对应参数
     Map<String,Object> insertMktCampaignByC4OfSysArea();
+
+    TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample, List<TarGrpCondition> conditions);
 }
