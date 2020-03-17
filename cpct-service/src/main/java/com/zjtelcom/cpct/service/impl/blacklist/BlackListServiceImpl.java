@@ -42,8 +42,8 @@ public class BlackListServiceImpl implements BlackListService {
     private BlackListMapper blackListMapper;
 
     /**
-     *
      * 从数据库导出黑名单上传ftp服务器
+     *
      * @return
      */
     @Override
@@ -140,8 +140,8 @@ public class BlackListServiceImpl implements BlackListService {
     }
 
     /**
-     *
      * 从ftp服务器上下载文件，解析并导入到数据库中
+     *
      * @return
      */
     @Override
@@ -157,25 +157,30 @@ public class BlackListServiceImpl implements BlackListService {
             String path = sftpUtils.cd(importPath, sftp);
             List<String> files = sftpUtils.listFiles(path, sftp);
             for (String fileName : files) {
-                if (!"..".equals(fileName) && !".".equals(fileName)  && fileName.toUpperCase().contains("HEAD") && !fileName.toUpperCase().endsWith(".FLG")) {
-                        // 下载文件到本地
-                        File file = new File(fileName);
-                        if (!file.exists()) {
-                            log.info("开始下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                            sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
-                            log.info("结束下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                        }
+                if (!"..".equals(fileName) && !".".equals(fileName) && fileName.toUpperCase().contains("HEAD") && !fileName.toUpperCase().endsWith(".FLG")) {
+                    // 下载文件到本地
+                    File file = new File(fileName);
+                    if (!file.exists()) {
+                        log.info("开始下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
+                        sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
+                        log.info("结束下载head文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
                     }
+                }
 
                 if (!"..".equals(fileName) && !".".equals(fileName) && !fileName.toUpperCase().contains("HEAD") && !fileName.toUpperCase().endsWith(".FLG")) {
-                        // 下载文件到本地
-                        File file = new File(fileName);
-                        if (!file.exists()) {
-                            log.info("开始下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                            sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
-                            log.info("结束下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
-                        }
+                    // 下载文件到本地
+                    File file = new File(fileName);
+                    if (!file.exists()) {
+                        log.info("开始下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
+                        sftpUtils.download(sftp, path + "/", fileName, localHeadFilePath);
+                        log.info("结束下载文件--->>>" + fileName + "****** 时间：" + simpleDateFormat.format(new Date()));
                     }
+                    boolean remove = sftpUtils.remove(sftp, importPath + '/' + fileName);
+                    if(remove){
+                        log.info("删除sftp服务器上的数据文件成功！");
+                    }
+                }
+
             }
 
             // 解析头文件
@@ -186,28 +191,30 @@ public class BlackListServiceImpl implements BlackListService {
             String[] dataArr = null;
             for (File headFile : fileArray) {
                 if (headFile.isFile() && headFile.getName().toUpperCase().contains("HEAD")) {
-                        File file = new File(localHeadFilePath + headFile.getName());
-                        BufferedReader bufferedReader = null;
-                        try {
-                            FileInputStream reader = new FileInputStream(file);
-                            bufferedReader = new BufferedReader(new InputStreamReader(reader, "UTF-8"));
-                            String line = null;
-                            int count = 0;
-                            while ((line = bufferedReader.readLine()) != null) {
-                                headArr = line.split("\u0007");
-                            }
-                        } catch (Exception e) {
-                            log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
+                    File file = new File(localHeadFilePath + headFile.getName());
+                    BufferedReader bufferedReader = null;
+                    try {
+                        FileInputStream reader = new FileInputStream(file);
+                        bufferedReader = new BufferedReader(new InputStreamReader(reader, "UTF-8"));
+                        String line = null;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            headArr = line.split("\u0007");
                         }
-                        //删除头文件
-                        headFile.delete();
+                    } catch (Exception e) {
+                        log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
                     }
+                    bufferedReader.close();
+                    //删除头文件
+                    boolean delete = headFile.delete();
+                    if (delete) {
+                        log.info("删除头文件成功！");
+                    }
+                }
             }
 
             // 解析数据文件
             for (File dataFile : fileArray) {
-                if (dataFile.isFile() && !dataFile.getName().toUpperCase().contains("HEAD")
-                        && dataFile.getName().toUpperCase().contains("BLACK_LIST")) {
+                if (dataFile.isFile() && !dataFile.getName().toUpperCase().contains("HEAD") && dataFile.getName().toUpperCase().contains("BLACK_LIST")) {
                     File file = new File(localHeadFilePath + dataFile.getName());
                     BufferedReader bufferedReader = null;
                     try {
@@ -231,14 +238,14 @@ public class BlackListServiceImpl implements BlackListService {
                                         field = c.getDeclaredField(propName);
                                     }
                                     field.setAccessible(true);
-                                    if(dataArr[i]!=null && !"".equals(dataArr[i])){
-                                        if(field!=null && field.getType()!=null && "int".equals(field.getType().getName())){
+                                    if (dataArr[i] != null && !"".equals(dataArr[i])) {
+                                        if (field != null && field.getType() != null && "int".equals(field.getType().getName())) {
                                             field.set(BlackListDO, Integer.valueOf(dataArr[i]));
-                                        } else if(field!=null && field.getType()!=null && "java.lang.Long".equals(field.getType().getName())){
+                                        } else if (field != null && field.getType() != null && "java.lang.Long".equals(field.getType().getName())) {
                                             field.set(BlackListDO, Long.valueOf(dataArr[i]));
-                                        } else if(field!=null && field.getType()!=null && "java.util.Date".equals(field.getType().getName())){
+                                        } else if (field != null && field.getType() != null && "java.util.Date".equals(field.getType().getName())) {
                                             field.set(BlackListDO, DateUtil.string2DateTime(dataArr[i]));
-                                        } else if(field!=null && field.getType()!=null && "java.lang.String".equals(field.getType().getName())){
+                                        } else if (field != null && field.getType() != null && "java.lang.String".equals(field.getType().getName())) {
                                             field.getType().cast(dataArr[i]);
                                             field.set(BlackListDO, dataArr[i]);
                                         }
@@ -247,7 +254,7 @@ public class BlackListServiceImpl implements BlackListService {
                                 blackListDOS.add(BlackListDO);
                                 log.info("BlackListDO--->>>" + JSON.toJSONString(BlackListDO));
                             } catch (Exception e) {
-                                log.error("解析文件异常：" , e);
+                                log.error("解析文件异常：", e);
                                 e.printStackTrace();
                             }
                         }
@@ -257,20 +264,27 @@ public class BlackListServiceImpl implements BlackListService {
                     } catch (Exception e) {
                         log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
                     }
-                    //删除头文件
-                    dataFile.delete();
+                    bufferedReader.close();
+                    //删除数据文件
+                    boolean delete = dataFile.delete();
+                    if (delete) {
+                        log.info("删除数据文件成功！");
+                    }
                 }
             }
-        } catch (Exception e) {
-            log.error("下载文件失败！", e);
-        }
-        return resultMap;
-    }
 
+            // 删除远程数据文件
+            //sftpUtils.cd()
+        } catch (Exception e) {
+            log.error("导入黑名单数据失败", e);
+            e.printStackTrace();
+        } return resultMap;
+    }
 
 
     /**
      * 将数据库字段转换为java属性，如user_name-->userName
+     *
      * @param field 字段名
      * @return
      */
