@@ -265,6 +265,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             label.put("code", labelDTOList.get(i).getLabelCode());
             label.put("name", labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType", labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
@@ -328,7 +329,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(), false);
-            List<LabelResultES> labelResultList = param.getLabelResultList();
             paramList.add(param);
         }
         requests.setParamList(paramList);
