@@ -640,4 +640,13 @@ public class RedisUtils {
         return list;
     }
 
+    // 获取开关：0为关，1为开。true为开，false为关。
+    public boolean getSwitch(String key) {
+        String redisOrSysParams = getRedisOrSysParams(key);
+        if ("1".equals(redisOrSysParams)) {
+            return true;
+        }
+        return false;
+    }
+
 }
