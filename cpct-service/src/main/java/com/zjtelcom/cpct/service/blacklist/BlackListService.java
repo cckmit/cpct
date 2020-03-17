@@ -4,6 +4,8 @@ import java.util.Map;
 
 public interface BlackListService {
 
-    public Map<String, Object> exportBlackListFile();
+    Map<String, Object> exportBlackListFile();
+
+    Map<String, Object> importBlackListFile();
 
 }

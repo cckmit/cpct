@@ -33,4 +33,22 @@ public class BlackListController extends BaseController {
         }
         return result;
     }
+
+
+    /**
+     * 导入黑名单
+     *
+     * @return
+     */
+    @PostMapping("/import")
+    @CrossOrigin
+    public Map<String, Object> importBlackList(){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = blackListService.importBlackListFile();
+        } catch (Exception e) {
+            logger.error("[op:BlackListController] fail to importBlackListFile",e);
+        }
+        return result;
+    }
 }
