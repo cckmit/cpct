@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class TrialRedisServiceImpl implements TrialRedisService {
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
 
+    @Autowired
+    private UCCPService uccpService;
     /**
      * 更新试算记录状态
      * @param batchNum
@@ -65,6 +68,14 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             operation.setRemark("全量试算成功");
         }else if (status.equals(TrialStatus.UPLOAD_SUCCESS.getValue())){
             operation.setRemark("文件下发成功");
+        }else if (status.equals(TrialStatus.ISEE_PUBLISH_FAIL.getValue())){
+            //协同-下发失败
+            String sendMsg = "协同-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+            uccpService.sendShortMessage("手机号",sendMsg,"lanId");
+        }else if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
+            //渠道-下发失败
+            String sendMsg = "渠道-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+            uccpService.sendShortMessage("手机号",sendMsg,"lanId");
         }else {
             operation.setRemark("操作失败");
         }
