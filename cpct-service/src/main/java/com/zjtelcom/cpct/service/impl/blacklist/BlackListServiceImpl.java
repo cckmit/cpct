@@ -146,7 +146,8 @@ public class BlackListServiceImpl implements BlackListService {
      */
     @Override
     public Map<String, Object> importBlackListFile() {
-        Map<String, Object> resultMap = null;
+        Map<String, Object> resultMap = new HashMap<>();
+        List<BlackListDO> blackListDOS = new ArrayList<>();
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             resultMap = new HashMap<>();
@@ -229,7 +230,6 @@ public class BlackListServiceImpl implements BlackListService {
                                     } else {
                                         field = c.getDeclaredField(propName);
                                     }
-
                                     field.setAccessible(true);
                                     if(dataArr[i]!=null && !"".equals(dataArr[i])){
                                         if(field!=null && field.getType()!=null && "int".equals(field.getType().getName())){
@@ -242,15 +242,18 @@ public class BlackListServiceImpl implements BlackListService {
                                             field.getType().cast(dataArr[i]);
                                             field.set(BlackListDO, dataArr[i]);
                                         }
-
                                     }
                                 }
+                                blackListDOS.add(BlackListDO);
                                 log.info("BlackListDO--->>>" + JSON.toJSONString(BlackListDO));
                             } catch (Exception e) {
                                 log.error("解析文件异常：" , e);
                                 e.printStackTrace();
                             }
                         }
+                        // 批量导入数据库
+                        blackListMapper.insertBatch(blackListDOS);
+                        resultMap.put("result", "success");
                     } catch (Exception e) {
                         log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
                     }
@@ -258,7 +261,6 @@ public class BlackListServiceImpl implements BlackListService {
                     dataFile.delete();
                 }
             }
-
         } catch (Exception e) {
             log.error("下载文件失败！", e);
         }
