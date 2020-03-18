@@ -123,14 +123,17 @@
         </foreach>
     </insert>
 
-    <select id="selectByBlackList" parameterMap="BaseResultMap" resultType="java.lang.String">
+    <select id="selectByBlackList" parameterType="com.zjtelcom.cpct.domain.blacklist.BlackListDO" resultType="java.lang.String">
         SELECT asset_phone FROM mkt_blacklist
-        WHERE 1 = 1
-        <if test = "maketingCate != null and maketingCate != ''">
-            AND marketing_cate = #{maketingCate}
-        </if>
-        <if test = "serviceCate != null and serviceCate != ''">
-            AND service_cate = #{serviceCate}
-        </if>
+        <where>
+            <if test = "maketingCate != null and maketingCate != ''">
+                AND marketing_cate = #{maketingCate}
+            </if>
+            <if test = "serviceCate != null and serviceCate != ''">
+                AND service_cate = #{serviceCate}
+            </if>
+        </where>
+
+
     </select>
 </mapper>
