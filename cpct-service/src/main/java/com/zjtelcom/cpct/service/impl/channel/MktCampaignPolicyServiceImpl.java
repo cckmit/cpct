@@ -9,8 +9,10 @@ import com.asiainfo.policyqry.vo.PolicyQueryVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamPolicyMapper;
 import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktCamPolicy;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MktCampaignPolicyService;
@@ -34,6 +36,8 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
     private IPolicyQueryService iPolicyQueryService;
     @Autowired(required = false)
     private MktCamPolicyMapper mktCamPolicyMapper;
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
 
 
     /**
@@ -47,7 +51,14 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
         PolicyQueryByOfferIdVo policyQueryByOfferIdVo = new PolicyQueryByOfferIdVo();
         Integer page = MapUtil.getIntNum(param.get("page"));
         Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
-        List<Long> offerIds = (List<Long>) param.get("offerIds");
+        List<Long> ItemList = (List<Long>) param.get("offerIds");
+        List<Long> offerIds = new ArrayList<>();
+        for (Long offerId : ItemList) {
+            MktCamItem camItem = mktCamItemMapper.selectByPrimaryKey(offerId);
+            if (camItem!=null && camItem.getItemType().equals("1000")){
+                offerIds.add(camItem.getItemId());
+            }
+        }
         policyQueryByOfferIdVo.setOfferIds(offerIds);
 
         HashMap<String, Object> policyByOfferId = iPolicyQueryService.getPolicyByOfferId(policyQueryByOfferIdVo);

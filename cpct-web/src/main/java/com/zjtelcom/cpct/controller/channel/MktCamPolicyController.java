@@ -19,7 +19,11 @@ public class MktCamPolicyController extends BaseController {
     @Autowired
     private MktCampaignPolicyService mktCampaignPolicyService;
 
-
+    /**
+     * 通过销售品id查询佣金政策列表
+     * @param param
+     * @return
+     */
     @PostMapping("getPolicyListByOfferList")
     @CrossOrigin
     public Map<String, Object> getPolicyListByOfferList(@RequestBody Map<String,Object> param) {
@@ -34,6 +38,12 @@ public class MktCamPolicyController extends BaseController {
         }
         return result;
     }
+
+    /**
+     * 政策名称搜索佣金分页
+     * @param param
+     * @return
+     */
     @PostMapping("getPolicyList")
     @CrossOrigin
     public Map<String, Object> getPolicyList(@RequestBody Map<String,Object> param) {
@@ -48,6 +58,13 @@ public class MktCamPolicyController extends BaseController {
         }
         return result;
     }
+
+
+    /**
+     * 添加活动跟佣金政策关系
+     * @param param
+     * @return
+     */
     @PostMapping("addCampaignPolicyRel")
     @CrossOrigin
     public Map<String, Object> addCampaignPolicyRel(@RequestBody Map<String,Object> param) {
@@ -62,6 +79,12 @@ public class MktCamPolicyController extends BaseController {
         }
         return result;
     }
+
+    /**
+     * 通过活动查询佣金列表
+     * @param param
+     * @return
+     */
     @PostMapping("getPolicyListByCampaign")
     @CrossOrigin
     public Map<String, Object> getPolicyListByCampaign(@RequestBody Map<String,Object> param) {
