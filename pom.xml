@@ -603,6 +603,12 @@
                 <version>1.0.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.asiainfo.policyqry</groupId>
+                <artifactId>policy-query-service</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
