@@ -3151,6 +3151,13 @@ public class EventApiServiceImpl implements EventApiService {
         labelItems.put("CPCP_JIFEI_MESSAGE", content.toString());
     }
 
+    /**
+     * 判断资产号码是否在黑名单中
+     *
+     * @param accNbr 资产号码
+     * @param type 活动类型
+     * @return
+     */
     private boolean checkBlackList(String accNbr, String type){
         BlackListDO blackListDO = new BlackListDO();
         if(StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)){
