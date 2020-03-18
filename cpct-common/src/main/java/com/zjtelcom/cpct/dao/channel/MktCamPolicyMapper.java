@@ -18,7 +18,7 @@ public interface MktCamPolicyMapper {
 
     int updateByPrimaryKey(MktCamPolicy record);
 
-    int deleteByCampaignId(@Param("campaignId") Long requestId);
+    int deleteByCampaignId(@Param("campaignId") Long campaignId);
 
     List<MktCamPolicy> selectByCampaignId(@Param("campaignId") Long requestId);
 

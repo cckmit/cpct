@@ -113,6 +113,7 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
         Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
         List<PolicyInfoVo> policyList  = (List<PolicyInfoVo>) param.get("list");
         List<Long> policyIdList = new ArrayList<>();
+        mktCamPolicyMapper.deleteByCampaignId(campaignId);
         for (PolicyInfoVo policyInfoVo : policyList) {
             MktCamPolicy camPolicy = new MktCamPolicy();
             camPolicy.setCreateDate(new Date());
