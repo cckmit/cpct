@@ -57,6 +57,8 @@ public class BlackListServiceImpl implements BlackListService {
         //File headFile = new File(headFileName);
         //创建数据文件
         File dataFile = new File(dataFileName);
+        SftpUtils sftpUtils = new SftpUtils();
+        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
@@ -114,12 +116,8 @@ public class BlackListServiceImpl implements BlackListService {
                     if (blackListDO.getOperType() != null) {
                         sline.append(blackListDO.getOperType());
                     }
-                    SftpUtils sftpUtils = new SftpUtils();
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
-
-                SftpUtils sftpUtils = new SftpUtils();
-                final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
                 log.info("sftp已获得连接");
                 sftpUtils.cd(exportPath, sftp);
                 boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
@@ -130,10 +128,13 @@ public class BlackListServiceImpl implements BlackListService {
                         log.info("删除本地文件成功！");
                     }
                 }
+                sftp.disconnect();
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
                 resultMap.put("resultMsg", "faile");
+            } finally {
+                sftp.disconnect();
             }
         }
         return resultMap;
@@ -148,11 +149,11 @@ public class BlackListServiceImpl implements BlackListService {
     public Map<String, Object> importBlackListFile() {
         Map<String, Object> resultMap = new HashMap<>();
         List<BlackListDO> blackListDOS = new ArrayList<>();
+        SftpUtils sftpUtils = new SftpUtils();
+        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             resultMap = new HashMap<>();
-            SftpUtils sftpUtils = new SftpUtils();
-            final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
             // 下载文件
             String path = sftpUtils.cd(importPath, sftp);
             List<String> files = sftpUtils.listFiles(path, sftp);
@@ -202,8 +203,9 @@ public class BlackListServiceImpl implements BlackListService {
                         }
                     } catch (Exception e) {
                         log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
+                    } finally {
+                        bufferedReader.close();
                     }
-                    bufferedReader.close();
                     //删除头文件
                     boolean delete = headFile.delete();
                     if (delete) {
@@ -264,8 +266,9 @@ public class BlackListServiceImpl implements BlackListService {
                         resultMap.put("result", "success");
                     } catch (Exception e) {
                         log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
+                    } finally {
+                        bufferedReader.close();
                     }
-                    bufferedReader.close();
                     //删除数据文件
                     boolean delete = dataFile.delete();
                     if (delete) {
@@ -273,13 +276,13 @@ public class BlackListServiceImpl implements BlackListService {
                     }
                 }
             }
-
-            // 删除远程数据文件
-            //sftpUtils.cd()
         } catch (Exception e) {
             log.error("导入黑名单数据失败", e);
             e.printStackTrace();
-        } return resultMap;
+        } finally {
+            sftp.disconnect();
+        }
+        return resultMap;
     }
 
 
