@@ -130,4 +130,13 @@
         <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="120000"/>
     </dubbo:reference>
 
+    <!-- 佣金政策查询接口 -->
+    <dubbo:reference registry="esb3" interface="com.asiainfo.policyqry.service.IPolicyQueryService"
+                     id="iPolicyQueryService" version="2.0" check="false">
+        <dubbo:method name="getPolicys" servicecode="33.1039.getPolicys" timeout="12000"/>
+        <dubbo:method name="getPolicyByOfferId" servicecode="33.1039.getPolicyByOfferId" timeout="12000"/>
+        <dubbo:method name="addActivityPolicyRel" servicecode="33.1039.addActivityPolicyRel" timeout="12000"/>
+    </dubbo:reference>
+
+
 </beans>

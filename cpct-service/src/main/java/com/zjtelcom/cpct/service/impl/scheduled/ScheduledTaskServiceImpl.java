@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
-import com.zjtelcom.cpct.dao.campaign.MktDttsLogMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
@@ -14,6 +13,7 @@ import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.service.scheduled.ScheduledTaskService;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
     @Autowired
-    private MktDttsLogMapper mktDttsLogMapper;
+    private RedisUtils redisUtils;
 
     // 批次下发时间最大允许时间
     public static final String maxDays = "BATCH_ISSUED_TIME";
@@ -60,52 +60,66 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
 
     @Override
     public void issuedSuccessMktCheck() {
-        // 每个派单成功活动取最后一个批次若该批次
-        List<TrialOperation> trialOperations = trialOperationMapper.queryIssuedSuccess();
-        Integer days = getSysParamsIntegerValue(maxDays);
-        Integer rate = getSysParamsIntegerValue(minRate);
-        for (TrialOperation trialOperation : trialOperations) {
-            try {
-                Date createDate = trialOperation.getCreateDate();
-                String batchNum = String.valueOf(trialOperation.getBatchNum());
-                Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
-                Long campaignId = trialOperation.getCampaignId();
-                MktCampaignDO mktCampaignDO1 = mktCampaignMapper.selectByPrimaryKey(campaignId);
-                if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null) {
-                    continue;
-                }
-                Long initId = mktCampaignDO1.getInitId();
-                if (daysBetween > days) {
-                    // TODO 调用营服查询处理率
-                    List<Map<String, String>> rptBatchOrder = getRptBatchOrder(initId.toString(), DateUtil.date2String(createDate));
-                    if (rptBatchOrder != null) {
-                        //logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
-                        for (Map<String, String> stringStringMap : rptBatchOrder) {
-                            String batchNbr = stringStringMap.get("batchNbr");
-                            logger.info("String batchNbr:" + batchNbr + ",batchNum:" + batchNum + ",batchNum.equals(batchNbr):" + batchNum.equals(batchNbr));
-                            if (batchNum.equals(batchNbr) && stringStringMap.get("handleRate")!=null) {
-                                String handleRateString = String.valueOf(stringStringMap.get("handleRate"));
-                                Double handleRate = Double.valueOf(handleRateString);
-                                boolean handleRateFlag = handleRate * 100 < rate;
-                                logger.info("handleRate:->" + handleRate + ",handleRateFlag:->" + handleRateFlag);
-                                if (handleRate * 100 < rate) {
-                                    // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
-                                    if (modifyCampaignBatchFailureTime(batchNum)) {
-                                        logger.info("批次失效短信通知");
-                                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(initId);
-                                        String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
-                                        uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+        if (batchExpirySwitch()) {
+            // 每个派单成功活动取最后一个批次若该批次
+            List<TrialOperation> trialOperations = trialOperationMapper.queryIssuedSuccess();
+            Integer days = getSysParamsIntegerValue(maxDays);
+            Integer rate = getSysParamsIntegerValue(minRate);
+            x: for (TrialOperation trialOperation : trialOperations) {
+                try {
+                    Date createDate = trialOperation.getCreateDate();
+                    String batchNum = String.valueOf(trialOperation.getBatchNum());
+                    Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
+                    Long campaignId = trialOperation.getCampaignId();
+                    MktCampaignDO mktCampaignDO1 = mktCampaignMapper.selectByPrimaryKey(campaignId);
+                    if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null) {
+                        continue;
+                    }
+                    Long initId = mktCampaignDO1.getInitId();
+                    if (daysBetween > days) {
+                        // TODO 调用营服查询处理率
+                        List<Map<String, String>> rptBatchOrder = getRptBatchOrder(initId.toString(), DateUtil.date2String(createDate));
+                        if (rptBatchOrder != null) {
+                            //logger.info("调用营服查询处理率" + JSON.toJSONString(rptBatchOrder));
+                            for (Map<String, String> stringStringMap : rptBatchOrder) {
+                                String batchNbr = stringStringMap.get("batchNbr");
+                                logger.info("String batchNbr:" + batchNbr + ",batchNum:" + batchNum + ",batchNum.equals(batchNbr):" + batchNum.equals(batchNbr));
+                                if (batchNum.equals(batchNbr) && stringStringMap.get("handleRate")!=null) {
+                                    String handleRateString = String.valueOf(stringStringMap.get("handleRate"));
+                                    if (null == handleRateString || handleRateString.isEmpty()){
+                                        continue;
+                                    }
+                                    handleRateString = String.valueOf(handleRateString);
+                                    Double handleRate = Double.valueOf(handleRateString);
+                                    boolean handleRateFlag = handleRate * 100 < rate;
+                                    logger.info("handleRate:->" + handleRate + ",handleRateFlag:->" + handleRateFlag);
+                                    if (handleRate * 100 < rate) {
+                                        // TODO 调用营服调整批次生失效时间，使其失效，并短信通知
+                                        if (modifyCampaignBatchFailureTime(batchNum)) {
+                                            logger.info("批次失效短信通知");
+                                            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(initId);
+                                            String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
+                                            uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
+                                            trialOperation.setStatusCd("");
+                                            trialOperationMapper.updateByPrimaryKey(trialOperation);
+                                            continue x;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }catch (Exception e) {
+                    logger.info(e.getMessage());
+                    e.printStackTrace();
                 }
-            }catch (Exception e) {
-                logger.info(e.getMessage());
-                e.printStackTrace();
             }
         }
+    }
+
+    // 查询批次失效开关
+    public boolean batchExpirySwitch() {
+        return redisUtils.getSwitch("BATCH_EXPIRY_SWITCH");
     }
 
     // 修改派单到营服的批次的失效时间
@@ -122,7 +136,6 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             Map resultMap = iCpcAPIService.updateProjectStateTime(map);
             logger.info("修改派单到营服的批次的失效时间->:" + JSON.toJSONString(resultMap) + ",batchNum:" + batchNum);
             if (resultMap != null && resultMap.get("resultCode").equals("1")) {
-                //mktDttsLogMapper.insert(null, "9001", null, null, "成功", "", null, "", null, null, "","","", "", "");
                 result = true;
             }
         }catch (Exception e){
