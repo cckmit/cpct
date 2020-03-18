@@ -117,17 +117,19 @@ public class SyncActivityServiceImpl implements SyncActivityService {
         } else {
             activityModel.setMarketingType("3");
         }
-
-        // 同步子活动的initId
-        List<String> childCampaignIdList = new ArrayList<>();
-        List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-        for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
-            if (mktCampaignRelDO != null && mktCampaignRelDO.getzMktCampaignId()!=null) {
-                childCampaignIdList.add(mktCampaignRelDO.getzMktCampaignId().toString());
+        try {
+            // 同步子活动的initId
+            List<String> childCampaignIdList = new ArrayList<>();
+            List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByAmktCampaignId(mktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            for (MktCampaignRelDO mktCampaignRelDO : mktCampaignRelDOS) {
+                if (mktCampaignRelDO != null && mktCampaignRelDO.getzMktCampaignId()!=null) {
+                    childCampaignIdList.add(mktCampaignRelDO.getzMktCampaignId().toString());
+                }
             }
+            activityModel.setChildCampaignList(childCampaignIdList);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        activityModel.setChildCampaignList(childCampaignIdList);
-
         //省份标识
         activityModel.setPrvnceId(AreaCodeEnum.ZHEJIAGN.getRegionId().toString());
         //账期

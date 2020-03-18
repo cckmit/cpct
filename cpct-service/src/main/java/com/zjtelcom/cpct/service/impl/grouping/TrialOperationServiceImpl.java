@@ -2095,7 +2095,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      * @param isSample
      * @return
      */
-    private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample,List<TarGrpCondition> conditions) {
+    @Override
+    public TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample,List<TarGrpCondition> conditions) {
         TrialOperationParamES param = new TrialOperationParamES();
         param.setRuleId(ruleId);
         MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
