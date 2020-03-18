@@ -253,13 +253,14 @@ public class BlackListServiceImpl implements BlackListService {
                                 }
                                 blackListDOS.add(BlackListDO);
                                 log.info("BlackListDO--->>>" + JSON.toJSONString(BlackListDO));
+                                blackListMapper.addBlackList(BlackListDO);
                             } catch (Exception e) {
                                 log.error("解析文件异常：", e);
                                 e.printStackTrace();
                             }
                         }
                         // 批量导入数据库
-                        blackListMapper.insertBatch(blackListDOS);
+                        //blackListMapper.insertBatch(blackListDOS);
                         resultMap.put("result", "success");
                     } catch (Exception e) {
                         log.error("[op:updateDifferentNetEsData] failed to read head files = {} 失败！ SftpException=", file.getName(), e);
