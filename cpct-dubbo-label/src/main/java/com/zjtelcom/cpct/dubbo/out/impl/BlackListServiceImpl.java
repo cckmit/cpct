@@ -27,6 +27,8 @@ public class BlackListServiceImpl implements BlackListService {
     private static final String SUCCESS_CODE = "0";
     private static final String FAIL_CODE = "1";
 
+    private com.zjtelcom.cpct.service.blacklist.BlackListService blackListService;
+
     @Override
     public Map<String, Object> addBlackList(List<Map<String, Object>> blackListContent) {
         Map<String,Object> result = new HashMap<>();
@@ -136,6 +138,21 @@ public class BlackListServiceImpl implements BlackListService {
             e.printStackTrace();
             return responseVO.response(FAIL_CODE,"获取黑名单失败");
         }
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> exportBlackListFile() {
+        return blackListService.exportBlackListFile();
+    }
+
+    @Override
+    public Map<String, Object> importBlackListFile() {
+        return blackListService.importBlackListFile();
     }
 
 }

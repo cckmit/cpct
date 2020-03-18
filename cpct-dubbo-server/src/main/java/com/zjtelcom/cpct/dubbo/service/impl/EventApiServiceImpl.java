@@ -23,6 +23,7 @@ import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
@@ -37,6 +38,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -191,6 +193,10 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private EventRedisService eventRedisService;
+
+    @Autowired
+    private BlackListMapper blackListMapper;
+
 
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
@@ -1335,13 +1341,20 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
+            boolean isBlack = checkBlackList(privateParams.get("accNbr"), type);
+            if(isBlack){
+                Map<String, Object> nonPassedMsg = (Map<String, Object>) activityTaskResultMap.get("nonPassedMsg");
+                if (nonPassedMsg != null) {
+                    nonPassedMsg.put("cam_" + activityId, "该资产已被黑名单过滤");
+                }
+                return activityTaskResultMap;
+            }
+
             if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
-                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             } else {
                 log.info("进入camApiService.ActivityTask");
-                //activityTaskResultMap = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
@@ -3136,6 +3149,22 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         labelItems.put("CPCP_JIFEI_MESSAGE", content.toString());
+    }
+
+    private boolean checkBlackList(String accNbr, String type){
+        BlackListDO blackListDO = new BlackListDO();
+        if(StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)){
+            blackListDO.setMaketingCate("1");  // 营销类活动
+        } else {
+            blackListDO.setServiceCate("1");   // 服务类活动
+        }
+        List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
+        // 被黑名单过滤
+        if (assetPhoneList != null && assetPhoneList.contains(accNbr)) {
+            log.info(accNbr + "该资产号码在黑名单中，被过滤了");
+            return true;
+        }
+        return false;
     }
 
 }

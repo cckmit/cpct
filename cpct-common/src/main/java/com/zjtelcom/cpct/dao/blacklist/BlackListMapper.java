@@ -22,5 +22,7 @@ public interface BlackListMapper {
 
     int insertBatch(List<BlackListDO> blackListDOS);
 
+    List<String> selectByBlackList(BlackListDO blackListDO);
+
 }
 
