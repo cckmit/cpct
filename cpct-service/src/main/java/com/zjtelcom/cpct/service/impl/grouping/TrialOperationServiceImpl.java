@@ -156,6 +156,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktDttsLogService mktDttsLogService;
 
+
 //    private String ftpAddress = "134.108.3.130";
     private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
@@ -2046,10 +2047,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
-        List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", operationDetailList);
+        List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
+        if (strategyIdList!=null){
+            List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", operationDetailList);
+        }else {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "strategyIdList isEmpty");
+        }
+//        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
         return result;
     }
 

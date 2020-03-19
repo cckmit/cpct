@@ -185,4 +185,14 @@
     ) o
     GROUP BY o.CAMPAIGN_ID
   </select>
+
+  <select id="findOperationListByStrategyIdLsit"  parameterType="java.util.ArrayList">
+    select <include refid="selectColumn"/>
+      from trial_operation
+      where STRATEGY_ID IN
+      <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+        #{item}
+      </foreach>
+      order by CREATE_DATE desc
+  </select>
 </mapper>
