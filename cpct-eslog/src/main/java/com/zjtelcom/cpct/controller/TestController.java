@@ -19,4 +19,6 @@ public class TestController implements ApplicationRunner {
         System.out.println("cpctEsLog添加日志中转队列消费启动正常~~!!");
     }
 
+
+
 }
