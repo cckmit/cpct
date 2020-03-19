@@ -47,8 +47,4 @@ public interface ContactChannelMapper {
 
     List<Channel> findChildListByTriggerType();
 
-    List<Channel> getRealTimeChannelAndBatchChannel();
-
-    // 集团和省下发触点渠道映射
-    Channel getMappingCode(@Param("code")String groupChannelCode);
 }

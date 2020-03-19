@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.open.controller.tarGrp;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -10,13 +9,11 @@ import com.zjtelcom.cpct.open.base.common.HttpUtil;
 import com.zjtelcom.cpct.open.base.controller.BaseController;
 import com.zjtelcom.cpct.open.service.tarGrp.OpenTarGrpService;
 import org.apache.http.HttpStatus;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -136,16 +133,5 @@ public class OpenTarGrpController extends BaseController {
 
     }
 
-    @Test
-    public void testTar() {
-        Map param = new HashMap();
-        TarGrp tarGrp = new TarGrp();
-        tarGrp.setTarGrpName("1");
-        // param.put("tarGrp", "{\"tarGrpName\":\"1\"}");
-        param.put("tarGrp", JSON.toJSONString(tarGrp));
-        /*JSONObject jsonObject = JSON.parseObject(param.get("tarGrp").toString());
-        TarGrp tarGrp = JSONObject.toJavaObject(), TarGrp.class);*/
-        TarGrp tarGrp1 = JSONObject.toJavaObject(JSON.parseObject(param.get("tarGrp").toString()), TarGrp.class);
-        System.out.println(tarGrp1);
-    }
+
 }

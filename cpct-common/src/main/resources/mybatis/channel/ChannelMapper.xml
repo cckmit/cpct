@@ -85,10 +85,4 @@
     from channel
   </select>
 
-  <select id="selectByPrimaryKeyFromShiTi" parameterType="java.lang.Long" resultMap="BaseResultMap">
-     select ORG_ID, CHANNEL_NBR, CHANNEL_NAME
-    from channel
-    where STATUS_CD = 1000 AND CHN_TYPE_CD in (110101,110102,110201,110202) AND  ORG_ID = #{orgId,jdbcType=BIGINT}
-  </select>
-
 </mapper>

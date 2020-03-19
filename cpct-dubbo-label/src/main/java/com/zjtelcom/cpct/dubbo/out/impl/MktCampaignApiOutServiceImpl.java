@@ -1,7 +1,10 @@
 package com.zjtelcom.cpct.dubbo.out.impl;
 
-import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.*;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultConfRelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
