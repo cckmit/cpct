@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.domain.channel.DisplayColumnLabel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.Message;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
@@ -45,6 +46,8 @@ public class TrialRedisServiceImpl implements TrialRedisService {
 
     @Autowired
     private UCCPService uccpService;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
     /**
      * 更新试算记录状态
      * @param batchNum
@@ -71,11 +74,21 @@ public class TrialRedisServiceImpl implements TrialRedisService {
         }else if (status.equals(TrialStatus.ISEE_PUBLISH_FAIL.getValue())){
             //协同-下发失败
             String sendMsg = "协同-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
-            uccpService.sendShortMessage("手机号",sendMsg,"lanId");
+            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+            if (send_msg!=null){
+                for (SysParams sysParams : send_msg) {
+                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                }
+            }
         }else if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
             //渠道-下发失败
             String sendMsg = "渠道-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
-            uccpService.sendShortMessage("手机号",sendMsg,"lanId");
+            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+            if (send_msg!=null){
+                for (SysParams sysParams : send_msg) {
+                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                }
+            }
         }else {
             operation.setRemark("操作失败");
         }
