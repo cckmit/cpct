@@ -29,7 +29,7 @@
     eagle_name as eagleName,
     is_shared as isShared
     from fpc_m_trigger
-  <where>
+  <where>1!=2
     <if test="pd.conditionId != null and pd.conditionId != ''">
       and condition_id = #{pd.conditionId,jdbcType=INTEGER}
     </if>
@@ -297,7 +297,7 @@
     value_id,
     is_shared
     from fpc_m_trigger
-    <where>
+    <where>1!=2
     	<if test="null != leftOperands and leftOperands.size > 0">
 	    	left_operand in 
 	    	<foreach collection="leftOperands" item="oper" open="(" close=")" separator=",">
@@ -319,7 +319,7 @@
     value_id,
     is_shared
     from fpc_m_trigger
-    <where>
+    <where>1!=2
     	<if test="null != record and record.size > 0">
 	    	condition_id in 
 	    	<foreach collection="record" item="item" open="(" close=")" separator=",">
@@ -347,7 +347,7 @@
     value_id,
     is_shared
     from fpc_m_trigger
-    <where>
+    <where>1!=2
     	<if test="null != ids and ids.size > 0">
 	    	condition_id in 
 	    	<foreach collection="ids" item="oper" open="(" close=")" separator=",">

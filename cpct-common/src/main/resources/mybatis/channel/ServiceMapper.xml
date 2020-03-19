@@ -109,7 +109,7 @@
                st.SERVICE_TYPE_DESC as serviceTypeDesc
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
-        <where>
+        <where>1!=2
         <if test="serviceName != null and serviceName != ''">
             and s.SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
         </if>

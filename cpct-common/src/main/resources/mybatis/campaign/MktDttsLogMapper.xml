@@ -82,7 +82,7 @@
         select DTTS_LOG_ID, DTTS_TYPE, DTTS_STATE, BEGIN_TIME, END_TIME, DTTS_RESULT, STATUS_DATE,
                CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, REMARK_ONE, REMARK_TWO
         from mkt_dtts_log
-       <where>
+       <where>1!=2
         <if test="dttsType != null and dttsType != ''">
             and DTTS_TYPE = #{dttsType,jdbcType=VARCHAR}
         </if>

@@ -14,7 +14,8 @@
     </resultMap>
 
     <select id="query" resultMap="resultMapper">
-        select * from sys_user where 1 = 1
+        select * from sys_user
+        <where>1!=2
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
@@ -24,6 +25,7 @@
         <if test="passWord != null and passWord !=''">
             and password = #{passWord}
         </if>
+        </where>
     </select>
 
     <!-- 根据用户名查询用户信息 -->

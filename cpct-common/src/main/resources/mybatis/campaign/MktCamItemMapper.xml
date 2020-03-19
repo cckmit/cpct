@@ -99,7 +99,7 @@
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
     from mkt_cam_item
-    <where>
+    <where>1!=2
     <if test="campaignId != null">
       and MKT_CAMPAIGN_ID = #{campaignId}
     </if>

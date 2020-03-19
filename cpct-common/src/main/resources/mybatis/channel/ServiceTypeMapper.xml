@@ -97,7 +97,7 @@
                EXT_SERVICE_TYPE_ID, SERVICE_TYPE_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
                CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         from service_type
-        <where>
+        <where>1!=2
         <if test="serviceTypeName != null and serviceTypeName != ''">
               and SERVICE_TYPE_NAME LIKE CONCAT(CONCAT('%',#{serviceTypeName}),'%')
         </if>

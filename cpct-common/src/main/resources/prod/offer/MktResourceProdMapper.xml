@@ -86,7 +86,7 @@
                EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
                UPDATE_DATE
         from mkt_resource
-        <where>
+        <where>1!=2
         <if test="mktResName != null and mktResName != ''">
         and MKT_RES_NAME LIKE CONCAT(CONCAT('%',#{mktResName}),'%')
         </if>

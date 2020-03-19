@@ -103,7 +103,7 @@
     PUSH_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE,
     REMARK
     from mkt_cam_chl_conf
-    <where>
+    <where>1!=2
     <if test="evtContactConfId != null and evtContactConfId !=0">
       and EVT_CONTACT_CONF_ID = #{evtContactConfId}
     </if>

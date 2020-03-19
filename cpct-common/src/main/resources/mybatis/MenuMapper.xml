@@ -14,7 +14,7 @@
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
         select * from menu
-        <where>
+        <where>1!=2
         <if test = "id != null and id != 0">
              and id = #{id}
         </if>

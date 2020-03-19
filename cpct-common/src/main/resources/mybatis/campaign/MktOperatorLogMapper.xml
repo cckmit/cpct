@@ -26,7 +26,7 @@
         select OPERATION_ID, MKT_CAMPAIGN_ID, MKT_ACTIVITY_NBR, MKT_CAMPAIGN_NAME, MKT_CAMPAIGN_STATE_BEFORE,
           MKT_CAMPAIGN_STATE_AFTER, OPERATOR_ACCOUNT, OPERATION_TYPE, OPERATOR_DATE
         from mkt_operator_log
-        <where>
+        <where>1!=2
         <if test="mktActivityNbr != null and mktActivityNbr != ''">
             AND MKT_ACTIVITY_NBR = #{mktActivityNbr,jdbcType=VARCHAR}
         </if>

@@ -72,7 +72,7 @@
     END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
     REMARK
     from mkt_questionnaire
-    <where>
+    <where>1!=2
     <if test="naireName !=null and naireName != ''">
       and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
     </if>
@@ -87,7 +87,7 @@
         END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
         REMARK
         from mkt_questionnaire
-       <where>
+       <where>1!=2
         <if test="NAIRE_NAME !=null and NAIRE_NAME != ''">
             and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
         </if>

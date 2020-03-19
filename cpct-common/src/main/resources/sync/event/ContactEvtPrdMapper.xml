@@ -41,7 +41,7 @@
         e.STATUS_CD statusCd
         from event e
         <include refid="eventJoin"/>
-        <where>
+        <where>1!=2
         <if test="contactEvtName != null and contactEvtName != ''">
             and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{contactEvtName}),'%')
         </if>
@@ -55,7 +55,7 @@
     <select id="query" resultMap="resultMapper">
         select * from event
 
-        <where>
+        <where>1!=2
         <if test="id != null and id != 0">
             and id = #{id}
         </if>

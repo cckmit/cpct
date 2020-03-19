@@ -64,7 +64,7 @@
     select QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_question
-    <where>
+    <where>1!=2
     <if test="map.questionName !=null and map.questionName != ''">
       and QUESTION_NAME LIKE CONCAT(CONCAT('%',#{map.questionName}),'%')
     </if>

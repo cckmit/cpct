@@ -240,7 +240,7 @@
     LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
     LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID
     from injection_label
-    <where>
+    <where>1!=2
     <if test="injectionLabelId != null and injectionLabelId != 0">
       and INJECTION_LABEL_ID = #{injectionLabelId}
     </if>
@@ -307,7 +307,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    <where>
+    <where>1!=2
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
@@ -344,7 +344,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from fpc_system.injection_label
-    <where>
+    <where>1!=2
       <if test="null != record and record.size > 0">
         INJECTION_LABEL_ID in
         <foreach collection="record" item="item" open="(" close=")" separator=",">
@@ -371,7 +371,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    <where>
+    <where>1!=2
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
@@ -394,7 +394,7 @@
         CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
         OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
       from injection_label
-    <where>
+    <where>1!=2
       <if test="null != injectionLabelIds and injectionLabelIds.size > 0">
         INJECTION_LABEL_ID not in
         <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
@@ -414,7 +414,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    <where>
+    <where>1!=2
       <if test="null != injectionLabelIds and injectionLabelIds.size > 0">
         INJECTION_LABEL_ID  in
         <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
@@ -437,7 +437,7 @@
   <select id="listLabelByCodeList" parameterType="java.util.List" resultType="com.zjtelcom.cpct.dto.grouping.SimpleInfo">
     select INJECTION_LABEL_NAME as name,INJECTION_LABEL_CODE as value
     from injection_label
-    <where>
+    <where>1!=2
       <if test="null != codeList and codeList.size > 0">
         INJECTION_LABEL_CODE  in
         <foreach collection="codeList" item="item" open="(" close=")" separator=",">

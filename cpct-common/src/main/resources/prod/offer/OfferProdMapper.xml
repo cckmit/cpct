@@ -179,7 +179,7 @@
     left join offer_prod_rel opr on opr.OFFER_ID = a.OFFER_ID
     left join product pr on pr.PROD_ID = opr.PROD_ID
     </if>
-   <where>
+   <where>1!=2
     <if test="statusCd == null or statusCd == ''">
       and a.STATUS_CD = 1000
     </if>
@@ -206,7 +206,7 @@
   <select id="findProductByType" resultMap="BaseResultMap">
     select PROD_ID AS OFFER_ID, PROD_NAME AS OFFER_NAME
     from product
-    <where>
+    <where>1!=2
     <if test="statusCd == null or statusCd == ''">
       and STATUS_CD = 1000
     </if>

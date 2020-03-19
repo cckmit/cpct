@@ -82,7 +82,7 @@
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
         UPDATE_DATE, UPDATE_STAFF
         from sys_staff
-        <where>
+        <where>1!=2
         <if test="status != null and status != ''">
             and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
         </if>

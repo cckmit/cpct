@@ -148,7 +148,7 @@
         select
         <include refid="Base_Column_List" />
         from fpc_org_tree
-        <where>
+        <where>1!=2
         <if test="areaId != null and areaId != ''">
             and area_id = #{areaId}
         </if>

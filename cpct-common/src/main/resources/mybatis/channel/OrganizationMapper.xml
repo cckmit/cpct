@@ -136,7 +136,7 @@
   <select id="selectByIdList" resultType="java.lang.Long">
     select ORG_ID
     from organization
-    <where>
+    <where>1!=2
     <if test="null != list and list.size > 0">
      and ORG_ID in
       <foreach collection="list" item="item" open="(" close=")" separator=",">

@@ -181,7 +181,7 @@
     INTERFACE_TYPE, PROVIDER, CALLER, PROTOCOL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from interface_cfg
-    <where>
+    <where>1!=2
     <if test="evtSrcId != null ">
       and EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
     </if>

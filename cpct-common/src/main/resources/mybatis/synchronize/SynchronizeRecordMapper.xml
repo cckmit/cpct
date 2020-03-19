@@ -37,7 +37,7 @@
     select
     CREATE_ID, SYNCHRONIZE_NAME, SYNCHRONIZE_ID, ROLE_NAME, SYNCHRONIZE_TIME,SYNCHRONIZE_TYPE
     from sys_synchronize_record
-    <where>
+    <where>1!=2
     <if test="createId != null and createId != ''">
       and CREATE_ID = #{createId}
     </if>

@@ -65,7 +65,7 @@
     EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE, REMARK
     from event_scene_type
-    <where>
+    <where>1!=2
     <if test="evtSceneTypeId != null and evtSceneTypeId != ''">
       and EVT_SCENE_TYPE_ID = #{evtSceneTypeId}
     </if>

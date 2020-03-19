@@ -88,7 +88,7 @@
         SELECT ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
                 CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         FROM mkt_algorithms
-        <where>
+        <where>1!=2
         <if test="algoId != null and algoId != ''">
             and ALGO_ID = #{algoId,jdbcType=BIGINT}
         </if>

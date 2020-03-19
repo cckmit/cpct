@@ -125,7 +125,7 @@
         EXT_EVENT_SCENE_ID, STATUS_CD, STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE,EVENT_SCENE_TYPE_ID,
         CREATE_DATE, REMARK, CONTACT_EVT_CODE
         from event_scene
-        where 1 = 1
+        <where>1!=2
         <if test="eventSceneId != null and eventSceneId != 0 ">
             and EVENT_SCENE_ID = #{eventSceneId}
         </if>
@@ -135,6 +135,7 @@
         <if test="eventSceneName != null and eventSceneName != '' ">
             and EVENT_SCENE_NAME like concat('%',concat(#{eventSceneName},'%'))
         </if>
+        </where>
     </select>
 
     <insert id="saveEventScene" parameterType="com.zjtelcom.cpct.dto.event.EventScene">

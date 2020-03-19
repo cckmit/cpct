@@ -66,7 +66,7 @@
     PARENT_ID, CHANNEL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE,
     UPDATE_DATE, CREATE_DATE, REMARK
     from contact_channel channel
-    <where>
+    <where>1!=2
       <if test="channelName != null and channelName != ''">
           and channel.CONTACT_CHL_NAME LIKE CONCAT(CONCAT('%',#{channelName}),'%')
       </if>

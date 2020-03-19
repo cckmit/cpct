@@ -45,7 +45,7 @@
         e.STATUS_CD statusCd
         from event e
         <include refid="eventJoin"/>
-        <where>
+        <where>1!=2
         <if test="contactEvtName != null and contactEvtName != ''">
             and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{contactEvtName}),'%')
         </if>
@@ -89,7 +89,7 @@
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
         select * from event
-        <where>
+        <where>1!=2
         <if test="id != null and id != 0">
             and id = #{id}
         </if>
@@ -432,7 +432,7 @@
         e.STATUS_CD statusCd
         from event e
         <include refid="eventJoin"/>
-        <where>
+        <where>1!=2
         <if test="contactEvtId != null and contactEvtId != ''">
             and e.EVENT_ID = #{contactEvtId}
         </if>

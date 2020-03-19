@@ -15,7 +15,7 @@
     <!--查询方法-->
     <select id="query" resultMap="resultMapper">
         select * from role_menu
-        <where>
+        <where>1!=2
         <if test = "id != null and id != 0">
             and id = #{id}
         </if>
