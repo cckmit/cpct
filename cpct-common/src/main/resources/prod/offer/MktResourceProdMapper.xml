@@ -86,7 +86,7 @@
                EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
                UPDATE_DATE
         from mkt_resource
-        where 1=1
+        <where>
         <if test="mktResName != null and mktResName != ''">
         and MKT_RES_NAME LIKE CONCAT(CONCAT('%',#{mktResName}),'%')
         </if>
@@ -97,5 +97,6 @@
             </foreach>
         </if>
         and (MKT_RES_TYPE_ID = 2 or MKT_RES_TYPE_ID = 3)
+        </where>
     </select>
 </mapper>

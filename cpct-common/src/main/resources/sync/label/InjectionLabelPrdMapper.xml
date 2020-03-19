@@ -206,11 +206,11 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    where 1=1
+    <where>
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
-
+    </where>
   </select>
 
   <!--< 参数查询 >-->
@@ -258,7 +258,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    where 1=1
+    <where>
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
@@ -271,6 +271,7 @@
     <if test="conditionType != null and conditionType != ''">
       and CONDITION_TYPE = #{conditionType}
     </if>
+    </where>
     order by CREATE_DATE desc
   </select>
 

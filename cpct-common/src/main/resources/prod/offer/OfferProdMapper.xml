@@ -179,7 +179,7 @@
     left join offer_prod_rel opr on opr.OFFER_ID = a.OFFER_ID
     left join product pr on pr.PROD_ID = opr.PROD_ID
     </if>
-    where 1=1
+   <where>
     <if test="statusCd == null or statusCd == ''">
       and a.STATUS_CD = 1000
     </if>
@@ -195,6 +195,7 @@
     <if test="offerName != null and offerName != ''">
       and a.OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
     </if>
+   </where>
   </select>
 
   <select id="selectByFourNum" resultMap="BaseResultMap">
@@ -205,7 +206,7 @@
   <select id="findProductByType" resultMap="BaseResultMap">
     select PROD_ID AS OFFER_ID, PROD_NAME AS OFFER_NAME
     from product
-    where 1=1
+    <where>
     <if test="statusCd == null or statusCd == ''">
       and STATUS_CD = 1000
     </if>
@@ -219,6 +220,7 @@
       and PROD_NAME LIKE CONCAT(CONCAT('%',#{offerName}),'%')
     </if>
     and PROD_USE_TYPE = '2000'
+    </where>
   </select>
 
 

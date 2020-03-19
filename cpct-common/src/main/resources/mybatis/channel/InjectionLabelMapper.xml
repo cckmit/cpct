@@ -240,7 +240,7 @@
     LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
     LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID
     from injection_label
-    where 1=1
+    <where>
     <if test="injectionLabelId != null and injectionLabelId != 0">
       and INJECTION_LABEL_ID = #{injectionLabelId}
     </if>
@@ -265,6 +265,7 @@
     <if test="statusCd != null and statusCd != ''">
       and STATUS_CD = #{statusCd}
     </if>
+    </where>
   </select>
 
   <select id="selectByScope" resultMap="BaseResultMap">
@@ -306,11 +307,11 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    where 1=1
+    <where>
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
-
+    </where>
   </select>
 
   <!--< 参数查询 >-->
@@ -370,7 +371,7 @@
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
     OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
     from injection_label
-    where 1=1
+    <where>
     <if test="labelName != null and labelName != ''">
       and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
     </if>
@@ -383,6 +384,7 @@
     <if test="conditionType != null and conditionType != ''">
       and CONDITION_TYPE = #{conditionType}
     </if>
+    </where>
     order by CREATE_DATE desc
   </select>
 

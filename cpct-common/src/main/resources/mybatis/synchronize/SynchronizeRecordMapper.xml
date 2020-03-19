@@ -37,7 +37,7 @@
     select
     CREATE_ID, SYNCHRONIZE_NAME, SYNCHRONIZE_ID, ROLE_NAME, SYNCHRONIZE_TIME,SYNCHRONIZE_TYPE
     from sys_synchronize_record
-    where 1=1
+    <where>
     <if test="createId != null and createId != ''">
       and CREATE_ID = #{createId}
     </if>
@@ -50,6 +50,7 @@
     <if test="endTime != null and endTime != ''" >
       and SYNCHRONIZE_TIME &lt;= #{endTime}
     </if>
+    </where>
     order by SYNCHRONIZE_TIME desc
   </select>
 

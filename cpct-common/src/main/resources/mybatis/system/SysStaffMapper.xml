@@ -91,7 +91,7 @@
         left join contact_channel as cc on sf.CHANNEL_ID = cc.CONTACT_CHL_ID
         left join sys_area as sa on sf.CITY_ID = sa.area_id
         left join sys_params as sp on sf.LOGIN_STATUS = sp.PARAM_VALUE and sp.PARAM_KEY = "SYSYTEM_LOGIN_STATUS"
-        where 1=1
+        <where>
         <if test="staffAccount != null and staffAccount != ''">
             and sf.STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
         </if>
@@ -110,6 +110,7 @@
         <if test="loginStatus != null and loginStatus != 0">
             and sf.LOGIN_STATUS = #{loginStatus,jdbcType=BIGINT}
         </if>
+        </where>
         order by sf.CREATE_DATE desc
     </select>
 

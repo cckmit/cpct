@@ -103,13 +103,14 @@
     PUSH_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE,
     REMARK
     from mkt_cam_chl_conf
-    where 1=1
+    <where>
     <if test="evtContactConfId != null and evtContactConfId !=0">
       and EVT_CONTACT_CONF_ID = #{evtContactConfId}
     </if>
     <if test="evtContactConfName != null and evtContactConfName !=''">
       and EVT_CONTACT_CONF_NAME like CONCAT('%',#{evtContactConfName,jdbcType=VARCHAR},'%')
     </if>
+    </where>
   </select>
 
   <select id="selectByCampaignId" resultMap="BaseResultMap" >

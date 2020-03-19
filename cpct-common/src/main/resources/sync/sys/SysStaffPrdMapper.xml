@@ -82,7 +82,7 @@
         STAFF_EMAIL, CHANNEL_ID, CITY_ID, STATUS, LAST_LOGIN, CREATE_DATE, CREATE_STAFF,
         UPDATE_DATE, UPDATE_STAFF
         from sys_staff
-        where 1=1
+        <where>
         <if test="status != null and status != ''">
             and STAFF_ACCOUNT like CONCAT('%',#{staffAccount,jdbcType=VARCHAR},'%')
         </if>
@@ -101,6 +101,7 @@
         <if test="loginStatus != null and loginStatus != 0">
             and LOGIN_STATUS = #{loginStatus,jdbcType=BIGINT}
         </if>
+        </where>
         order by CREATE_DATE desc
     </select>
 

@@ -64,7 +64,7 @@
     select QUESTION_ID, QUESTION_NAME, QUESTION_TYPE, QUESTION_DESC, ANSWER_TYPE, DEFAULT_ANSWER,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_question
-    where 1=1
+    <where>
     <if test="map.questionName !=null and map.questionName != ''">
       and QUESTION_NAME LIKE CONCAT(CONCAT('%',#{map.questionName}),'%')
     </if>
@@ -74,6 +74,7 @@
     <if test="map.answerType !=null and map.answerType != ''">
       and ANSWER_TYPE = #{map.answerType}
     </if>
+    </where>
     order by CREATE_DATE desc
   </select>
 

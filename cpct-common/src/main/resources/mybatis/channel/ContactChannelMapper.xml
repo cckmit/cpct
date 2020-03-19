@@ -66,11 +66,11 @@
     PARENT_ID, CHANNEL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE,
     UPDATE_DATE, CREATE_DATE, REMARK
     from contact_channel channel
-    where 1=1
+    <where>
       <if test="channelName != null and channelName != ''">
           and channel.CONTACT_CHL_NAME LIKE CONCAT(CONCAT('%',#{channelName}),'%')
       </if>
-
+    </where>
   </select>
 
   <select id="selectByType" resultMap="BaseResultMap">
@@ -78,7 +78,7 @@
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REGION_ID, STATUS_DATE, UPDATE_DATE, CREATE_DATE,
     REMARK
     from contact_channel channel
-    where 1=1 and channel.CONTACT_CHL_TYPE = #{channelType}
+    where  channel.CONTACT_CHL_TYPE = #{channelType}
   </select>
 
   <select id="findParentList" resultMap="BaseResultMap">

@@ -181,7 +181,7 @@
     INTERFACE_TYPE, PROVIDER, CALLER, PROTOCOL_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from interface_cfg
-    where 1=1
+    <where>
     <if test="evtSrcId != null ">
       and EVT_SRC_ID = #{evtSrcId,jdbcType=BIGINT}
     </if>
@@ -191,6 +191,7 @@
     <if test="interfaceType != null and interfaceType != ''">
       and INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR}
     </if>
+    </where>
   </select>
 
   <select id="selectByProvider" resultMap="BaseResultMap">

@@ -62,7 +62,7 @@
     select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL, 
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_script
-    where 1=1
+    <where>
       <if test="scriptName != null and scriptName != ''">
           and SCRIPT_NAME LIKE CONCAT(CONCAT('%',#{scriptName}),'%')
       </if>
@@ -75,6 +75,7 @@
     <if test="scriptType != null and scriptType != ''">
       and SCRIPT_TYPE = #{scriptType}
     </if>
+    </where>
     order by UPDATE_DATE desc
   </select>
 
@@ -82,13 +83,14 @@
     select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_script
-    where 1=1
+    <where>
     <if test="scriptName != null and scriptName != ''">
       and SCRIPT_NAME LIKE CONCAT(CONCAT('%',#{scriptName}),'%')
     </if>
     <if test="scriptType != null and scriptType != ''">
       and SCRIPT_TYPE = #{scriptType}
     </if>
+    </where>
   </select>
 
 
@@ -96,7 +98,7 @@
     select SCRIPT_ID, SCRIPT_NAME, SCRIPT_DESC, SCRIPT_TYPE, SUIT_CHANNEL_TYPE, EXEC_CHANNEL,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
     from mkt_script
-    where 1=1
+    <where>
     <if test="scriptId != null and scriptId != ''">
       and SCRIPT_ID = #{scriptId}
     </if>
@@ -118,5 +120,6 @@
     <if test="createStaff != null and createStaff != ''">
       and CREATE_STAFF = #{createStaff}
     </if>
+    </where>
   </select>
 </mapper>

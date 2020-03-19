@@ -29,7 +29,7 @@
     eagle_name as eagleName,
     is_shared as isShared
     from fpc_m_trigger
-    where 1=1
+  <where>
     <if test="pd.conditionId != null and pd.conditionId != ''">
       and condition_id = #{pd.conditionId,jdbcType=INTEGER}
     </if>
@@ -51,6 +51,7 @@
     <if test="pd.rightOperand != null and pd.rightOperand != ''">
       and right_operand = #{pd.rightOperand,jdbcType=VARCHAR}
     </if>
+  </where>
     order by condition_id desc
   </select>
 

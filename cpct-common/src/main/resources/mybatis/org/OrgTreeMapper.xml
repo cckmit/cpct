@@ -148,7 +148,7 @@
         select
         <include refid="Base_Column_List" />
         from fpc_org_tree
-        where 1=1
+        <where>
         <if test="areaId != null and areaId != ''">
             and area_id = #{areaId}
         </if>
@@ -173,6 +173,7 @@
         <if test="cityType != null ">
             and city_type = #{cityType}
         </if>
+        </where>
         order by state_date desc
     </select>
 

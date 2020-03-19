@@ -88,13 +88,14 @@
         SELECT ALGO_ID, ALGO_CODE, ALGO_NAME, HANDLE_CLASS, ALGO_DESC, STATUS_CD, STATUS_DATE, CREATE_STAFF,
                 CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK
         FROM mkt_algorithms
-        WHERE 1=1
+        <where>
         <if test="algoId != null and algoId != ''">
             and ALGO_ID = #{algoId,jdbcType=BIGINT}
         </if>
         <if test="algoName != null and algoName != ''">
             and ALGO_NAME LIKE CONCAT(CONCAT('%',#{algoName}),'%')
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 </mapper>
