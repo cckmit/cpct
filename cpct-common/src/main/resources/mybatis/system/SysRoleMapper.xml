@@ -44,10 +44,11 @@
     <select id="selectByParams" resultMap="BaseResultMap">
         select ROLE_ID, ROLE_NAME, ROLE_CODE,REMARK, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_role
-        where 1=1
+        <where>1!=2
         <if test="roleName != null and roleName != ''">
             and ROLE_NAME = #{roleName,jdbcType=VARCHAR}
         </if>
+        </where>
         order by CREATE_DATE desc
     </select>
 

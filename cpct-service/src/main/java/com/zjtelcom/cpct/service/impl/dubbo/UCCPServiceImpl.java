@@ -4,6 +4,7 @@ import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
@@ -20,6 +21,8 @@ public class UCCPServiceImpl implements UCCPService {
     private UCCPSendService uCCPSendService;
     @Autowired(required = false)
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
 
     @Value("${uccp.userAcct}")
     private String userAcct;
@@ -83,6 +86,8 @@ public class UCCPServiceImpl implements UCCPService {
         Map map = uCCPSendService.sendShortMessage(params);
         if (map == null) return "调用sendShortMessage返回结果异常！";
         if (!map.get("code").equals("0000")) {
+            // 短信发送成功记录数据
+            saveShortMessageLog(targPhone, sendContent);
             return map.get("msg").toString();
         } else {
             return "";
@@ -96,5 +101,14 @@ public class UCCPServiceImpl implements UCCPService {
             val += String.valueOf(random.nextInt(10));
         }
         return val;
+    }
+
+    // 短信发送类型任务记录
+    public void saveShortMessageLog(String targPhone, String sendContent) {
+        try {
+            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
