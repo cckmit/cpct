@@ -115,8 +115,8 @@
         select TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC, TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from tar_grp
-        where 1 = 1
-        <!--<where>-->
+        <where>1!=2
+        <!--<where>1!=2-->
         <!--<if test="null != list and list.size > 0">-->
             <!--TAR_GRP_ID  in-->
             <!--<foreach collection="list" item="item" open="(" close=")" separator=",">-->
@@ -131,6 +131,7 @@
         </if>
         <!--</where>-->
         and REMARK = #{remark}
+        </where>
         order by UPDATE_DATE desc
     </select>
 

@@ -98,7 +98,8 @@
     select MKT_CAM_ITEM_ID, MKT_CAMPAIGN_ID, ITEM_TYPE, ITEM_ID, PRIORITY, ITEM_GROUP, OFFER_CODE,OFFER_NAME,
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
-    from mkt_cam_item where 1=1
+    from mkt_cam_item
+    <where>1!=2
     <if test="campaignId != null">
       and MKT_CAMPAIGN_ID = #{campaignId}
     </if>
@@ -108,6 +109,7 @@
     <if test="name != null and name != '' ">
       and OFFER_NAME like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
     </if>
+    </where>
   </select>
 
   <select id="selectByCampaignId" resultMap="BaseResultMap">

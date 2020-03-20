@@ -72,13 +72,14 @@
     END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
     REMARK
     from mkt_questionnaire
-    where 1=1
+    <where>1!=2
     <if test="naireName !=null and naireName != ''">
       and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
     </if>
     <if test="naireType !=null and naireType != ''">
       and NAIRE_TYPE = #{naireType}
     </if>
+    </where>
   </select>
 
     <select id="findNairePageByParam" resultMap="BaseResultMap">
@@ -86,13 +87,14 @@
         END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
         REMARK
         from mkt_questionnaire
-        where 1=1
+       <where>1!=2
         <if test="NAIRE_NAME !=null and NAIRE_NAME != ''">
             and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
         </if>
         <if test="NAIRE_TYPE !=null and NAIRE_TYPE != ''">
             and NAIRE_TYPE = #{naireType}
         </if>
+        </where>
     </select>
 
 

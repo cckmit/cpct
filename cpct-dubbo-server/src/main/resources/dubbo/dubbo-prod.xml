@@ -161,10 +161,21 @@
         <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
 
-    <!--&lt;!&ndash;渠道协同接触任务id&ndash;&gt;-->
-    <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">-->
+    <!--渠道协同接触任务id-->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
+        <dubbo:method name="queryEventInst" servicecode="00.1079.queryEventInst"  timeout="120000"/>
+        <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
+        <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
+        <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
         <!--&lt;!&ndash; 发布活动的时候调用营服接口传递活动信息 &ndash;&gt;-->
         <!--<dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>-->
-    <!--</dubbo:reference>-->
+    </dubbo:reference>
+
+    <!-- 门户-获取用户角色信息 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService"
+                     id="iSystemUserDtoDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
+    </dubbo:reference>
+
 
 </beans>

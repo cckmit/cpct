@@ -79,7 +79,7 @@
     <select id="getBlackListPageByKey" resultMap="BaseResultMap">
         select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id, create_staff, create_date, update_staff,update_date
         from mkt_blacklist
-        <where>
+        <where>1!=2
             <if test = "assetPhone != null and assetPhone != ''">
                 asset_phone = #{assetPhone}
             </if>

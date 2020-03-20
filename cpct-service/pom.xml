@@ -222,6 +222,12 @@
             <version>1.0.3</version>
         </dependency>
 
+        <!--佣金政策接口-->
+        <dependency>
+            <groupId>com.asiainfo.policyqry</groupId>
+            <artifactId>policy-query-service</artifactId>
+        </dependency>
+
     </dependencies>
 
 
