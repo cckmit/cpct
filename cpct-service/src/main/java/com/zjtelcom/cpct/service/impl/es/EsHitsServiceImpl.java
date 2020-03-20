@@ -598,13 +598,13 @@ public class EsHitsServiceImpl implements EsHitsService {
         return boolQueryBuilder;
     }
 
-    //把资产查询接口  CRM获取客户真实信息
+    //CRM获取客户真实信息
     @Override
     public Map<String, Object> getCustomer(Map<String, String> params) {
         return cpcEsService.queryCustomer(params);
     }
 
-    //客户级查询接口
+    //把资产查询接口
     @Override
     public Map<String, Object> getCustomerByCustId(Map<String, String> params) {
         return cpcEsService.queryCustomerByCustId(params);
