@@ -10,10 +10,12 @@ import com.zjtelcom.cpct.domain.channel.DisplayColumnLabel;
 import com.zjtelcom.cpct.domain.channel.Label;
 import com.zjtelcom.cpct.domain.channel.Message;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
 import com.zjtelcom.cpct.enums.TrialStatus;
+import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,10 @@ public class TrialRedisServiceImpl implements TrialRedisService {
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
 
+    @Autowired
+    private UCCPService uccpService;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
     /**
      * 更新试算记录状态
      * @param batchNum
@@ -49,7 +55,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
      * @return
      */
     @Override
-    public Map<String, Object> updateOperationStatus(Long batchNum, String status) {
+    public Map<String, Object> updateOperationStatus(Long batchNum, String status) throws Exception {
         Map<String,Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum.toString());
         if (operation==null){
@@ -65,6 +71,24 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             operation.setRemark("全量试算成功");
         }else if (status.equals(TrialStatus.UPLOAD_SUCCESS.getValue())){
             operation.setRemark("文件下发成功");
+        }else if (status.equals(TrialStatus.ISEE_PUBLISH_FAIL.getValue())){
+            //协同-下发失败
+            String sendMsg = "协同-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+            if (send_msg!=null){
+                for (SysParams sysParams : send_msg) {
+                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                }
+            }
+        }else if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
+            //渠道-下发失败
+            String sendMsg = "渠道-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+            if (send_msg!=null){
+                for (SysParams sysParams : send_msg) {
+                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                }
+            }
         }else {
             operation.setRemark("操作失败");
         }

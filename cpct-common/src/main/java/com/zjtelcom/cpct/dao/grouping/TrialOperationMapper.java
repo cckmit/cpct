@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -39,4 +40,8 @@ public interface TrialOperationMapper {
     TrialOperation selectByBatchNum(@Param("batchNum") String batchNum);
 
     List<TrialOperation> listOperationByCamIdAndStatusCd(@Param("campaignId")Long campaignId, @Param("statusCd")String statusCd);
+
+    List<TrialOperation> queryIssuedSuccess();
+
+    List<TrialOperation> findOperationListByStrategyIdLsit(List<String> strategyIdList);
 }

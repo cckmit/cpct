@@ -1255,6 +1255,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (params.get("idcardScanFlag") != null && params.get("idcardScanFlag") != "") {
             String idcardScanFlag = params.get("idcardScanFlag").toString();
             paramMap.put("idcardScanFlag", idcardScanFlag);
+        }else {//默认否
+            paramMap.put("idcardScanFlag", "0");
         }
         //网点类型
         if (params.get("channelType") != null && params.get("channelType") != "") {

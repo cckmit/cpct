@@ -2188,10 +2188,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
-        List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", operationDetailList);
+        List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
+        if (strategyIdList!=null){
+            List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", operationDetailList);
+        }else {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "strategyIdList isEmpty");
+        }
+//        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
         return result;
     }
 

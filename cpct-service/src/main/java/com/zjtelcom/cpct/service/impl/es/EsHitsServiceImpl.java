@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.es.es.service.EsService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -64,6 +65,8 @@ public class EsHitsServiceImpl implements EsHitsService {
 
     @Autowired(required = false)
     private MqProducerService mqProducerService;
+    @Autowired(required = false)
+    private EsService  cpcEsService;
 
     @Override
     public List<Map<String, Object> >search(List<String> assetList) {
@@ -91,6 +94,7 @@ public class EsHitsServiceImpl implements EsHitsService {
         } while (myresponse.getHits().getHits().length != 0);
         return result;
     }
+
 
     @Override
     public void add() throws Exception {
@@ -593,6 +597,18 @@ public class EsHitsServiceImpl implements EsHitsService {
         }
         System.out.println(boolQueryBuilder);
         return boolQueryBuilder;
+    }
+
+    //把资产查询接口  CRM获取客户真实信息
+    @Override
+    public Map<String, Object> getCustomer(Map<String, String> params) {
+        return cpcEsService.queryCustomer(params);
+    }
+
+    //客户级查询接口
+    @Override
+    public Map<String, Object> getCustomerByCustId(Map<String, String> params) {
+        return cpcEsService.queryCustomerByCustId(params);
     }
 
 }

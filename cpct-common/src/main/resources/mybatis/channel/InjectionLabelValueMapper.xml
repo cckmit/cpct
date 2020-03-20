@@ -55,7 +55,7 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select LABEL_VALUE_ID, INJECTION_LABEL_ID, LABEL_VALUE, VALUE_NAME, VALUE_DESC, STATUS_CD, 
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
-    from injection_label_value
+    from injection_label_value WHERE 1!=2
   </select>
 
   <delete id="deleteAll">

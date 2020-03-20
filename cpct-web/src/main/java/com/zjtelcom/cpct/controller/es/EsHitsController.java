@@ -1,21 +1,22 @@
 package com.zjtelcom.cpct.controller.es;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.util.ElasticsearchUtil;
 import com.zjtelcom.cpct.elastic.util.EsPage;
 
 import com.zjtelcom.cpct.service.es.EsHitsService;
+import com.zjtelcom.cpct.service.impl.es.EsHitsServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ import java.util.Map;
 @EnableAutoConfiguration
 @RequestMapping("/esHits")
 public class EsHitsController {
+    private Logger logger = LoggerFactory.getLogger(EsHitsController.class);
     /**
      * 测试索引
      */
@@ -42,6 +44,7 @@ public class EsHitsController {
 
     @Autowired(required = false)
     private EsHitsService esService;
+
 
 
     /**
@@ -223,5 +226,31 @@ public class EsHitsController {
         else{
             return  "startPage或者pageSize缺失";
         }
+    }
+
+    //把资产查询接口和客户级查询接口控制层订阅 加一个前端页面展示
+    @PostMapping("/getCustomer")
+    @CrossOrigin
+    public Map<String,Object> getCustomer(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = esService.getCustomer(params);
+        } catch (Exception e) {
+            logger.error("getCustomer! Exception: ", JSONArray.toJSON(params), e);
+        }
+        return map;
+    }
+
+    //客户级查询接口
+    @PostMapping("/getCustomer")
+    @CrossOrigin
+    public Map<String,Object> getCustomerByCustId(@RequestBody Map<String, String> params){
+        Map<String, Object> map = new HashMap<>();
+        try {
+            map = esService.getCustomerByCustId(params);
+        } catch (Exception e) {
+            logger.error("getCustomerByCustId! Exception: ", JSONArray.toJSON(params), e);
+        }
+        return map;
     }
 }
