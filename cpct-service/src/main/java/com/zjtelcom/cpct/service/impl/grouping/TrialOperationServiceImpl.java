@@ -159,6 +159,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktDttsLogService mktDttsLogService;
 
+
 //    private String ftpAddress = "134.108.3.130";
     private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
