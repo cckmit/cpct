@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.MktCamPolicy;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MktCampaignPolicyService;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +52,18 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
         PolicyQueryByOfferIdVo policyQueryByOfferIdVo = new PolicyQueryByOfferIdVo();
         Integer page = MapUtil.getIntNum(param.get("page"));
         Integer pageSize = MapUtil.getIntNum(param.get("pageSize"));
-        List<Long> ItemList = (List<Long>) param.get("offerIds");
+        List<Integer> ItemList = (List<Integer>) param.get("offerIds");
         List<Long> offerIds = new ArrayList<>();
-        for (Long offerId : ItemList) {
-            MktCamItem camItem = mktCamItemMapper.selectByPrimaryKey(offerId);
+        for (Integer offerId : ItemList) {
+            MktCamItem camItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(offerId.toString()));
             if (camItem!=null && camItem.getItemType().equals("1000")){
                 offerIds.add(camItem.getItemId());
             }
+        }
+        if (offerIds.isEmpty()){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","未查询到有效的销售品");
+            return result;
         }
         policyQueryByOfferIdVo.setOfferIds(offerIds);
 
@@ -122,7 +128,14 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
     public Map<String, Object> addCampaignPolicyRel(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
         Long campaignId = MapUtil.getLongNum(param.get("campaignId"));
-        List<PolicyInfoVo> policyList  = (List<PolicyInfoVo>) param.get("list");
+        List<Map<String,Object>> policyMapList  = (List<Map<String,Object>>) param.get("list");
+        List<PolicyInfoVo> policyList = new ArrayList<>();
+        for (Map<String, Object> map : policyMapList) {
+            PolicyInfoVo InfoVo = ChannelUtil.mapToEntity(map, PolicyInfoVo.class);
+            InfoVo.setPolicyId(Long.valueOf(map.get("policyId").toString()));
+            policyList.add(InfoVo);
+        }
+
         List<Long> policyIdList = new ArrayList<>();
         mktCamPolicyMapper.deleteByCampaignId(campaignId);
         for (PolicyInfoVo policyInfoVo : policyList) {
