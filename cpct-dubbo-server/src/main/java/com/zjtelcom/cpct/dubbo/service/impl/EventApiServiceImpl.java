@@ -458,11 +458,11 @@ public class EventApiServiceImpl implements EventApiService {
 
             try {
                 // List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
-                List<String> list =new ArrayList<>();
+                List<String> list = new ArrayList<>();
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("eventCode", map.get("eventCode"));
                 Map<String, Object> channelCodeRedis = eventRedisService.getRedis("CHANNEL_CODE_LIST_", paramMap);
-                if(channelCodeRedis!=null){
+                if (channelCodeRedis != null) {
                     list = (List<String>) channelCodeRedis.get("CHANNEL_CODE_LIST_" + map.get("eventCode"));
                 }
 
@@ -476,7 +476,7 @@ public class EventApiServiceImpl implements EventApiService {
                     result.put("CPCResultMsg", "接入渠道不符");
                     return result;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 esJson.put("hit", false);
                 esJson.put("success", true);
                 esJson.put("msg", "接入渠道查询异常");
@@ -500,7 +500,7 @@ public class EventApiServiceImpl implements EventApiService {
                 paramMap.put("eventCode", map.get("eventCode"));
                 Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", paramMap);
                 ContactEvt event = new ContactEvt();
-                if(eventRedis!=null){
+                if (eventRedis != null) {
                     event = (ContactEvt) eventRedis.get("EVENT_" + map.get("eventCode"));
                 }
                 if (event == null) {
@@ -800,7 +800,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     } catch (Exception e) {
                         log.error("Exception = " + e);
-                    }finally {
+                    } finally {
                         executor.shutdown();
                     }
                 }
@@ -824,7 +824,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }finally {
+                    } finally {
                         executor.shutdown();
                     }
                 }
@@ -847,7 +847,7 @@ public class EventApiServiceImpl implements EventApiService {
                 * 4、都不满足暂不推
                 *
                 * */
-               // Map<String, Object> surveyMapRedis = eventRedisService.getRedis("SATISFACTION_ACCEPT");
+                // Map<String, Object> surveyMapRedis = eventRedisService.getRedis("SATISFACTION_ACCEPT");
                 //String eventCodeStr = (String) surveyMapRedis.get("SATISFACTION_ACCEPT");
                 //if (eventCode.indexOf(eventCodeStr) >= 0) {
                 if ("EVTS000001120".equals(eventCode)) {
@@ -855,7 +855,7 @@ public class EventApiServiceImpl implements EventApiService {
                     // 判断是否添加是否为微厅的标签
                     Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
                     String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
-                    String isBind= (String) reultMap.get(followFlgType);
+                    String isBind = (String) reultMap.get(followFlgType);
 /*
 
                     // 联系号码-事件采集项
@@ -932,10 +932,10 @@ public class EventApiServiceImpl implements EventApiService {
                     } else {
                         // 判断资产类型
                         boolean isCdma = false;
-                    //    Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
-                    //    String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
-                    //    log.info("444---cpcpProductType --->" + cpcpProductType);
-                    //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
+                        //    Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
+                        //    String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
+                        //    log.info("444---cpcpProductType --->" + cpcpProductType);
+                        //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                         // 判断采集项，资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
                         if ("PHY-MAN-0022".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                             reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
@@ -943,7 +943,7 @@ public class EventApiServiceImpl implements EventApiService {
                         } else {
                             // 资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
                             boolean isMobile = false;
-                            if(contactNumber!=null){
+                            if (contactNumber != null) {
                                 // 判断是否为手机号码
                                 isMobile = isMobile(contactNumber);
                             }
@@ -952,7 +952,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
                                 log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
                                 if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
-                                    log.info("444--- "+ isMobile +" 为C网用户");
+                                    log.info("444--- " + isMobile + " 为C网用户");
                                     reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                                     reultMap.put("CPCP_ACCS_NBR", contactNumber);
                                 }
@@ -974,15 +974,15 @@ public class EventApiServiceImpl implements EventApiService {
                 * 4、都不满足暂不推
                 *
                 * */
-             //   Map<String, Object> zhuangMapRedis = eventRedisService.getRedis("SATISFACTION_ZHUANG");
-             //   String eventCodeZhuangStr = (String) zhuangMapRedis.get("SATISFACTION_ZHUANG");
-             //   if (eventCodeZhuangStr.indexOf(eventCodeStr) >= 0) {
+                //   Map<String, Object> zhuangMapRedis = eventRedisService.getRedis("SATISFACTION_ZHUANG");
+                //   String eventCodeZhuangStr = (String) zhuangMapRedis.get("SATISFACTION_ZHUANG");
+                //   if (eventCodeZhuangStr.indexOf(eventCodeStr) >= 0) {
                 if ("EVTD000000091".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
                     Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
                     String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
-                    String isBind= (String) reultMap.get(followFlgType);
+                    String isBind = (String) reultMap.get(followFlgType);
                     // 联系号码-事件采集项
                     String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     // 1为绑定公众号，0 为不绑定公众号
@@ -996,10 +996,6 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
-
-
-
-
 
 
                 //遍历活动
@@ -1022,7 +1018,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 Long mktCampaginId = (Long) activeMap.get("mktCampaginId");
                                 String type = (String) activeMap.get("type");
                                 List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
-                                Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId,type , privateParams, labelItems, evtTriggers, strategyMapList, o));
+                                Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId, type, privateParams, labelItems, evtTriggers, strategyMapList, o));
                                 //将线程处理结果添加到结果集
                                 threadList.add(f);
                             }
@@ -1045,7 +1041,7 @@ public class EventApiServiceImpl implements EventApiService {
                                         String type = (String) activeMap.get("type");
                                         List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                                         //线程参数
-                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId,type , privateParams, labelItems, evtTriggers, strategyMapList, o));
+                                        Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId, type, privateParams, labelItems, evtTriggers, strategyMapList, o));
                                         //将线程处理结果添加到结果集
                                         threadList.add(f);
                                     }
@@ -1069,7 +1065,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     List<Map<String, Object>> strategyMapList = (List<Map<String, Object>>) activeMap.get("strategyMapList");
                                     //线程参数
                                     //资产级
-                                    Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId, type, privateParams, labelItems, evtTriggers,strategyMapList, resultMapList.get(0)));
+                                    Future<Map<String, Object>> f = executorService.submit(new ActivityTask(map, mktCampaginId, type, privateParams, labelItems, evtTriggers, strategyMapList, resultMapList.get(0)));
                                     //将线程处理结果添加到结果集
                                     threadList.add(f);
                                 }
@@ -1096,12 +1092,12 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             if (map1.get("nonPassedMsg") != null) {
                                 Object nonPassedMsg1 = map1.get("nonPassedMsg");
-                                nonPassedMsg.putAll((Map<String, Object>)nonPassedMsg1);
+                                nonPassedMsg.putAll((Map<String, Object>) nonPassedMsg1);
                                 // flag = false;
                             }
                             if (flag) {
                                 // 命中活动
-                                if (future.get() != null && future.get().get("ruleList") != null ) {
+                                if (future.get() != null && future.get().get("ruleList") != null) {
                                     activityList.addAll((List<Map<String, Object>>) (future.get().get("ruleList")));
                                 }
                             }
@@ -1197,12 +1193,12 @@ public class EventApiServiceImpl implements EventApiService {
                 esJson.put("timeCost", cost);
                 esJson.put("hit", false);
                 esJson.put("success", true);
-                esJson.put("msg", "策略中心计算异常"+e.getMessage()+e.toString());
+                esJson.put("msg", "策略中心计算异常" + e.getMessage() + e.toString());
                 esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
 
                 //构造返回参数
                 result.put("CPCResultCode", "1000");
-                result.put("CPCResultMsg", "策略中心计算异常"+e.getMessage()+e.toString());
+                result.put("CPCResultMsg", "策略中心计算异常" + e.getMessage() + e.toString());
                 result.put("reqId", map.get("reqId"));
                 result.put("custId", custId);
                 return result;
@@ -1341,21 +1337,26 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
+/*
             boolean isBlack = checkBlackList(privateParams.get("accNbr"), type);
-            if(isBlack){
+            if (isBlack) {
                 Map<String, Object> nonPassedMsg = (Map<String, Object>) activityTaskResultMap.get("nonPassedMsg");
                 if (nonPassedMsg != null) {
                     nonPassedMsg.put("cam_" + activityId, "该资产已被黑名单过滤");
                 }
                 return activityTaskResultMap;
             }
+*/
 
-            if(StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)){
+            if (StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)) {
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
                 activityTaskResultMap = camApiSerService.ActivitySerTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
-            } else {
+            } else if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)) {
                 log.info("进入camApiService.ActivityTask");
                 activityTaskResultMap = camApiService.ActivityTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+            } else if (StatusCode.XIETONG_SCENE.getStatusCode().equals(type)) {
+                log.info("进入协同场景服务camApiSerService.ActivityXieTongTask");
+                activityTaskResultMap = camApiSerService.ActivityXieTongTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
             }
             return activityTaskResultMap;
         }
@@ -1469,7 +1470,7 @@ public class EventApiServiceImpl implements EventApiService {
         // 通过活动Id查询所有规则
         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignDO.getMktCampaignId());
         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {
-            if(ruleInitId.equals(mktStrategyConfRuleDO.getInitId())){
+            if (ruleInitId.equals(mktStrategyConfRuleDO.getInitId())) {
                 ruleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
                 break;
             }
@@ -2200,7 +2201,7 @@ public class EventApiServiceImpl implements EventApiService {
                     Map<String, Object> params = new HashMap<>();
                     params.put("strategyTypeList", strategyTypeList);
                     List<FilterRule> filterRuleList = new ArrayList<>();
-                    Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_STR_", mktCampaginId,  params);
+                    Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_STR_", mktCampaginId, params);
                     if (filterRuleRedis != null) {
                         filterRuleList = (List<FilterRule>) filterRuleRedis.get("FILTER_RULE_STR_" + mktCampaginId);
                     }
@@ -2226,7 +2227,7 @@ public class EventApiServiceImpl implements EventApiService {
                             dubboResult_F = yzServ.queryYz(JSON.toJSONString(param));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            log.error("queryYz查询失败："+e,JSON.toJSONString(dubboResult_F));
+                            log.error("queryYz查询失败：" + e, JSON.toJSONString(dubboResult_F));
                         }
                         try {
                             if ("0".equals(dubboResult_F.get("result_code").toString())) {
@@ -2279,7 +2280,7 @@ public class EventApiServiceImpl implements EventApiService {
                         Map<String, Object> params = new HashMap<>();
                         params.put("strategyTypeList", strategyTypeList);
                         List<FilterRule> filterRuleList = new ArrayList<>();
-                        Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_STR_", mktCampaginId,  params);
+                        Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_STR_", mktCampaginId, params);
                         if (filterRuleRedis != null) {
                             filterRuleList = (List<FilterRule>) filterRuleRedis.get("FILTER_RULE_STR_" + mktCampaginId);
                         }
@@ -2379,7 +2380,7 @@ public class EventApiServiceImpl implements EventApiService {
                 Map<String, Object> MktStrategyConfRedis = eventRedisService.getRedis("MKT_CAM_STRATEGY_", mktCampaginId);
                 List<MktStrategyConfDO> mktStrategyConfDOS = new ArrayList<>();
                 if (MktStrategyConfRedis != null) {
-                    mktStrategyConfDOS = ( List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_CAM_STRATEGY_" + mktCampaginId);
+                    mktStrategyConfDOS = (List<MktStrategyConfDO>) MktStrategyConfRedis.get("MKT_CAM_STRATEGY_" + mktCampaginId);
                 }
 
                 if (mktStrategyConfDOS == null) {
@@ -2566,7 +2567,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 List<String> mktCamCodeList = new ArrayList<>();
                 Map<String, Object> mktCamCodeListRedis = eventRedisService.getRedis("MKT_CAM_API_CODE_KEY");
-                if(mktCamCodeListRedis!=null){
+                if (mktCamCodeListRedis != null) {
                     mktCamCodeList = (List<String>) mktCamCodeListRedis.get("MKT_CAM_API_CODE_KEY");
                 }
 
@@ -2593,9 +2594,9 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMap.put("mktCampaignCustMap", mktCampaignCustMap);
 
             } catch (Exception e) {
-                log.info("预校验出错",e.getCause());
-                log.info("预校验出错",e.toString());
-                log.info("预校验出错",e.getMessage());
+                log.info("预校验出错", e.getCause());
+                log.info("预校验出错", e.toString());
+                log.info("预校验出错", e.getMessage());
                 e.printStackTrace();
             }
             return resultMap;
@@ -2743,7 +2744,7 @@ public class EventApiServiceImpl implements EventApiService {
                 for (MktCamEvtRel mktCamEvtRel : resultByEvent) {
                     if (campaignList.contains(mktCamEvtRel.getMktCampaignId().toString()) && !hasCust && mktCamEvtRel.getLevelConfig() == 1) {
                         hasCust = true;
-                    } else if(campaignList.contains(mktCamEvtRel.getMktCampaignId().toString()) && !hasProm && mktCamEvtRel.getLevelConfig() == 2){
+                    } else if (campaignList.contains(mktCamEvtRel.getMktCampaignId().toString()) && !hasProm && mktCamEvtRel.getLevelConfig() == 2) {
                         hasProm = true;
                     }
                 }
@@ -2755,7 +2756,7 @@ public class EventApiServiceImpl implements EventApiService {
                     if (campaignList.contains(ruleMap.get("campaignId").toString())) {
                         if ((Integer) ruleMap.get("levelConfig") == 1) {  // 客户级
                             custRuleIdList.add(ruleMap.get("ruleId").toString());
-                        } else if((Integer) ruleMap.get("levelConfig") == 2){ // 套餐级
+                        } else if ((Integer) ruleMap.get("levelConfig") == 2) { // 套餐级
                             packageRuleIdList.add(ruleMap.get("ruleId").toString());
                         } else {
                             assetRuleIdList.add(ruleMap.get("ruleId").toString());  // 资产级
@@ -2790,7 +2791,7 @@ public class EventApiServiceImpl implements EventApiService {
                 } else {
                     assetIdList.add(map.get("integrationId"));
                 }
-                if(hasProm){
+                if (hasProm) {
                     List<Map<String, Object>> accNbrMapList = getAccNbrList(map.get("accNbr"));
                     for (Map<String, Object> accNbrMap : accNbrMapList) {
                         String assetIntegId = (String) accNbrMap.get("ASSET_INTEG_ID");
@@ -2870,7 +2871,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 Map<String, Object> filterRuleListRedis = eventRedisService.getRedis("FILTER_RULE_LIST_", mktCampaignId.longValue());
                                 List<FilterRule> filterRuleList = new ArrayList<>();
                                 if (filterRuleListRedis != null) {
-                                    filterRuleList = (List<FilterRule>) filterRuleListRedis.get("FILTER_RULE_LIST_"+mktCampaignId);
+                                    filterRuleList = (List<FilterRule>) filterRuleListRedis.get("FILTER_RULE_LIST_" + mktCampaignId);
                                 }
 //                                List<FilterRule> filterRuleList = (List<FilterRule>) redisUtils.get("FILTER_RULE_LIST_" + mktCampaignId);
 //                                if (filterRuleList == null) {
@@ -2943,7 +2944,7 @@ public class EventApiServiceImpl implements EventApiService {
                             for (Map<String, Object> taskChlCountMap : taskChlCountList) {
                                 // taskChlCountMap.put("triggers", JSONArray.parse(JSONArray.toJSON(map.get("evtContent")).toString()));
                                 List<Map<String, Object>> triggersList = new ArrayList<>();
-                                if(evtContent!=null){
+                                if (evtContent != null) {
                                     for (Map.Entry entry : evtContent.entrySet()) {
                                         Map<String, Object> trigger = new HashMap<>();
                                         trigger.put("key", entry.getKey());
@@ -2980,6 +2981,8 @@ public class EventApiServiceImpl implements EventApiService {
                                         result.put("activityType", "1"); //服务
                                     } else if ("6000".equals(mktCampaignDO.getMktCampaignType())) {
                                         result.put("activityType", "2"); //随销
+                                    } else if ("7000".equals(mktCampaignDO.getMktCampaignType())) {
+                                        result.put("activityType", "3"); //协同场景
                                     } else {
                                         result.put("activityType", "0"); //活动类型 默认营销
                                     }
@@ -3069,7 +3072,7 @@ public class EventApiServiceImpl implements EventApiService {
             }
 
             // 根据offerInstId和statusCd查询offerProdInstRelId
-            if (mainOfferInstId!=null){
+            if (mainOfferInstId != null) {
                 CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
                 //            log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
                 if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
@@ -3103,12 +3106,12 @@ public class EventApiServiceImpl implements EventApiService {
     }
 
 
-
     /**
      * 计费短信合并功能 CPCP_JIFEI_CONTENT
+     *
      * @param labelItems
      */
-    private void cpcpJifeiContent(Map<String, String> labelItems, JSONObject evtParams){
+    private void cpcpJifeiContent(Map<String, String> labelItems, JSONObject evtParams) {
         StringBuilder content = new StringBuilder();
         String usedFlow = "";
         String totalFlow = "";
@@ -3155,12 +3158,12 @@ public class EventApiServiceImpl implements EventApiService {
      * 判断资产号码是否在黑名单中
      *
      * @param accNbr 资产号码
-     * @param type 活动类型
+     * @param type   活动类型
      * @return
      */
-    private boolean checkBlackList(String accNbr, String type){
+    private boolean checkBlackList(String accNbr, String type) {
         BlackListDO blackListDO = new BlackListDO();
-        if(StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)){
+        if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)) {
             blackListDO.setMaketingCate("1");  // 营销类活动
         } else {
             blackListDO.setServiceCate("1");   // 服务类活动
