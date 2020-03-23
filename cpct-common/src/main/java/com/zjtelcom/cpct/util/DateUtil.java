@@ -566,6 +566,24 @@ public class DateUtil {
      *
      * @return
      */
+    public static Date string2DateTimeAll(String stringDate) {
+        if (stringDate != null && !stringDate.equals("")) {
+            try {
+                Date date = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(stringDate);
+                return date;
+            } catch (ParseException var3) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 字符转日期
+     *
+     * @return
+     */
     public static Date string2DateTime4Minute(String stringDate) {
         if (stringDate != null && !stringDate.equals("")) {
             try {
