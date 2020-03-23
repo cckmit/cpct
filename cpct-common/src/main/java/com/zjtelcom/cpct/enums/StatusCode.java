@@ -47,6 +47,7 @@ public enum StatusCode {
     VALUE_ADDED_SERVICE_CAMPAIGN("增值业务活动", "4000"),
     SERVICE_CAMPAIGN("服务活动", "5000"),
     SERVICE_SALES_CAMPAIGN("服务随销活动", "6000"),
+    XIETONG_SCENE("协同场景", "7000"),
 
     /*活动周期性*/
     ONE_TIME("一次性", "1000"),
