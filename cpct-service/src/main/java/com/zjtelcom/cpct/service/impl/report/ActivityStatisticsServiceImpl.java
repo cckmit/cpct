@@ -1264,7 +1264,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
         Map<String, Object> stringObjectMap = new HashMap<>();
         try {
-            stringObjectMap = null;//iReportService.queryEventOrder(paramMap);
+            stringObjectMap = iReportService.queryEventOrder(paramMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1307,7 +1307,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         Map<String, Object> stringObjectMap = new HashMap<>();
         try {
-            stringObjectMap = null ;//iReportService.queryRptEventOrderChl(paramMap);
+            stringObjectMap = iReportService.queryRptEventOrderChl(paramMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
