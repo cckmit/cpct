@@ -2,7 +2,7 @@ package com.zjtelcom.cpct.service.blacklist;
 
 import java.util.Map;
 
-public interface BlackListService {
+public interface BlackListCpctService {
 
     Map<String, Object> exportBlackListFile();
 

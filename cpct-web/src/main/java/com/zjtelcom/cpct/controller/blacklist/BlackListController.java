@@ -1,9 +1,7 @@
 package com.zjtelcom.cpct.controller.blacklist;
 
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.service.blacklist.BlackListService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +13,7 @@ import java.util.Map;
 public class BlackListController extends BaseController {
 
     @Autowired
-    private BlackListService blackListService;
+    private BlackListCpctService blackListCpctService;
 
     /**
      * 导出黑名单
@@ -27,7 +25,7 @@ public class BlackListController extends BaseController {
     public Map<String, Object> export(){
         Map<String, Object> result = new HashMap<>();
         try {
-            result = blackListService.exportBlackListFile();
+            result = blackListCpctService.exportBlackListFile();
         } catch (Exception e) {
             logger.error("[op:BlackListController] fail to exportBlackListFile",e);
         }
@@ -45,7 +43,7 @@ public class BlackListController extends BaseController {
     public Map<String, Object> importBlackList(){
         Map<String, Object> result = new HashMap<>();
         try {
-            result = blackListService.importBlackListFile();
+            result = blackListCpctService.importBlackListFile();
         } catch (Exception e) {
             logger.error("[op:BlackListController] fail to importBlackListFile",e);
         }
