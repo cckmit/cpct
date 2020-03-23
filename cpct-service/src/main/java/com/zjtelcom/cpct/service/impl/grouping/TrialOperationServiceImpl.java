@@ -1430,7 +1430,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         int x = customerList.size() / 1000;
-        for (int i = 0; i <= x; i++) {
+        for (int i = 1; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
             if (i == x) {
                 newSublist = customerList.subList(0, customerList.size());
