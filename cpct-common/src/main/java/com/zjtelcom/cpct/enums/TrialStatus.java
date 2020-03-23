@@ -31,8 +31,8 @@ public enum TrialStatus {
 
     UPLOAD_GOING("7000", "下发中"),
     UPLOAD_SUCCESS("8000","下发成功"),
-    UPLOAD_FAIL("9000","下发失败");
-
+    UPLOAD_FAIL("9000","下发失败"),
+    UPLOAD_EXPIRED("9191","批次失效");
 
     private String value;
     private String name;
