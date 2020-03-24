@@ -69,7 +69,7 @@ public class TimeoutMonitoringAOP {
         Integer x = 0;
         String name = joinPoint.getSignature().getName();
         // 告警信息存入redis中
-        String value = redisUtils.hget(timeOutMonitoring, name);
+        String value = redisUtils.hget(timeOutMonitoring, name).toString();
         if (value != null) {
             x = Integer.valueOf(value);
         }

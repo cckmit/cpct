@@ -41,17 +41,23 @@ public class RedisUtils {
         }
     }*/
 
-    public String hget(String key,String field){
-        ProxyJedis jedis = new ProxyJedis();
+    public Object hget(final String key, String filed) {
+        Object result = null;
         try {
-            jedis = ctgJedisPool.getResource();
-            return jedis.hget(key, field) ;
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                String resultString = jedis.hget(key, filed);
+                result = unserizlize(resultString);
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        }finally{
-            jedis.close();
         }
+        return result;
     }
 
 
