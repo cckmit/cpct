@@ -53,7 +53,7 @@ public class TimeoutMonitoringAOP {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void scheduledReset() {
-        map.clear();
+        redisUtils.del(timeOutMonitoring);
     }
 
     @Pointcut("@annotation(com.zjtelcom.cpct.service.annotations.InterfaceTimeoutMonitoring)")
@@ -69,16 +69,9 @@ public class TimeoutMonitoringAOP {
         Integer x = 0;
         String name = joinPoint.getSignature().getName();
         // 告警信息存入redis中
-        Object object = redisUtils.hgetAllRedisList(timeOutMonitoring);
-        if (object != null && object != "") {
-            List<Map<String, Object>> list = (List<Map<String, Object>>) object;
-            for (Map<String, Object> stringObjectMap : list) {
-                for (String key : stringObjectMap.keySet()) {
-                    if (key.equals(name)) {
-                        x = Integer.valueOf(stringObjectMap.get(name).toString());
-                    }
-                }
-            }
+        String value = redisUtils.hget(timeOutMonitoring, name);
+        if (value != null) {
+            x = Integer.valueOf(value);
         }
         long end = System.currentTimeMillis();
         long time = end - start;
@@ -96,7 +89,6 @@ public class TimeoutMonitoringAOP {
                     JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(array));
                     String s = uccpService.sendShortMessage(jsonObject.get("phone").toString(), sendContent, jsonObject.get("lanId").toString());
                     if (null != null && !"".equals(s)) {
-                        //map.put(name, map.get(name) == null ? 1 : (map.get(name) + 1));
                         redisUtils.hset(timeOutMonitoring, name, x == null ? 1 : x + 1);
                     }
                 }
