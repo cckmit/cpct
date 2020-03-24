@@ -62,6 +62,7 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.es.es.service.EsService;
 import org.apache.commons.lang.math.NumberUtils;
@@ -740,8 +741,6 @@ public class EventApiServiceImpl implements EventApiService {
                     Map<String, Object> assetLabelMap = getAssetAndPromLabel(mktAllLabel, map, privateParams, context, esJson, labelItems);
                     if (assetLabelMap != null) {
                         reultMap.putAll(assetLabelMap);
-                    } else {
-                        return null;
                     }
                     resultMapList.add(reultMap);
                 }
@@ -756,11 +755,6 @@ public class EventApiServiceImpl implements EventApiService {
                         esJson.put("msg", "客户级活动，事件采集项未包含客户编码");
                         esHitService.save(esJson, IndexList.EVENT_MODULE, map.get("reqId"));
                         log.error("采集项未包含客户编码:" + map.get("reqId"));
-                        //事件采集项没有客户编码
-                        result.put("CPCResultCode", "1000");
-                        result.put("CPCResultMsg", "采集项未包含客户编码");
-                        return result;
-
                     }
                     ExecutorService executor = Executors.newCachedThreadPool();
                     JSONObject param = new JSONObject();
@@ -1050,9 +1044,9 @@ public class EventApiServiceImpl implements EventApiService {
                         } else {
                             //资产级
                             for (DefaultContext<String, Object> o : resultMapList) {
-                                String assetId = o.get("integrationId").toString();
+                                String assetId = o.get("integrationId")==null ? "" : o.get("integrationId").toString() ;
                                 // 判断资产编码是否与接入的一致
-                                if (assetId.equals(map.get("integrationId"))) {
+                                if (assetId.equals(map.get("integrationId")==null? "" : map.get("integrationId"))) {
                                     Map<String, String> privateParams = new HashMap<>();
                                     privateParams.put("isCust", "1"); //是否是客户级
                                     privateParams.put("accNbr", map.get("accNbr"));
@@ -1463,6 +1457,7 @@ public class EventApiServiceImpl implements EventApiService {
         Map<String, Object> result = new HashMap();
         Long activityInitId = Long.valueOf((String) params.get("activityId"));
         Long ruleInitId = Long.valueOf((String) params.get("ruleId"));
+        String sourceChannel = MapUtil.getString(params.get("sourceChannel"));
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(activityInitId);
         Long activityId = mktCampaignDO.getMktCampaignId();
 
@@ -1516,6 +1511,9 @@ public class EventApiServiceImpl implements EventApiService {
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
+                    if (mktCamChlResultDO==null || !sourceChannel.equals(mktCamChlResultDO.getSourceChannelId()==null ? "" : mktCamChlResultDO.getSourceChannelId())){
+                        continue;
+                    }
                     if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
                         // 查询推送渠道
                         List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOS = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());

@@ -156,6 +156,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Autowired
     private MktDttsLogService mktDttsLogService;
 
+
 //    private String ftpAddress = "134.108.3.130";
     private String ftpAddress = "134.108.0.93";
     private int ftpPort = 22;
@@ -1429,9 +1430,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         int x = customerList.size() / 1000;
-        for (int i = 0; i <= x; i++) {
+        if (customerList.size() % 1000 > 0) {
+            x++;
+        }
+        for (int i = 1; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
-            if (i == x) {
+            if (i == x ) {
                 newSublist = customerList.subList(0, customerList.size());
             } else {
                 newSublist = customerList.subList(0, 1000);
@@ -2046,10 +2050,17 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
-        List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", operationDetailList);
+        List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
+        if (strategyIdList!=null){
+            List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", operationDetailList);
+        }else {
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "strategyIdList isEmpty");
+        }
+//        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
         return result;
     }
 
@@ -2095,7 +2106,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      * @param isSample
      * @return
      */
-    private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample,List<TarGrpCondition> conditions) {
+    @Override
+    public TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample,List<TarGrpCondition> conditions) {
         TrialOperationParamES param = new TrialOperationParamES();
         param.setRuleId(ruleId);
         MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);

@@ -87,16 +87,20 @@ public class ProjectManageServiceImpl implements ProjectManageService{
     @Override
     public Map<String, Object> updateProjectPcState(Long mktCampaginId) {
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String, Object> params = new HashMap<>();
-        List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
-        params.put("state", "0");
-        getCreater(params);
-        for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
-            params.put("policyId", mktStrategyConfDO.getInitId());
-            logger.info("updateProjectPcState接口入参：" + JSON.toJSONString(params));
-            // 调用系统中心dubbo接口 - 4.19派单活动状态修改接口
-            resultMap = iCpcAPIService.updateProjectPcState(params);
-            logger.info("updateProjectPcState接口出参：" + JSON.toJSONString(resultMap));
+        try {
+            Map<String, Object> params = new HashMap<>();
+            List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
+            params.put("state", "0");
+            getCreater(params);
+            for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
+                params.put("policyId", mktStrategyConfDO.getInitId());
+                logger.info("updateProjectPcState接口入参：" + JSON.toJSONString(params));
+                // 调用系统中心dubbo接口 - 4.19派单活动状态修改接口
+                resultMap = iCpcAPIService.updateProjectPcState(params);
+                logger.info("updateProjectPcState接口出参：" + JSON.toJSONString(resultMap));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return resultMap;
     }

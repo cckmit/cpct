@@ -22,7 +22,7 @@ import com.zjtelcom.cpct.dubbo.model.MktCampaignResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrConfRuleResp;
 import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
-import com.zjtelcom.cpct.dubbo.service.MktCampaignApiOutService;
+import com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;

@@ -56,10 +56,11 @@
     select GRP_ID, GRP_NAME, GRP_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE,
     STATUS_DATE, UPDATE_DATE, REMARK
     from injection_label_grp
-    where 1=1
+    <where>1!=2
     <if test="grpName !=null and grpName != ''">
       and GRP_NAME LIKE CONCAT(CONCAT('%',#{grpName}),'%')
     </if>
+    </where>
     order by UPDATE_DATE desc
   </select>
 
