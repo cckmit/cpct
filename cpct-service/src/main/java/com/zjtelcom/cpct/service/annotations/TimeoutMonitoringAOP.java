@@ -1,6 +1,14 @@
 package com.zjtelcom.cpct.service.annotations;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.sun.deploy.panel.ITreeNode;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
+import com.zjtelcom.cpct.service.system.SysParamsService;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.poi.hssf.record.cf.Threshold;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -8,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Aspect
@@ -17,8 +27,19 @@ public class TimeoutMonitoringAOP {
 
     @Autowired
     private UCCPService uccpService;
+    @Autowired
+    private SysParamsService sysParamsService;
+    @Autowired
+    private RedisUtils redisUtils;
 
-    final String TimeoutMonitoring = "SYSTEM_TIMEOUT_MONITORING";
+    // 系统接口超时监控
+    final String timeOutMonitoring = "SYSTEM_TIMEOUT_MONITORING";
+    // 接口超时阀值
+    final String timeOutThreshold = "TIMEOUT_THRESHOLD";
+    // 告警短信发送次数阀值
+    final String msgSendThreshold = "WARNINGMSG_SENDT_THRESHOLD";
+    // 告警短信发送人
+    final String msgRecipient = "WARNING_MSG_RECIPIENT";
 
     /**
      * map全局
@@ -32,7 +53,7 @@ public class TimeoutMonitoringAOP {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void scheduledReset() {
-        map = null;
+        map.clear();
     }
 
     @Pointcut("@annotation(com.zjtelcom.cpct.service.annotations.InterfaceTimeoutMonitoring)")
@@ -45,16 +66,39 @@ public class TimeoutMonitoringAOP {
 
     @AfterReturning("@annotation(interfaceTimeoutMonitoring)")
     public void endMonitoring(ProceedingJoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring) {
+        Integer x = 0;
+        String name = joinPoint.getSignature().getName();
+        // 告警信息存入redis中
+        Object object = redisUtils.hgetAllRedisList(timeOutMonitoring);
+        if (object != null && object != "") {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) object;
+            for (Map<String, Object> stringObjectMap : list) {
+                for (String key : stringObjectMap.keySet()) {
+                    if (key.equals(name)) {
+                        x = Integer.valueOf(stringObjectMap.get(name).toString());
+                    }
+                }
+            }
+        }
         long end = System.currentTimeMillis();
         long time = end - start;
-        String name = joinPoint.getSignature().getName();
+        String timeOut = redisUtils.getRedisOrSysParams(timeOutThreshold);
+        long l = Long.valueOf(timeOut) * 1000;
+        String msgSend = redisUtils.getRedisOrSysParams(msgSendThreshold);
+        Integer i = Integer.valueOf(msgSend);
         // key为当前切入的方法名
-        if (interfaceTimeoutMonitoring.timeout() < time && map.get(name) == null ? true : (map.get(name) < 3 ? true : false)) {
+        if (l < time && x == null ? true : (x < i ? true : false)) {
             try {
-                String sendContent = name + "方法调用超时，请前往查看！";
-                String s = uccpService.sendShortMessage("15355003610", sendContent, "571");
-                if (null != null && !"".equals(s)) {
-                    map.put(name, map.get(name) == null ? 1 : (map.get(name) + 1));
+                String sendContent = name + "方法在" + DateUtil.date2StringDate(new Date()) + "调用超时，用时" + time + "毫秒，请前往查看！";
+                String recipient = redisUtils.getRedisOrSysParams(msgRecipient);
+                JSONArray jsonArray = JSONArray.parseArray(recipient);
+                for (Object array : jsonArray) {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(array));
+                    String s = uccpService.sendShortMessage(jsonObject.get("phone").toString(), sendContent, jsonObject.get("lanId").toString());
+                    if (null != null && !"".equals(s)) {
+                        //map.put(name, map.get(name) == null ? 1 : (map.get(name) + 1));
+                        redisUtils.hset(timeOutMonitoring, name, x == null ? 1 : x + 1);
+                    }
                 }
             }catch (Exception e) {
                 e.printStackTrace();
