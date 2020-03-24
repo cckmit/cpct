@@ -65,7 +65,7 @@ public class TimeoutMonitoringAOP {
     }
 
     @AfterReturning("@annotation(interfaceTimeoutMonitoring)")
-    public void endMonitoring(ProceedingJoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring) {
+    public void endMonitoring(JoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring) {
         Integer x = 0;
         String name = joinPoint.getSignature().getName();
         // 告警信息存入redis中
