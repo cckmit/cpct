@@ -2129,10 +2129,10 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             });
             // 获取事件中配置的前TopCampaignNum个活动
-            if (event == null || (event != null && event.getTopCampaignNum() == null)) {
+            if (event == null || (event != null && (event.getTopCampaignNum() == null || event.getTopCampaignNum() == 0))) {
                 mktCampaginIdList.addAll(mktCampaginIds);
             } else {
-                for (int i = 0; i < event.getTopCampaignNum() ; i++) {
+                for (int i = 0; i < mktCampaginIds.size() && i < event.getTopCampaignNum(); i++) {
                     mktCampaginIdList.add(mktCampaginIds.get(i));
                 }
             }
