@@ -1283,7 +1283,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                if(mktCamChlConfAttr.getAttrValue()!= null){
+                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                }
                 taskChlAttrList.add(taskChlAttr);
             } else if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
                 taskChlAttr = new ConcurrentHashMap<>();
@@ -1299,7 +1301,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    if(mktCamChlConfAttr.getAttrValue()!= null){
+                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    }
                     taskChlAttrList.add(taskChlAttr);
                 }
             } else if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
@@ -1310,7 +1314,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    if(mktCamChlConfAttr.getAttrValue()!= null){
+                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    }
                     taskChlAttrList.add(taskChlAttr);
                 }
             } else if (mktCamChlConfAttr.getAttrId() == 500600010008L) {  //获取调查问卷ID
