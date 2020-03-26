@@ -39,10 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
@@ -162,7 +159,14 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
         Map<String, Object> map = new HashMap<>();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
-        for (ContactEvt evt : contactEvtList){
+        Iterator<ContactEvt> iterator = contactEvtList.iterator();
+        while (iterator.hasNext()){
+            ContactEvt evt = iterator.next();
+            // 如果当前事件的实际关联活动数大于允许的最大关联数，则列表页面不显示该事件
+            int i = contactEvtMapper.selectEvtContactCamCount(evt.getContactEvtId());
+            if (evt.getTopCampaignNum() == null ? false : evt.getTopCampaignNum() > i ? false : true) {
+                contactEvtList.remove(evt);
+            }
             ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(evt.getContactEvtTypeId());
             if (evtType!=null){
                 evt.setContactEvtTypeName(evtType.getContactEvtName());

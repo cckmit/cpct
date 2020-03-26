@@ -1172,8 +1172,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     relationCamList.add(rel.getMktCampaignId());
                 }
             }
-            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
             PageHelper.startPage(1, 50);
+            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(MktCampaignPar);
             Page pageInfo = new Page(new PageInfo(mktCampaignDOList));
             List<CampaignVO> voList = new ArrayList<>();
             for (MktCampaignDO campaignDO : mktCampaignDOList) {
@@ -1941,15 +1941,18 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
                     //派单活动状态修改接口
+                    try {
                     List<TrialOperation> trialOperations = trialOperationMapper.listOperationByCamIdAndStatusCd(mktCampaignId, TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue());
-                    if (trialOperations != null && trialOperations.size() > 0) {
-                        projectManageService.updateProjectPcState(mktCampaignId);
+                        if (trialOperations != null && trialOperations.size() > 0) {
+                            projectManageService.updateProjectPcState(mktCampaignId);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
 
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
-
                 try {
                     campaignRedisChane(mktCampaignId);
                 } catch (Exception e) {
@@ -1958,13 +1961,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
                 try {
                     eventRedisService.deleteByCampaign(mktCampaignId);
-                    logger.error("【活动缓存清理成功】："+mktCampaignDO.getMktCampaignName());
+                    logger.info("【活动缓存清理成功】："+mktCampaignDO.getMktCampaignName());
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
                 // 对象转换
-                Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
                     new Thread() {
@@ -1972,6 +1974,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         public void run() {
                             try {
                                 try {
+//                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
 //                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
 //                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
                                 }catch (Exception e) {
@@ -2025,6 +2028,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("[op:changeMktCampaignStatus] 修改活动状态statusCd = {}失败,Exception = ", statusCd, e);
             if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
                 maps.put("resultMsg", ErrorCode.STATUS_CODE_PUBLISHED_FAILURE.getErrorMsg());

@@ -9,6 +9,7 @@ import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboSe
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.open.base.service.BaseService;
+import com.zjtelcom.cpct.open.entity.event.OpenEvent;
 import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
@@ -37,6 +38,28 @@ public class UCCPServiceImpl extends BaseService implements UCCPService {
     private String password;
     @Value("${uccp.sceneId}")
     private String sceneId;
+
+    // 发送短信给集团事件承接人、业务负责人员以及运维人员
+    @Override
+    public void sendShortMessage4GroupEventRecipient(OpenEvent openEvent) {
+        try {
+            List<Map<String, String>> group_campaign_recipient = sysParamsMapper.listParamsByKey("GROUP_CAMPAIGN_RECIPIENT");
+            logger.info("【获取承接人信息】"+JSON.toJSONString(group_campaign_recipient));
+            for (Map<String, String> stringStringMap : group_campaign_recipient) {
+                String value = stringStringMap.get("value");
+                JSONArray jsonArray = JSONArray.parseArray(value);
+                for (Object array : jsonArray) {
+                    JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(array));
+                    String content = "[" + openEvent.getEventName() + "]集团事件已下发，请尽快登陆系统处理。";
+                    String resultMsg = sendShortMessage(jsonObject.get("phone").toString(), content, jsonObject.get("lanId").toString());
+                    logger.info("uccp=======================================");
+                    logger.info(resultMsg);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     // 发送短信给集团活动承接人、业务负责人员以及运维人员
     @Override

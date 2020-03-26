@@ -25,4 +25,5 @@ public interface MktStrategyConfMapper {
 
     List<MktStrategyConfDO> selectByIdList(@Param("idList")List<String> idList);
 
+    List<String> selectByIdForInitId(Long strategyId);
 }

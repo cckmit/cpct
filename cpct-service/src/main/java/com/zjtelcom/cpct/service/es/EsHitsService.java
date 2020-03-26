@@ -22,4 +22,8 @@ public interface EsHitsService {
 
     List<Map<String, Object> > search(List<String> assetList);
 
+    Map<String,Object> getCustomer(Map<String, String> params);
+
+    Map<String,Object> getCustomerByCustId(Map<String, String> params);
+
 }

@@ -126,13 +126,14 @@
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
-        where 1 = 1
+        <where>1!=2
         <if test="closeName != null and closeName != ''">
             AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
         </if>
         <if test="closeType != null and closeType != ''">
             AND CLOSE_TYPE = #{closeType}
         </if>
+        </where>
         ORDER BY RULE_ID DESC
     </select>
 
@@ -233,7 +234,7 @@
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,CLOSE_CODE
         from close_rule
-        where 1 = 1
+        <where>1!=2
         <if test="chooseProduct != null and chooseProduct != ''">
             AND CHOOSE_PRODUCT like concat('%',concat(#{chooseProduct},'%'))
         </if>
@@ -241,6 +242,7 @@
             AND PRODUCT_TYPE = #{executionChannel}
         </if>
         AND CLOSE_TYPE = #{filterType}
+        </where>
         ORDER BY UPDATE_DATE DESC
     </select>
 
@@ -281,7 +283,7 @@
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
-        where 1 = 1
+        <where>1!=2
         <if test="closeName != null and closeName != ''">
             AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
         </if>
@@ -291,6 +293,7 @@
         <if test="staffId != null and staffId != ''">
             AND CREATE_STAFF = #{staffId}
         </if>
+        </where>
         ORDER BY RULE_ID DESC
     </select>
 
@@ -302,7 +305,7 @@
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
         DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
-        where 1 = 1
+        <where>1!=2
         <if test="closeName != null and closeName != ''">
             AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
         </if>
@@ -314,6 +317,7 @@
                 AND CLOSE_TYPE NOT IN (1000,3000)
             </otherwise>
         </choose>
+        </where>
         ORDER BY RULE_ID DESC
     </select>
 

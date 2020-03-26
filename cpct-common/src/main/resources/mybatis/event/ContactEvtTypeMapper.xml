@@ -65,13 +65,14 @@
         select EVT_TYPE_ID, EVT_TYPE_NBR, EVT_TYPE_NAME, PAR_EVT_TYPE_ID, EVT_TYPE_DESC,
         STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_type
-        where 1 = 1
+        <where>1!=2
         <if test="evtTypeId != null and evtTypeId != ''">
             and EVT_TYPE_ID = #{evtTypeId}
         </if>
         <if test="parEvtTypeId != null and parEvtTypeId != ''">
             and PAR_EVT_TYPE_ID = #{parEvtTypeId}
         </if>
+        </where>
     </select>
 
     <insert id="createContactEvtType" parameterType="com.zjtelcom.cpct.dto.event.ContactEvtType"  keyProperty="evtTypeId" useGeneratedKeys="true">
@@ -117,7 +118,7 @@
         select EVT_TYPE_ID, EVT_TYPE_NBR, EVT_TYPE_NAME, PAR_EVT_TYPE_ID, EVT_TYPE_DESC,
         STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_type
-        where 1 = 1
+        <where>1!=2
         <if test="evtTypeId != null and evtTypeId != 0">
             and EVT_TYPE_ID = #{evtTypeId}
         </if>
@@ -133,6 +134,7 @@
         <if test="statusCd != null and statusCd != ''">
             and STATUS_CD = #{statusCd}
         </if>
+        </where>
     </select>
 
     <select id="listByEvtTypeName" resultMap="BaseResultMap">

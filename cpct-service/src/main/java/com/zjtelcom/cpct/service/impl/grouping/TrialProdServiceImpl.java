@@ -46,6 +46,7 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
+import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
@@ -154,6 +155,8 @@ public class TrialProdServiceImpl implements TrialProdService {
     private CloseRuleMapper closeRuleMapper;
     @Autowired
     private MktDttsLogService mktDttsLogService;
+    @Autowired
+    private TrialOperationService trialOperationService;
 
     /**
      * 提供dtts定时任务清单存入es
@@ -262,6 +265,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             label.put("code", labelDTOList.get(i).getLabelCode());
             label.put("name", labelDTOList.get(i).getInjectionLabelName());
             label.put("labelType", labelDTOList.get(i).getLabelType());
+            label.put("displayType",labelDTOList.get(i).getLabelDisplayType());
             label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
@@ -325,7 +329,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         List<MktStrategyConfRuleRelDO> ruleRelList = ruleRelMapper.selectByMktStrategyConfId(request.getStrategyId());
         for (MktStrategyConfRuleRelDO ruleRelDO : ruleRelList) {
             TrialOperationParamES param = getTrialOperationParamES(request, trialOperation.getBatchNum(), ruleRelDO.getMktStrategyConfRuleId(), false);
-            List<LabelResultES> labelResultList = param.getLabelResultList();
             paramList.add(param);
         }
         requests.setParamList(paramList);
@@ -370,7 +373,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         return codeNumber;
     }
 
-
     /**
      * 下发参数
      * @param operationVO
@@ -380,204 +382,7 @@ public class TrialProdServiceImpl implements TrialProdService {
      * @return
      */
     private TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample) {
-        TrialOperationParamES param = new TrialOperationParamES();
-        param.setRuleId(ruleId);
-        MktStrategyConfRuleDO confRule = ruleMapper.selectByPrimaryKey(ruleId);
-        if (confRule != null) {
-            param.setRuleName(confRule.getMktStrategyConfRuleName());
-            param.setTarGrpId(confRule.getTarGrpId());
-        }
-        if (!isSample){
-            // 获取规则信息
-            Map<String, Object> mktStrategyConfRuleMap = mktStrategyConfRuleService.getMktStrategyConfRule(ruleId);
-            MktStrategyConfRule mktStrategyConfRule = (MktStrategyConfRule) mktStrategyConfRuleMap.get("mktStrategyConfRule");
-
-            // 获取销售品集合
-            Map<String, Object> productRuleListMap = productService.getProductRuleList(UserUtil.loginId(), mktStrategyConfRule.getProductIdlist());
-            List<MktProductRule> mktProductRuleList = (List<MktProductRule>) productRuleListMap.get("resultMsg");
-            ArrayList<MktProductRuleES> mktProductRuleEsList = new ArrayList<>();
-            for (MktProductRule rule : mktProductRuleList){
-                MktProductRuleES es = BeanUtil.create(rule,new MktProductRuleES());
-                es.setPriority(es.getPriority()==null ? 0L : es.getPriority());
-                mktProductRuleEsList.add(es);
-            }
-            param.setMktProductRuleList(mktProductRuleEsList);
-
-            // 获取推送渠道
-            List<MktCamChlConfDetail> mktCamChlConfDetailList = new ArrayList<>();
-            ArrayList<MktCamChlConfDetailES> mktCamChlConfDetaiEslList = new ArrayList<>();
-            List<MktCamChlConfDetail> mktCamChlConfList = mktStrategyConfRule.getMktCamChlConfDetailList();
-            if(mktStrategyConfRule.getMktCamChlResultList()!=null){
-                for (MktCamChlResult mktCamChlResult:mktStrategyConfRule.getMktCamChlResultList()) {
-                    if(mktCamChlResult.getMktCamChlConfDetailList()!=null){
-                        for (MktCamChlConfDetail mktCamChlConfDetail : mktCamChlResult.getMktCamChlConfDetailList()) {
-                            mktCamChlConfList.add(mktCamChlConfDetail);
-                        }
-                    }
-                }
-            }
-            if (mktCamChlConfList != null) {
-                for (MktCamChlConfDetail mktCamChlConf : mktCamChlConfList) {
-                    Map<String, Object> mktCamChlConfDetailMap = mktCamChlConfService.getMktCamChlConf(mktCamChlConf.getEvtContactConfId());
-                    MktCamChlConfDetail mktCamChlConfDetail = (MktCamChlConfDetail) mktCamChlConfDetailMap.get("mktCamChlConfDetail");
-                    MktCamChlConfDetailES es = BeanUtil.create(mktCamChlConfDetail,new MktCamChlConfDetailES());
-                    CamScriptES camScriptES = BeanUtil.create(mktCamChlConfDetail.getCamScript(),new CamScriptES());
-                    es.setCamScript(camScriptES);
-                    ArrayList<MktCamChlConfAttrES> attrs = new ArrayList<>();
-                    ArrayList<VerbalVOES> verbalES = new ArrayList<>();
-                    if (mktCamChlConfDetail.getMktCamChlConfAttrList()!=null){
-                        for (MktCamChlConfAttr attr : mktCamChlConfDetail.getMktCamChlConfAttrList()){
-                            MktCamChlConfAttrES attrES = BeanUtil.create(attr,new MktCamChlConfAttrES());
-                            attrs.add(attrES);
-                        }
-                    }
-                    if (mktCamChlConfDetail.getVerbalVOList()!=null){
-                        for (VerbalVO verbalVO : mktCamChlConfDetail.getVerbalVOList()){
-                            VerbalVOES verbalVOES = BeanUtil.create(verbalVO,new VerbalVOES());
-                            verbalES.add(verbalVOES);
-                        }
-                    }
-                    es.setVerbalVOList(verbalES);
-                    es.setMktCamChlConfAttrList(attrs);
-                    mktCamChlConfDetaiEslList.add(es);
-                }
-            }
-            param.setMktCamChlConfDetailList(mktCamChlConfDetaiEslList);
-        }
-        // 设置批次号
-        param.setBatchNum(batchNum);
-        //redis取规则
-        String rule = "";
-        List<LabelResult> labelResultList = new ArrayList<>();
-        ArrayList<LabelResultES> labelResultES = new ArrayList<>();
-
-        //获取规则
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        try {
-            MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
-            if (ruleDO!=null){
-                Future<Map<String, Object>> future = executorService.submit(new TarGrpRuleTask(operationVO.getCampaignId(),operationVO.getStrategyId(), ruleDO));
-                rule = future.get().get("express").toString();
-                labelResultList = ( List<LabelResult>)future.get().get("labelResultList");
-            }
-            // 关闭线程池
-            if (!executorService.isShutdown()) {
-                executorService.shutdown();
-            }
-        }catch (Exception e){
-            // 关闭线程池
-            if (!executorService.isShutdown()) {
-                executorService.shutdown();
-            }
-        }
-        System.out.println("*************************" + rule);
-        param.setRule(rule);
-        for (LabelResult labelResult : labelResultList){
-            LabelResultES labelEs = BeanUtil.create(labelResult,new LabelResultES());
-            labelResultES.add(labelEs);
-        }
-        param.setLabelResultList(labelResultES);
-        return param;
-    }
-
-    class TarGrpRuleTask implements Callable<Map<String,Object>> {
-        private Long mktCampaignId;
-
-        private Long mktStrategyConfId;
-
-        private MktStrategyConfRuleDO mktStrategyConfRuleDO;
-
-
-        public TarGrpRuleTask(Long mktCampaignId, Long mktStrategyConfId, MktStrategyConfRuleDO mktStrategyConfRuleDO) {
-            this.mktCampaignId = mktCampaignId;
-            this.mktStrategyConfId = mktStrategyConfId;
-            this.mktStrategyConfRuleDO = mktStrategyConfRuleDO;
-        }
-
-        @Override
-        public Map<String, Object> call() {
-            Map<String, Object> result = new HashMap<>();
-            // 策略配置规则Id
-            Long mktStrategyConfRuleId = mktStrategyConfRuleDO.getMktStrategyConfRuleId();
-            //  2.判断活动的客户分群规则---------------------------
-            //查询分群规则list
-            Long tarGrpId = mktStrategyConfRuleDO.getTarGrpId();
-            List<TarGrpCondition> tarGrpConditionDOs = tarGrpConditionMapper.listTarGrpCondition(tarGrpId);
-            List<LabelResult> labelResultList = new ArrayList<>();
-            List<String> codeList = new ArrayList<>();
-
-            StringBuilder express = new StringBuilder();
-            if (tarGrpId != null && tarGrpId != 0) {
-                //将规则拼装为表达式
-                if (tarGrpConditionDOs != null && tarGrpConditionDOs.size() > 0) {
-                    express.append("if(");
-                    //遍历所有规则
-                    for (int i = 0; i < tarGrpConditionDOs.size(); i++) {
-                        LabelResult labelResult = new LabelResult();
-                        String type = tarGrpConditionDOs.get(i).getOperType();
-                        Label label = injectionLabelMapper.selectByPrimaryKey(Long.parseLong(tarGrpConditionDOs.get(i).getLeftParam()));
-                        if (label==null){
-                            continue;
-                        }
-                        labelResult.setLabelCode(label.getInjectionLabelCode());
-                        labelResult.setLabelName(label.getInjectionLabelName());
-                        labelResult.setRightOperand(label.getLabelType());
-                        labelResult.setRightParam(tarGrpConditionDOs.get(i).getRightParam());
-                        labelResult.setClassName(label.getClassName());
-                        labelResult.setOperType(type);
-                        labelResult.setLabelDataType(label.getLabelDataType()==null ? "1100" : label.getLabelDataType());
-                        labelResultList.add(labelResult);
-                        codeList.add(label.getInjectionLabelCode());
-                        if ("7100".equals(type)) {
-                            express.append("!");
-                        }
-                        express.append("(");
-                        express.append(label.getInjectionLabelCode());
-                        if ("1000".equals(type)) {
-                            express.append(">");
-                        } else if ("2000".equals(type)) {
-                            express.append("<");
-                        } else if ("3000".equals(type)) {
-                            express.append("==");
-                        } else if ("4000".equals(type)) {
-                            express.append("!=");
-                        } else if ("5000".equals(type)) {
-                            express.append(">=");
-                        } else if ("6000".equals(type)) {
-                            express.append("<=");
-                        } else if ("7000".equals(type)) {
-                            express.append("in");
-                        }else if ("7200".equals(type)) {
-                            express.append("@@@@");//区间于
-                        } else if ("7100".equals(type)) {
-                            express.append("notIn");
-                        }
-                        express.append(tarGrpConditionDOs.get(i).getRightParam());
-                        express.append(")");
-                        if (i + 1 != tarGrpConditionDOs.size()) {
-                            express.append("&&");
-                        }
-                    }
-                    express.append(") {return true} else {return false}");
-                }else {
-                    express.append("");
-                }
-                // 将表达式存入Redis
-                String key = "EVENT_RULE_" + mktCampaignId + "_" + mktStrategyConfId + "_" + mktStrategyConfRuleId;
-                System.out.println("key>>>>>>>>>>" + key + ">>>>>>>>express->>>>:" + JSON.toJSONString(express));
-                redisUtils.set(key, express);
-
-                //标签条件编码集合 试算展示用
-                redisUtils.hset("LABEL_CODE_"+mktStrategyConfId,tarGrpId+"",codeList);
-                System.out.println("TAR_GRP_ID>>>>>>>>>>" + tarGrpId + ">>>>>>>>codeList->>>>:" + JSON.toJSONString(codeList));
-
-                // 将所有的标签集合存入redis
-                redisUtils.set(key + "_LABEL", JSON.toJSONString(labelResultList));
-            }
-            result.put("express",express.toString());
-            result.put("labelResultList",labelResultList);
-            return result;
-        }
-
+        TrialOperationParamES trialOperationParamES = trialOperationService.getTrialOperationParamES(operationVO, batchNum, ruleId, isSample, null);
+        return trialOperationParamES;
     }
 }

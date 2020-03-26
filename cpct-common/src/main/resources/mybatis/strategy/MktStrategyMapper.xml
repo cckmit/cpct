@@ -70,13 +70,14 @@
     STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK,
     LAN_ID
     from mkt_strategy
-    WHERE 1 = 1
+    <where>1!=2
     <if test="strategyId != null and strategyId != ''">
       AND STRATEGY_ID = #{strategyId,jdbcType=VARCHAR}
     </if>
     <if test="strategyName != null and strategyName != '' ">
       AND STRATEGY_NAME = #{strategyName,jdbcType=VARCHAR}
     </if>
+    </where>
 
   </select>
 

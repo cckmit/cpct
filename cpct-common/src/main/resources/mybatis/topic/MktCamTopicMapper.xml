@@ -82,7 +82,7 @@
     <select id="selectByKey" resultMap="BaseResultMap">
         select topic_id, year, season, topic_name, topic_code, status_cd, status_date, description, create_staff, create_date, update_staff,update_date
         from mkt_cam_topic
-        <where>
+        <where>1!=2
             <if test = "year != null and year != ''">
                 year = #{year}
             </if>

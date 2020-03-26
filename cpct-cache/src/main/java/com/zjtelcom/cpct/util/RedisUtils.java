@@ -30,6 +30,37 @@ public class RedisUtils {
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+
+    /*public void setRedisExpiry() {
+        ProxyJedis jedis = new ProxyJedis();
+        try {
+            jedis = ctgJedisPool.getResource();
+            jedis.setpxnx()
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public Object hget(final String key, String filed) {
+        Object result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                String resultString = jedis.hget(key, filed);
+                result = unserizlize(resultString);
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     /**
      *
      * 通过key获取所有客户信息
@@ -638,6 +669,15 @@ public class RedisUtils {
         String[] split = value.split(",");
         List<String> list = Arrays.asList(split);
         return list;
+    }
+
+    // 获取开关：0为关，1为开。true为开，false为关。
+    public boolean getSwitch(String key) {
+        String redisOrSysParams = getRedisOrSysParams(key);
+        if ("1".equals(redisOrSysParams)) {
+            return true;
+        }
+        return false;
     }
 
 }

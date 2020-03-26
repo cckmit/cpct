@@ -68,4 +68,10 @@
     where cs.MKT_CAMPAIGN_ID = #{campaignId}
   </select>
 
+  <select id="selectByIdForInitId" resultType="java.lang.String">
+  select MKT_STRATEGY_CONF_ID FROM mkt_strategy_conf where INIT_ID IN (
+    select INIT_ID from mkt_strategy_conf
+      where MKT_STRATEGY_CONF_ID = #{strategyId,jdbcType=BIGINT})
+  </select>
+
 </mapper>
