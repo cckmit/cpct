@@ -27,6 +27,7 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="TOP_CAMPAIGN_NUM" jdbcType="VARCHAR" property="topCampaignNum" />
     </resultMap>
 
     <sql id="eventJoin">
@@ -42,7 +43,8 @@
         e.EVENT_NAME contactEvtName,
         e.EVENT_DESC contactEvtDesc,
         t.EVT_TYPE_NAME contactEvtTypeName,
-        e.STATUS_CD statusCd
+        e.STATUS_CD statusCd,
+        e.TOP_CAMPAIGN_NUM topCampaignNum
         from event e
         <include refid="eventJoin"/>
         <where>1!=2
@@ -516,5 +518,11 @@
         from event e
         LEFT JOIN mkt_evt_interface_rel r ON r.EVENT_ID = e.EVENT_ID
         where e.EVENT_NBR = #{evtCode}
+    </select>
+
+    <select id="selectEvtContactCamCount" parameterType="long" resultType="int">
+        select count(*)
+        from mkt_cam_evt_rel
+        where EVENT_ID = #{evtId}
     </select>
 </mapper>
