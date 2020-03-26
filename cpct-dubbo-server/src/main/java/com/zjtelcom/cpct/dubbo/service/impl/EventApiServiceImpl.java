@@ -923,6 +923,7 @@ public class EventApiServiceImpl implements EventApiService {
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
                         reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                     } else {
                         // 判断资产类型
                         boolean isCdma = false;
@@ -2108,8 +2109,34 @@ public class EventApiServiceImpl implements EventApiService {
         Map<String, Object> redis = eventRedisService.getRedis("CAM_IDS_EVT_REL_", eventId);
         List<Map<String, Object>> mktCampaginIdList = new ArrayList<>();
         if (redis != null) {
-            mktCampaginIdList = (List<Map<String, Object>>) redis.get("CAM_IDS_EVT_REL_" + eventId);
-
+            List<Map<String, Object>> mktCampaginIds = (List<Map<String, Object>>) redis.get("CAM_IDS_EVT_REL_" + eventId);
+            log.info("查询的结果mktCampaginIds：" + JSON.toJSONString(mktCampaginIds));
+            //根据事件code查询事件信息
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("eventCode", eventCode);
+            Map<String, Object> eventRedis = eventRedisService.getRedis("EVENT_", paramMap);
+            ContactEvt event = new ContactEvt();
+            if (eventRedis != null) {
+                event = (ContactEvt) eventRedis.get("EVENT_" + eventCode);
+            }
+            // 根据优先级排序
+            Collections.sort(mktCampaginIds, new Comparator<Map<String, Object>>() {
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    Integer count1 = (Integer) o1.get("campaignSeq");
+                    Integer count2 = (Integer) o2.get("campaignSeq");
+                    return count2.compareTo(count1);
+                }
+            });
+            // 获取事件中配置的前TopCampaignNum个活动
+            if (event == null || (event != null && event.getTopCampaignNum() == null)) {
+                mktCampaginIdList.addAll(mktCampaginIds);
+            } else {
+                for (int i = 0; i < event.getTopCampaignNum() ; i++) {
+                    mktCampaginIdList.add(mktCampaginIds.get(i));
+                }
+            }
+            log.info("排序筛选后mktCampaginIdList：" + JSON.toJSONString(mktCampaginIdList));
         }
         // 初始化线程
         ExecutorService fixThreadPool = Executors.newFixedThreadPool(maxPoolSize);

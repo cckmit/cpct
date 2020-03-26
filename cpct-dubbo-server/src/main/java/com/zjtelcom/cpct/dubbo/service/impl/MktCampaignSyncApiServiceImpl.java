@@ -413,7 +413,7 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
                         String[] evtContactConfIds = mktStrategyConfRuleDO.getEvtContactConfId().split("/");
                         if (evtContactConfIds != null && !"".equals(evtContactConfIds[0])) {
                             for (String evtContactConfId : evtContactConfIds) {
-                                redisUtils_prd.del("CHL_CONF_DETAIL_" + evtContactConfIds);
+                                redisUtils_prd.del("CHL_CONF_DETAIL_" + evtContactConfId);
                             }
                         }
                     }
