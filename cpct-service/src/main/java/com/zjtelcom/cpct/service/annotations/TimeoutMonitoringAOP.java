@@ -3,23 +3,16 @@ package com.zjtelcom.cpct.service.annotations;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.deploy.panel.ITreeNode;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
-import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import org.apache.poi.hssf.record.cf.Threshold;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Aspect
 @Component
@@ -27,8 +20,6 @@ public class TimeoutMonitoringAOP {
 
     @Autowired
     private UCCPService uccpService;
-    @Autowired
-    private SysParamsService sysParamsService;
     @Autowired
     private RedisUtils redisUtils;
 
@@ -47,7 +38,7 @@ public class TimeoutMonitoringAOP {
      *  value为短信发送次数
      *  当同一个方法当天短信发送超过3次时不再发送短信提醒
      */
-    Map<String, Integer> map = new HashMap();
+    // Map<String, Integer> map = new HashMap();
 
     long start = 0L;
 
@@ -97,5 +88,4 @@ public class TimeoutMonitoringAOP {
             }
         }
     }
-
 }
