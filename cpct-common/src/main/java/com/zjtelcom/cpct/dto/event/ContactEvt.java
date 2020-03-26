@@ -34,6 +34,7 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private String longitude;//经度
     private String latitude;//纬度
     private String locationSwitch;//位置切换开关
+    private Long topCampaignNum;// 事件允许关联最大活动数
 
     public String getRecCampaignAmount() {
         return recCampaignAmount;
@@ -201,5 +202,13 @@ public class ContactEvt extends BaseEntity implements Serializable {
 
     public void setLocationSwitch(String locationSwitch) {
         this.locationSwitch = locationSwitch;
+    }
+
+    public Long getTopCampaignNum() {
+        return topCampaignNum;
+    }
+
+    public void setTopCampaignNum(Long topCampaignNum) {
+        this.topCampaignNum = topCampaignNum;
     }
 }
