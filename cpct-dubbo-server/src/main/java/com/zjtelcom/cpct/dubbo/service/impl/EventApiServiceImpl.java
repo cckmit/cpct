@@ -2123,8 +2123,8 @@ public class EventApiServiceImpl implements EventApiService {
             Collections.sort(mktCampaginIds, new Comparator<Map<String, Object>>() {
                 @Override
                 public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                    Integer count1 = (Integer) o1.get("campaignSeq");
-                    Integer count2 = (Integer) o2.get("campaignSeq");
+                    Long count1 = (Long) o1.get("campaignSeq");
+                    Long count2 = (Long) o2.get("campaignSeq");
                     return count2.compareTo(count1);
                 }
             });
