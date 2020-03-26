@@ -9,7 +9,9 @@ import com.ql.util.express.DefaultContext;
 import com.ql.util.express.ExpressRunner;
 import com.ql.util.express.rule.RuleResult;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -281,10 +284,79 @@ public class TestController extends BaseController {
     @Autowired
     private ScheduledTaskService scheduledTaskService;
 
+
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+
     @PostMapping(value = "/testIssuedSuccessMktCheck")
     @CrossOrigin
     public void testIssuedSuccessMktCheck() {
-        scheduledTaskService.issuedSuccessMktCheck();
+        try {
+            String msg = "runCycleMarketCampaignDay执行任务";
+            //筛选出周期性、已发布的活动
+            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            //筛选出周期为"天"的营销活动
+            List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
+            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                String[] execInvl = mktCampaignDO.getExecInvl().split("-");
+                if (execInvl.length < 2) {
+                    continue;
+                }
+                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("1000")) {
+                    mktCampaignDOs.add(mktCampaignDO);
+                }
+            }
+            cycleDayRule(mktCampaignDOs);
+        } catch (Exception e) {
+        }
+    }
+
+
+
+    /**
+     * 单位为天的周期性营销活动
+     */
+    public void runCycleMarketCampaignDay() throws Throwable { //不带Job job参数、没有返回，适用于无参数无返回的任务
+
+    }
+
+    /**
+     * 周期为“天”的方案
+     */
+    private void cycleDayRule(List<MktCampaignDO> list) {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            //筛选出条件满足的周期性活动id
+            List<Integer> campaignIdList = new ArrayList<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String today = sdf.format(new Date());
+            for (MktCampaignDO campaignDO : list) {
+                String planEndTime = sdf.format(campaignDO.getPlanEndTime());
+                String planBeginTime = sdf.format(campaignDO.getPlanBeginTime());
+                long flagEnd = (sdf.parse(planEndTime).getTime() - sdf.parse(today).getTime()) / (1000 * 3600 * 24);
+                long flagBegin = (sdf.parse(today).getTime() - sdf.parse(planBeginTime).getTime()) / (1000 * 3600 * 24);
+                //判断当前日期是否在活动的生失效时间内
+                if (flagEnd >= 0 && flagBegin >= 0) {
+                    String[] execInvl = campaignDO.getExecInvl().split("-");
+                    String execInitTime = campaignDO.getExecInitTime();
+                    //当前时间与执行时间的相差时间
+                    long dayDifference = (sdf.parse(today).getTime() - sdf.parse(execInitTime).getTime()) / (1000 * 3600 * 24);
+                    //判断当前时间是否在执行时间之后
+                    if (dayDifference >= 0) {
+                        int cycleTime = Integer.parseInt(execInvl[0]);
+                        //判断相差时间是否符合周期间隔
+                        if (dayDifference % cycleTime == 0) {
+                            campaignIdList.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
+                        }
+                    }
+                }
+            }
+            System.out.println("*******************周期为“天”的营销活动列表*******************" + campaignIdList);
+            result.put("idList", campaignIdList);
+            result.put("perCampaign", "PER_CAMPAIGN");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

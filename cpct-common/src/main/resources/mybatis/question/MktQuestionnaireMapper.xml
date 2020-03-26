@@ -72,7 +72,7 @@
     END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
     REMARK
     from mkt_questionnaire
-    where 1=1
+    <where>1!=2
     <if test="map.naireName !=null and map.naireName != ''">
       and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{map.naireName}),'%')
     </if>
@@ -82,7 +82,7 @@
     <if test="map.status !=null and map.status != ''">
       and  STATUS_CD = #{map.status}
     </if>
-
+    </where>
   </select>
 
     <select id="findNairePageByParam" resultMap="BaseResultMap">
@@ -90,13 +90,14 @@
         END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
         REMARK
         from mkt_questionnaire
-        where 1=1
+      <where>1!=2
         <if test="NAIRE_NAME !=null and NAIRE_NAME != ''">
             and NAIRE_NAME LIKE CONCAT(CONCAT('%',#{naireName}),'%')
         </if>
         <if test="NAIRE_TYPE !=null and NAIRE_TYPE != ''">
             and NAIRE_TYPE = #{naireType}
         </if>
+      </where>
     </select>
 
 
@@ -105,7 +106,7 @@
     END_TIP, STATUS_CD, STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
     REMARK
     from mkt_questionnaire
-    where 1=1
+    <where>1!=2
     <if test="naireId !=null and naireId != ''">
       and NAIRE_ID = #{naireId}
     </if>
@@ -121,6 +122,7 @@
     <if test="statusCd !=null and statusCd != ''">
       and STATUS_CD = #{statusCd}
     </if>
+    </where>
   </select>
 
 

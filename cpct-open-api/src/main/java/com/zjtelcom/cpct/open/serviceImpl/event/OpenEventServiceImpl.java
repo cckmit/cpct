@@ -9,8 +9,10 @@ import com.zjtelcom.cpct.domain.event.EventMatchRulDO;
 import com.zjtelcom.cpct.dto.event.*;
 import com.zjtelcom.cpct.open.base.service.BaseService;
 import com.zjtelcom.cpct.open.entity.event.*;
+import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.open.service.event.OpenEventService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +35,8 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
     private ContactEvtTypeMapper contactEvtTypeMapper;
     @Autowired
     private EventRelMapper eventRelMapper;
-
+    @Autowired
+    private UCCPService uccpService;
     /*
      ** 新增事件
      */
@@ -191,6 +194,8 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                     eventRelMapper.insert(eventRel);
                 }
             }
+            // 集团下发短信通知
+            uccpService.sendShortMessage4GroupEventRecipient(openEvent);
         }
         resultObject.put("events",events);
         resultMap.put("resultCode","0");

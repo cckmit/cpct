@@ -212,7 +212,7 @@
       </trim>
     </trim>
 
-    <where>
+    <where>1!=2
       <foreach collection="list" separator="or" item="item">
         CONTACT_CHL_ATTR_RSTR_ID = #{item.contactChlAttrRstrId}
       </foreach>

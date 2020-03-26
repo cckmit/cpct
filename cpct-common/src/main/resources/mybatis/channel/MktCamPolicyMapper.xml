@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktCamPolicyMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktCamPolicy">
+    <id column="MKT_CAM_POLICY_ID" jdbcType="BIGINT" property="mktCamPolicyId" />
+    <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="POLICY_ID" jdbcType="BIGINT" property="policyId" />
+    <result column="POLICY_NAME" jdbcType="VARCHAR" property="policyName" />
+    <result column="POLICY_DESC" jdbcType="VARCHAR" property="policyDesc" />
+    <result column="POLICY_TYPE_NAME" jdbcType="VARCHAR" property="policyTypeName" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_cam_policy
+    where MKT_CAM_POLICY_ID = #{mktCamPolicyId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktCamPolicy">
+    insert into mkt_cam_policy (MKT_CAM_POLICY_ID, MKT_CAMPAIGN_ID, POLICY_ID, 
+      POLICY_NAME, POLICY_DESC, POLICY_TYPE_NAME, 
+      CREATE_DATE, UPDATE_DATE, STATUS_CD, 
+      CREATE_STAFF, UPDATE_STAFF, REMARK
+      )
+    values (#{mktCamPolicyId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{policyId,jdbcType=BIGINT}, 
+      #{policyName,jdbcType=VARCHAR}, #{policyDesc,jdbcType=VARCHAR}, #{policyTypeName,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktCamPolicy">
+    update mkt_cam_policy
+    set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      POLICY_ID = #{policyId,jdbcType=BIGINT},
+      POLICY_NAME = #{policyName,jdbcType=VARCHAR},
+      POLICY_DESC = #{policyDesc,jdbcType=VARCHAR},
+      POLICY_TYPE_NAME = #{policyTypeName,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where MKT_CAM_POLICY_ID = #{mktCamPolicyId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_POLICY_ID, MKT_CAMPAIGN_ID, POLICY_ID, POLICY_NAME, POLICY_DESC, POLICY_TYPE_NAME, 
+    CREATE_DATE, UPDATE_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REMARK
+    from mkt_cam_policy
+    where MKT_CAM_POLICY_ID = #{mktCamPolicyId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_CAM_POLICY_ID, MKT_CAMPAIGN_ID, POLICY_ID, POLICY_NAME, POLICY_DESC, POLICY_TYPE_NAME, 
+    CREATE_DATE, UPDATE_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REMARK
+    from mkt_cam_policy
+  </select>
+
+  <delete id="deleteByCampaignId">
+    delete from mkt_cam_policy
+    where MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="selectByCampaignId" resultMap="BaseResultMap">
+    select MKT_CAM_POLICY_ID, MKT_CAMPAIGN_ID, POLICY_ID, POLICY_NAME, POLICY_DESC, POLICY_TYPE_NAME,
+    CREATE_DATE, UPDATE_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, REMARK
+    from mkt_cam_policy WHERE  MKT_CAMPAIGN_ID = #{campaignId,jdbcType=BIGINT}
+  </select>
+
+
+</mapper>

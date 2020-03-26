@@ -165,13 +165,14 @@
     ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD,
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     FROM trial_operation
-    WHERE 1 = 1
+    <where>1!=2
     <if test="campaignId != null">
       AND CAMPAIGN_ID = #{campaignId}
     </if>
     <if test="statusCd != null">
       AND STATUS_CD = #{statusCd}
     </if>
+    </where>
   </select>
 
 
@@ -184,5 +185,15 @@
         ORDER BY CREATE_DATE DESC LIMIT 99999
     ) o
     GROUP BY o.CAMPAIGN_ID
+  </select>
+
+  <select id="findOperationListByStrategyIdLsit"  parameterType="java.util.ArrayList" resultMap="BaseResultMap" >
+    select <include refid="selectColumn"/>
+      from trial_operation
+      where STRATEGY_ID IN
+      <foreach collection="list" item="item" open="(" separator="," close=")" index="index">
+        #{item}
+      </foreach>
+      order by CREATE_DATE desc
   </select>
 </mapper>

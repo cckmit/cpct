@@ -7,6 +7,7 @@ import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.blacklist.BlackListLogDO;
 import com.zjtelcom.cpct.dubbo.out.BlackListService;
+import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,8 @@ public class BlackListServiceImpl implements BlackListService {
     BlackListLogMapper blackListLogMapper;
     private static final String SUCCESS_CODE = "0";
     private static final String FAIL_CODE = "1";
+
+    private BlackListCpctService blackListCpctService;
 
     @Override
     public Map<String, Object> addBlackList(List<Map<String, Object>> blackListContent) {
@@ -136,6 +139,21 @@ public class BlackListServiceImpl implements BlackListService {
             e.printStackTrace();
             return responseVO.response(FAIL_CODE,"获取黑名单失败");
         }
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> exportBlackListFile() {
+        return blackListCpctService.exportBlackListFile();
+    }
+
+    @Override
+    public Map<String, Object> importBlackListFile() {
+        return blackListCpctService.importBlackListFile();
     }
 
 }

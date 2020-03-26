@@ -109,13 +109,14 @@
                st.SERVICE_TYPE_DESC as serviceTypeDesc
         from service s
         left join service_type st on s.SERVICE_TYPE_ID = st.SERVICE_TYPE_ID
-        where 1=1
+        <where>1!=2
         <if test="serviceName != null and serviceName != ''">
             and s.SERVICE_NAME LIKE CONCAT(CONCAT('%',#{serviceName}),'%')
         </if>
         <if test="serviceTypeId != null and serviceTypeId != ''">
             and s.SERVICE_TYPE_ID = #{serviceTypeId,jdbcType=BIGINT}
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 </mapper>

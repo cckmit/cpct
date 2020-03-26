@@ -62,10 +62,11 @@
         select SCENE_CAM_REL_ID, EVENT_SCENE_ID, CAMPAIGN_SEQ, MKT_CAMPAIGN_ID, STATUS_CD,LEVEL_CONFIG,
         STATUS_DATE, CREATE_STAFF, UPDATE_STAFF, UPDATE_DATE, CREATE_DATE, REMARK
         from evt_scene_cam_rel
-        where 1 = 1
+        <where>1!=2
         <if test="eventSceneId != null and eventSceneId != 0 ">
             and EVENT_SCENE_ID = #{eventSceneId}
         </if>
+        </where>
     </select>
 
 

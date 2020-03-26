@@ -263,7 +263,7 @@
         MKT_CAMPAIGN_ID, INIT_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,UPDATE_DATE,CREATE_STAFF
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="map.mktCampaignName != null and map.mktCampaignName != ''">
             AND MKT_CAMPAIGN_NAME like CONCAT('%',#{map.mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -292,6 +292,7 @@
             AND CREATE_CHANNEL like CONCAT('%',#{map.channel,jdbcType=VARCHAR},'%')
         </if>
         AND STATUS_CD != 2001
+        </where>
         order by UPDATE_DATE desc
     </select>
 
@@ -326,7 +327,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -357,6 +358,7 @@
         <if test="lanIdFive != null and lanIdFive != ''">
             AND t.LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT}
         </if>
+        </where>
         order by t.UPDATE_DATE desc
     </select>
 
@@ -512,7 +514,7 @@
         UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
         SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
             AND MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
         </if>
@@ -613,6 +615,7 @@
         <if test="lanIdFive != null and lanIdFive != ''">
             AND t.LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT}
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 
@@ -623,13 +626,14 @@
         UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
         SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID, EXEC_INIT_TIME, LAN_ID_FOUR, LAN_ID_FIVE
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="execType != null and execType != ''">
             AND EXEC_TYPE = #{execType,jdbcType=VARCHAR}
         </if>
         <if test="statusCd != null and statusCd != ''">
             AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 
@@ -675,7 +679,7 @@
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
         CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME,INIT_ID,LAN_ID_FOUR, LAN_ID_FIVE
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
             AND MKT_CAMPAIGN_ID = #{mktCampaignId}
         </if>
@@ -704,6 +708,7 @@
         <if test="theMe != null and theMe != '' and theMe !='all' ">
             AND THE_ME  = #{theMe}
         </if>
+        </where>
         ORDER BY CREATE_DATE DESC
     </select>
 
@@ -713,7 +718,7 @@
     <select id="countByStatus" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT (1)
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="map.startTime != null and map.endTime != null">
             AND CREATE_DATE BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
         </if>
@@ -729,13 +734,14 @@
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
         </if>
+        </where>
     </select>
 
 
     <select id="countBylanIdFour" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT (1)
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="map.startTime != null and map.endTime != null">
             AND CREATE_DATE BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
         </if>
@@ -754,13 +760,14 @@
         <if test="map.tiggerType != null and map.tiggerType != ''">
             AND TIGGER_TYPE = #{map.tiggerType,jdbcType=VARCHAR}
         </if>
+        </where>
     </select>
 
 
     <select id="countByTrial" parameterType="map" resultType="java.lang.Integer">
         SELECT COUNT (1)
         from mkt_campaign t
-        where 1 = 1
+        <where>1!=2
         <if test="map.startTime != null and map.endTime != null">
             AND CREATE_DATE BETWEEN  #{map.startTime,jdbcType=TIMESTAMP} AND #{map.endTime,jdbcType=TIMESTAMP}
         </if>
@@ -794,6 +801,7 @@
             WHERE
             tril.CREATE_STAFF = 1000 )
         </if>
+        </where>
 
 
     </select>
@@ -972,7 +980,7 @@
         STATUS_DATE, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID,
         CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE, SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME,INIT_ID,LAN_ID_FOUR, LAN_ID_FIVE
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
             AND MKT_CAMPAIGN_ID = #{mktCampaignId}
         </if>
@@ -1003,6 +1011,7 @@
                  open="(" separator="," close=")">
             #{item}
         </foreach>
+        </where>
         ORDER BY CREATE_DATE DESC
     </select>
 
@@ -1223,7 +1232,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -1248,6 +1257,7 @@
         <if test="createStaff != null and createStaff != ''">
             AND t.CREATE_STAFF = #{createStaff,jdbcType=BIGINT}
         </if>
+        </where>
         order by t.UPDATE_DATE desc
     </select>
 

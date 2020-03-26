@@ -91,4 +91,16 @@
         <dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetailApi" timeout="10000"/>
     </dubbo:service>
 
+
+    <!--黑名单对外接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.BlackListService" ref="blackListServiceImpl"
+                   version="1.0">
+        <dubbo:method name="addBlackList" servicecode="33.1083.addBlackList" timeout="10000"/>
+        <dubbo:method name="deleteBlackList" servicecode="33.1083.deleteBlackList" timeout="10000"/>
+        <dubbo:method name="getBlackListById" servicecode="33.1083.getBlackListById" timeout="10000"/>
+        <dubbo:method name="getAllBlackList" servicecode="33.1083.getAllBlackList" timeout="10000"/>
+        <dubbo:method name="exportBlackListFile" servicecode="33.1083.exportBlackListFile" timeout="10000"/>
+        <dubbo:method name="importBlackListFile" servicecode="33.1083.importBlackListFile" timeout="10000"/>
+    </dubbo:service>
+
 </beans>

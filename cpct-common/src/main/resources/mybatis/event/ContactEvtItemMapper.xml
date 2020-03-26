@@ -86,10 +86,11 @@
         EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, IS_LABEL,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_item
-        where 1 = 1
+        <where>1!=2
         <if test="contactEvtId != null and contactEvtId != 0 ">
             AND EVENT_ID = #{contactEvtId}
         </if>
+        </where>
     </select>
 
     <select id="listMainItem"  resultMap="BaseResultMap">

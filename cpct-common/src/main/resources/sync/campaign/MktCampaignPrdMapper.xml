@@ -193,7 +193,7 @@
         MKT_CAMPAIGN_ID, TIGGER_TYPE, MKT_CAMPAIGN_NAME, PLAN_BEGIN_TIME, PLAN_END_TIME,
         MKT_CAMPAIGN_TYPE,  MANAGE_TYPE, MKT_ACTIVITY_NBR,  STATUS_CD, LAN_ID, CREATE_CHANNEL, CREATE_DATE,UPDATE_DATE
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="map.mktCampaignName != null and map.mktCampaignName != ''">
             AND MKT_CAMPAIGN_NAME like CONCAT('%',#{map.mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -222,6 +222,7 @@
             AND CREATE_CHANNEL like CONCAT('%',#{map.channel,jdbcType=VARCHAR},'%')
         </if>
         AND STATUS_CD != 2001
+        </where>
         order by UPDATE_DATE desc
     </select>
 
@@ -256,7 +257,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -278,6 +279,7 @@
         <if test="createChannel != null and createChannel != ''">
             AND t.CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR}
         </if>
+        </where>
         order by t.UPDATE_DATE desc
     </select>
 
@@ -297,7 +299,7 @@
         UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
         SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID,EXEC_INIT_TIME
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
             AND MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
         </if>
@@ -388,6 +390,7 @@
         <if test="execInitTime != null and execInitTime != ''">
             AND EXEC_INIT_TIME =  #{execInitTime,jdbcType=BIGINT}
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 
@@ -398,13 +401,14 @@
         UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, CREATE_CHANNEL, DIRECTORY_ID, CAM_LEVEL, IS_CHECK_RULE, SRC_ID, SRC_TYPE,
         SERVICE_CANCLE_FLAG, REGION_ID, LIFE_STAGE, SERVICE_TYPE, EXT_MKT_CAMPAIGN_ID, EXEC_INIT_TIME
         from mkt_campaign
-        where 1 = 1
+        <where>1!=2
         <if test="execType != null and execType != ''">
             AND EXEC_TYPE = #{execType,jdbcType=VARCHAR}
         </if>
         <if test="statusCd != null and statusCd != ''">
             AND STATUS_CD = #{statusCd,jdbcType=VARCHAR}
         </if>
+        </where>
         order by UPDATE_DATE desc
     </select>
 </mapper>

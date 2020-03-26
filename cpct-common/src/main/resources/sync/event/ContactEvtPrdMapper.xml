@@ -41,26 +41,28 @@
         e.STATUS_CD statusCd
         from event e
         <include refid="eventJoin"/>
-        where 1=1
+        <where>1!=2
         <if test="contactEvtName != null and contactEvtName != ''">
             and e.EVENT_NAME LIKE CONCAT(CONCAT('%',#{contactEvtName}),'%')
         </if>
         <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
             and e.EVT_TYPE_ID = #{contactEvtTypeId}
         </if>
+        </where>
     </select>
 
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
         select * from event
 
-        where 1=1
+        <where>1!=2
         <if test="id != null and id != 0">
             and id = #{id}
         </if>
         <if test="name != null and name != ''">
             and name = #{name}
         </if>
+        </where>
     </select>
 
     <!--插入操作,useGeneratedKeys代表支持自动生成序列号,keyProperty代表自动生成序列号的属性为id-->

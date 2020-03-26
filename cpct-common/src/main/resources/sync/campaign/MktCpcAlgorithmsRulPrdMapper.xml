@@ -61,7 +61,7 @@
     select ALGORITHMS_RUL_ID, ALGORITHMS_RUL_NAME, RULE_DESC, RULE_EXPRESSION, STATUS_CD,
     CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK
     from mkt_cpc_algorithms_rul
-    WHERE 1 = 1
+    <where>1!=2
     <if test="algorithmsRulId != null and algorithmsRulId != ''">
       AND ALGORITHMS_RUL_ID = #{algorithmsRulId}
     </if>
@@ -71,6 +71,7 @@
     <if test="ruleExpression != null and ruleExpression != '' ">
       AND RULE_EXPRESSION = #{ruleExpression}
     </if>
+    </where>
   </select>
 
 

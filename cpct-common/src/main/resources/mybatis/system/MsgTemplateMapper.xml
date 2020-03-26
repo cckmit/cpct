@@ -62,7 +62,7 @@
     <select id="selectPageMsgTemplate" resultMap="BaseResultMap">
         select msg_id,type,msg_type,content,create_staff, create_date, update_staff,update_date
         from mkt_msg_template
-        <where>
+        <where>1!=2
             <if test = "type != null and type != ''">
                 TYPE = #{type}
             </if>

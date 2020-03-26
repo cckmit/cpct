@@ -65,7 +65,7 @@ spec:
             cpu: "2000m"
           limits:
             memory: "8Gi"
-            cpu: "8000m"
+            cpu: "10000m"
       - name: jmx
         image: 134.108.5.132:8000/mgt/jmxtrans:v3.0
         imagePullPolicy: Always

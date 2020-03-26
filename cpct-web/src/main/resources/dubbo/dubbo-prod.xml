@@ -28,6 +28,8 @@
         <dubbo:method name="uploadFile2Prod" servicecode="00.1083.uploadFile2Prod" timeout="10000"/>
         <dubbo:method name="trialLog" servicecode="00.1083.trialLog" timeout="10000"/>
         <dubbo:method name="addLogByBatchNum" servicecode="00.1083.addLogByBatchNum" timeout="10000"/>
+        <dubbo:method name="queryCustomer" servicecode="00.1083.queryCustomer" timeout="10000"/>
+        <dubbo:method name="queryCustomerByCustId" servicecode="00.1083.queryCustomerByCustId" timeout="10000"/>
     </dubbo:reference>
 
     <dubbo:reference registry="esb3" interface="org.springframework.session.data.ctg.IDubboCtgService"
@@ -124,8 +126,8 @@
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
         <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
-        <!-- 发布活动的时候调用营服接口传递活动信息 -->
-        <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
+        <!--&lt;!&ndash; 发布活动的时候调用营服接口传递活动信息 &ndash;&gt;-->
+        <!--<dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>-->
     </dubbo:reference>
 
     <!-- 集团下发活动反馈接口 1.0 -->
