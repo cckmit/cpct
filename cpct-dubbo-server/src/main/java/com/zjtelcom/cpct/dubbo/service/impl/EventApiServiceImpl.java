@@ -923,6 +923,7 @@ public class EventApiServiceImpl implements EventApiService {
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
                         reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                     } else {
                         // 判断资产类型
                         boolean isCdma = false;
