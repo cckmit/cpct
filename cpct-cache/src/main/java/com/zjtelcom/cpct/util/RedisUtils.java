@@ -30,6 +30,37 @@ public class RedisUtils {
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+
+    /*public void setRedisExpiry() {
+        ProxyJedis jedis = new ProxyJedis();
+        try {
+            jedis = ctgJedisPool.getResource();
+            jedis.setpxnx()
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public Object hget(final String key, String filed) {
+        Object result = null;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                String resultString = jedis.hget(key, filed);
+                result = unserizlize(resultString);
+                jedis.close();
+            } catch (Throwable je) {
+                je.printStackTrace();
+                jedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
     /**
      *
      * 通过key获取所有客户信息

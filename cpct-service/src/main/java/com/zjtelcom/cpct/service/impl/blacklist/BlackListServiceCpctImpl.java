@@ -2,10 +2,9 @@ package com.zjtelcom.cpct.service.impl.blacklist;
 
 import com.alibaba.fastjson.JSON;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
-import com.zjtelcom.cpct.service.blacklist.BlackListService;
+import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SftpUtils;
 import org.slf4j.Logger;
@@ -24,9 +23,9 @@ import java.util.*;
 
 @Service
 @Transactional
-public class BlackListServiceImpl implements BlackListService {
+public class BlackListServiceCpctImpl implements BlackListCpctService {
 
-    private final static Logger log = LoggerFactory.getLogger(BlackListServiceImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(BlackListServiceCpctImpl.class);
     private final static String splitMark = "\u0007";
     private final static String superfield = "createStaff,updateStaff,createDate,updateDate";
 
