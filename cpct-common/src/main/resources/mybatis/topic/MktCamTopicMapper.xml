@@ -84,7 +84,7 @@
         from mkt_cam_topic
         <where>1!=2
             <if test = "year != null and year != ''">
-                year = #{year}
+               AND year = #{year}
             </if>
             <if test = "season != null and season != ''">
                 AND season = #{season}
