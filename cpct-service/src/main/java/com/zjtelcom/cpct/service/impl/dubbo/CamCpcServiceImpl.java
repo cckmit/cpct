@@ -858,10 +858,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                         express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
                     }
                 }
-                Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
+                Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL_KEY");
                 sysParams = new SysParams();
                 if (checkLabelRedis != null) {
-                    sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+                    sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL_KEY");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1230,10 +1230,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                 String isaleCheck = eventRedisService.getRedis("ISALE_CHECK_FLG") == null ? "0" : eventRedisService.getRedis("ISALE_CHECK_FLG").toString();
                 //isale预校验固定参数
                 String loginId = "";
-                Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID");
+                Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID_KEY");
                 List<Map<String, String>> sysParam = new ArrayList<>();
                 if (coolLoginIdRedis != null) {
-                    sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID");
+                    sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID_KEY");
                 }
                 if (sysParam != null && !sysParam.isEmpty()) {
                     loginId = sysParam.get(0).get("value");
@@ -1283,7 +1283,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                 taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                 taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                if(mktCamChlConfAttr.getAttrValue()!= null){
+                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                }
                 taskChlAttrList.add(taskChlAttr);
             } else if (mktCamChlConfAttr.getAttrId() == 500600010005L || mktCamChlConfAttr.getAttrId() == 500600010011L) {
                 taskChlAttr = new ConcurrentHashMap<>();
@@ -1299,7 +1301,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    if(mktCamChlConfAttr.getAttrValue()!= null){
+                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    }
                     taskChlAttrList.add(taskChlAttr);
                 }
             } else if (mktCamChlConfAttr.getAttrId() == 500600010007L) {
@@ -1310,7 +1314,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                     taskChlAttr.put("attrId", mktCamChlConfAttr.getAttrId().toString());
                     taskChlAttr.put("attrKey", mktCamChlConfAttr.getAttrId().toString());
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    if(mktCamChlConfAttr.getAttrValue()!= null){
+                        taskChlAttr.put("attrValue", simpleDateFormat.format(Long.valueOf(mktCamChlConfAttr.getAttrValue())));
+                    }
                     taskChlAttrList.add(taskChlAttr);
                 }
             } else if (mktCamChlConfAttr.getAttrId() == 500600010008L) {  //获取调查问卷ID

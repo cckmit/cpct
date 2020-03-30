@@ -338,7 +338,7 @@ public class EventRedisServiceImpl implements EventRedisService {
             List<String> labelCodeList = injectionLabelMapper.selectLabelCodeByType("1100"); // 1100 代表为时间类型的标签
             redisUtils.set(key, labelCodeList);
             resutlt.put(key, labelCodeList);
-        } else if ("COOL_LOGIN_ID".equals(key)) {
+        } else if ("COOL_LOGIN_ID_KEY".equals(key)) {
             List<Map<String, String>> sysParam = sysParamsMapper.listParamsByKey("COOL_LOGIN_ID");
             redisUtils.set(key, sysParam);
             resutlt.put(key, sysParam);
@@ -349,7 +349,7 @@ public class EventRedisServiceImpl implements EventRedisService {
                 redisUtils.set(key, channelFilterCode);
                 resutlt.put(key, channelFilterCode);
             }
-        } else if ("CHECK_LABEL".equals(key)) {   // 事件实时接入标签验证开关
+        } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
             if (systemParamList.size() > 0) {
                 redisUtils.set(key, systemParamList.get(0));
