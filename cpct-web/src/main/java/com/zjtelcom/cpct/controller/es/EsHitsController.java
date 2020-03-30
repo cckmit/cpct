@@ -228,7 +228,7 @@ public class EsHitsController {
         }
     }
 
-    //把资产查询接口和客户级查询接口控制层订阅 加一个前端页面展示
+    //客户级查询接口控制层订阅 加一个前端页面展示
     @PostMapping("/getCustomer")
     @CrossOrigin
     public Map<String,Object> getCustomer(@RequestBody Map<String, String> params){
@@ -241,8 +241,8 @@ public class EsHitsController {
         return map;
     }
 
-    //客户级查询接口
-    @PostMapping("/getCustomer")
+    //资产查询接口
+    @PostMapping("/getCustomerByCustId")
     @CrossOrigin
     public Map<String,Object> getCustomerByCustId(@RequestBody Map<String, String> params){
         Map<String, Object> map = new HashMap<>();
