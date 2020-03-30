@@ -101,4 +101,39 @@
         </where>
 
     </select>
+
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO mkt_blacklist (asset_phone, service_cate, marketing_cate, public_benefit_cate,
+         channel, staff_id,create_staff, create_date, update_staff,update_date,operType)
+        VALUES
+        <foreach collection="list" item="item" separator="," index="i">
+        (   #{item.assetPhone, jdbcType = VARCHAR},
+            #{item.serviceCate, jdbcType = VARCHAR},
+            #{item.maketingCate, jdbcType = VARCHAR},
+            #{item.publicBenefitCate, jdbcType = VARCHAR},
+            #{item.channel, jdbcType = VARCHAR},
+            #{item.staffId, jdbcType = VARCHAR},
+            #{item.createStaff, jdbcType = VARCHAR},
+            #{item.createDate, jdbcType = TIMESTAMP},
+            #{item.updateStaff, jdbcType = VARCHAR},
+            #{item.updateDate, jdbcType = TIMESTAMP},
+            #{item.operType, jdbcType = VARCHAR}
+        )
+        </foreach>
+    </insert>
+
+    <select id="selectByBlackList" parameterType="com.zjtelcom.cpct.domain.blacklist.BlackListDO" resultType="java.lang.String">
+        SELECT asset_phone FROM mkt_blacklist
+        <where>
+            <if test = "maketingCate != null and maketingCate != ''">
+                AND marketing_cate = #{maketingCate}
+            </if>
+            <if test = "serviceCate != null and serviceCate != ''">
+                AND service_cate = #{serviceCate}
+            </if>
+        </where>
+
+
+    </select>
 </mapper>

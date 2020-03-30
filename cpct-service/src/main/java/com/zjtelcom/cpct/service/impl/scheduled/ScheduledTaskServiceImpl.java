@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
@@ -100,7 +101,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                                             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(initId);
                                             String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
                                             uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
-                                            trialOperation.setStatusCd("");
+                                            trialOperation.setStatusCd(TrialStatus.UPLOAD_EXPIRED.getValue());
                                             trialOperationMapper.updateByPrimaryKey(trialOperation);
                                             continue x;
                                         }

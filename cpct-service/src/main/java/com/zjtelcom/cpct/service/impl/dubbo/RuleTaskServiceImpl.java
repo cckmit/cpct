@@ -287,10 +287,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                     express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
                 }
             }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
+            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL_KEY");
             sysParams = new SysParams();
             if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
+                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL_KEY");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -644,10 +644,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
             String isaleCheck = eventRedisService.getRedis("ISALE_CHECK_FLG") == null ? "0" : eventRedisService.getRedis("ISALE_CHECK_FLG").toString();
             //isale预校验固定参数
             String loginId = "";
-            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID");
+            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID_KEY");
             List<Map<String, String>> sysParam = new ArrayList<>();
             if (coolLoginIdRedis != null) {
-                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID");
+                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID_KEY");
             }
             if (sysParam != null && !sysParam.isEmpty()) {
                 loginId = sysParam.get(0).get("value");

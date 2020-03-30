@@ -30,4 +30,10 @@ public class CamApiSerServiceImpl implements CamApiSerService {
         return activity;
     }
 
+    @Override
+    public Map<String, Object> ActivityXieTongTask(Map<String, String> params, Long activityId, Map<String, String> privateParams, Map<String, String> labelItems, List<Map<String, Object>> evtTriggers, List<Map<String, Object>> strategyMapList, DefaultContext<String, Object> context) {
+        Map<String, Object> activity = camCpcService.ActivityCpcTask(params, activityId, privateParams, labelItems, evtTriggers, strategyMapList, context);
+        return activity;
+    }
+
 }
