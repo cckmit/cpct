@@ -77,7 +77,11 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
             if (send_msg!=null){
                 for (SysParams sysParams : send_msg) {
-                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    try {
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }else if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
@@ -86,7 +90,11 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
             if (send_msg!=null){
                 for (SysParams sysParams : send_msg) {
-                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    try {
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }else {
