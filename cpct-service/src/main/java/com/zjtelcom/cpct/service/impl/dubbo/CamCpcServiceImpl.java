@@ -625,7 +625,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         return activity;
     }
 
-    @InterfaceTimeoutMonitoring
+    @InterfaceTimeoutMonitoring(cutMethodType = "outside")
     public String prodFilter(Map<String, String> privateParams, Map<String, Object> filterRuleTimeMap) {
         String productStr;
         log.info("111------accNbr --->" + privateParams.get("accNbr"));

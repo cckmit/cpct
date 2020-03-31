@@ -74,6 +74,18 @@ public class TimeoutMonitoringAOP {
         long end = System.currentTimeMillis();
         long time = end - start;
         String timeOut = redisUtils.getRedisOrSysParams(timeOutThreshold);
+        JSONObject jsonObject1 = JSONObject.parseObject(timeOut);
+        String type = interfaceTimeoutMonitoring.cutMethodType();
+        switch (type) {
+            // 内部类型方法，超时2秒
+            case "inside":
+                timeOut = jsonObject1.get("inside").toString();
+                break;
+            // 外部类型方法，dubbo。超时5秒
+            case "outside":
+                timeOut = jsonObject1.get("outside").toString();
+                break;
+        }
         long l = Long.valueOf(timeOut) * 1000;
         String msgSend = redisUtils.getRedisOrSysParams(msgSendThreshold);
         Integer i = Integer.valueOf(msgSend);
