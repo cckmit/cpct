@@ -464,7 +464,8 @@ public class EventRedisServiceImpl implements EventRedisService {
             for (Long filterRuleId : filterRuleIds) {
                 // 删除单个过滤规则
                 redisUtils.del("FILTER_RULE_" + filterRuleId);
-                redisUtils.del("FILTER_RULE_DISTURB_" + filterRuleId);
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                redisUtils.del("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
             }
             List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
             for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
