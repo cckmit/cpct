@@ -45,6 +45,9 @@ public class MultiJobRunner {
     private QuerySaturationService querySaturationService;
     @Autowired
     private LabelSaturationMapper labelSaturationMapper;
+    @Autowired
+    private TrialOperationMapper trialOperationMapper;
+
 
     /**
      * 单位为天的周期性营销活动
@@ -655,5 +658,34 @@ public class MultiJobRunner {
         }
     }
 
+
+    //3-31 11:07 x
+    //周期性活动定时任务添加校验接口若未执行的 二次执行
+    public void playAgainPeriodicity(){
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 01:00:00");
+        String startTime = sdf.format(d);
+        System.out.println("格式化后的日期：" + startTime);
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 05:00:00");
+        String endTime = sdf2.format(d);
+        System.out.println("格式化后的日期：" + endTime);
+        List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
+        Arraylist<String> stringArraylist = new Arraylist<String>();
+        if (trialOperationList!=null){
+            for (TrialOperation operation : trialOperationList){
+                String statusCd = operation.getStatusCd();
+                //判断状态
+                if (!statusCd.equals("7300") || statusCd.equals("8100")){
+                    stringArraylist.add(operation.getId().toString());
+                }
+            }
+            //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
+            if (stringArraylist!=null){
+
+            }
+        }
+
+
+    }
 
 }
