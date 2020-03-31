@@ -8,6 +8,8 @@ import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ import java.util.Date;
 @Aspect
 @Component
 public class TimeoutMonitoringAOP {
+
+    protected Logger logger = LoggerFactory.getLogger(TimeoutMonitoringAOP.class);
 
     @Autowired
     private UCCPService uccpService;
@@ -53,12 +57,15 @@ public class TimeoutMonitoringAOP {
     @Before("@annotation(interfaceTimeoutMonitoring)")
     public void startMonitoring(JoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring){
         start = System.currentTimeMillis();
+        String name = joinPoint.getSignature().getName();
+        logger.info(name + "方法切入123456789~~~~~~~~~~~");
     }
 
     @AfterReturning("@annotation(interfaceTimeoutMonitoring)")
     public void endMonitoring(JoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring) {
-        Integer x = 0;
         String name = joinPoint.getSignature().getName();
+        logger.info(name + "方法切入987654321~~~~~~~~~~~");
+        Integer x = 0;
         // 告警信息存入redis中
         String value = redisUtils.hget(timeOutMonitoring, name).toString();
         if (value != null) {
