@@ -3,32 +3,27 @@ package com.zjtelcom.cpct.service.annotations;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.deploy.panel.ITreeNode;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
-import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import org.apache.poi.hssf.record.cf.Threshold;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Aspect
 @Component
 public class TimeoutMonitoringAOP {
 
+    protected Logger logger = LoggerFactory.getLogger(TimeoutMonitoringAOP.class);
+
     @Autowired
     private UCCPService uccpService;
-    @Autowired
-    private SysParamsService sysParamsService;
     @Autowired
     private RedisUtils redisUtils;
 
@@ -47,7 +42,7 @@ public class TimeoutMonitoringAOP {
      *  value为短信发送次数
      *  当同一个方法当天短信发送超过3次时不再发送短信提醒
      */
-    Map<String, Integer> map = new HashMap();
+    // Map<String, Integer> map = new HashMap();
 
     long start = 0L;
 
@@ -62,12 +57,15 @@ public class TimeoutMonitoringAOP {
     @Before("@annotation(interfaceTimeoutMonitoring)")
     public void startMonitoring(JoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring){
         start = System.currentTimeMillis();
+        String name = joinPoint.getSignature().getName();
+        logger.info(name + "方法切入123456789~~~~~~~~~~~");
     }
 
     @AfterReturning("@annotation(interfaceTimeoutMonitoring)")
     public void endMonitoring(JoinPoint joinPoint, InterfaceTimeoutMonitoring interfaceTimeoutMonitoring) {
-        Integer x = 0;
         String name = joinPoint.getSignature().getName();
+        logger.info(name + "方法切入987654321~~~~~~~~~~~");
+        Integer x = 0;
         // 告警信息存入redis中
         String value = redisUtils.hget(timeOutMonitoring, name).toString();
         if (value != null) {
@@ -76,6 +74,18 @@ public class TimeoutMonitoringAOP {
         long end = System.currentTimeMillis();
         long time = end - start;
         String timeOut = redisUtils.getRedisOrSysParams(timeOutThreshold);
+        JSONObject jsonObject1 = JSONObject.parseObject(timeOut);
+        String type = interfaceTimeoutMonitoring.cutMethodType();
+        switch (type) {
+            // 内部类型方法，超时2秒
+            case "inside":
+                timeOut = jsonObject1.get("inside").toString();
+                break;
+            // 外部类型方法，dubbo。超时5秒
+            case "outside":
+                timeOut = jsonObject1.get("outside").toString();
+                break;
+        }
         long l = Long.valueOf(timeOut) * 1000;
         String msgSend = redisUtils.getRedisOrSysParams(msgSendThreshold);
         Integer i = Integer.valueOf(msgSend);
@@ -97,5 +107,4 @@ public class TimeoutMonitoringAOP {
             }
         }
     }
-
 }
