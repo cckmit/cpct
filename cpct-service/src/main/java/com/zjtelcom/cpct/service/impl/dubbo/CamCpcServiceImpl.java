@@ -302,13 +302,10 @@ public class CamCpcServiceImpl implements CamCpcService {
                     } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
                         //将过扰规则的标签放到iSale展示列
                         //获取过扰标签
-                        log.info("filterRule" + JSON.toJSONString(filterRule));
                         Map<String, Object> labelsRedis = eventRedisService.getRedis("FILTER_RULE_DISTURB_" , filterRule.getConditionId());
-                        log.info("labelsRedis" + JSON.toJSONString(labelsRedis));
                         List<String> labels = new ArrayList<>();
                         if (labelsRedis != null) {
                             labels = (List<String>) labelsRedis.get("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
-                            log.info("labels" + JSON.toJSONString(labels));
                             if (labels == null) {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
