@@ -309,6 +309,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                             if (labels == null) {
                                 //过滤规则信息查询失败
                                 esJson.put("hit", false);
+
                                 esJson.put("msg", "过扰规则信息查询失败 byId: " + filterRuleId);
                                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
                                 nonPassedMsg.put("cam_" + activityId, "过扰规则信息查询失败 byId: " + filterRuleId);
@@ -1230,7 +1231,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     jsonObject.put("msg", "渠道均未命中");
                     esHitService.save(jsonObject, IndexList.RULE_MODULE);
                     // return Collections.EMPTY_MAP;
-                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
+//                    nonPassedMsg.put("rule_" + ruleId, "渠道均未命中");
                     return nonPassedMsg;
                 }
 
