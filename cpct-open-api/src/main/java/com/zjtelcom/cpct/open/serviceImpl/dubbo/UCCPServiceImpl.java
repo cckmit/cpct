@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.open.base.service.BaseService;
 import com.zjtelcom.cpct.open.entity.event.OpenEvent;
 import com.zjtelcom.cpct.open.service.dubbo.UCCPService;
+import com.zjtelcom.cpct.open.service.mktCampaign.MktDttsLogService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class UCCPServiceImpl extends BaseService implements UCCPService {
     private ISystemUserDtoDubboService iSystemUserDtoDubboService;
     @Autowired
     private SysParamsMapper sysParamsMapper;
+    @Autowired
+    private MktDttsLogService mktDttsLogService;
 
     @Value("${uccp.userAcct}")
     private String userAcct;
@@ -140,6 +143,8 @@ public class UCCPServiceImpl extends BaseService implements UCCPService {
         if (map == null) return "调用sendShortMessage返回结果异常！";
         log.info("【调用UCCP短信接口返回】："+JSON.toJSONString(map));
         if (!map.get("code").equals("0000")) {
+            // 短信发送成功记录数据
+            saveShortMessageLog(targPhone, sendContent);
             return map.get("msg").toString();
         } else {
             return "";
@@ -153,5 +158,14 @@ public class UCCPServiceImpl extends BaseService implements UCCPService {
             val += String.valueOf(random.nextInt(10));
         }
         return val;
+    }
+
+    // 短信发送类型任务记录
+    public void saveShortMessageLog(String targPhone, String sendContent) {
+        try {
+            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

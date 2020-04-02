@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
@@ -34,6 +35,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.VerbalConditionVO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -52,6 +54,7 @@ import com.zjtelcom.cpct_prd.dao.channel.ContactChannelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
+import com.zjtelcom.cpct_prd.dao.filter.FilterRulePrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
@@ -193,6 +196,12 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
     private ContactChannelPrdMapper contactChannelPrdMapper;
     @Autowired
     private InjectionLabelValuePrdMapper injectionLabelValuePrdMapper;
+
+    @Autowired
+    private FilterRuleMapper filterRuleMapper;
+
+    @Autowired
+    private FilterRulePrdMapper filterRulePrdMapper;
 
     @Autowired
     private MktCamScriptMapper mktCamScriptMapper;
@@ -416,7 +425,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
             redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
+                FilterRule filterRule = filterRulePrdMapper.selectByPrimaryKey(filterRuleId);
+                redisUtils.del("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
             }
             // 删除展示列的标签
             redisUtils_prd.del("MKT_ISALE_LABEL_" + mktCampaignDO.getIsaleDisplay());
@@ -489,7 +499,8 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
             List<Long> longList = mktStrategyFilterRuleRelMapper.selectByStrategyId(mktCampaignId);
             redisUtils.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils.del("FILTER_RULE_DISTURB_" + filterRuleId);
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                redisUtils.del("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
             }
 
             // 删除展示列的标签

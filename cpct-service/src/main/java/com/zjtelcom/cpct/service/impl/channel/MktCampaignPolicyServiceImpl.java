@@ -143,7 +143,7 @@ public class MktCampaignPolicyServiceImpl extends BaseService implements MktCamp
             camPolicy.setCreateDate(new Date());
             camPolicy.setCreateStaff(UserUtil.getUser().getStaffId());
             camPolicy.setMktCampaignId(campaignId);
-            camPolicy.setPolicyDesc(policyInfoVo.getPolicyDesc());
+            camPolicy.setRemark(policyInfoVo.getPolicyDesc());
             camPolicy.setPolicyId(policyInfoVo.getPolicyId());
             camPolicy.setPolicyName(policyInfoVo.getPolicyName());
             camPolicy.setStatusCd(STATUSCD_EFFECTIVE);
