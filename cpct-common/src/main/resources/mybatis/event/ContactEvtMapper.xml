@@ -172,6 +172,7 @@
         STATUS_DATE,
         UPDATE_DATE,
         REC_CAMPAIGN_AMOUNT,
+        TOP_CAMPAIGN_NUM,
         REMARK)
         values (
         #{interfaceCfgId,jdbcType=BIGINT},
@@ -196,6 +197,7 @@
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
+        #{topCampaignNum,jdbcType=VARCHAR},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -407,6 +409,7 @@
 
             REMARK = #{remark,jdbcType=VARCHAR},
 
+            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=VARCHAR},
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
