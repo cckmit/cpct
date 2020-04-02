@@ -1493,11 +1493,6 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("resultMsg", "结果id为空");
             return result;
         }
-        if (custId == null || "".equals(custId)) {
-            result.put("resultCode", "1000");
-            result.put("resultMsg", "客户编码为空");
-            return result;
-        }
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "本地网编码为空");
