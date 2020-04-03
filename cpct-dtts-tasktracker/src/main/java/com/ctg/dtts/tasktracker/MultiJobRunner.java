@@ -47,7 +47,13 @@ public class MultiJobRunner {
     private LabelSaturationMapper labelSaturationMapper;
     @Autowired
     private TrialOperationMapper trialOperationMapper;
+    @Autowired(required = false)
+    private TrialProdService trialProdService;
 
+
+    private static final String userAcct = "CPCPYX";
+    private static final String password = "908234";
+    private static final String sceneId = "7149";
 
     /**
      * 单位为天的周期性营销活动
@@ -681,11 +687,77 @@ public class MultiJobRunner {
             }
             //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
             if (stringArraylist!=null){
-
+                //再次执行
+                try {
+                    Map<String,Object> param =new HashMap<>();
+                    param.put("idList",stringArraylist); //活动id集合
+                    param.put("perCampaign","PER_CAMPAIGN")//周期性活动标识
+                    result =  trialProdService.campaignIndexTask(param);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //下发短信
+                String sendMsg = "周期性活动下发或试算失败，活动id为："+JSON.toJSONString(stringArraylist);
+                List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+                for (SysParams sysParams : send_msg) {
+                    try {
+                        sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
 
     }
 
+
+    //下发短信
+    public String sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
+        HashMap params = new HashMap();
+        //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
+        params.put("TransactionId", userAcct + date2StringDate(new Date()) + getRandom(10));
+        //UCCP分配的系统编码
+        params.put("SystemCode", userAcct);
+        //UCCP分配的帐号
+        params.put("UserAcct", userAcct);
+        //UCCP分配的认证密码
+        params.put("Password", password);
+        //场景标识
+        params.put("SceneId", sceneId);
+        //请求的时间,请求发起的时间,必须为下边的格式
+        params.put("RequestTime",date2StringDate(new Date()));
+        //接收消息推送的手机号码
+        params.put("AccNbr",targPhone);
+        //params.put("AccNbr","18957181789");
+        //消息内容
+        params.put("OrderContent",sendContent);
+        //本地网/辖区
+        params.put("LanId",lanId);
+        Map map = uCCPSendService.sendShortMessage(params);
+        if (map == null) return "调用sendShortMessage返回结果异常！";
+        if (!map.get("code").equals("0000")) {
+            // 短信发送成功记录数据
+            saveShortMessageLog(targPhone, sendContent);
+            return map.get("msg").toString();
+        } else {
+            return "";
+        }
+    }
+
+    public static String date2StringDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String result = sdf.format(date);
+        return result;
+    }
+
+    // 短信发送类型任务记录
+    public void saveShortMessageLog(String targPhone, String sendContent) {
+        try {
+            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
