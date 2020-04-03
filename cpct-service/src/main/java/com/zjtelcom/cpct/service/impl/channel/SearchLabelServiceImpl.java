@@ -119,10 +119,10 @@ public class SearchLabelServiceImpl extends BaseService implements SearchLabelSe
                         Label label = null;
                         MktVerbalCondition condition = verbalConditionMapper.selectByPrimaryKey(filterRule.getConditionId());
                         if (condition!=null){
-                            if (redisUtils.get("LABEL_LIB_"+filterRule.getConditionId())!=null){
-                                label = (Label) redisUtils.get("LABEL_LIB_"+filterRule.getConditionId());
+                            if (redisUtils.get("LABEL_LIB_"+condition.getLeftParam())!=null){
+                                label = (Label) redisUtils.get("LABEL_LIB_"+condition.getLeftParam());
                             }else {
-                                label = injectionLabelMapper.selectByPrimaryKey(filterRule.getConditionId());
+                                label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
                                 if (label!=null){
                                     redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
                                 }else {

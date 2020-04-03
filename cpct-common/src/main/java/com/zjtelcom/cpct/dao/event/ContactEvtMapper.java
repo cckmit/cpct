@@ -62,4 +62,6 @@ public interface ContactEvtMapper {
     EventInterfaceRel selectEvtInterfaceRel(EventInterfaceRel eventInterfaceRel);
 
     List<String> selectChannelListByEvtCode(String evtCode);
+
+    int selectEvtContactCamCount(long evtId);
 }

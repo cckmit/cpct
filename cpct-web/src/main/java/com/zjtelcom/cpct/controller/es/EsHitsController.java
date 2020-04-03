@@ -242,7 +242,7 @@ public class EsHitsController {
     }
 
     //客户级查询接口
-    @PostMapping("/getCustomer")
+    @PostMapping("/getCustomerByCustId")
     @CrossOrigin
     public Map<String,Object> getCustomerByCustId(@RequestBody Map<String, String> params){
         Map<String, Object> map = new HashMap<>();

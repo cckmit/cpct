@@ -212,14 +212,14 @@ public class EventRedisServiceImpl implements EventRedisService {
             List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(id);
             redisUtils.set(key, filterRuleIds);
             resutlt.put(key, filterRuleIds);
-        } else if (key.startsWith("FILTER_RULE_")) { // 过滤规则
-            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
-            redisUtils.set(key, filterRule);
-            resutlt.put(key, filterRule);
         } else if (key.startsWith("FILTER_RULE_DISTURB_")) {  // 过滤规则信息查询失败
             List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(id);
             redisUtils.set(key, labels);
             resutlt.put(key, labels);
+        } else if (key.startsWith("FILTER_RULE_")) { // 过滤规则
+            FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
+            redisUtils.set(key, filterRule);
+            resutlt.put(key, filterRule);
         } else if (key.startsWith("MKT_ISALE_LABEL_")) {
             List<Map<String, Object>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(id);
             redisUtils.set(key, iSaleDisplay);
@@ -338,7 +338,7 @@ public class EventRedisServiceImpl implements EventRedisService {
             List<String> labelCodeList = injectionLabelMapper.selectLabelCodeByType("1100"); // 1100 代表为时间类型的标签
             redisUtils.set(key, labelCodeList);
             resutlt.put(key, labelCodeList);
-        } else if ("COOL_LOGIN_ID".equals(key)) {
+        } else if ("COOL_LOGIN_ID_KEY".equals(key)) {
             List<Map<String, String>> sysParam = sysParamsMapper.listParamsByKey("COOL_LOGIN_ID");
             redisUtils.set(key, sysParam);
             resutlt.put(key, sysParam);
@@ -349,7 +349,7 @@ public class EventRedisServiceImpl implements EventRedisService {
                 redisUtils.set(key, channelFilterCode);
                 resutlt.put(key, channelFilterCode);
             }
-        } else if ("CHECK_LABEL".equals(key)) {   // 事件实时接入标签验证开关
+        } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
             if (systemParamList.size() > 0) {
                 redisUtils.set(key, systemParamList.get(0));
@@ -464,7 +464,8 @@ public class EventRedisServiceImpl implements EventRedisService {
             for (Long filterRuleId : filterRuleIds) {
                 // 删除单个过滤规则
                 redisUtils.del("FILTER_RULE_" + filterRuleId);
-                redisUtils.del("FILTER_RULE_DISTURB_" + filterRuleId);
+                FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(filterRuleId);
+                redisUtils.del("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
             }
             List<MktStrategyConfDO> mktStrategyConfDOS = mktStrategyConfMapper.selectByCampaignId(mktCampaginId);
             for (MktStrategyConfDO mktStrategyConfDO : mktStrategyConfDOS) {
