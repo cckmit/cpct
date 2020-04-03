@@ -564,7 +564,27 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRule.setUpdateStaff(UserUtil.loginId());
             closeRule.setStatusDate(DateUtil.getCurrentTime());
             closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
-            closeRuleMapper.createFilterRule(closeRule);
+            int filterRule = closeRuleMapper.createFilterRule(closeRule);
+
+            //导入销售品 关单编码为空？
+            if (StringUtils.isNotBlank(closeType) && closeType.equals("1000")){
+                closeRule.setExpression("CR001");
+            }
+            if (StringUtils.isNotBlank(closeType) && closeType.equals("3000")){
+                closeRule.setExpression("CR003");
+            }
+            if (StringUtils.isNotBlank(closeType) && closeType.equals("4000")){
+                closeRule.setExpression("CR004");
+            }
+            if (StringUtils.isNotBlank(closeType) && closeType.equals("2000")){
+                closeRule.setExpression("CR002");
+            }
+            if (StringUtils.isNotBlank(closeType) && closeType.equals("5000")){
+                closeRule.setExpression("CR005");
+            }
+            //自动步枪6位数 前面补零
+            String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
+            closeRuleMapper.updateExpression(String.valueOf(filterRule),closeRule.getExpression()+expression);
         }else {
             Integer count = closeRuleMapper.getCloseNameCount(closeName);
             if (count>1){
