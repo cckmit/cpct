@@ -34,7 +34,7 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private String longitude;//经度
     private String latitude;//纬度
     private String locationSwitch;//位置切换开关
-    public Long topCampaignNum;// 事件允许关联最大活动数
+    private Long topCampaignNum;// 事件允许关联最大活动数
 
     public String getRecCampaignAmount() {
         return recCampaignAmount;
