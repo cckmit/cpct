@@ -30,6 +30,33 @@
         <result column="TOP_CAMPAIGN_NUM" jdbcType="VARCHAR" property="topCampaignNum" />
     </resultMap>
 
+    <sql id="entity">EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REC_CAMPAIGN_AMOUNT,
+        REMARK,
+        TOP_CAMPAIGN_NUM
+        </sql>
+
     <sql id="eventJoin">
         LEFT JOIN event_type t ON t.EVT_TYPE_ID = e.EVT_TYPE_ID
     </sql>
@@ -197,7 +224,7 @@
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
-        #{topCampaignNum,jdbcType=VARCHAR},
+        #{topCampaignNum,jdbcType=BIGINT},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -234,7 +261,7 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventById" resultMap="resultMapper">
-        select * from event
+        select <include refid="entity"/> from event
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </select>
 
@@ -365,51 +392,30 @@
 
     <update id="modContactEvt" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
         update event
-        set INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
-
-            EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
-
-            EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
-
-            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
-
-            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
-
-            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
-
-            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
-
-            EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
-
-            EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
-
-            EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
-
-            LOCATION_NBR = #{locationNbr,jdbcType=VARCHAR},
-
-            LONGITUDE = #{longitude,jdbcType=VARCHAR},
-
-            LATITUDE = #{latitude,jdbcType=VARCHAR},
-
-            LOCATION_SWITCH = #{locationSwitch,jdbcType=VARCHAR},
-
-            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-
-            REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
-
-            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-
-            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-
-            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-
-            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-
-            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-
-            REMARK = #{remark,jdbcType=VARCHAR},
-
-            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=VARCHAR},
+        set
+        INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+        EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
+        EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
+        EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+        EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+        EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+        EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+        EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
+        EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
+        EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
+        LOCATION_NBR = #{locationNbr,jdbcType=VARCHAR},
+        LONGITUDE = #{longitude,jdbcType=VARCHAR},
+        LATITUDE = #{latitude,jdbcType=VARCHAR},
+        LOCATION_SWITCH = #{locationSwitch,jdbcType=VARCHAR},
+        STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
+        CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
