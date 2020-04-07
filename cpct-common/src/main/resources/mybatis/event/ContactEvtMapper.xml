@@ -27,7 +27,7 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-        <result column="TOP_CAMPAIGN_NUM" jdbcType="VARCHAR" property="topCampaignNum" />
+        <result column="TOP_CAMPAIGN_NUM" jdbcType="BIGINT" property="topCampaignNum" />
     </resultMap>
 
     <sql id="eventJoin">
@@ -197,7 +197,7 @@
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
-        #{topCampaignNum,jdbcType=VARCHAR},
+        #{topCampaignNum,jdbcType=BIGINT},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -409,7 +409,7 @@
 
             REMARK = #{remark,jdbcType=VARCHAR},
 
-            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=VARCHAR},
+            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>

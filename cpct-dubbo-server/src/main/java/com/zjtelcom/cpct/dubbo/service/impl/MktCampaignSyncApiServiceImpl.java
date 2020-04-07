@@ -29,6 +29,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
@@ -46,6 +47,7 @@ import com.zjtelcom.cpct_prd.dao.campaign.*;
 import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
+import com.zjtelcom.cpct_prd.dao.filter.FilterRulePrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
 import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
 import com.zjtelcom.cpct_prd.dao.strategy.*;
@@ -222,6 +224,9 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
     @Autowired
     private SearchLabelService searchLabelService;
 
+    @Autowired
+    private FilterRulePrdMapper filterRulePrdMapper;
+
 
     //同步表名
     private static final String tableName = "mkt_campaign";
@@ -381,7 +386,8 @@ public class MktCampaignSyncApiServiceImpl implements MktCampaignSyncApiService 
             List<Long> longList = mktStrategyFilterRuleRelPrdMapper.selectByStrategyId(mktCampaignId);
             redisUtils_prd.del("MKT_FILTER_RULE_IDS_" + mktCampaignId);
             for (Long filterRuleId : longList) {
-                redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRuleId);
+                FilterRule filterRule = filterRulePrdMapper.selectByPrimaryKey(filterRuleId);
+                redisUtils_prd.del("FILTER_RULE_DISTURB_" + filterRule.getConditionId());
             }
 
             // 删除展示列的标签
