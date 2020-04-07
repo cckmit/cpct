@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -324,9 +323,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private ProjectManageService projectManageService;
     @Autowired
     private EventRedisService eventRedisService;
-    @Autowired(required = false)
-    private ICpcAPIService iCpcAPIService;
-
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -1978,9 +1974,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         public void run() {
                             try {
                                 try {
-                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
-                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
-                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+//                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
+//                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+//                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
                                 }catch (Exception e) {
                                     logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
                                 }
