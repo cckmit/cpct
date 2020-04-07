@@ -23,9 +23,9 @@ import java.util.*;
 
 @Service
 @Transactional
-public class BlackListServiceCpctImpl implements BlackListCpctService {
+public class BlackListCpctServiceImpl implements BlackListCpctService {
 
-    private final static Logger log = LoggerFactory.getLogger(BlackListServiceCpctImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(BlackListCpctServiceImpl.class);
     private final static String splitMark = "\u0007";
     private final static String superfield = "createStaff,updateStaff,createDate,updateDate";
 

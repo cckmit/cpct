@@ -155,7 +155,7 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
      * @return
      */
     @Override
-    public Map<String, Object> listEvents(ContactEvt contactEvt, Page pageInfo) {
+    public Map<String, Object> listEventsForCam(ContactEvt contactEvt, Page pageInfo) {
         Map<String, Object> map = new HashMap<>();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
         List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
@@ -165,8 +165,31 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
             // 如果当前事件的实际关联活动数大于允许的最大关联数，则列表页面不显示该事件
             int i = contactEvtMapper.selectEvtContactCamCount(evt.getContactEvtId());
             if (evt.getTopCampaignNum() == null ? false : evt.getTopCampaignNum() > i ? false : true) {
-                contactEvtList.remove(evt);
+                iterator.remove();
             }
+            ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(evt.getContactEvtTypeId());
+            if (evtType!=null){
+                evt.setContactEvtTypeName(evtType.getContactEvtName());
+            }
+        }
+        map.put("resultCode", CommonConstant.CODE_SUCCESS);
+        map.put("resultMsg", StringUtils.EMPTY);
+        map.put("contactEvtList", contactEvtList);
+        map.put("pageInfo", new Page(new PageInfo(contactEvtList)));
+        return map;
+    }
+
+    /**
+     * 查询事件列表
+     *
+     * @return
+     */
+    @Override
+    public Map<String, Object> listEvents(ContactEvt contactEvt, Page pageInfo) {
+        Map<String, Object> map = new HashMap<>();
+        PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+        List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
+        for (ContactEvt evt : contactEvtList) {
             ContactEvtType evtType = evtTypeMapper.selectByPrimaryKey(evt.getContactEvtTypeId());
             if (evtType!=null){
                 evt.setContactEvtTypeName(evtType.getContactEvtName());

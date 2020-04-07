@@ -27,7 +27,7 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-        <result column="TOP_CAMPAIGN_NUM" jdbcType="VARCHAR" property="topCampaignNum" />
+        <result column="TOP_CAMPAIGN_NUM" jdbcType="BIGINT" property="topCampaignNum" />
     </resultMap>
 
     <sql id="entity">EVENT_ID,
@@ -199,6 +199,7 @@
         STATUS_DATE,
         UPDATE_DATE,
         REC_CAMPAIGN_AMOUNT,
+        TOP_CAMPAIGN_NUM,
         REMARK)
         values (
         #{interfaceCfgId,jdbcType=BIGINT},
@@ -223,6 +224,7 @@
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
+        #{topCampaignNum,jdbcType=BIGINT},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -259,7 +261,7 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventById" resultMap="resultMapper">
-        select <include refid="entity"/> from event
+        select * from event
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </select>
 
