@@ -638,6 +638,12 @@ public class CamCpcServiceImpl implements CamCpcService {
 
     @InterfaceTimeoutMonitoring(cutMethodType ="inside")
     public String getProdFilter(Map<String, String> privateParams, Map<String, Object> filterRuleTimeMap) {
+        String redisOrSysParams = redisUtils.getRedisOrSysParams("TEST_THREAD_SLEEP_SECONDS");
+        try {
+            Thread.sleep(Long.valueOf(redisOrSysParams) * 1000L);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         String productStr;List<String> prodList = new ArrayList<>();
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
         //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
