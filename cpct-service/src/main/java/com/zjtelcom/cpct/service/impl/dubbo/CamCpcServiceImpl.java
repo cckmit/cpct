@@ -203,6 +203,15 @@ public class CamCpcServiceImpl implements CamCpcService {
                     filterRule = (FilterRule) filterRuleRedis.get("FILTER_RULE_" + filterRuleId);
                 }
                 //判断过滤类型(红名单，黑名单)
+                // 测试线程睡眠时间(单位为秒)
+                String sleepTime = redisUtils.getRedisOrSysParams("test_thread_sleep_time");
+                if (sleepTime != null && Integer.valueOf(sleepTime) > 0) {
+                    try {
+                        Thread.sleep(Long.valueOf(sleepTime) * 1000);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (filterRule != null) {
                     if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
                         boolean productCheck = true; // 默认拦截
