@@ -6,6 +6,6 @@ public interface TrialRedisService {
 
     Map<String,Object> searchFromRedis(String key);
 
-    Map<String,Object> updateOperationStatus(Long batchNum,String status);
+    Map<String,Object> updateOperationStatus(Long batchNum,String status) throws Exception;
 
 }

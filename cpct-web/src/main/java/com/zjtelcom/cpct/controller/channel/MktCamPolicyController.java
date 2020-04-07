@@ -16,7 +16,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 @RequestMapping("${adminPath}/camPolicy")
 public class MktCamPolicyController extends BaseController {
 
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignPolicyService mktCampaignPolicyService;
 
     /**

@@ -834,13 +834,13 @@ public class EventApiServiceImpl implements EventApiService {
                  */
 
                 /*
-                * 满意度调查事件（受理）
-                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                * 4、都不满足暂不推
-                *
-                * */
+                 * 满意度调查事件（受理）
+                 * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
+                 * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                 * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                 * 4、都不满足暂不推
+                 *
+                 * */
                 // Map<String, Object> surveyMapRedis = eventRedisService.getRedis("SATISFACTION_ACCEPT");
                 //String eventCodeStr = (String) surveyMapRedis.get("SATISFACTION_ACCEPT");
                 //if (eventCode.indexOf(eventCodeStr) >= 0) {
@@ -944,13 +944,13 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                             log.info("222---isMobile --->" + isMobile);
                             if (isMobile) {
-                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
-                                if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
+                            //    CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
+                            //    log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
+                            //    if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
                                     log.info("444--- " + isMobile + " 为C网用户");
                                     reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
                                     reultMap.put("CPCP_ACCS_NBR", contactNumber);
-                                }
+                            //    }
                             }
                         }
                     }
@@ -961,14 +961,14 @@ public class EventApiServiceImpl implements EventApiService {
 
 
 
-                   /*
-                * 满意度调查事件（装维）
-                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                * 4、都不满足暂不推
-                *
-                * */
+                /*
+                 * 满意度调查事件（装维）
+                 * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
+                 * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                 * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                 * 4、都不满足暂不推
+                 *
+                 * */
                 //   Map<String, Object> zhuangMapRedis = eventRedisService.getRedis("SATISFACTION_ZHUANG");
                 //   String eventCodeZhuangStr = (String) zhuangMapRedis.get("SATISFACTION_ZHUANG");
                 //   if (eventCodeZhuangStr.indexOf(eventCodeStr) >= 0) {
@@ -1493,6 +1493,7 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("resultMsg", "结果id为空");
             return result;
         }
+
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "本地网编码为空");
@@ -2673,9 +2674,11 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
+        log.info("contextNew --->>>>" + JSON.toJSONString(contextNew));
         contextNew.putAll(context);      // 客户级标签
         contextNew.put("integrationId", privateParams.get("integrationId"));
         contextNew.put("accNbr", privateParams.get("accNbr"));
+        log.info("contextNew222 --->>>>" + JSON.toJSONString(contextNew));
         return contextNew;
     }
 
@@ -2993,6 +2996,7 @@ public class EventApiServiceImpl implements EventApiService {
 //                                }
 
                                 if (mktCampaignDO != null) {
+                                    System.out.println(JSON.toJSONString(mktCampaignDO));
                                     if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
                                         result.put("activityType", "0"); //营销
                                     } else if ("5000".equals(mktCampaignDO.getMktCampaignType())) {
@@ -3004,7 +3008,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     } else {
                                         result.put("activityType", "0"); //活动类型 默认营销
                                     }
-
+                                    System.out.println(JSON.toJSONString(result));
                                     result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
                                     result.put("activityEndTime", simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
                                 } else {

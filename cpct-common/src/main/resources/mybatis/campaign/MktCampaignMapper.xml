@@ -392,7 +392,7 @@
         t.MKT_CAMPAIGN_ID = r.Z_MKT_CAMPAIGN_ID
         ) AS A_MKT_CAMPAIGN_ID
         from mkt_campaign t
-        where  t.STATUS_CD NOT IN (2002, 2006, 2007, 2008, 2010)
+        where  t.STATUS_CD  IN (2001 ,2003 ,2004 ,2005 ,2009 ,2011)
         <if test="mktCampaignName != null and mktCampaignName != ''">
             AND t.MKT_CAMPAIGN_NAME like CONCAT('%',#{mktCampaignName,jdbcType=VARCHAR},'%')
         </if>
@@ -705,7 +705,7 @@
         <if test="lanId != null and lanId != '' and lanId != '1'">
             AND LAN_ID IN #{lanId}
         </if>
-        <if test="theMe != null and theMe != '' and theMe !='all' ">
+        <if test="theMe != null and theMe != '' ">
             AND THE_ME  = #{theMe}
         </if>
         </where>
@@ -793,13 +793,13 @@
             tril.CREATE_STAFF = 1000)
         </if>
         <if test="map.trilType != null and map.trilType != '' and map.trilType == '2000' ">
-            AND t.MKT_CAMPAIGN_ID NOT IN (
+            AND t.MKT_CAMPAIGN_ID  IN (
             SELECT
             tril.CAMPAIGN_ID
             FROM
             trial_operation tril
             WHERE
-            tril.CREATE_STAFF = 1000 )
+            tril.CREATE_STAFF = 2000 )
         </if>
         </where>
 

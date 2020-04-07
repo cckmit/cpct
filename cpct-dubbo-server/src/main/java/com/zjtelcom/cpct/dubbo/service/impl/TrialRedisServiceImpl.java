@@ -55,7 +55,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
      * @return
      */
     @Override
-    public Map<String, Object> updateOperationStatus(Long batchNum, String status) {
+    public Map<String, Object> updateOperationStatus(Long batchNum, String status) throws Exception {
         Map<String,Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum.toString());
         if (operation==null){

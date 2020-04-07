@@ -55,6 +55,6 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select INDEX_ID, INDEX_SUFFIX, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
     STATUS_DATE, UPDATE_DATE, START_IMPORT_DATE, END_IMPORT_DATE, STATUS_IMPORT, REMAKE
-    from index_log
+    from index_log WHERE 1!=2
   </select>
 </mapper>

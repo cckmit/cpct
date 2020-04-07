@@ -97,7 +97,7 @@
     PARENT_ORG_ID, ORG_LEVEL, ORG_INDEX, SALESORG_CODE, DIVORG_FLAG, CREATE_DATE, CREATE_STAFF, 
     STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE, 
     ORG_AREA_LEVEL, REMARK, ORG_DESC
-    from organization
+    from organization WHERE 1!=2
   </select>
 
   <select id="selectByParentId" resultMap="BaseResultMap">

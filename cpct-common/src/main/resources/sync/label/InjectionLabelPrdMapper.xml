@@ -160,7 +160,7 @@
     LAB_LEVEL3, LAB_LEVEL3_NAME, LAB_LEVEL4, LAB_LEVEL4_NAME, LAB_LEVEL5, LAB_LEVEL5_NAME,
     LAB_LEVEL6, LAB_LEVEL6_NAME, LAB_UPDATE_FEQ, LAB_BUSI_DESC, LAB_TECH_DESC, LAB_STATE,
     LAB_MANAGE_TYPE, LAB_TAG_CODE, SYSTEM_INFO_ID
-    from injection_label
+    from injection_label WHERE 1!=2
   </select>
 
   <select id="selectByScope" resultMap="BaseResultMap">

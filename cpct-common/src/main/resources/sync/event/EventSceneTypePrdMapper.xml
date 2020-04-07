@@ -57,7 +57,7 @@
     select EVT_SCENE_TYPE_ID, EVT_SCENE_TYPE_NBR, EVT_SCENE_TYPE_NAME, PAR_EVT_SCENE_TYPE_ID, 
     EVT_SCENE_TYPE_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
     UPDATE_DATE, REMARK
-    from event_scene_type
+    from event_scene_type WHERE 1!=2
   </select>
 
   <select id="listEventSceneTypes" resultMap="BaseResultMap">
