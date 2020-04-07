@@ -58,6 +58,7 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        boolean uploadResult = false;
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
@@ -119,7 +120,14 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
                 }
                 log.info("sftp已获得连接");
                 sftpUtils.cd(exportPath, sftp);
-                boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+                uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+
+                sftp.disconnect();
+                resultMap.put("resultMsg", "success");
+            } catch (Exception e) {
+                log.error("黑名单数据文件dataFile失败！Expection = ", e);
+                resultMap.put("resultMsg", "faile");
+            } finally {
                 if (uploadResult) {
                     log.info("上传成功，开始删除本地文件！");
                     boolean b1 = dataFile.delete();
@@ -127,12 +135,6 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
                         log.info("删除本地文件成功！");
                     }
                 }
-                sftp.disconnect();
-                resultMap.put("resultMsg", "success");
-            } catch (Exception e) {
-                log.error("黑名单数据文件dataFile失败！Expection = ", e);
-                resultMap.put("resultMsg", "faile");
-            } finally {
                 sftp.disconnect();
             }
         }
