@@ -72,7 +72,19 @@
 
     <!--返回所有黑名单-->
     <select id="getAllBlackList"  resultMap="BaseResultMap">
-        select * from mkt_blacklist
+        select asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id,
+        create_staff, create_date, update_staff,update_date,operType from mkt_blacklist
+    </select>
+
+    <select id="getBlackListLimit" parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+        select asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id,
+        create_staff, create_date, update_staff,update_date,operType from mkt_blacklist
+         limit #{m},#{n}
+    </select>
+
+
+    <select id="getCountAll"  resultType="java.lang.Integer">
+        select count(1) from mkt_blacklist
     </select>
 
     <!--    分页获取主题列表模糊搜索-->

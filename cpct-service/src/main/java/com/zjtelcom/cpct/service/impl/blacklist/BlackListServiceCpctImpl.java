@@ -23,9 +23,9 @@ import java.util.*;
 
 @Service
 @Transactional
-public class BlackListCpctServiceImpl implements BlackListCpctService {
+public class BlackListServiceCpctImpl implements BlackListCpctService {
 
-    private final static Logger log = LoggerFactory.getLogger(BlackListCpctServiceImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(BlackListServiceCpctImpl.class);
     private final static String splitMark = "\u0007";
     private final static String superfield = "createStaff,updateStaff,createDate,updateDate";
 
@@ -35,7 +35,9 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
     private String ftpPassword = "V1p9*2_9%3#";
     private String exportPath = "/app/cpcp_cxzx/black_list_export/";
     private String importPath = "/app/cpcp_cxzx/black_list_import/";
-    private String localHeadFilePath = this.getClass().getResource("/").getPath();
+    private String localHeadFilePath = "/app/";
+
+    private final static int NUM = 5000;
 
     @Autowired
     private BlackListMapper blackListMapper;
@@ -58,83 +60,108 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        boolean uploadResult = false;
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
                 dataFile.createNewFile();
                 //创建策略定义文件
                 // 从数据库查询获取黑名单数据
-                List<BlackListDO> allBlackList = blackListMapper.getAllBlackList();
-                for (BlackListDO blackListDO : allBlackList) {
-                    StringBuilder sline = new StringBuilder();
-                    if (blackListDO.getBlackId() != 0) {
-                        sline.append(blackListDO.getBlackId());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getAssetPhone() != null) {
-                        sline.append(blackListDO.getAssetPhone());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getServiceCate() != null) {
-                        sline.append(blackListDO.getServiceCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getMaketingCate() != null) {
-                        sline.append(blackListDO.getMaketingCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getPublicBenefitCate() != null) {
-                        sline.append(blackListDO.getPublicBenefitCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getChannel() != null) {
-                        sline.append(blackListDO.getChannel());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getStaffId() != null) {
-                        sline.append(blackListDO.getStaffId());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getCreateStaff() != null) {
-                        sline.append(blackListDO.getCreateStaff());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getCreateDate() != null) {
+//                List<BlackListDO> allBlackList = blackListMapper.getAllBlackList();
 
-                        sline.append(DateUtil.date2StringDate(blackListDO.getCreateDate()));
+                int total = blackListMapper.getCountAll();
+                int count = total / NUM;
+                if (total % NUM > 1) {
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
+                    List<BlackListDO> allBlackList = new ArrayList<>();
+                    if (i == count - 1) {
+                        allBlackList = blackListMapper.getBlackListLimit(i * NUM, total - (i * NUM));
+                    } else {
+                        allBlackList = blackListMapper.getBlackListLimit(i * NUM,  NUM);
                     }
-                    sline.append(splitMark);
-                    if (blackListDO.getUpdateStaff() != null) {
-                        sline.append(blackListDO.getUpdateStaff());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getUpdateDate() != null) {
-                        sline.append(DateUtil.date2StringDate(blackListDO.getUpdateDate()));
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getOperType() != null) {
-                        sline.append(blackListDO.getOperType());
+                    System.out.println("allBlackList.size() = " + allBlackList.size());
+                    StringBuilder sline = new StringBuilder();
+                    for (int j = 0; j < allBlackList.size(); j++) {
+                        BlackListDO blackListDO = allBlackList.get(j);
+                        if (blackListDO.getBlackId() != 0) {
+                            sline.append(blackListDO.getBlackId());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getAssetPhone() != null) {
+                            sline.append(blackListDO.getAssetPhone());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getServiceCate() != null) {
+                            sline.append(blackListDO.getServiceCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getMaketingCate() != null) {
+                            sline.append(blackListDO.getMaketingCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getPublicBenefitCate() != null) {
+                            sline.append(blackListDO.getPublicBenefitCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getChannel() != null) {
+                            sline.append(blackListDO.getChannel());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getStaffId() != null) {
+                            sline.append(blackListDO.getStaffId());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getCreateStaff() != null) {
+                            sline.append(blackListDO.getCreateStaff());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getCreateDate() != null) {
+
+                            sline.append(DateUtil.date2StringDate(blackListDO.getCreateDate()));
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getUpdateStaff() != null) {
+                            sline.append(blackListDO.getUpdateStaff());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getUpdateDate() != null) {
+                            sline.append(DateUtil.date2StringDate(blackListDO.getUpdateDate()));
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getOperType() != null) {
+                            sline.append(blackListDO.getOperType());
+                        }
+                        if (j < allBlackList.size() - 1) {
+                            sline.append("\r\n");
+                        }
                     }
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
+
+
                 log.info("sftp已获得连接");
                 sftpUtils.cd(exportPath, sftp);
-                boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
-                if (uploadResult) {
-                    log.info("上传成功，开始删除本地文件！");
-                    boolean b1 = dataFile.delete();
-                    if (b1) {
-                        log.info("删除本地文件成功！");
-                    }
-                }
+                uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+
                 sftp.disconnect();
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
                 resultMap.put("resultMsg", "faile");
             } finally {
+                if (uploadResult) {
+                    log.info("上传成功，开始删除本地文件！");
+                }
+                boolean b1 = dataFile.delete();
+                if (b1) {
+                    log.info("删除本地文件成功！");
+                }
                 sftp.disconnect();
             }
+        } else {
+            log.info(dataFileName + "文件已存在！");
         }
         return resultMap;
     }
@@ -184,7 +211,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             }
 
             // 解析头文件
-            File headFolders = new File(this.getClass().getResource("/").getPath());
+            File headFolders = new File(localHeadFilePath);
             File[] fileArray = headFolders.listFiles();
             StringBuilder head = new StringBuilder();
             String[] headArr = null;
