@@ -30,6 +30,33 @@
         <result column="TOP_CAMPAIGN_NUM" jdbcType="BIGINT" property="topCampaignNum" />
     </resultMap>
 
+    <sql id="entity">EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REC_CAMPAIGN_AMOUNT,
+        REMARK,
+        TOP_CAMPAIGN_NUM
+        </sql>
+
     <sql id="eventJoin">
         LEFT JOIN event_type t ON t.EVT_TYPE_ID = e.EVT_TYPE_ID
     </sql>
