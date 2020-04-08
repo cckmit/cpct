@@ -1964,6 +1964,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
+
+                try {
+                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
+                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+                }catch (Exception e) {
+                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
+                }
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
@@ -1971,14 +1979,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                try {
-                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
-                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
-                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
-                                }catch (Exception e) {
-                                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
-                                }
-
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                                 String roleName = "admin";
