@@ -9,4 +9,8 @@ public interface BlackListService {
     Map<String,Object> getBlackListById(List<String> phoneNums);
     Map<String,Object> getAllBlackList();
 
+    Map<String, Object> exportBlackListFile();
+
+    Map<String, Object> importBlackListFile();
+
 }
