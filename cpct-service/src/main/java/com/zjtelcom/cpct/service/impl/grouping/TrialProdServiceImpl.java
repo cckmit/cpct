@@ -183,7 +183,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         }
 
         List<Map<String,Object>> resList = new ArrayList<>();
-        mktDttsLogService.saveMktDttsLog("1000","活动",new Date(),new Date(),"成功",null);
 
         for (Integer id : idList){
             MktCampaignDO cam = campaignMapper.selectByPrimaryKey(Long.valueOf(id.toString()));
@@ -225,6 +224,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                 //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
+                    mktDttsLogService.saveMktDttsLog("1000","周期性活动："+campaignDO.getMktCampaignName(),new Date(),new Date(),"成功",null);
                 }
                 //清单方案
                 if (userListCam.equals("USER_LIST_CAM")){

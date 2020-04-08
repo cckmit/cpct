@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.enums.DateUnit.DAY;
@@ -57,6 +55,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     public static final String maxDays = "BATCH_ISSUED_TIME";
     // 批次下发处理率最小允许值
     public static final String minRate = "BATCH_DEAL_RATE";
+    // 有效活动列表(只执行存在列表中的)
+    public static final String executeCamList = "EXECUTE_CAM_LIST";
 
     @Override
     public void issuedSuccessMktCheck() {
@@ -65,6 +65,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             List<TrialOperation> trialOperations = trialOperationMapper.queryIssuedSuccess();
             Integer days = getSysParamsIntegerValue(maxDays);
             Integer rate = getSysParamsIntegerValue(minRate);
+            String redisOrSysParams = redisUtils.getRedisOrSysParams(executeCamList);
+            List<String> camList = Arrays.asList(redisOrSysParams.split(","));
             x: for (TrialOperation trialOperation : trialOperations) {
                 try {
                     Date createDate = trialOperation.getCreateDate();
@@ -72,7 +74,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                     Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
                     Long campaignId = trialOperation.getCampaignId();
                     MktCampaignDO mktCampaignDO1 = mktCampaignMapper.selectByPrimaryKey(campaignId);
-                    if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null) {
+                    if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null || !camList.contains(campaignId)) {
                         continue;
                     }
                     Long initId = mktCampaignDO1.getInitId();
@@ -100,7 +102,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                                             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(initId);
                                             String content = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "的" + batchNum + "该批次的派单任务因处理率过低，现已自动失效！";
                                             uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, content);
-                                            trialOperation.setStatusCd("");
+                                            trialOperation.setStatusCd(TrialStatus.UPLOAD_EXPIRED.getValue());
                                             trialOperationMapper.updateByPrimaryKey(trialOperation);
                                             continue x;
                                         }
