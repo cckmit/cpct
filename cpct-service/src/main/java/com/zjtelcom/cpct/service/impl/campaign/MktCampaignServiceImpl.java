@@ -42,7 +42,6 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
@@ -78,8 +77,6 @@ import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,8 +101,6 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-
-
 
     // 集团活动承接接口
     @Override
@@ -326,7 +321,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private EventRedisService eventRedisService;
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
-
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -1970,6 +1964,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
+
+                try {
+                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
+                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+                }catch (Exception e) {
+                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
+                }
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
@@ -1977,14 +1979,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                try {
-                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
-                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
-                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
-                                }catch (Exception e) {
-                                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
-                                }
-
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                                 String roleName = "admin";
