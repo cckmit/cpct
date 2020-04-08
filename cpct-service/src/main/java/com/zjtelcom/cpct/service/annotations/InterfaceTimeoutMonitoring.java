@@ -20,4 +20,7 @@ public @interface InterfaceTimeoutMonitoring {
      */
     boolean shortMessageIfTimeout() default true;
 
+
+    String cutMethodType();
+
 }

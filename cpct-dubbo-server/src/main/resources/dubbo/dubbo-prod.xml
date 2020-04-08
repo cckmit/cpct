@@ -178,5 +178,9 @@
         <dubbo:method name="qrySystemUserDto" servicecode="00.1077.qrySystemUserDto" timeout="10000"/>
     </dubbo:reference>
 
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo" id="esServiceInfoImpl" version="1.0" check="false">
+        <!--联系号码查询是否绑定微厅-->
+        <dubbo:method name="getAssetByTelFourYN" servicecode="00.1083.getAssetByTelFourYN" timeout="120000"/>
+    </dubbo:reference>
 
 </beans>

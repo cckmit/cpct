@@ -27,8 +27,35 @@
         <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-        <result column="TOP_CAMPAIGN_NUM" jdbcType="VARCHAR" property="topCampaignNum" />
+        <result column="TOP_CAMPAIGN_NUM" jdbcType="BIGINT" property="topCampaignNum" />
     </resultMap>
+
+    <sql id="entity">EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REC_CAMPAIGN_AMOUNT,
+        REMARK,
+        TOP_CAMPAIGN_NUM
+        </sql>
 
     <sql id="eventJoin">
         LEFT JOIN event_type t ON t.EVT_TYPE_ID = e.EVT_TYPE_ID
@@ -172,6 +199,7 @@
         STATUS_DATE,
         UPDATE_DATE,
         REC_CAMPAIGN_AMOUNT,
+        TOP_CAMPAIGN_NUM,
         REMARK)
         values (
         #{interfaceCfgId,jdbcType=BIGINT},
@@ -196,6 +224,7 @@
         #{statusDate,jdbcType=TIMESTAMP},
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
+        #{topCampaignNum,jdbcType=BIGINT},
         #{remark,jdbcType=VARCHAR})
     </insert>
 
@@ -407,6 +436,7 @@
 
             REMARK = #{remark,jdbcType=VARCHAR},
 
+            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
