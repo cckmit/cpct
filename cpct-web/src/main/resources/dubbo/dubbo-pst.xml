@@ -126,7 +126,13 @@
         <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
         <!--&lt;!&ndash; 发布活动的时候调用营服接口传递活动信息 &ndash;&gt;-->
-        <!--<dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>-->
+        <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
+    </dubbo:reference>
+
+    <!-- 集团下发活动反馈接口 1.0 -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.open.service.completeMktCampaign.OpenCompleteMktCampaignService"
+                   id="openCompleteMktCampaignServiceImpl" version="1.0" check="false">
+        <dubbo:method name="completeMktCampaign" servicecode="00.1083.completeMktCampaign" timeout="10000"/>
     </dubbo:reference>
 
     <!-- 统计分析 -->
