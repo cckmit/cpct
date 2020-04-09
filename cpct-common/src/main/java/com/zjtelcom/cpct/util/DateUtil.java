@@ -693,6 +693,8 @@ public class DateUtil {
     }
 
     public static String date2StringDate(Date date) {
+        if (date == null)
+            return "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String result = sdf.format(date);
         return result;
