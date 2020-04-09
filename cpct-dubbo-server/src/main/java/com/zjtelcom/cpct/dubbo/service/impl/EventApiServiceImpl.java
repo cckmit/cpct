@@ -1037,7 +1037,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //套餐级
                             for (DefaultContext<String, Object> o : packResultMapList) {
                                 for (Map<String, Object> accNbrMap : accNbrMapList) {
-                                    if (o.get("accNbr").toString().equals(accNbrMap.get("ACC_NBR"))) {
+                                    if (o.get("integrationId").toString().equals(accNbrMap.get("ASSET_INTEG_ID"))) {
                                         //客户级下，循环资产级
                                         Map<String, String> privateParams = new HashMap<>();
                                         privateParams.put("isCust", "0"); //是客户级
