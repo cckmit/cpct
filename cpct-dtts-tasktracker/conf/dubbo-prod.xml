@@ -45,4 +45,10 @@
     <dubbo:reference registry="esb3" interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" check="false">
         <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
     </dubbo:reference>
+
+    <!-- blacklistservice -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.BlackListService" id="blackListService" version="1.0" check="false">
+        <dubbo:method name="exportBlackListFile" servicecode="33.1083.exportBlackListFile" timeout="10000"/>
+        <dubbo:method name="importBlackListFile" servicecode="33.1083.importBlackListFile" timeout="10000"/>
+    </dubbo:reference>
 </beans>
