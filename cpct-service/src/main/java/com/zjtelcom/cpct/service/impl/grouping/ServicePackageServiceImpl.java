@@ -52,8 +52,8 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${ctg.cpctTopic}")
-    private String importTopic;
+    @Value("${ctg.cpctSerpackageTopic}")
+    private String cpctSerpackageTopic;
 
     private final static int NUM = 1000;
 
@@ -129,7 +129,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 msgBody.put("contentList", newContentList);
                 try {
                     // 判断是否发送成功
-                    if (!mqService.msg2Producer(msgBody, importTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
+                    if (!mqService.msg2Producer(msgBody, cpctSerpackageTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
                         // 发送失败自动重发2次，如果还是失败，记录
                         logger.error("CTGMQ消息生产失败,servicePackageId:" + servicePackageId, JSON.toJSONString(msgBody));
                     }
