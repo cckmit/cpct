@@ -1965,13 +1965,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
 
-                try {
-                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
-                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
-                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
-                }catch (Exception e) {
-                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
-                }
+                syncCamData2Synergy(mktCampaignDO);
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
@@ -2041,6 +2035,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
 
         return maps;
+    }
+
+    // 同步活动信息到营服协同
+    public void syncCamData2Synergy(MktCampaignDO mktCampaignDO) {
+        try {
+            Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
+            stringObjectMap.put("planBeginTime", date2StringDate(mktCampaignDO.getPlanBeginTime()));
+            stringObjectMap.put("planEndTime", date2StringDate(mktCampaignDO.getPlanEndTime()));
+            stringObjectMap.put("beginTime", date2StringDate(mktCampaignDO.getBeginTime()));
+            stringObjectMap.put("endTime", date2StringDate(mktCampaignDO.getEndTime()));
+            stringObjectMap.put("createDate", date2StringDate(mktCampaignDO.getCreateDate()));
+            stringObjectMap.put("statusDate", date2StringDate(mktCampaignDO.getStatusDate()));
+            stringObjectMap.put("updateDate", date2StringDate(mktCampaignDO.getUpdateDate()));
+            Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+            logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+        }catch (Exception e) {
+            logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
+        }
     }
 
     /**
