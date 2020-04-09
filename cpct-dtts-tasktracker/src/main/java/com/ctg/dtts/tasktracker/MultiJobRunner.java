@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.LabelSaturation;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
+import com.zjtelcom.cpct.dubbo.out.BlackListService;
 import com.zjtelcom.cpct.dubbo.out.CampaignService;
 import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
@@ -54,6 +55,8 @@ public class MultiJobRunner {
     private UCCPSendService uCCPSendService;
 //    @Autowired(required = false)
 //    private MktDttsLogService mktDttsLogService;
+    @Autowired(required = false)
+    private BlackListService blackListService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -781,4 +784,42 @@ public class MultiJobRunner {
 //            e.printStackTrace();
 //        }
 //    }
+
+    /**
+     * 黑名单导出
+     */
+    public void exportBlackListFile() throws Throwable {
+        try {
+            LOGGER.info("黑名单导出exportBlackListFile执行");
+            springBean.hello();
+            String msg = "exportBlackListFile执行任务";
+            LOGGER.info(msg);
+            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
+            bizLogger.info(msg);
+            //黑名单导出
+            blackListService.exportBlackListFile();
+        } catch (Exception e) {
+            LOGGER.info("Run exportBlackListFile failed!", e);
+        }
+    }
+
+
+    /**
+     * 黑名单导入
+     */
+    public void importBlackListFile() throws Throwable {
+        try {
+            LOGGER.info("黑名单导入importBlackListFile执行");
+            springBean.hello();
+            String msg = "importBlackListFile执行任务";
+            LOGGER.info(msg);
+            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
+            bizLogger.info(msg);
+            //黑名单导入
+            blackListService.importBlackListFile();
+        } catch (Exception e) {
+            LOGGER.info("Run importBlackListFile failed!", e);
+        }
+    }
+
 }
