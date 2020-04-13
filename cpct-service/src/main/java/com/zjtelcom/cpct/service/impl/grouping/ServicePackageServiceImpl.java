@@ -112,6 +112,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 if (i == 0) {
                     if (i == total - 1) {
                         newContentList = contentList.subList(2, contentList.size());
+                        System.out.println(newContentList.get(0));
                     } else {
                         newContentList = contentList.subList(2, NUM);
                     }
