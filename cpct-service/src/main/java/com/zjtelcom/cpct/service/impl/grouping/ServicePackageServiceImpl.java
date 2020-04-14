@@ -100,6 +100,9 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             // 获取服务包Id
             Long servicePackageId = servicePackage.getServicePackageId();
 
+            // 创建索引
+            esServicePackageService.servicePackageInport(servicePackageId, new ArrayList<>());
+
             logger.info("服务包清单contentList数量：" + contentList.size());
             int mqSum = 0;
             int total = contentList.size() / NUM;
