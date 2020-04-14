@@ -52,10 +52,10 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${ctg.cpctTopic}")
-    private String importTopic;
+    @Value("${ctg.cpctSerpackageTopic}")
+    private String cpctSerpackageTopic;
 
-    private final static int NUM = 1000;
+    private final static int NUM = 2000;
 
     @Override
     public Map<String, Object> saveServicePackage(String name, MultipartFile multipartFile) {
@@ -106,22 +106,25 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             if (contentList.size() % NUM > 0) {
                 total++;
             }
-            logger.info("有 " + total +" 批的清单数据");
-            List<String> newContentList = new ArrayList();
+            logger.info("有 " + total +" 批的服务包数据");
             for (int i = 0; i < total; i++) {
+                List<String> newContentList = new ArrayList();
                 if (i == 0) {
                     if (i == total - 1) {
                         newContentList = contentList.subList(2, contentList.size());
+                        System.out.println(newContentList.get(0));
                     } else {
                         newContentList = contentList.subList(2, NUM);
                     }
-                } else if (i == total - 1) {
+                } else{
                     if (i == total - 1) {
-                        newContentList = contentList.subList(0, contentList.size());
+                        newContentList = contentList.subList(i * NUM, contentList.size());
                     } else {
-                        newContentList = contentList.subList(0, NUM);
+                        newContentList = contentList.subList(i * NUM, (i + 1) * NUM);
                     }
                 }
+                System.out.println(" i = " + i);
+                logger.info("newContentList.size() = " + newContentList.size());
                 // 向MQ中扔入contentList
                 HashMap msgBody = new HashMap();
                 msgBody.put("servicePackageId", servicePackageId);
@@ -129,7 +132,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 msgBody.put("contentList", newContentList);
                 try {
                     // 判断是否发送成功
-                    if (!mqService.msg2Producer(msgBody, importTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
+                    if (!mqService.msg2Producer(msgBody, cpctSerpackageTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
                         // 发送失败自动重发2次，如果还是失败，记录
                         logger.error("CTGMQ消息生产失败,servicePackageId:" + servicePackageId, JSON.toJSONString(msgBody));
                     }
@@ -138,7 +141,6 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                newContentList.clear();
             }
             redisUtils.set("MQ_SERPACK_SUM_" + servicePackageId, mqSum);
 
