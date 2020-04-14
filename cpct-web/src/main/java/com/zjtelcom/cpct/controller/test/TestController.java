@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
@@ -21,10 +23,12 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
+import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.service.scheduled.ScheduledTaskService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -282,10 +286,6 @@ public class TestController extends BaseController {
     }
 
     @Autowired
-    private ScheduledTaskService scheduledTaskService;
-
-
-    @Autowired
     private MktCampaignMapper mktCampaignMapper;
 
     @PostMapping(value = "/testIssuedSuccessMktCheck")
@@ -358,6 +358,36 @@ public class TestController extends BaseController {
             e.printStackTrace();
         }
     }
+
+    @Autowired
+    private ScheduledTaskService scheduledTaskService;
+
+    @PostMapping("issuedSuccessMktCheck")
+    @CrossOrigin
+    public void issuedSuccessMktCheck() {
+        scheduledTaskService.issuedSuccessMktCheck();
+    }
+
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
+
+    @PostMapping("onlineScanCodeOrCallPhone4Home")
+    @CrossOrigin
+    public String onlineScanCodeOrCallPhone4Home(@RequestBody  HashMap<String, Object> params) {
+        return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params);
+    }
+
+
+    @Test
+    public void SSSSSSS() {
+        /*Integer rate = 1;
+        String handleRateString = "0.00012";
+        Double handleRate = Double.valueOf(handleRateString);
+        System.out.println(handleRate * 100 < rate);*/
+        scheduledTaskService.issuedSuccessMktCheck();
+    }
+
+
 }
 
 
