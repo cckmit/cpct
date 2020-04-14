@@ -231,13 +231,13 @@
         <dependency>
             <groupId>com.ccssoft.zj</groupId>
             <artifactId>interfaceplatform-module-service</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
-      <!--  <dependency>
+        <dependency>
             <groupId>CCP</groupId>
             <artifactId>REST_SMS_SDK_JAVA</artifactId>
-            <version>v2.6.3r</version>
-        </dependency>-->
+            <version>v2.6.4r</version>
+        </dependency>
 
     </dependencies>
 
