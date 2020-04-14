@@ -187,7 +187,7 @@
     GROUP BY o.CAMPAIGN_ID
   </select>
 
-  <select id="findOperationListByStrategyIdLsit"  parameterType="java.util.ArrayList" resultMap="BaseResultMap">
+  <select id="findOperationListByStrategyIdLsit"  parameterType="java.util.ArrayList" resultMap="BaseResultMap" >
     select <include refid="selectColumn"/>
       from trial_operation
       where STRATEGY_ID IN
@@ -195,5 +195,12 @@
         #{item}
       </foreach>
       order by CREATE_DATE desc
+  </select>
+
+
+  <select id="getDataStartToEnd" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="selectColumn"/>
+    from trial_operation
+    WHERE  CREATE_DATE > #{startTime} AND #{endTime} > CREATE_DATE AND CREATE_STAFF = 2000
   </select>
 </mapper>

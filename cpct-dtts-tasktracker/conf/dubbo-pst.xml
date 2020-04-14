@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://code.alibabatech.com/schema/dubbo
-	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="00.1083"/>
@@ -31,7 +32,7 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.CampaignService" id="campaignServiceImpl"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="campaignDelayNotice" servicecode="33.1083.campaignDelayNotice" timeout="10000"/>
-        <dubbo:method name="issuedSuccessMktCheck" servicecode="33.1083.issuedSuccessMktCheck" timeout="10000"/>
+        <!--<dubbo:method name="issuedSuccessMktCheck" servicecode="33.1083.issuedSuccessMktCheck" timeout="10000"/>-->
     </dubbo:reference>
 
     <!-- 标签饱和度查询接口 -->
@@ -40,6 +41,14 @@
         <dubbo:method name="querySaturation" servicecode="33.1307.querySaturation" timeout="10000"/>
     </dubbo:reference>
 
+    <!-- UCCP短信发送 -->
+    <dubbo:reference registry="esb3" interface="com.ztesoft.uccp.dubbo.interfaces.UCCPSendService" id="uCCPSendService" version="1.0" check="false">
+        <dubbo:method name="sendShortMessage" servicecode="33.1099.sendShortMessage" timeout="120000"/>
+    </dubbo:reference>
 
-
+    <!-- blacklistservice -->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.BlackListService" id="blackListService" version="1.0" check="false">
+        <dubbo:method name="exportBlackListFile" servicecode="33.1083.exportBlackListFile" timeout="10000"/>
+        <dubbo:method name="importBlackListFile" servicecode="33.1083.importBlackListFile" timeout="10000"/>
+    </dubbo:reference>
 </beans>

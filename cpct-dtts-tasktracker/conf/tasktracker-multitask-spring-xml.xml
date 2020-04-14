@@ -16,6 +16,12 @@
 
     <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
         <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="playAgainPeriodicity"/>
+        <property name="shardValue" value="playAgainPeriodicity"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
         <property name="targetMethod" value="runCycleMarketCampaignDay"/>
         <property name="shardValue" value="cycleMarketCampaignDay"/>
     </bean>
@@ -115,6 +121,19 @@
         <property name="targetMethod" value="sendMsgByOfferOver"/>
         <property name="shardValue" value="sendMsgByOfferOver"/>
     </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="exportBlackListFile"/>
+        <property name="shardValue" value="exportBlackListFile"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="importBlackListFile"/>
+        <property name="shardValue" value="importBlackListFile"/>
+    </bean>
+
 
     <!-- 这个 TaskTrackerAnnotationFactoryBean bean 要放在 MethodInvokingJobRunner的后面  -->
     <bean id="taskTracker" class="com.ctg.dtts.spring.TaskTrackerAnnotationFactoryBean" init-method="start">
