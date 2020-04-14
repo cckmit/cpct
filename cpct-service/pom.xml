@@ -228,6 +228,17 @@
             <artifactId>policy-query-service</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ccssoft.zj</groupId>
+            <artifactId>interfaceplatform-module-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>CCP</groupId>
+            <artifactId>REST_SMS_SDK_JAVA</artifactId>
+            <version>v2.6.3r</version>
+        </dependency>
+
     </dependencies>
 
 
