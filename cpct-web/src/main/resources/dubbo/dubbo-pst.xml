@@ -156,10 +156,10 @@
     </dubbo:reference>
 
     <!-- 线上扫码、电话到家特殊逻辑 -->
-    <dubbo:service interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" ref="iSaleService" version="1.0" timeout="20000">
+    <dubbo:reference registry="esb3" interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" id="iSaleService" version="1.0" check="false">
         <dubbo:method name="queryResCoverAddrService" servicecode="33.1103.queryResCoverAddrService"/>
         <dubbo:method name="queryCoverIdByAddr" servicecode="33.1103.queryCoverIdByAddr"/>
         <dubbo:method name="queryResCoverInfoService" servicecode="33.1103.queryResCoverInfoService"/>
-    </dubbo:service>
+    </dubbo:reference>
 
 </beans>

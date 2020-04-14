@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.org.StaffGisRelMapper">
+
+    <select id="selectStaffTelByGisCode" resultType="string">
+        SELECT s.staff_tel
+        FROM staff_gis_rel r
+        LEFT JOIN staff s ON r.staff_id = s.staff_id
+        WHERE r.GIS_CODE = #{gisCode} and r.status_cd = 1000 and r.rel_type = 1100
+    </select>
+
+</mapper>
