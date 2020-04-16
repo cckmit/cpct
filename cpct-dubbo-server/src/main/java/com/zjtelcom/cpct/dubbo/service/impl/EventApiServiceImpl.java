@@ -60,8 +60,10 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
+import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
@@ -197,6 +199,8 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private BlackListMapper blackListMapper;
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
 
     @Autowired(required = false)
     private EsServiceInfo esServiceInfo;
@@ -1006,6 +1010,14 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.add(reultMap);
                 }
 
+                // 扫码下单、电话到家事件特殊逻辑
+                if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
+                    HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
+                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtParamsMap, eventCode);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    reultMap.put("CPCP_ACCS_NBR", managerTel);
+                    resultMapList.add(reultMap);
+                }
 
                 //遍历活动
                 for (Map<String, Object> resultMap : resultByEvent) {
@@ -1506,7 +1518,6 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("resultMsg", "结果id为空");
             return result;
         }
-
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "本地网编码为空");
@@ -3004,7 +3015,6 @@ public class EventApiServiceImpl implements EventApiService {
 //                                }
 
                                 if (mktCampaignDO != null) {
-                                    System.out.println(JSON.toJSONString(mktCampaignDO));
                                     if ("1000".equals(mktCampaignDO.getMktCampaignType())) {
                                         result.put("activityType", "0"); //营销
                                     } else if ("5000".equals(mktCampaignDO.getMktCampaignType())) {
@@ -3016,7 +3026,7 @@ public class EventApiServiceImpl implements EventApiService {
                                     } else {
                                         result.put("activityType", "0"); //活动类型 默认营销
                                     }
-                                    System.out.println(JSON.toJSONString(result));
+
                                     result.put("activityStartTime", simpleDateFormat.format(mktCampaignDO.getPlanBeginTime()));
                                     result.put("activityEndTime", simpleDateFormat.format(mktCampaignDO.getPlanEndTime()));
                                 } else {

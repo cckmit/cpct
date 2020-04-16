@@ -2,6 +2,9 @@ package com.zjtelcom.cpct.service.impl.dubbo;
 
 import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
 import com.ql.util.express.DefaultContext;
+import com.zjtelcom.cpct.dao.org.StaffGisRelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,26 +19,50 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.stereotype.Service;
 
-    @Service
-    public class CamCpcSpecialLogic {
+@Service
+public class CamCpcSpecialLogic {
 
-        @Autowired(required = false)
-        private ISaleService iSaleService;
+    public static final Logger logger = LoggerFactory.getLogger(CamCpcSpecialLogic.class);
+
+    @Autowired(required = false)
+    private ISaleService iSaleService;
+    @Autowired
+    private StaffGisRelMapper staffGisRelMapper;
 
     // 线上扫码、电话到家事件接入特殊逻辑,判断事件是这两个事件   DefaultContext<String, Object> context
-    public String onlineScanCodeOrCallPhone4Home(HashMap<String, Object> context) {
-        // c4标识
-        String c4 = context.get("400600000026").toString();
-        // 详细地址
-        String addr = context.get("400600000016").toString();
-        // 本地网标识
-        String lanId = context.get("lanId").toString();
-        String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
-        String respXml = iSaleService.queryResCoverInfoService(resCoverId);
-        List<Map<String, Object>> maps = parseData(respXml);
-        Map<String, Object> map = maps.get(0);
-        // 获取GIS网格编码
-        String wgbm = getValue4CycleMap(map, "Wgbm");
+    public String onlineScanCodeOrCallPhone4Home(HashMap<String, Object> context, String eventCode) {
+        String wgbm = "";
+        try {
+            // c4标识
+            String c4 = context.get("400600000026").toString();
+            // 详细地址
+            String addr = context.get("400600000016").toString();
+            // 本地网标识
+            String lanId = context.get("lanId").toString();
+            String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
+            logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);
+            String resCoverIdXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<WebService FuncName=\"QueryResCoverInfoService\" City=\"WT\">\n" +
+                    "\t<Root>\n" +
+                    "\t\t<AreaBm>" + lanId + "</AreaBm>\n" +
+                    "\t\t<Method>QueryResCoverInfo</Method>\n" +
+                    "\t\t<Query>\n" +
+                    "\t\t\t<ResCoverId>" + resCoverId + "</ResCoverId>\n" +
+                    "\t\t</Query>\n" +
+                    "\t</Root>\n" +
+                    "</WebService>";
+            String respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
+            logger.info("onlineScanCodeOrCallPhone4Home-->respXml:" + respXml);
+            List<Map<String, Object>> maps = parseData(respXml);
+            logger.info("onlineScanCodeOrCallPhone4Home-->maps:" + maps);
+            Map<String, Object> map = maps.get(0);
+            // 获取GIS网格编码
+            wgbm = getValue4CycleMap(map, "Wgbm");
+            logger.info("onlineScanCodeOrCallPhone4Home-->wgbm:" + wgbm);
+        }catch (Exception e) {
+            logger.info("onlineScanCodeOrCallPhone4Home-->error!!!" );
+            e.printStackTrace();
+        }
         return wgbm;
     }
 
