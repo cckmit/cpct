@@ -202,6 +202,7 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private OrganizationMapper organizationMapper;
+
     @Autowired
     private CamCpcSpecialLogic camCpcSpecialLogic;
 
@@ -307,7 +308,6 @@ public class EventApiServiceImpl implements EventApiService {
             //初始化返回结果
             Map<String, Object> result = new HashMap();
             result = new EventTask().cpc(params);
-            log.info("222222222");
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
@@ -750,9 +750,6 @@ public class EventApiServiceImpl implements EventApiService {
                         reultMap.putAll(assetLabelMap);
                     }
                     resultMapList.add(reultMap);
-                    if (map.get("custId")==null || "0".equals(map.get("custId"))){
-                        map.put("custId",reultMap.get("CCUST_ID")==null ? "" : reultMap.get("CCUST_ID").toString());
-                    }
                 }
                 // 是客户级的
                 if (hasCust) {
@@ -927,37 +924,71 @@ public class EventApiServiceImpl implements EventApiService {
 
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
-                    HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
-                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtParamsMap, eventCode);
+                    // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
+                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(map, eventCode);
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     reultMap.put("CPCP_ACCS_NBR", managerTel);
+                    resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
 
                 if ("EVT0000000103".equals(eventCode)) {
+                    boolean isCommLvl4 = false;
                     // 从4A组织ID
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
-                    log.info("获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
+                    log.info("4-获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
                     if (commLvl4Id != null) {
                         Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
-                        log.info("查询orgId为：" + orgId);
+                        log.info("4-查询orgId为：" + orgId);
                         if (orgId != null) {
                             List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
-                            log.info("staffIdAndTypeMapListde ");
+                            log.info("4-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
                             if (staffIdAndTypeMapList != null) {
                                 for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
                                     if (staffIdAndTypeMap.get("staffId") != null) {
                                         Long staffId = (Long) staffIdAndTypeMap.get("staffId");
-                                        log.info("staffId: " + staffId);
+                                        log.info("4-staffId: " + staffId);
                                         int count = organizationMapper.getCount(staffId);
-                                        log.info("统计的数量为：" + count);
+                                        log.info("4-统计的数量为：" + count);
                                         if (count > 0) {
-                                            if(staffIdAndTypeMap.get("staffTel") != null){
-                                                reultMap.put("CPCP_PUSH_CHANNEL", staffIdAndTypeMap.get("staffTel"));
+                                            if(staffIdAndTypeMap.get("staffCode") != null){
+                                                reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
+                                                isCommLvl4 = true;
                                                 break;
                                             } else {
-                                                log.info("staffTel的值为空");
+                                                log.info("4-staffTel的值为空");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!isCommLvl4) {
+                        // 从3A组织ID
+                        String commLvl3Id = (String) reultMap.get("COMM_LVL3_ID");
+                        log.info("3-获取到COMM_LVL3_ID标签的值为：" + commLvl3Id);
+                        if (commLvl4Id != null) {
+                            Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl3Id));
+                            log.info("3-查询orgId为：" + orgId);
+                            if (orgId != null) {
+                                List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
+                                log.info("3-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
+                                if (staffIdAndTypeMapList != null) {
+                                    for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
+                                        if (staffIdAndTypeMap.get("staffId") != null) {
+                                            Long staffId = (Long) staffIdAndTypeMap.get("staffId");
+                                            log.info("3-staffId: " + staffId);
+                                            int count = organizationMapper.getCount(staffId);
+                                            log.info("3-统计的数量为：" + count);
+                                            if (count > 0) {
+                                                if (staffIdAndTypeMap.get("staffCode") != null) {
+                                                    reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
+                                                    break;
+                                                } else {
+                                                    log.info("3-staffTel的值为空");
+                                                }
                                             }
                                         }
                                     }
@@ -1000,7 +1031,7 @@ public class EventApiServiceImpl implements EventApiService {
                             //套餐级
                             for (DefaultContext<String, Object> o : packResultMapList) {
                                 for (Map<String, Object> accNbrMap : accNbrMapList) {
-                                    if (o.get("accNbr").toString().equals(accNbrMap.get("ACC_NBR"))) {
+                                    if (o.get("integrationId").toString().equals(accNbrMap.get("ASSET_INTEG_ID"))) {
                                         //客户级下，循环资产级
                                         Map<String, String> privateParams = new HashMap<>();
                                         privateParams.put("isCust", "0"); //是客户级
@@ -1224,6 +1255,9 @@ public class EventApiServiceImpl implements EventApiService {
         labelList.addAll(custLabelList);
         // 添加落地网格AREA_ID标签
         labelList.add("AREA_ID");
+        labelList.add("COMM_LVL4_ID");
+        labelList.add("COMM_LVL3_ID");
+
 
         // 判断是否添加是否为微厅的标签
         Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
@@ -1436,6 +1470,7 @@ public class EventApiServiceImpl implements EventApiService {
         Map<String, Object> result = new HashMap();
         Long activityInitId = Long.valueOf((String) params.get("activityId"));
         Long ruleInitId = Long.valueOf((String) params.get("ruleId"));
+        String sourceChannel = MapUtil.getString(params.get("sourceChannel"));
         MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(activityInitId);
         Long activityId = mktCampaignDO.getMktCampaignId();
 
@@ -1470,11 +1505,6 @@ public class EventApiServiceImpl implements EventApiService {
             result.put("resultMsg", "结果id为空");
             return result;
         }
-        if (custId == null || "".equals(custId)) {
-            result.put("resultCode", "1000");
-            result.put("resultMsg", "客户编码为空");
-            return result;
-        }
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "本地网编码为空");
@@ -1489,6 +1519,9 @@ public class EventApiServiceImpl implements EventApiService {
             if (resultIds != null && !"".equals(resultIds[0])) {
                 for (String resultId : resultIds) {
                     MktCamChlResultDO mktCamChlResultDO = mktCamChlResultMapper.selectByPrimaryKey(Long.valueOf(resultId));
+                    if (mktCamChlResultDO==null || !sourceChannel.equals(mktCamChlResultDO.getSourceChannelId()==null ? "" : mktCamChlResultDO.getSourceChannelId())){
+                        continue;
+                    }
                     if (resultNbr.equals(mktCamChlResultDO.getReason().toString())) {
                         // 查询推送渠道
                         List<MktCamChlResultConfRelDO> mktCamChlResultConfRelDOS = mktCamChlResultConfRelMapper.selectByMktCamChlResultId(mktCamChlResultDO.getMktCamChlResultId());
@@ -2103,8 +2136,12 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             });
             // 获取事件中配置的前TopCampaignNum个活动
-            for (int i = 0; i < event.getTopCampaignNum() ; i++) {
-                mktCampaginIdList.add(mktCampaginIds.get(i));
+            if (event == null || (event != null && (event.getTopCampaignNum() == null || event.getTopCampaignNum() == 0))) {
+                mktCampaginIdList.addAll(mktCampaginIds);
+            } else {
+                for (int i = 0; i < mktCampaginIds.size() && i < event.getTopCampaignNum(); i++) {
+                    mktCampaginIdList.add(mktCampaginIds.get(i));
+                }
             }
             log.info("排序筛选后mktCampaginIdList：" + JSON.toJSONString(mktCampaginIdList));
         }
@@ -2615,20 +2652,13 @@ public class EventApiServiceImpl implements EventApiService {
     private DefaultContext<String, Object> getAssetAndPromLabel(Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
         //资产级标签
         DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
-        System.out.println("mktAllLabel"+JSON.toJSONString(mktAllLabel));
-        if ((mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) || ("0".equals(params.get("custId")==null ? "" : params.get("custId")) )  ) {
-            String assetLabels = mktAllLabel.get("assetLabels");
-            System.out.println(JSON.toJSONString(assetLabels));
-            if (!assetLabels.contains("CCUST_ID")){
-                assetLabels += ",CCUST_ID";
-            }
-            System.out.println(JSON.toJSONString(assetLabels));
+        if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
             JSONObject assParam = new JSONObject();
             assParam.put("queryNum", privateParams.get("accNbr"));
             assParam.put("c3", params.get("lanId"));
             assParam.put("queryId", privateParams.get("integrationId"));
             assParam.put("type", "1");
-            assParam.put("queryFields",assetLabels);
+            assParam.put("queryFields", mktAllLabel.get("assetLabels"));
             assParam.put("centerType", "00");
 
             //因子查询-----------------------------------------------------
@@ -2655,11 +2685,9 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
-        log.info("contextNew --->>>>" + JSON.toJSONString(contextNew));
         contextNew.putAll(context);      // 客户级标签
         contextNew.put("integrationId", privateParams.get("integrationId"));
         contextNew.put("accNbr", privateParams.get("accNbr"));
-        log.info("contextNew222 --->>>>" + JSON.toJSONString(contextNew));
         return contextNew;
     }
 

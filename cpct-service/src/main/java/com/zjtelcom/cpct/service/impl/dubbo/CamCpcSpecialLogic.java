@@ -29,8 +29,8 @@ public class CamCpcSpecialLogic {
     private StaffGisRelMapper staffGisRelMapper;
 
     // 线上扫码、电话到家事件接入特殊逻辑,判断事件是这两个事件   DefaultContext<String, Object> context
-    public String onlineScanCodeOrCallPhone4Home(HashMap<String, Object> context, String eventCode) {
-        String wgbm = "";
+    public String onlineScanCodeOrCallPhone4Home(Map<String, String> context, String eventCode) {
+        String tel = "";
         try {
             // c4标识
             String c4 = "";
@@ -61,13 +61,14 @@ public class CamCpcSpecialLogic {
             logger.info("onlineScanCodeOrCallPhone4Home-->maps:" + maps);
             Map<String, Object> map = maps.get(0);
             // 获取GIS网格编码
-            wgbm = getValue4CycleMap(map, "Wgbm");
+            String wgbm = getValue4CycleMap(map, "Wgbm");
             logger.info("onlineScanCodeOrCallPhone4Home-->wgbm:" + wgbm);
+            tel = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
         }catch (Exception e) {
             logger.info("onlineScanCodeOrCallPhone4Home-->error!!!" );
             e.printStackTrace();
         }
-        return wgbm;
+        return tel;
     }
 
 

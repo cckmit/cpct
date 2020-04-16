@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
@@ -375,8 +376,8 @@ public class TestController extends BaseController {
 
     @PostMapping("onlineScanCodeOrCallPhone4Home")
     @CrossOrigin
-    public String onlineScanCodeOrCallPhone4Home(@RequestBody  HashMap<String, Object> params) {
-        return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params, params.get("eventCode").toString());
+    public String onlineScanCodeOrCallPhone4Home(@RequestBody  Map<String, String> params) {
+        return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params, params.get("eventCode"));
     }
 
 
@@ -388,7 +389,7 @@ public class TestController extends BaseController {
         System.out.println(handleRate * 100 < rate);*/
         // scheduledTaskService.issuedSuccessMktCheck();
 
-        Object newObj = null;
+        /*Object newObj = null;
         String s17 = "%C2%AC%C3%AD%00%05t%00%3Eif%28%28PROM_AGREE_EXP_TYPE%3E%3D1%29%29+%7Breturn+true%7D+else+%7Breturn+false%7D";
         String s18 = "%C2%AC%C3%AD%00%05t%00%C2%9F%5B%7B%22labelCode%22%3A%22PROM_AGREE_EXP_TYPE%22%2C%22labelDataType%22%3A%221300%22%2C%22labelName%22%3A%22%C3%A5%C2%8D%C2%8F%C3%A8%C2%AE%C2%AE%C3%A5%C2%88%C2%B0%C3%A6%C2%9C%C2%9F%C3%A6%C2%97%C2%B6%C3%A9%C2%95%C2%BF%C3%AF%C2%BC%C2%88%C3%A6%C2%9C%C2%88%C3%AF%C2%BC%C2%89%22%2C%22operType%22%3A%225000%22%2C%22rightOperand%22%3A%222000%22%2C%22rightParam%22%3A%221%22%7D%5D";
         String s19 = "%C2%AC%C3%AD%00%05t%00%3Eif%28%28PROM_AGREE_EXP_TYPE%3E%3D6%29%29+%7Breturn+true%7D+else+%7Breturn+false%7D";
@@ -399,15 +400,17 @@ public class TestController extends BaseController {
                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 newObj = objectInputStream.readObject();
                 System.out.println(newObj.toString());
-               /* String[] split = newObj.toString().split(",");
+               *//* String[] split = newObj.toString().split(",");
                 List<String> list = Arrays.asList(split);
-                System.out.println(!list.contains(String.valueOf(33823L)));*/
+                System.out.println(!list.contains(String.valueOf(33823L)));*//*
                 objectInputStream.close();
                 byteArrayInputStream.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+
+
     }
 
 

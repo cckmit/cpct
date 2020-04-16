@@ -3000,6 +3000,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }
                 }
+                //活动延期接口把活动状态，自动改成已发布
+                MktCampaignDO aDo = new MktCampaignDO();
+                aDo.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+                aDo.setStatusCd("2002");
+                mktCampaignMapper.updateByPrimaryKey(aDo);
             } catch (Exception e) {
                 Map map = new HashMap();
                 map.put("campaignId", mktCampaignDO.getMktCampaignId());
