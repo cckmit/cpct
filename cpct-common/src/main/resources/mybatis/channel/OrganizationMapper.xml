@@ -265,20 +265,6 @@
     AND r.ORG_ID = {#orgId,jdbcType=BIGINT}
   </select>
 
-  <select id="getStaffIdAndType" parameterType="java.lang.Long" resultType="java.util.Map">
-    SELECT
-    r.STAFF_ID AS staffId, s.STAFF_TEL AS staffTel
-    FROM
-    staff_org_rel r,
-    staff s
-    WHERE
-    s.STAFF_ID = r.STAFF_ID
-    AND	r.REL_TYPE = 1900
-    AND r.STATUS_CD = 1000
-    AND r.ORG_ID = {#orgId,jdbcType=BIGINT}
-  </select>
-
-
   <select id="getCount" parameterType="java.lang.Long" resultType="java.util.Map">
     SELECT
       COUNT (1)
