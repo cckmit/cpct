@@ -159,7 +159,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             privateParams.put("activityType", "1"); //服务
         } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
             privateParams.put("activityType", "2"); //随销
-        } else {
+        } else if ("7000".equals(mktCampaign.getMktCampaignType())) {
+            privateParams.put("activityType", "3"); //协同场景
+        }else {
             privateParams.put("activityType", "0"); //活动类型 默认营销
         }
         if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {

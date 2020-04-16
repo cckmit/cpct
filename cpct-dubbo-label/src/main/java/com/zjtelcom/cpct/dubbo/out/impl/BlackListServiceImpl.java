@@ -28,6 +28,7 @@ public class BlackListServiceImpl implements BlackListService {
     private static final String SUCCESS_CODE = "0";
     private static final String FAIL_CODE = "1";
 
+    @Autowired
     private BlackListCpctService blackListCpctService;
 
     @Override
