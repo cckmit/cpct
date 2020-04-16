@@ -74,7 +74,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                     Integer daysBetween = DateUtil.daysBetween(createDate, new Date());
                     Long campaignId = trialOperation.getCampaignId();
                     MktCampaignDO mktCampaignDO1 = mktCampaignMapper.selectByPrimaryKey(campaignId);
-                    if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null || !camList.contains(campaignId)) {
+                    if (mktCampaignDO1 == null || mktCampaignDO1.getInitId() == null || !camList.contains(campaignId.toString())) {
                         continue;
                     }
                     Long initId = mktCampaignDO1.getInitId();

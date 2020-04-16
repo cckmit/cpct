@@ -57,6 +57,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
+import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -202,6 +203,8 @@ public class EventApiServiceImpl implements EventApiService {
     @Autowired
     private OrganizationMapper organizationMapper;
 
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
 
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
@@ -919,6 +922,15 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.add(reultMap);
                 }
 
+                // 扫码下单、电话到家事件特殊逻辑
+                if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
+                    // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
+                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(map, eventCode);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    reultMap.put("CPCP_ACCS_NBR", managerTel);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+                }
 
                 if ("EVT0000000103".equals(eventCode)) {
                     boolean isCommLvl4 = false;

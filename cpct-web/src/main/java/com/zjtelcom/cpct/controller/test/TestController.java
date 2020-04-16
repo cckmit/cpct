@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.controller.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemPostDubboService;
@@ -12,6 +14,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
@@ -21,14 +24,18 @@ import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
+import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.service.scheduled.ScheduledTaskService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -282,10 +289,6 @@ public class TestController extends BaseController {
     }
 
     @Autowired
-    private ScheduledTaskService scheduledTaskService;
-
-
-    @Autowired
     private MktCampaignMapper mktCampaignMapper;
 
     @PostMapping(value = "/testIssuedSuccessMktCheck")
@@ -358,6 +361,59 @@ public class TestController extends BaseController {
             e.printStackTrace();
         }
     }
+
+    @Autowired
+    private ScheduledTaskService scheduledTaskService;
+
+    @PostMapping("issuedSuccessMktCheck")
+    @CrossOrigin
+    public void issuedSuccessMktCheck() {
+        scheduledTaskService.issuedSuccessMktCheck();
+    }
+
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
+
+    @PostMapping("onlineScanCodeOrCallPhone4Home")
+    @CrossOrigin
+    public String onlineScanCodeOrCallPhone4Home(@RequestBody  Map<String, String> params) {
+        return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params, params.get("eventCode"));
+    }
+
+
+    @Test
+    public void SSSSSSS() {
+        /*Integer rate = 1;
+        String handleRateString = "0.00012";
+        Double handleRate = Double.valueOf(handleRateString);
+        System.out.println(handleRate * 100 < rate);*/
+        // scheduledTaskService.issuedSuccessMktCheck();
+
+        /*Object newObj = null;
+        String s17 = "%C2%AC%C3%AD%00%05t%00%3Eif%28%28PROM_AGREE_EXP_TYPE%3E%3D1%29%29+%7Breturn+true%7D+else+%7Breturn+false%7D";
+        String s18 = "%C2%AC%C3%AD%00%05t%00%C2%9F%5B%7B%22labelCode%22%3A%22PROM_AGREE_EXP_TYPE%22%2C%22labelDataType%22%3A%221300%22%2C%22labelName%22%3A%22%C3%A5%C2%8D%C2%8F%C3%A8%C2%AE%C2%AE%C3%A5%C2%88%C2%B0%C3%A6%C2%9C%C2%9F%C3%A6%C2%97%C2%B6%C3%A9%C2%95%C2%BF%C3%AF%C2%BC%C2%88%C3%A6%C2%9C%C2%88%C3%AF%C2%BC%C2%89%22%2C%22operType%22%3A%225000%22%2C%22rightOperand%22%3A%222000%22%2C%22rightParam%22%3A%221%22%7D%5D";
+        String s19 = "%C2%AC%C3%AD%00%05t%00%3Eif%28%28PROM_AGREE_EXP_TYPE%3E%3D6%29%29+%7Breturn+true%7D+else+%7Breturn+false%7D";
+        try {
+            if(s18 != null) {
+                String redStr = java.net.URLDecoder.decode(s19, "UTF-8");
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(redStr.getBytes("ISO-8859-1"));
+                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+                newObj = objectInputStream.readObject();
+                System.out.println(newObj.toString());
+               *//* String[] split = newObj.toString().split(",");
+                List<String> list = Arrays.asList(split);
+                System.out.println(!list.contains(String.valueOf(33823L)));*//*
+                objectInputStream.close();
+                byteArrayInputStream.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+
+    }
+
+
 }
 
 
