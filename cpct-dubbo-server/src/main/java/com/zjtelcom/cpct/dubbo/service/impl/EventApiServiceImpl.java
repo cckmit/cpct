@@ -688,7 +688,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
                 // 过滤事件采集项中的标签
-                Map<String, String> mktAllLabel = filterLabel(labelItems, mktAllLabels);
+                Map<String, String> mktAllLabel = filterLabel(eventCode, labelItems, mktAllLabels);
 
                 //初始化结果集
                 List<Future<Map<String, Object>>> threadList = new ArrayList<>();
@@ -1220,7 +1220,7 @@ public class EventApiServiceImpl implements EventApiService {
      * @param mktAllLabels 事件下所有的标签
      * @return
      */
-    private Map<String, String> filterLabel(Map<String, String> labelItems, Map<String, String> mktAllLabels) {
+    private Map<String, String> filterLabel(String  eventCode, Map<String, String> labelItems, Map<String, String> mktAllLabels) {
         Map<String, String> mktAllLabel = new HashMap<>();
         Iterator<Map.Entry<String, String>> iterator = labelItems.entrySet().iterator();
         List<String> assetLabelList = new ArrayList<>();
@@ -1255,6 +1255,10 @@ public class EventApiServiceImpl implements EventApiService {
         labelList.addAll(custLabelList);
         // 添加落地网格AREA_ID标签
         labelList.add("AREA_ID");
+        if ("EVT0000000103".equals(eventCode) && (assetLabelList == null || assetLabelList.size() == 0)) {
+            assetLabelList.add("COMM_LVL4_ID");
+            assetLabelList.add("COMM_LVL3_ID");
+        }
         labelList.add("COMM_LVL4_ID");
         labelList.add("COMM_LVL3_ID");
 
