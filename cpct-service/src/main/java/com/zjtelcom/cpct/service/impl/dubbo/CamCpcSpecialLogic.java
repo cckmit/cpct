@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.dubbo;
 
 import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
-import com.ql.util.express.DefaultContext;
 import com.zjtelcom.cpct.dao.org.StaffGisRelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
