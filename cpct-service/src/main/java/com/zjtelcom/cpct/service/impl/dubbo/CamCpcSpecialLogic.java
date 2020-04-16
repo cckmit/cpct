@@ -33,7 +33,12 @@ public class CamCpcSpecialLogic {
         String wgbm = "";
         try {
             // c4标识
-            String c4 = context.get("400600000026").toString();
+            String c4 = "";
+            if ("EVT0000000101".equals(eventCode)) {
+                c4 = context.get("400600000026").toString();
+            } else {
+                c4 = context.get("400600000014").toString();
+            }
             // 详细地址
             String addr = context.get("400600000016").toString();
             // 本地网标识
