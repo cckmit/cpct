@@ -30,7 +30,7 @@ public class CamCpcSpecialLogic {
     private StaffGisRelMapper staffGisRelMapper;
 
     // 线上扫码、电话到家事件接入特殊逻辑,判断事件是这两个事件   DefaultContext<String, Object> context
-    public String onlineScanCodeOrCallPhone4Home(HashMap<String, Object> context, String eventCode) {
+    public String onlineScanCodeOrCallPhone4Home(Map<String, String> context, String eventCode) {
         String tel = "";
         try {
             // c4标识
