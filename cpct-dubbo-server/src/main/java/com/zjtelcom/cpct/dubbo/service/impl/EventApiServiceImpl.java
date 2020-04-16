@@ -25,10 +25,7 @@ import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktCamScriptMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
@@ -199,12 +196,14 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private BlackListMapper blackListMapper;
-    @Autowired
-    private CamCpcSpecialLogic camCpcSpecialLogic;
 
     @Autowired(required = false)
     private EsServiceInfo esServiceInfo;
 
+    @Autowired
+    private OrganizationMapper organizationMapper;
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
 
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
@@ -308,6 +307,7 @@ public class EventApiServiceImpl implements EventApiService {
             //初始化返回结果
             Map<String, Object> result = new HashMap();
             result = new EventTask().cpc(params);
+            log.info("222222222");
             //调用协同中心回调接口
             Map<String, Object> back = iContactTaskReceiptService.contactTaskReceipt(result);
             if (back != null) {
@@ -750,6 +750,9 @@ public class EventApiServiceImpl implements EventApiService {
                         reultMap.putAll(assetLabelMap);
                     }
                     resultMapList.add(reultMap);
+                    if (map.get("custId")==null || "0".equals(map.get("custId"))){
+                        map.put("custId",reultMap.get("CCUST_ID")==null ? "" : reultMap.get("CCUST_ID").toString());
+                    }
                 }
                 // 是客户级的
                 if (hasCust) {
@@ -830,100 +833,22 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                 }
 
-                /**
-                 *  满意度调查事件，定义采集项
-                 *  1、判断联系电话是否绑定微信公众号，是绑定用户则送微厅进行线上测评。
-                 *  2、判断业务号码是否绑定微信公众号，是绑定用户则送微厅进行线上测评。
-                 *  3、判断联系电话是否电信号码（接一个查询是否c网资产的判断接口），是发短信。
-                 *  4、判断产品类型：PHY-MAN-0022 （移动电话）业务号码是否移动电话，是发短信
-                 *  5、将来：联系电话推IVR
-                 *
-                 */
 
                 /*
-                 * 满意度调查事件（受理）
-                 * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                 * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                 * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                 * 4、都不满足暂不推
-                 *
-                 * */
-                // Map<String, Object> surveyMapRedis = eventRedisService.getRedis("SATISFACTION_ACCEPT");
-                //String eventCodeStr = (String) surveyMapRedis.get("SATISFACTION_ACCEPT");
-                //if (eventCode.indexOf(eventCodeStr) >= 0) {
+                * 满意度调查事件（受理）
+                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
+                * 2、如果资产未绑定公众号，则判断联系号码是否绑定公众号，推送微厅，推送账号为联系号码
+                * 3、如果上面2者都未绑定微厅，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                * 4、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                * 5、都不满足暂不推
+                *
+                * */
                 if ("EVTS000001120".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
                     Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
                     String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
                     String isBind = (String) reultMap.get(followFlgType);
-/*
-
-                    // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
-                    Map<String, Object> paramsMap = new HashMap<>();
-                    paramsMap.put("phone", contactNumber);
-                    paramsMap.put("type", "1");
-                    labelItems.put("CPCP_PUSH_NUMBER", contactNumber);
-                    // 判断该联系号码是否绑定微厅（从大数据标签中获取）
-                    Map<String, Object> resultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
-                    if (resultMap != null && resultMap.get("data") != null && ((List<Map>) resultMap.get("data")).size() > 0) {
-                        // 绑定微厅
-                        List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) resultMap.get("data");
-                        for (Map dataMap : dataMapList) {
-                            if (dataMap.get("tel_status") != null && (Integer) dataMap.get("tel_status") == 0) {
-                                labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
-                                break;
-                            }
-                        }
-                    } else {
-                        // 判断资产号码是否绑定微厅
-                        paramsMap.put("phone", map.get("accNbr"));
-                        log.info("paramsMap2 --->" + JSON.toJSONString(paramsMap));
-                        Map<String, Object> accResultMap = queryBindByAccCardService.queryBindByAccCard(paramsMap);
-                        log.info("accResultMap --->" + JSON.toJSONString(accResultMap));
-                        if (accResultMap != null && accResultMap.get("data") != null && ((List<Map>) accResultMap.get("data")).size() > 0) {
-                            // 绑定微厅
-                            List<Map<String, Object>> dataMapList = (List<Map<String, Object>>) accResultMap.get("data");
-                            for (Map dataMap : dataMapList) {
-                                if (dataMap.get("tel_status") != null && (Integer) dataMap.get("tel_status") == 0) {
-                                    labelItems.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
-                                    break;
-                                }
-                            }
-                        } else {
-                            // 若未绑定微厅，查看联系号码是否为C网用户
-                            // 价格判断是否为手机号码
-                            log.info("111---contactNumber --->" + contactNumber);
-                            boolean isMobile = isMobile(contactNumber);
-                            boolean isCUser = false;
-                            log.info("222---isMobile --->" + isMobile);
-                            if (isMobile) {
-                                CacheResultObject<Set<String>> prodInstIdResult = iCacheProdIndexQryService.qryProdInstIndex3(contactNumber, "100000");
-                                log.info("333---是否为C网用户-----prodInstIdResult --->" + JSON.toJSONString(prodInstIdResult));
-                                if (prodInstIdResult != null && prodInstIdResult.getResultObject() != null && prodInstIdResult.getResultObject().size() > 0) {
-                                    labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                    isCUser = true;
-                                }
-                            }
-                            if (!isCUser) {
-                                boolean isCdma = false;
-                                //资产类型
-                                Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
-                                String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
-                                log.info("444---cpcpProductType --->" + cpcpProductType);
-                                if(cpcpProductType!=null && "PHY-MAN-0001".equals(evtParams.get("CPCP_PRODUCT_TYPE"))){
-                                    labelItems.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
-                                    isCdma = true;
-                                }
-                                // 若不为C网用户，则“推送渠道”为IVR外呼
-                                if (!isCdma) {
-                                    labelItems.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
-                                }
-                            }
-                        }
-                    }
-*/
                     // 联系号码-事件采集项
                     String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
                     // 1为绑定公众号，0 为不绑定公众号
@@ -938,16 +863,10 @@ public class EventApiServiceImpl implements EventApiService {
                         log.info("esServiceInfo.getAssetByTelFourYN入参 = " + JSON.toJSONString(telMap));
                         Map<String, Object> assetByTelFourYN = esServiceInfo.getAssetByTelFourYN(telMap);
                         log.info("结果assetByTelFourYN = " + JSON.toJSONString(assetByTelFourYN));
-                        if(assetByTelFourYN!=null && "200".equals(assetByTelFourYN.get("resultCode")) && "true".equals(assetByTelFourYN.get("msg"))) {
+                        if (assetByTelFourYN != null && "200".equals(assetByTelFourYN.get("resultCode")) && "true".equals(assetByTelFourYN.get("msg"))) {
                             reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
                             reultMap.put("CPCP_ACCS_NBR", contactNumber);
                         } else {
-                            // 判断资产类型
-                            boolean isCdma = false;
-                            //    Map<String, Object> productTypeRedis = eventRedisService.getRedis("CPCP_PRODUCT_TYPE");
-                            //    String cpcpProductType = (String) productTypeRedis.get("CPCP_PRODUCT_TYPE");
-                            //    log.info("444---cpcpProductType --->" + cpcpProductType);
-                            //    if (cpcpProductType != null && cpcpProductType.equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                             // 判断采集项，资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
                             if ("PHY-MAN-0022".equals(evtParams.get("CPCP_PRODUCT_TYPE"))) {
                                 reultMap.put("CPCP_PUSH_CHANNEL", "2"); // 1-微厅, 2-短厅, 3-IVR
@@ -978,18 +897,14 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-
                 /*
-                 * 满意度调查事件（装维）
-                 * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                 * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                 * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                 * 4、都不满足暂不推
-                 *
-                 * */
-                //   Map<String, Object> zhuangMapRedis = eventRedisService.getRedis("SATISFACTION_ZHUANG");
-                //   String eventCodeZhuangStr = (String) zhuangMapRedis.get("SATISFACTION_ZHUANG");
-                //   if (eventCodeZhuangStr.indexOf(eventCodeStr) >= 0) {
+                * 满意度调查事件（装维）
+                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
+                * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                * 4、都不满足暂不推
+                *
+                * */
                 if ("EVTD000000091".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
@@ -1018,6 +933,43 @@ public class EventApiServiceImpl implements EventApiService {
                     reultMap.put("CPCP_ACCS_NBR", managerTel);
                     resultMapList.add(reultMap);
                 }
+
+                if ("EVT0000000103".equals(eventCode)) {
+                    // 从4A组织ID
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
+                    log.info("获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
+                    if (commLvl4Id != null) {
+                        Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
+                        log.info("查询orgId为：" + orgId);
+                        if (orgId != null) {
+                            List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
+                            log.info("staffIdAndTypeMapListde ");
+                            if (staffIdAndTypeMapList != null) {
+                                for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
+                                    if (staffIdAndTypeMap.get("staffId") != null) {
+                                        Long staffId = (Long) staffIdAndTypeMap.get("staffId");
+                                        log.info("staffId: " + staffId);
+                                        int count = organizationMapper.getCount(staffId);
+                                        log.info("统计的数量为：" + count);
+                                        if (count > 0) {
+                                            if(staffIdAndTypeMap.get("staffTel") != null){
+                                                reultMap.put("CPCP_PUSH_CHANNEL", staffIdAndTypeMap.get("staffTel"));
+                                                break;
+                                            } else {
+                                                log.info("staffTel的值为空");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    log.info("reultMap的值为：" + JSON.toJSONString(reultMap));
+                }
+
+
+
 
                 //遍历活动
                 for (Map<String, Object> resultMap : resultByEvent) {
@@ -1516,6 +1468,11 @@ public class EventApiServiceImpl implements EventApiService {
         if (resultNbr == null || "".equals(resultNbr)) {
             result.put("resultCode", "1000");
             result.put("resultMsg", "结果id为空");
+            return result;
+        }
+        if (custId == null || "".equals(custId)) {
+            result.put("resultCode", "1000");
+            result.put("resultMsg", "客户编码为空");
             return result;
         }
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
@@ -2146,12 +2103,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
             });
             // 获取事件中配置的前TopCampaignNum个活动
-            if (event == null || (event != null && (event.getTopCampaignNum() == null || event.getTopCampaignNum() == 0))) {
-                mktCampaginIdList.addAll(mktCampaginIds);
-            } else {
-                for (int i = 0; i < mktCampaginIds.size() && i < event.getTopCampaignNum(); i++) {
-                    mktCampaginIdList.add(mktCampaginIds.get(i));
-                }
+            for (int i = 0; i < event.getTopCampaignNum() ; i++) {
+                mktCampaginIdList.add(mktCampaginIds.get(i));
             }
             log.info("排序筛选后mktCampaginIdList：" + JSON.toJSONString(mktCampaginIdList));
         }
@@ -2662,13 +2615,20 @@ public class EventApiServiceImpl implements EventApiService {
     private DefaultContext<String, Object> getAssetAndPromLabel(Map<String, String> mktAllLabel, Map<String, String> params, Map<String, String> privateParams, DefaultContext<String, Object> context, JSONObject esJson, Map<String, String> labelItems) {
         //资产级标签
         DefaultContext<String, Object> contextNew = new DefaultContext<String, Object>();
-        if (mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) {
+        System.out.println("mktAllLabel"+JSON.toJSONString(mktAllLabel));
+        if ((mktAllLabel.get("assetLabels") != null && !"".equals(mktAllLabel.get("assetLabels"))) || ("0".equals(params.get("custId")==null ? "" : params.get("custId")) )  ) {
+            String assetLabels = mktAllLabel.get("assetLabels");
+            System.out.println(JSON.toJSONString(assetLabels));
+            if (!assetLabels.contains("CCUST_ID")){
+                assetLabels += ",CCUST_ID";
+            }
+            System.out.println(JSON.toJSONString(assetLabels));
             JSONObject assParam = new JSONObject();
             assParam.put("queryNum", privateParams.get("accNbr"));
             assParam.put("c3", params.get("lanId"));
             assParam.put("queryId", privateParams.get("integrationId"));
             assParam.put("type", "1");
-            assParam.put("queryFields", mktAllLabel.get("assetLabels"));
+            assParam.put("queryFields",assetLabels);
             assParam.put("centerType", "00");
 
             //因子查询-----------------------------------------------------
@@ -2695,9 +2655,11 @@ public class EventApiServiceImpl implements EventApiService {
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例
+        log.info("contextNew --->>>>" + JSON.toJSONString(contextNew));
         contextNew.putAll(context);      // 客户级标签
         contextNew.put("integrationId", privateParams.get("integrationId"));
         contextNew.put("accNbr", privateParams.get("accNbr"));
+        log.info("contextNew222 --->>>>" + JSON.toJSONString(contextNew));
         return contextNew;
     }
 
