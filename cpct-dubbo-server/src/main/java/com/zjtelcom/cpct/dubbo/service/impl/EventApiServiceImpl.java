@@ -921,29 +921,62 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 if ("EVT0000000103".equals(eventCode)) {
+                    boolean isCommLvl4 = false;
                     // 从4A组织ID
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
-                    log.info("获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
+                    log.info("4-获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
                     if (commLvl4Id != null) {
                         Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
-                        log.info("查询orgId为：" + orgId);
+                        log.info("4-查询orgId为：" + orgId);
                         if (orgId != null) {
                             List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
-                            log.info("staffIdAndTypeMapListde ");
+                            log.info("4-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
                             if (staffIdAndTypeMapList != null) {
                                 for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
                                     if (staffIdAndTypeMap.get("staffId") != null) {
                                         Long staffId = (Long) staffIdAndTypeMap.get("staffId");
-                                        log.info("staffId: " + staffId);
+                                        log.info("4-staffId: " + staffId);
                                         int count = organizationMapper.getCount(staffId);
-                                        log.info("统计的数量为：" + count);
+                                        log.info("4-统计的数量为：" + count);
                                         if (count > 0) {
                                             if(staffIdAndTypeMap.get("staffTel") != null){
-                                                reultMap.put("CPCP_PUSH_CHANNEL", staffIdAndTypeMap.get("staffTel"));
+                                                reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffTel"));
+                                                isCommLvl4 = true;
                                                 break;
                                             } else {
-                                                log.info("staffTel的值为空");
+                                                log.info("4-staffTel的值为空");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!isCommLvl4) {
+                        // 从3A组织ID
+                        String commLvl3Id = (String) reultMap.get("COMM_LVL3_ID");
+                        log.info("3-获取到COMM_LVL3_ID标签的值为：" + commLvl3Id);
+                        if (commLvl4Id != null) {
+                            Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl3Id));
+                            log.info("3-查询orgId为：" + orgId);
+                            if (orgId != null) {
+                                List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
+                                log.info("3-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
+                                if (staffIdAndTypeMapList != null) {
+                                    for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
+                                        if (staffIdAndTypeMap.get("staffId") != null) {
+                                            Long staffId = (Long) staffIdAndTypeMap.get("staffId");
+                                            log.info("3-staffId: " + staffId);
+                                            int count = organizationMapper.getCount(staffId);
+                                            log.info("3-统计的数量为：" + count);
+                                            if (count > 0) {
+                                                if (staffIdAndTypeMap.get("staffTel") != null) {
+                                                    reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffTel"));
+                                                    break;
+                                                } else {
+                                                    log.info("3-staffTel的值为空");
+                                                }
                                             }
                                         }
                                     }
