@@ -925,7 +925,7 @@ public class EventApiServiceImpl implements EventApiService {
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
                     // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
-                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode);
+                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     reultMap.put("CPCP_ACCS_NBR", managerTel);
                     resultMapList.clear();

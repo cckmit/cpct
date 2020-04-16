@@ -29,7 +29,7 @@ public class CamCpcSpecialLogic {
     private StaffGisRelMapper staffGisRelMapper;
 
     // 线上扫码、电话到家事件接入特殊逻辑,判断事件是这两个事件   DefaultContext<String, Object> context
-    public String onlineScanCodeOrCallPhone4Home(Map<String, String> context, String eventCode) {
+    public String onlineScanCodeOrCallPhone4Home(Map<String, Object> context, String eventCode, String lanId) {
         String tel = "";
         try {
             // c4标识
@@ -42,7 +42,7 @@ public class CamCpcSpecialLogic {
             // 详细地址
             String addr = context.get("400600000016").toString();
             // 本地网标识
-            String lanId = context.get("lanId").toString();
+            // String lanId = context.get("lanId").toString();
             String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
             logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);
             String resCoverIdXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
