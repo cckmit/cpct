@@ -1000,6 +1000,7 @@ public class EventApiServiceImpl implements EventApiService {
                     String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtParamsMap, eventCode);
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     reultMap.put("CPCP_ACCS_NBR", managerTel);
+                    resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
 
