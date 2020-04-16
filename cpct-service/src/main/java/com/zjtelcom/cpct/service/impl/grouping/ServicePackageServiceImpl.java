@@ -100,6 +100,9 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             // 获取服务包Id
             Long servicePackageId = servicePackage.getServicePackageId();
 
+            // 创建索引
+            esServicePackageService.servicePackageInport(servicePackageId, new ArrayList<>());
+
             logger.info("服务包清单contentList数量：" + contentList.size());
             int mqSum = 0;
             int total = contentList.size() / NUM;
@@ -132,7 +135,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 msgBody.put("contentList", newContentList);
                 try {
                     // 判断是否发送成功
-                    if (!mqService.msg2Producer(msgBody, cpctSerpackageTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
+                    if (!mqService.msgServicePackage(msgBody, cpctSerpackageTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
                         // 发送失败自动重发2次，如果还是失败，记录
                         logger.error("CTGMQ消息生产失败,servicePackageId:" + servicePackageId, JSON.toJSONString(msgBody));
                     }
@@ -143,18 +146,6 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 }
             }
             redisUtils.set("MQ_SERPACK_SUM_" + servicePackageId, mqSum);
-
-            // 异步调用es的dubbo服务，入参 servicePackageId, contentList
-/*
-            new Thread() {
-                @Override
-                public void run() {
-                    esServicePackageService.servicePackageInport(servicePackageId, contentList);
-                }
-            }.start();
-*/
-
-
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "添加服务包成功！");
