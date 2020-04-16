@@ -254,7 +254,7 @@
 
   <select id="getStaffIdAndType" parameterType="java.lang.Long" resultType="java.util.Map">
     SELECT
-      r.STAFF_ID AS staffId, s.STAFF_TEL AS staffTel
+      r.STAFF_ID AS staffId,  s.STAFF_CODE AS staffCode
     FROM
       staff_org_rel r,
       staff s
@@ -265,7 +265,7 @@
     AND r.ORG_ID = #{orgId,jdbcType=BIGINT}
   </select>
 
-  <select id="getCount" parameterType="java.lang.Long" resultType="java.util.Map">
+  <select id="getCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
     SELECT
       COUNT (1)
     FROM

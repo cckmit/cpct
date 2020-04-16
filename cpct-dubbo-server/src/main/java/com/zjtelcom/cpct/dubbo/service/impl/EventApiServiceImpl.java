@@ -940,8 +940,8 @@ public class EventApiServiceImpl implements EventApiService {
                                         int count = organizationMapper.getCount(staffId);
                                         log.info("4-统计的数量为：" + count);
                                         if (count > 0) {
-                                            if(staffIdAndTypeMap.get("staffTel") != null){
-                                                reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffTel"));
+                                            if(staffIdAndTypeMap.get("staffCode") != null){
+                                                reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
                                                 isCommLvl4 = true;
                                                 break;
                                             } else {
@@ -971,8 +971,8 @@ public class EventApiServiceImpl implements EventApiService {
                                             int count = organizationMapper.getCount(staffId);
                                             log.info("3-统计的数量为：" + count);
                                             if (count > 0) {
-                                                if (staffIdAndTypeMap.get("staffTel") != null) {
-                                                    reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffTel"));
+                                                if (staffIdAndTypeMap.get("staffCode") != null) {
+                                                    reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
                                                     break;
                                                 } else {
                                                     log.info("3-staffTel的值为空");
