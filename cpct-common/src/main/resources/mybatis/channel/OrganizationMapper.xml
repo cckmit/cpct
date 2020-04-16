@@ -245,4 +245,49 @@
       from organization WHERE ORG_ID IN ("800000000021","800000000022","800000000023","800000000024","800000000025","800000000026","800000000037","800000000038","800000000039","800000000040","800000000041")
   </select>
 
+  <select id="getByOrgid4a" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select ORG_ID
+    from organization
+    where org_id_4a = #{orgId4a}
+  </select>
+
+
+  <select id="getStaffIdAndType" parameterType="java.lang.Long" resultType="java.util.Map">
+    SELECT
+      r.STAFF_ID AS staffId, s.STAFF_TEL AS staffTel
+    FROM
+      staff_org_rel r,
+      staff s
+    WHERE
+      s.STAFF_ID = r.STAFF_ID
+    AND	r.REL_TYPE = 1900
+    AND r.STATUS_CD = 1000
+    AND r.ORG_ID = {#orgId,jdbcType=BIGINT}
+  </select>
+
+  <select id="getStaffIdAndType" parameterType="java.lang.Long" resultType="java.util.Map">
+    SELECT
+    r.STAFF_ID AS staffId, s.STAFF_TEL AS staffTel
+    FROM
+    staff_org_rel r,
+    staff s
+    WHERE
+    s.STAFF_ID = r.STAFF_ID
+    AND	r.REL_TYPE = 1900
+    AND r.STATUS_CD = 1000
+    AND r.ORG_ID = {#orgId,jdbcType=BIGINT}
+  </select>
+
+
+  <select id="getCount" parameterType="java.lang.Long" resultType="java.util.Map">
+    SELECT
+      COUNT (1)
+    FROM
+    staff_attr
+    WHERE
+    staff_id = #{staffId}
+    AND attr_id = 30001027
+    AND status_cd = 1000
+    AND attr_value = '10'
+  </select>
 </mapper>
