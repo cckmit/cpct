@@ -1243,6 +1243,9 @@ public class EventApiServiceImpl implements EventApiService {
         labelList.addAll(custLabelList);
         // 添加落地网格AREA_ID标签
         labelList.add("AREA_ID");
+        labelList.add("COMM_LVL4_ID");
+        labelList.add("COMM_LVL3_ID");
+
 
         // 判断是否添加是否为微厅的标签
         Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");

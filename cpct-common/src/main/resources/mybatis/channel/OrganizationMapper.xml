@@ -262,7 +262,7 @@
       s.STAFF_ID = r.STAFF_ID
     AND	r.REL_TYPE = 1900
     AND r.STATUS_CD = 1000
-    AND r.ORG_ID = {#orgId,jdbcType=BIGINT}
+    AND r.ORG_ID = #{orgId,jdbcType=BIGINT}
   </select>
 
   <select id="getCount" parameterType="java.lang.Long" resultType="java.util.Map">
