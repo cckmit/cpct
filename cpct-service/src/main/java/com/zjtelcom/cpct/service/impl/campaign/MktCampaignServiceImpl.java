@@ -2048,6 +2048,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             stringObjectMap.put("createDate", date2StringDate(mktCampaignDO.getCreateDate()));
             stringObjectMap.put("statusDate", date2StringDate(mktCampaignDO.getStatusDate()));
             stringObjectMap.put("updateDate", date2StringDate(mktCampaignDO.getUpdateDate()));
+            logger.info(JSON.toJSONString(stringObjectMap));
             Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
             logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
         }catch (Exception e) {
