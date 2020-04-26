@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -1970,8 +1971,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
-
-                syncCamData2Synergy(mktCampaignDO);
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
@@ -1979,6 +1978,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
+                                syncCamData2Synergy(mktCampaignDO);
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                                 String roleName = "admin";

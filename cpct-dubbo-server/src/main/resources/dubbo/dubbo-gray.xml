@@ -173,10 +173,9 @@
     </dubbo:reference>
 
     <!--渠道协同接触任务id-->
-    <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
-        &lt;!&ndash; 发布活动的时候调用营服接口传递活动信息 &ndash;&gt;
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="2.0" check="false">
         <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
-    </dubbo:reference>-->
+    </dubbo:reference>
 
     <!-- 线上扫码、电话到家特殊逻辑 -->
     <dubbo:reference registry="esb3" interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" id="iSaleService" version="1.0" check="false">
