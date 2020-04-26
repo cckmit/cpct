@@ -74,6 +74,14 @@ ctg:
   pushGroupName2 : cpct_file_import2
   pushTopic : cpct_push_end_topic
 
+  # 第四topic es日志添加队列中转
+  cpctEsLogTopic: cpct_eslog_gray
+  cpctEsLogGroup: cpct_eslog_group_gray
+
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_gray
+  cpctSerpackageGroup: cpct_es_servicepackage_group_gray
+
 #uccp短信平台账号配置
 uccp:
   userAcct: CPCPYX

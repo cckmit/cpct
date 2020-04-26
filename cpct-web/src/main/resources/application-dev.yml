@@ -95,5 +95,8 @@ ctg:
   tenantID: 2
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_prod
+  cpctSerpackageGroup: cpct_es_servicepackage_group_prod
 
 

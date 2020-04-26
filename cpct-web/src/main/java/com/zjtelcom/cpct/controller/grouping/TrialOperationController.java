@@ -35,6 +35,21 @@ public class TrialOperationController extends BaseController {
     @Autowired(required = false)
     private TrialProdService trialProdService;
 
+    @PostMapping("yzservTest")
+    @CrossOrigin
+    public Map<String, Object> yzservTest( @RequestBody HashMap<String,Object> param){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result =  trialProdService.yzservTest(param);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to yzservTest", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to yzservTest");
+            return result;
+        }
+        return result;
+    }
+
     /**
      * ppm-导入清单
      * @param param

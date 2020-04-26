@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemPost;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
@@ -1424,6 +1423,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             maps.put("resultCode", CODE_SUCCESS);
             maps.put("resultMsg", "延期成功");
+            try {
+                eventRedisService.deleteByCampaign(campaignId);
+                logger.info("【活动缓存清理成功】："+campaignDO.getMktCampaignName());
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("【活动缓存清理失败】："+campaignDO.getMktCampaignName());
+            }
         } catch (Exception e) {
             logger.error("Excepiton = " + e);
             maps.put("resultCode", CODE_FAIL);
@@ -1922,11 +1928,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     //redisUtils.del("CAM_EVT_REL_" + mktCamEvtRelDO.getEventId());
                     //redisUtils.del("CAM_IDS_EVT_REL_" + mktCamEvtRelDO.getEventId());
                 }
-                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
-                    //活动发布若是清单活动重新试算全量清单
-                    UserListTemp(mktCampaignId, mktCampaignDO);
-                    UserListTemp(mktCampaignId,mktCampaignDO.getInitId());
-                }
+//                if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd)) {
+//                    //活动发布若是清单活动重新试算全量清单
+//                    UserListTemp(mktCampaignId, mktCampaignDO);
+//                    UserListTemp(mktCampaignId,mktCampaignDO.getInitId());
+//                }
                 // 发布调整的活动，下线源活动
                 if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) && !mktCampaignId.equals(initId)) {
                     // 查询initId为mktCampaignId且状态为调整中
@@ -3000,11 +3006,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }
                 }
-                //活动延期接口把活动状态，自动改成已发布
-                MktCampaignDO aDo = new MktCampaignDO();
-                aDo.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                aDo.setStatusCd("2002");
-                mktCampaignMapper.updateByPrimaryKey(aDo);
             } catch (Exception e) {
                 Map map = new HashMap();
                 map.put("campaignId", mktCampaignDO.getMktCampaignId());

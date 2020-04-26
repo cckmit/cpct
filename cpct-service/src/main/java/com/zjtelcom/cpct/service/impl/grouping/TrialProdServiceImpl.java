@@ -1,9 +1,11 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamDisplayColumnRelMapper;
@@ -157,6 +159,23 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktDttsLogService mktDttsLogService;
     @Autowired
     private TrialOperationService trialOperationService;
+
+    @Autowired(required = false)
+    private YzServ yzServ; //因子实时查询dubbo服务
+
+    @Override
+    public Map<String, Object> yzservTest(Map<String, Object> param) {
+        //查询标签实例数据
+        Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
+        if ("0".equals(dubboResult.get("result_code").toString())) {
+            JSONObject body = new JSONObject((HashMap) dubboResult.get("msgbody"));
+            //解析返回结果
+            return body;
+        } else {
+            System.out.println("查询标签失败:" + dubboResult.get("result_msg"));
+            return new JSONObject();
+        }
+    }
 
     /**
      * 提供dtts定时任务清单存入es
