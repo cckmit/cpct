@@ -159,10 +159,10 @@ public class MqServiceImpl implements MqService {
                 message.setBody(JSON.toJSONString(msgBody).getBytes());
                 MQSendResult send = producer.send(message);
                 MQSendStatus sendStatus = send.getSendStatus();
-                if (sendStatus.toString().equals("SEND_OK")){
-                    insertSendLog(send.getMessageID(), tag, key);
-                    return "SEND_OK";
-                }
+//                if (sendStatus.toString().equals("SEND_OK")){
+//                    insertSendLog(send.getMessageID(), tag, key);
+//                    return "SEND_OK";
+//                }
             }else {
                 logger.info("MqServiceImpl->msg2Producer:producerConnect连接异常！");
             }

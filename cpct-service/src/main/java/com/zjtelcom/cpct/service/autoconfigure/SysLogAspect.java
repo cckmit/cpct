@@ -3,13 +3,10 @@ package com.zjtelcom.cpct.service.autoconfigure;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ctzj.smt.bss.core.util.SpringContextUtil;
-import com.google.gson.Gson;
 import com.zjtelcom.annotation.SysLog;
 import com.zjtelcom.cpct.dubbo.service.MqProducerService;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.UrlUtil;
-import com.zjtelcom.cpct.util.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,15 +18,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Map;
-
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
-import static com.zjtelcom.cpct.constants.CommonConstant.EVENT_ACCESS_SERVICE;
 import static com.zjtelcom.cpct.constants.CommonConstant.NORMAL_SERVICE;
 
 @Aspect

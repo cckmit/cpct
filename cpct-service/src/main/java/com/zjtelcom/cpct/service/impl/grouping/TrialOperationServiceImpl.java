@@ -65,7 +65,7 @@ import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
-//import com.zjtelcom.es.es.service.EsServiceInfo;
+import com.zjtelcom.es.es.service.EsServiceInfo;
 import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -194,8 +194,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktStrategyCloseRuleRelMapper strategyCloseRuleRelMapper;
     @Autowired
     private CloseRuleMapper closeRuleMapper;
-//    @Autowired(required = false)
-//    private EsServiceInfo esServiceInfo;
+    @Autowired(required = false)
+    private EsServiceInfo esServiceInfo;
     @Autowired
     private OrgTreeService orgTreeService;
     @Autowired
@@ -347,9 +347,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     //抽样展示全量试算记录
     @Override
     public Map<String, Object> showCalculationLog(Long id) {
-//        TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
-//        return esServiceInfo.showCalculationLog(trialOperation.getBatchNum().toString());
-        return  null;
+        TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
+        return esServiceInfo.showCalculationLog(trialOperation.getBatchNum().toString());
 
     }
 
@@ -1573,12 +1572,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         logger.info("导入试运算清单importUserList->customerList的数量：" + customerList.size());
         Long mqSum = 0L;
         int x = customerList.size() / 1000;
-        if (customerList.size() % 1000 > 0) {
-            x++;
-        }
-        for (int i = 1; i <= x; i++) {
+        for (int i = 0; i <= x; i++) {
             List<Map<String, Object>> newSublist = new ArrayList();
-            if (i == x ) {
+            if (i == x) {
                 newSublist = customerList.subList(0, customerList.size());
             } else {
                 newSublist = customerList.subList(0, 1000);

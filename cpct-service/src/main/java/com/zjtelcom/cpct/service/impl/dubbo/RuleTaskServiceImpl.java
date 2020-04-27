@@ -29,7 +29,6 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.service.dubbo.RuleTaskService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -42,7 +41,6 @@ import com.zjtelcom.cpct.util.ThreadPool;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -317,10 +315,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                     express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
                 }
             }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL_KEY");
+            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
             sysParams = new SysParams();
             if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL_KEY");
+                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -699,10 +697,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
             String isaleCheck = eventRedisService.getRedis("ISALE_CHECK_FLG") == null ? "0" : eventRedisService.getRedis("ISALE_CHECK_FLG").toString();
             //isale预校验固定参数
             String loginId = "";
-            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID_KEY");
+            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID");
             List<Map<String, String>> sysParam = new ArrayList<>();
             if (coolLoginIdRedis != null) {
-                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID_KEY");
+                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID");
             }
             if (sysParam != null && !sysParam.isEmpty()) {
                 loginId = sysParam.get(0).get("value");

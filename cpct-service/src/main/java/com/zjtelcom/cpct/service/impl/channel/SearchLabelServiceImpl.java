@@ -11,10 +11,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlConfAttrDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.CamScript;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.MktVerbal;
-import com.zjtelcom.cpct.domain.channel.MktVerbalCondition;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
@@ -86,6 +83,29 @@ public class SearchLabelServiceImpl extends BaseService implements SearchLabelSe
                 if (campaign==null){
                     continue;
                 }
+                //isale展示列
+                List<DisplayColumnLabel> isaleDisplays = (List<DisplayColumnLabel>) redisUtils.get("ISALE_LABEL_DTO_LIST" + id);
+                if (isaleDisplays == null) {
+                    isaleDisplays = displayColumnLabelMapper.findListByDisplayId(campaign.getIsaleDisplay());
+                    redisUtils.set("ISALE_LABEL_DTO_LIST" + id, isaleDisplays);
+                }
+                for (DisplayColumnLabel isaleDis : isaleDisplays) {
+                    Label label = null;
+                    if (redisUtils.get("LABEL_LIB_"+isaleDis.getInjectionLabelId())!=null){
+                        label = (Label) redisUtils.get("LABEL_LIB_"+isaleDis.getInjectionLabelId());
+                    }else {
+                        label = injectionLabelMapper.selectByPrimaryKey(isaleDis.getInjectionLabelId());
+                        redisUtils.set("LABEL_LIB_"+label.getInjectionLabelId(),label);
+                    }
+                    if (label!=null) {
+                        if (idlIst.contains(label.getInjectionLabelId())) {
+                            continue;
+                        }
+                        idlIst.add(label.getInjectionLabelId());
+                        codeList(assetCode, promCode, custCode, label);
+                    }
+                }
+
                 //展示列
                 List<LabelDTO> labelDTOList = (List<LabelDTO>) redisUtils.get("CAM_LABEL_DTO_LIST" + id);
                 if (labelDTOList == null) {

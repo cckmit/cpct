@@ -102,7 +102,6 @@
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiSerService"
                      version="2.0" retries="0" check="false">
         <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="15000"/>
-        <dubbo:method name="ActivityXieTongTask" servicecode="00.1083.ActivityXieTongTask" timeout="20000"/>
     </dubbo:reference>
 
     <!-- 事件接入dubbo接口 -->
@@ -167,9 +166,4 @@
         <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
 
-    <!--渠道协同接触任务id-->
-    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
-        <!-- 发布活动的时候调用营服接口传递活动信息 -->
-        <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
-    </dubbo:reference>
 </beans>

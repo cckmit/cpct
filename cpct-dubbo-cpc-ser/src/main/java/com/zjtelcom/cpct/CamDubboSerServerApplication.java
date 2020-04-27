@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
+@EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass=true)
 @ImportResource("classpath:dubbo/dubbo-${spring.profiles.active}.xml")
 public class CamDubboSerServerApplication {
 

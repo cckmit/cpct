@@ -44,6 +44,4 @@ public interface TrialOperationMapper {
     List<TrialOperation> queryIssuedSuccess();
 
     List<TrialOperation> findOperationListByStrategyIdLsit(List<String> strategyIdList);
-
-    List<TrialOperation> getDataStartToEnd (String startTime,String endTime);
 }

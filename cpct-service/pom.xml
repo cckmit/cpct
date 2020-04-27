@@ -113,6 +113,11 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!--渠道协同接触任务id-->
         <!--<dependency>
             <groupId>com.ctzj.smt.bss</groupId>
@@ -226,6 +231,17 @@
         <dependency>
             <groupId>com.asiainfo.policyqry</groupId>
             <artifactId>policy-query-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ccssoft.zj</groupId>
+            <artifactId>interfaceplatform-module-service</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>CCP</groupId>
+            <artifactId>REST_SMS_SDK_JAVA</artifactId>
+            <version>v2.6.4r</version>
         </dependency>
 
     </dependencies>

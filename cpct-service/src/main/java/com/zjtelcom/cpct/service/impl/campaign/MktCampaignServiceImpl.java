@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
@@ -42,7 +43,6 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.dto.campaign.*;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
@@ -78,8 +78,6 @@ import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,8 +102,6 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-
-
 
     // 集团活动承接接口
     @Override
@@ -326,7 +322,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private EventRedisService eventRedisService;
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
-
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -1970,6 +1965,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                     logger.error("【活动缓存清理失败】："+mktCampaignDO.getMktCampaignName());
                 }
+
+                syncCamData2Synergy(mktCampaignDO);
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
@@ -1977,14 +1974,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         @Override
                         public void run() {
                             try {
-                                try {
-                                    Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
-                                    Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
-                                    logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
-                                }catch (Exception e) {
-                                    logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
-                                }
-
                                 // 删除生产redis缓存
                                 synchronizeCampaignService.deleteCampaignRedisProd(mktCampaignId);
                                 String roleName = "admin";
@@ -2047,6 +2036,26 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
 
         return maps;
+    }
+
+    // 同步活动信息到营服协同
+    public void syncCamData2Synergy(MktCampaignDO mktCampaignDO) {
+        try {
+            Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO,SerializerFeature.WriteMapNullValue), new TypeReference<Map<String, Object>>() {});
+            stringObjectMap.put("planBeginTime", date2StringDate(mktCampaignDO.getPlanBeginTime()));
+            stringObjectMap.put("planEndTime", date2StringDate(mktCampaignDO.getPlanEndTime()));
+            stringObjectMap.put("beginTime", date2StringDate(mktCampaignDO.getBeginTime()));
+            stringObjectMap.put("endTime", date2StringDate(mktCampaignDO.getEndTime()));
+            stringObjectMap.put("createDate", date2StringDate(mktCampaignDO.getCreateDate()));
+            stringObjectMap.put("statusDate", date2StringDate(mktCampaignDO.getStatusDate()));
+            stringObjectMap.put("updateDate", date2StringDate(mktCampaignDO.getUpdateDate()));
+            stringObjectMap.put("manageType", mktCampaignDO.getMktCampaignCategory());
+            logger.info(JSON.toJSONString(stringObjectMap));
+            Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+            logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
+        }catch (Exception e) {
+            logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
+        }
     }
 
     /**
@@ -2981,7 +2990,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
                         String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
-                        System.out.println(sendContent);
+                        logger.info(sendContent);
                         if (lanId != null && lanId != 1) {
                             String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                             if (!resultMsg.isEmpty()) {
@@ -2994,6 +3003,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }
                 }
+                //活动延期接口把活动状态，自动改成已发布
+                MktCampaignDO aDo = new MktCampaignDO();
+                aDo.setMktCampaignId(mktCampaignDO.getMktCampaignId());
+                aDo.setStatusCd("2002");
+                mktCampaignMapper.updateByPrimaryKey(aDo);
             } catch (Exception e) {
                 Map map = new HashMap();
                 map.put("campaignId", mktCampaignDO.getMktCampaignId());
@@ -3002,7 +3016,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 e.printStackTrace();
             }
         }
-        System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
+        logger.info("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
         mktDttsLogService.saveMktDttsLog("6000", "成功", startDate, new Date(), "成功", JSON.toJSONString(sendFailList));
     }
 

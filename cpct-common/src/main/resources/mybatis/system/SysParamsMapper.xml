@@ -53,7 +53,7 @@
         select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
         PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_params
-        <where>
+        <where>1!=2
         <if test="paramName != null and paramName != ''">
             and PARAM_NAME like CONCAT('%',#{paramName,jdbcType=VARCHAR},'%')
         </if>

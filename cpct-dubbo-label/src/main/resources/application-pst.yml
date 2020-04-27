@@ -5,15 +5,15 @@ server:
 #数据库相关配置
 spring:
   datasource:
+    driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://134.108.27.240:15001/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user
     password: cpc_user_123
-    driver-class-name: com.mysql.jdbc.Driver
 
 # 第二数据源
   datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.27.240:15001/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user
     password: cpc_user_123
 
@@ -29,4 +29,22 @@ spring:
       min-idle: 0
     timeout: 30000
 
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  cpctGroupName: cpct_file_import
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
 
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_pst
+  cpctSerpackageGroup: cpct_es_servicepackage_group_pst

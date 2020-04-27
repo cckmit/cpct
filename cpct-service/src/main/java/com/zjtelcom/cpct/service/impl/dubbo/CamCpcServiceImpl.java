@@ -37,7 +37,6 @@ import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-import jdk.internal.instrumentation.InstrumentationMethod;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,9 +159,7 @@ public class CamCpcServiceImpl implements CamCpcService {
             privateParams.put("activityType", "1"); //服务
         } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
             privateParams.put("activityType", "2"); //随销
-        } else if ("7000".equals(mktCampaign.getMktCampaignType())) {
-            privateParams.put("activityType", "3"); //协同场景
-        }else {
+        } else {
             privateParams.put("activityType", "0"); //活动类型 默认营销
         }
         if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
@@ -229,7 +226,9 @@ public class CamCpcServiceImpl implements CamCpcService {
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
-                                productStr = prodFilter(privateParams, filterRuleTimeMap);
+                                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                                productStr = getProdFilter(privateParams, filterRuleTimeMap);
+                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
                                 if ("2000".equals(filterRule.getOperator())) { // 不存在
@@ -628,11 +627,15 @@ public class CamCpcServiceImpl implements CamCpcService {
         return activity;
     }
 
-    @InterfaceTimeoutMonitoring(cutMethodType = "outside")
-    public String prodFilter(Map<String, String> privateParams, Map<String, Object> filterRuleTimeMap) {
-        String productStr;
-        log.info("111------accNbr --->" + privateParams.get("accNbr"));
-        List<String> prodList = new ArrayList<>();
+    @InterfaceTimeoutMonitoring(cutMethodType ="outside")
+    public String getProdFilter(Map<String, String> privateParams, Map<String, Object> filterRuleTimeMap) {
+        String redisOrSysParams = redisUtils.getRedisOrSysParams("TEST_THREAD_SLEEP_SECONDS");
+        try {
+            Thread.sleep(Long.valueOf(redisOrSysParams) * 1000L);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        String productStr;List<String> prodList = new ArrayList<>();
         CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
         //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {

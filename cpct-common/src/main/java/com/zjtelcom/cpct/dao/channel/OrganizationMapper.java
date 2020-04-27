@@ -45,4 +45,9 @@ public interface OrganizationMapper {
 
     List<Organization> selectMenuByEleven();
 
+    Long getByOrgid4a(@Param("orgId4a") Long orgId4a);
+
+    List<Map<String, Object>> getStaffIdAndType(Long orgId);
+
+    int getCount(@Param("staffId") Long staffId);
 }

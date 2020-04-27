@@ -29,13 +29,14 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
     private final static String splitMark = "\u0007";
     private final static String superfield = "createStaff,updateStaff,createDate,updateDate";
 
-    private String ftpAddress = "134.108.0.92";
+//    private String ftpAddress = "134.108.0.92";
+    private String ftpAddress = "134.108.3.130";
     private int ftpPort = 22;
     private String ftpName = "ftp";
     private String ftpPassword = "V1p9*2_9%3#";
     private String exportPath = "/app/cpcp_cxzx/black_list_export/";
     private String importPath = "/app/cpcp_cxzx/black_list_import/";
-    private String localHeadFilePath = this.getClass().getResource("/").getPath();
+    private String localHeadFilePath = "/app/";
 
     @Autowired
     private BlackListMapper blackListMapper;
@@ -58,6 +59,7 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        boolean uploadResult = false;
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
@@ -119,20 +121,21 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
                 }
                 log.info("sftp已获得连接");
                 sftpUtils.cd(exportPath, sftp);
-                boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
-                if (uploadResult) {
-                    log.info("上传成功，开始删除本地文件！");
-                    boolean b1 = dataFile.delete();
-                    if (b1) {
-                        log.info("删除本地文件成功！");
-                    }
-                }
+                uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+
                 sftp.disconnect();
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
                 resultMap.put("resultMsg", "faile");
             } finally {
+                if (uploadResult) {
+                    log.info("上传成功，开始删除本地文件！");
+                }
+                boolean b1 = dataFile.delete();
+                if (b1) {
+                    log.info("删除本地文件成功！");
+                }
                 sftp.disconnect();
             }
         }
@@ -184,7 +187,7 @@ public class BlackListServiceCpctImpl implements BlackListCpctService {
             }
 
             // 解析头文件
-            File headFolders = new File(this.getClass().getResource("/").getPath());
+            File headFolders = new File(localHeadFilePath);
             File[] fileArray = headFolders.listFiles();
             StringBuilder head = new StringBuilder();
             String[] headArr = null;

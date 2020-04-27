@@ -100,7 +100,7 @@ public class TarGrpTemplateController  extends BaseController {
     @RequestMapping(value = "/saveTarGrpTemplate", method = RequestMethod.POST)
     @CrossOrigin
     public String saveTarGrpTemplate(HttpServletRequest request, HttpServletResponse response , @RequestBody TarGrpTemplateDetail tarGrpTemplateDetail) {
-        Map<String, Object> map = tarGrpTemplateService.saveTarGrpTemplate(tarGrpTemplateDetail, request,  response );
+        Map<String, Object> map = tarGrpTemplateService.saveTarGrpTemplate(tarGrpTemplateDetail);
         return JSON.toJSONString(map);
     }
 
