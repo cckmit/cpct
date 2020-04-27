@@ -693,7 +693,7 @@ public class MultiJobRunner {
             for (TrialOperation operation : trialOperationList){
                 String statusCd = operation.getStatusCd();
                 //判断状态
-                if (!statusCd.equals("7300") && !statusCd.equals("8100")){
+                if (!statusCd.equals("7300") || !statusCd.equals("8100")){
                     stringArraylist.add(Integer.valueOf(operation.getCampaignId().toString()));
 
                 }

@@ -159,7 +159,9 @@ public class CamCpcServiceImpl implements CamCpcService {
             privateParams.put("activityType", "1"); //服务
         } else if ("6000".equals(mktCampaign.getMktCampaignType())) {
             privateParams.put("activityType", "2"); //随销
-        } else {
+        } else if ("7000".equals(mktCampaign.getMktCampaignType())) {
+            privateParams.put("activityType", "3"); //协同场景
+        }else {
             privateParams.put("activityType", "0"); //活动类型 默认营销
         }
         if ("0".equals(mktCampaign.getIsCheckRule()) || "校验".equals(mktCampaign.getIsCheckRule())) {
@@ -226,9 +228,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                             Map<String, Object> filterRuleTimeMap = new HashMap<>();
                             // 判断是否进行CRM销售品过滤
                             if (realProdFilter != null && "1".equals(realProdFilter)) {
-                                log.info("111------accNbr --->" + privateParams.get("accNbr"));
-                                productStr = getProdFilter(privateParams, filterRuleTimeMap);
-                                log.info("999------productStr --->" + JSON.toJSONString(productStr));
+                                productStr = prodFilter(privateParams, filterRuleTimeMap);
                             } else if (!context.containsKey("PROM_LIST")) { // 有没有办理销售品--销售列表标签
                                 //存在于校验
                                 if ("2000".equals(filterRule.getOperator())) { // 不存在
@@ -670,7 +670,6 @@ public class CamCpcServiceImpl implements CamCpcService {
             }
         }
         productStr = ChannelUtil.StringList2String(prodList);
-        log.info("999------productStr --->" + JSON.toJSONString(productStr));
         return productStr;
     }
 

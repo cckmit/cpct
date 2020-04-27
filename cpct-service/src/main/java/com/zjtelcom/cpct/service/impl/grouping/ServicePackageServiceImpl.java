@@ -52,10 +52,10 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     @Autowired
     private RedisUtils redisUtils;
 
-    @Value("${ctg.cpctSerpackageTopic}")
-    private String cpctSerpackageTopic;
+    @Value("${ctg.cpctTopic}")
+    private String importTopic;
 
-    private final static int NUM = 2000;
+    private final static int NUM = 1000;
 
     @Override
     public Map<String, Object> saveServicePackage(String name, MultipartFile multipartFile) {
@@ -98,13 +98,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             servicePackageMapper.insert(servicePackage);
 
             // 获取服务包Id
-            Long servicePackageId = 2L; //servicePackage.getServicePackageId();
-
-            // 创建索引
-            logger.info("调用servicePackageInport创建索引");
-            boolean b = esServicePackageService.servicePackageInport(servicePackageId, new ArrayList<>());
-            logger.info("创建索引完成 " + b);
-
+            Long servicePackageId = servicePackage.getServicePackageId();
 
             logger.info("服务包清单contentList数量：" + contentList.size());
             int mqSum = 0;
@@ -112,25 +106,22 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             if (contentList.size() % NUM > 0) {
                 total++;
             }
-            logger.info("有 " + total +" 批的服务包数据");
+            logger.info("有 " + total +" 批的清单数据");
+            List<String> newContentList = new ArrayList();
             for (int i = 0; i < total; i++) {
-                List<String> newContentList = new ArrayList();
                 if (i == 0) {
                     if (i == total - 1) {
                         newContentList = contentList.subList(2, contentList.size());
-                        System.out.println(newContentList.get(0));
                     } else {
                         newContentList = contentList.subList(2, NUM);
                     }
-                } else{
+                } else if (i == total - 1) {
                     if (i == total - 1) {
-                        newContentList = contentList.subList(i * NUM, contentList.size());
+                        newContentList = contentList.subList(0, contentList.size());
                     } else {
-                        newContentList = contentList.subList(i * NUM, (i + 1) * NUM);
+                        newContentList = contentList.subList(0, NUM);
                     }
                 }
-                System.out.println(" i = " + i);
-                logger.info("newContentList.size() = " + newContentList.size());
                 // 向MQ中扔入contentList
                 HashMap msgBody = new HashMap();
                 msgBody.put("servicePackageId", servicePackageId);
@@ -138,7 +129,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 msgBody.put("contentList", newContentList);
                 try {
                     // 判断是否发送成功
-                    if (!mqService.msg2Producer(msgBody, cpctSerpackageTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
+                    if (!mqService.msg2Producer(msgBody, importTopic, servicePackageId.toString(), labelCode).equals("SEND_OK")) {
                         // 发送失败自动重发2次，如果还是失败，记录
                         logger.error("CTGMQ消息生产失败,servicePackageId:" + servicePackageId, JSON.toJSONString(msgBody));
                     }
@@ -147,8 +138,8 @@ public class ServicePackageServiceImpl implements ServicePackageService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                newContentList.clear();
             }
-            logger.info("mqSum" + mqSum);
             redisUtils.set("MQ_SERPACK_SUM_" + servicePackageId, mqSum);
 
             // 异步调用es的dubbo服务，入参 servicePackageId, contentList

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
@@ -3003,11 +3002,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         }
                     }
                 }
-                //活动延期接口把活动状态，自动改成已发布
-                MktCampaignDO aDo = new MktCampaignDO();
-                aDo.setMktCampaignId(mktCampaignDO.getMktCampaignId());
-                aDo.setStatusCd("2002");
-                mktCampaignMapper.updateByPrimaryKey(aDo);
             } catch (Exception e) {
                 Map map = new HashMap();
                 map.put("campaignId", mktCampaignDO.getMktCampaignId());

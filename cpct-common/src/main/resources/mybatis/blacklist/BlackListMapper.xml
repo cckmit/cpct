@@ -75,7 +75,7 @@
     <select id="getAllBlackList"  resultMap="BaseResultMap">
         select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate,
         channel, staff_id, create_staff, create_date, update_staff,update_date
-         from mkt_blacklist <where>1!=2</where>
+         from mkt_blacklist WHERE  1!=2
     </select>
 
     <!--    分页获取主题列表模糊搜索-->
@@ -84,7 +84,7 @@
         from mkt_blacklist
         <where>1!=2
             <if test = "assetPhone != null and assetPhone != ''">
-               and asset_phone = #{assetPhone}
+                AND asset_phone = #{assetPhone}
             </if>
             <if test = "serviceCate != null and serviceCate != ''">
                 AND service_cate = #{serviceCate}

@@ -81,4 +81,7 @@ ctg:
   cpctEsLogTopic: cpct_eslog_prod
   cpctEsLogGroup: cpct_eslog_group_gray
 
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_gray
+  cpctSerpackageGroup: cpct_es_servicepackage_group_gray
 
