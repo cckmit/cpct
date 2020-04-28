@@ -20,10 +20,7 @@ public @interface InterfaceTimeoutMonitoring {
      */
     boolean shortMessageIfTimeout() default true;
 
-    /**
-     * 切入方法类型  inside outside
-     * @return
-     */
+
     String cutMethodType();
 
 }

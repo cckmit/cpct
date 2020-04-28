@@ -61,14 +61,30 @@ public class CamCpcSpecialLogic {
                     "\t</Root>\n" +
                     "</WebService>";
             String respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
+            if (null == respXml || "".equals(respXml)) {
+                return "GIS网格覆盖编码查询失败：地址不精确。";
+            }
             logger.info("onlineScanCodeOrCallPhone4Home-->respXml:" + respXml);
             List<Map<String, Object>> maps = parseData(respXml);
             logger.info("onlineScanCodeOrCallPhone4Home-->maps:" + maps);
             Map<String, Object> map = maps.get(0);
             // 获取GIS网格编码
             String wgbm = getValue4CycleMap(map, "Wgbm");
+            if (null == wgbm || "".equals(wgbm)) {
+                return "地址查询网格编码为空";
+            }
             logger.info("onlineScanCodeOrCallPhone4Home-->wgbm:" + wgbm);
-            tel = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
+            List<String> list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
+            if (null == list || list.size() == 0) {
+                return "GIS网格编码:" + wgbm + "对应专员编码为空";
+            }
+            for (String s : list) {
+                if (s == null) {
+                    continue;
+                }
+                tel = s;
+                break;
+            }
         }catch (Exception e) {
             logger.info("onlineScanCodeOrCallPhone4Home-->error!!!" );
             e.printStackTrace();
