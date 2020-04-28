@@ -361,7 +361,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
     public void exportBlackListFileManage(HttpServletResponse response) throws IOException {
         try {
             //excel文件名
-            String fileName = "blacklist.xls";
+            String fileName = "blacklist.xlsx";
             //设置响应的编码格式
             response.setCharacterEncoding("UTF-8");
             //设置响应类型
