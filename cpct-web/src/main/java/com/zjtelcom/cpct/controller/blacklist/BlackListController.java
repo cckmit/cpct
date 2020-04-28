@@ -107,42 +107,43 @@ public class BlackListController extends BaseController {
     /*导出模板*/
     @RequestMapping("/exportTemplate")
     @CrossOrigin
-    public void downloadExcel(HttpServletResponse response, HttpServletRequest request) throws IOException {
-        String encode = "utf-8";
-        response.setContentType("text/html;charset=" + encode);
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-        String downLoadPath = "G:\\cpct-pst\\cpct\\cpct-web\\src\\main\\resources\\file\\offerTemplate.xlsx";
+    public String downloadExcel(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        OutputStream ouputStream = null;
         try {
-            File file = new File(downLoadPath);
-            long fileLength = file.length();
-            String fileName = file.getName();
-            response.setContentType("application/vnd.ms-excel;");
-            response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes(encode), "ISO8859-1"));
-            response.setHeader("Content-Length", String.valueOf(fileLength));
-            bis = new BufferedInputStream(new FileInputStream(downLoadPath));
-            bos = new BufferedOutputStream(response.getOutputStream());
-            byte[] buff = new byte[2048];
-            int len;
-            while (-1 != (len = bis.read(buff, 0, buff.length))) {
-                bos.write(buff, 0, len);
+            String fileName = "全局黑名单模板.xlsx";
+
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null; //文件输入流
+            BufferedInputStream bis = null;
+            fis = new FileInputStream("D:/blacklist_template.xlsx");
+            bis = new BufferedInputStream(fis);
+
+            //处理导出问题
+            response.reset();
+            response.setContentType(CommonConstant.CONTENTTYPE);
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            ouputStream = response.getOutputStream();
+
+            int len = 0;
+            while ((len = bis.read(buffer)) > 0) {
+                ouputStream.write(buffer, 0, len);
             }
+            int i = bis.read(buffer);
+//            while (i != -1) {
+//                ouputStream.write(buffer);
+//                i = bis.read(buffer);
+//            }
+            ouputStream.flush();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         } finally {
-            if (bis != null)
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                }
-            if (bos != null)
-                try {
-                    bos.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                }
+            try {
+                ouputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        return initSuccRespInfo("导出成功");
 
     }
 
