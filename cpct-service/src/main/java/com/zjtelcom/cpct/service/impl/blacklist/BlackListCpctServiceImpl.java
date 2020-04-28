@@ -1,25 +1,39 @@
 package com.zjtelcom.cpct.service.impl.blacklist;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jcraft.jsch.ChannelSftp;
+import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SftpUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
 @Service
 @Transactional
@@ -35,7 +49,9 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
     private String ftpPassword = "V1p9*2_9%3#";
     private String exportPath = "/app/cpcp_cxzx/black_list_export/";
     private String importPath = "/app/cpcp_cxzx/black_list_import/";
-    private String localHeadFilePath = this.getClass().getResource("/").getPath();
+    private String localHeadFilePath = "/app/";
+
+    private final static int NUM = 5000;
 
     @Autowired
     private BlackListMapper blackListMapper;
@@ -58,83 +74,108 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        boolean uploadResult = false;
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
                 dataFile.createNewFile();
                 //创建策略定义文件
                 // 从数据库查询获取黑名单数据
-                List<BlackListDO> allBlackList = blackListMapper.getAllBlackList();
-                for (BlackListDO blackListDO : allBlackList) {
-                    StringBuilder sline = new StringBuilder();
-                    if (blackListDO.getBlackId() != 0) {
-                        sline.append(blackListDO.getBlackId());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getAssetPhone() != null) {
-                        sline.append(blackListDO.getAssetPhone());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getServiceCate() != null) {
-                        sline.append(blackListDO.getServiceCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getMaketingCate() != null) {
-                        sline.append(blackListDO.getMaketingCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getPublicBenefitCate() != null) {
-                        sline.append(blackListDO.getPublicBenefitCate());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getChannel() != null) {
-                        sline.append(blackListDO.getChannel());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getStaffId() != null) {
-                        sline.append(blackListDO.getStaffId());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getCreateStaff() != null) {
-                        sline.append(blackListDO.getCreateStaff());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getCreateDate() != null) {
+//                List<BlackListDO> allBlackList = blackListMapper.getAllBlackList();
 
-                        sline.append(DateUtil.date2StringDate(blackListDO.getCreateDate()));
+                int total = blackListMapper.getCountAll();
+                int count = total / NUM;
+                if (total % NUM > 1) {
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
+                    List<BlackListDO> allBlackList = new ArrayList<>();
+                    if (i == count - 1) {
+                        allBlackList = blackListMapper.getBlackListLimit(i * NUM, total - (i * NUM));
+                    } else {
+                        allBlackList = blackListMapper.getBlackListLimit(i * NUM,  NUM);
                     }
-                    sline.append(splitMark);
-                    if (blackListDO.getUpdateStaff() != null) {
-                        sline.append(blackListDO.getUpdateStaff());
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getUpdateDate() != null) {
-                        sline.append(DateUtil.date2StringDate(blackListDO.getUpdateDate()));
-                    }
-                    sline.append(splitMark);
-                    if (blackListDO.getOperType() != null) {
-                        sline.append(blackListDO.getOperType());
+                    System.out.println("allBlackList.size() = " + allBlackList.size());
+                    StringBuilder sline = new StringBuilder();
+                    for (int j = 0; j < allBlackList.size(); j++) {
+                        BlackListDO blackListDO = allBlackList.get(j);
+                        if (blackListDO.getBlackId() != 0) {
+                            sline.append(blackListDO.getBlackId());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getAssetPhone() != null) {
+                            sline.append(blackListDO.getAssetPhone());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getServiceCate() != null) {
+                            sline.append(blackListDO.getServiceCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getMaketingCate() != null) {
+                            sline.append(blackListDO.getMaketingCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getPublicBenefitCate() != null) {
+                            sline.append(blackListDO.getPublicBenefitCate());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getChannel() != null) {
+                            sline.append(blackListDO.getChannel());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getStaffId() != null) {
+                            sline.append(blackListDO.getStaffId());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getCreateStaff() != null) {
+                            sline.append(blackListDO.getCreateStaff());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getCreateDate() != null) {
+
+                            sline.append(DateUtil.date2StringDate(blackListDO.getCreateDate()));
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getUpdateStaff() != null) {
+                            sline.append(blackListDO.getUpdateStaff());
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getUpdateDate() != null) {
+                            sline.append(DateUtil.date2StringDate(blackListDO.getUpdateDate()));
+                        }
+                        sline.append(splitMark);
+                        if (blackListDO.getOperType() != null) {
+                            sline.append(blackListDO.getOperType());
+                        }
+                        if (j < allBlackList.size() - 1) {
+                            sline.append("\r\n");
+                        }
                     }
                     sftpUtils.writeFileContent(dataFile.getName(), sline.toString());
                 }
+
+
                 log.info("sftp已获得连接");
                 sftpUtils.cd(exportPath, sftp);
-                boolean uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
-                if (uploadResult) {
-                    log.info("上传成功，开始删除本地文件！");
-                    boolean b1 = dataFile.delete();
-                    if (b1) {
-                        log.info("删除本地文件成功！");
-                    }
-                }
+                uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
+
                 sftp.disconnect();
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("黑名单数据文件dataFile失败！Expection = ", e);
                 resultMap.put("resultMsg", "faile");
             } finally {
+                if (uploadResult) {
+                    log.info("上传成功，开始删除本地文件！");
+                }
+                boolean b1 = dataFile.delete();
+                if (b1) {
+                    log.info("删除本地文件成功！");
+                }
                 sftp.disconnect();
             }
+        } else {
+            log.info(dataFileName + "文件已存在！");
         }
         return resultMap;
     }
@@ -184,7 +225,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             }
 
             // 解析头文件
-            File headFolders = new File(this.getClass().getResource("/").getPath());
+            File headFolders = new File(localHeadFilePath);
             File[] fileArray = headFolders.listFiles();
             StringBuilder head = new StringBuilder();
             String[] headArr = null;
@@ -310,6 +351,180 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             }
         }
         return property.toString();
+    }
+
+
+    /*黑名单管理接口*/
+
+    /*导出黑名单*/
+    @Override
+    public void exportBlackListFileManage(HttpServletResponse response) throws IOException {
+        try {
+            //excel文件名
+            String fileName = "blacklist.xls";
+            //设置响应的编码格式
+            response.setCharacterEncoding("UTF-8");
+            //设置响应类型
+            response.setContentType("application/msexcel;charset=UTF-8");
+            //设置响应头
+            response.setHeader("Content-Disposition",
+                    "attachment;filename="+
+                            new String(fileName.getBytes(),"iso8859-1"));
+
+            Map<String, Object> maps = new HashMap<>();
+            OutputStream outputStream = response.getOutputStream();
+//            FileOutputStream outputStream=new FileOutputStream("d:\\blacklist.xls");
+            List<BlackListDO> blackListDOList = blackListMapper.getAllBlackList();
+            List<List> list = new ArrayList<>();
+            for(BlackListDO blackListDO:blackListDOList){
+                ArrayList<String> sublist = new ArrayList();
+                sublist.add(blackListDO.getAssetPhone());
+                sublist.add(blackListDO.getServiceCate());
+                sublist.add(blackListDO.getMaketingCate());
+                sublist.add(blackListDO.getPublicBenefitCate());
+                sublist.add(blackListDO.getChannel());
+                sublist.add(blackListDO.getStaffId());
+                list.add(sublist);
+            }
+            writeExcel(list,outputStream);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /*导入黑名单*/
+    @Override
+    public Map<String, Object> importBlackListFileManage(MultipartFile multipartFile) throws IOException {
+        Map<String, Object> maps = new HashMap<>();
+        InputStream inputStream = multipartFile.getInputStream();
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
+        Sheet sheet = wb.getSheetAt(0);
+        Integer rowNums = sheet.getLastRowNum() + 1;
+        List<String> resultList = new ArrayList<>();
+        for (int i = 1; i < rowNums; i++) {
+            Row row = sheet.getRow(i);
+            if (row.getLastCellNum() < 6) {
+                maps.put("resultCode", CODE_FAIL);
+                maps.put("resultMsg", "请返回检查模板格式");
+                return maps;
+            }
+            Cell assetPhoneCell = row.getCell(0);
+            assetPhoneCell.setCellType(CellType.STRING);
+            String assetPhone = assetPhoneCell.getStringCellValue();
+
+            Cell serviceCateCell = row.getCell(1);
+            serviceCateCell.setCellType(CellType.STRING);
+            String serviceCate = serviceCateCell.getStringCellValue();
+
+            Cell maketingCateCell = row.getCell(2);
+            maketingCateCell.setCellType(CellType.STRING);
+            String maketingCate = maketingCateCell.getStringCellValue();
+
+            Cell publicBenefitCateCell = row.getCell(3);
+            publicBenefitCateCell.setCellType(CellType.STRING);
+            String publicBenefitCate = publicBenefitCateCell.getStringCellValue();
+
+            Cell channelCell = row.getCell(4);
+            channelCell.setCellType(CellType.STRING);
+            String channel = channelCell.getStringCellValue();
+
+            Cell staffIdCell = row.getCell(5);
+            staffIdCell.setCellType(CellType.STRING);
+            String staffId = staffIdCell.getStringCellValue();
+
+            BlackListDO blackListDO = new BlackListDO();
+            blackListDO.setAssetPhone(assetPhone);
+            blackListDO.setServiceCate(serviceCate);
+            blackListDO.setMaketingCate(maketingCate);
+            blackListDO.setPublicBenefitCate(publicBenefitCate);
+            blackListDO.setChannel(channel);
+            blackListDO.setStaffId(staffId);
+            //添加黑名单
+            blackListDO.setCreateDate(new Date());
+            blackListMapper.addBlackList(blackListDO);
+
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", "导入文件成功");
+        return maps;
+
+    }
+
+    /*分页获取黑名单列表*/
+    @Override
+    public Map<String, Object> getBlackListPageByKey(Map<String,Object> pageParams) {
+        Map<String,Object> result = new HashMap<>();
+        List<BlackListDO> blackListDOS = new ArrayList<>();
+        String pageSize = "10";
+        if(pageParams.get("pageSize").toString() != ""){
+            pageSize = pageParams.get("pageSize").toString();
+        }
+        try {
+            String orderBy = "black_id desc";
+            PageHelper.startPage(Integer.parseInt(pageParams.get("page").toString()),Integer.parseInt(pageSize.toString()),orderBy);
+            blackListDOS= blackListMapper.getBlackListPageByKey((String)pageParams.get("assetPhone"),(String)pageParams.get("serviceCate"),(String)pageParams.get("maketingCate"),
+                    (String)pageParams.get("publicBenefitCate"),(String)pageParams.get("channel"),(String)pageParams.get("staffId"));
+            result.put("resultCode",CommonConstant.CODE_SUCCESS);
+            result.put("resultMsg","请求成功");
+            result.put("blackList",blackListDOS);
+            result.put("pageInfo",new Page(new PageInfo<>(blackListDOS)));
+
+        }catch (Exception e){
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+            result.put("resultMsg","请求失败");
+            e.printStackTrace();
+        }finally {
+            return result;
+        }
+    }
+
+    /**
+     * 把内容写入Excel
+     * @param list 传入要写的内容，此处以一个List内容为例，先把要写的内容放到一个list中
+     * @param outputStream 把输出流怼到要写入的Excel上，准备往里面写数据
+     */
+    public static void writeExcel(List<List> list, OutputStream outputStream) {
+        //创建工作簿
+        HSSFWorkbook hssfWorkbook = null;
+        hssfWorkbook = new HSSFWorkbook();
+        //创建工作表
+        HSSFSheet hssfSheet;
+        hssfSheet = hssfWorkbook.createSheet();
+        //创建行
+        HSSFRow hssfRow;
+        hssfRow = hssfSheet.createRow(0);
+        hssfRow.createCell(0).setCellValue("assetPhone");
+        hssfRow.createCell(1).setCellValue("serviceCate");
+        hssfRow.createCell(2).setCellValue("maketingCate");
+        hssfRow.createCell(3).setCellValue("publicBenefitCate");
+        hssfRow.createCell(4).setCellValue("channel");
+        hssfRow.createCell(5).setCellValue("staffId");
+
+        //创建列，即单元格Cell
+        HSSFCell hssfCell;
+
+// 设置单元格编码格式
+
+        //把List里面的数据写到excel中
+        for (int i=0;i<list.size();i++) {
+            //从第一行开始写入
+            hssfRow = hssfSheet.createRow(i+1);
+//            创建每个单元格Cell，即列的数据
+            List sub_list =list.get(i);
+            for (int j=0;j<sub_list.size();j++) {
+
+                hssfCell = hssfRow.createCell(j); //创建单元格
+                hssfCell.setCellValue((String)sub_list.get(j)); //设置单元格内容
+            }
+        }
+        //用输出流写到excel
+        try {
+            hssfWorkbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -46,14 +46,35 @@ spring:
 
 #集团CPCT定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.40,134.108.0.41
+   ip: 134.108.0.40,134.108.0.41,134.108.0.208,134.108.0.209
    port: 9051
    database: 0
    password: CRM_CPCP_002_USER#bssCpc_ro
 
 
 redisConfig_Prd:
-   ip: 134.108.0.59
-   port: 41701
-   database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro
+   ip: 134.108.0.38,134.108.0.39
+   port: 9051
+   database: 0
+   password: CRM_CPCP_001_USER#Bsscpc!z3
+
+
+ctg:
+  namesrvAddr: 134.108.11.159:9892;134.108.11.160:9892;134.108.11.161:9892
+  cpctGroupName: cpct_file_import
+  namesrvAuthID: cpct_user
+  namesrvAuthPwd: cpct_user123
+  consumeOrderly: false
+  instanceName: prod_cpct
+  maxMessageSize: 8242880
+  sendMaxRetryTimes: 2
+  sendMsgTimeout: 30000
+  compressMsgBodyOverHowmuch: 4098
+  clusterName: pst_crm_mq
+  tenantID: 2
+  cpctTopic: cpct_topic_import
+  clientWorkerThreads: 4
+
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_prod
+  cpctSerpackageGroup: cpct_es_servicepackage_group_prod

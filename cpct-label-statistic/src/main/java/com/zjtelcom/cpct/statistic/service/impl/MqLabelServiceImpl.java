@@ -64,6 +64,13 @@ public class MqLabelServiceImpl implements MqLabelService, InitializingBean, Dis
         logger.info("试算清单数据消费者初始化成功！");
     }
 
+
+
+
+
+
+
+
     /**
      * 试算用户标签数据
      */

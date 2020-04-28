@@ -126,8 +126,8 @@
         <dubbo:method name="queryEventInstLog" servicecode="00.1079.queryEventInstLog" timeout="120000"/>
         <dubbo:method name="updateProjectPcState" servicecode="00.1079.updateProjectPcState" timeout="120000"/>
         <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
-        <!--&lt;!&ndash; 发布活动的时候调用营服接口传递活动信息 &ndash;&gt;-->
-        <!--<dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>-->
+        <!-- 发布活动的时候调用营服接口传递活动信息 -->
+        <dubbo:method name="mktCampaignSync" servicecode="00.1079.mktCampaignSync" timeout="120000"/>
     </dubbo:reference>
 
     <!-- 集团下发活动反馈接口 1.0 -->
@@ -140,6 +140,20 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.statistic.service.TrialLabelService"
                      id="trialLabelServiceImpl" version="1.0" check="false">
         <dubbo:method name="statisticalAnalysts" servicecode="00.1083.statisticalAnalysts" timeout="120000"/>
+    </dubbo:reference>
+
+    <!-- 佣金政策查询接口 -->
+    <dubbo:reference registry="esb3" interface="com.asiainfo.policyqry.service.IPolicyQueryService"
+                     id="iPolicyQueryService" version="1.0" check="false">
+        <dubbo:method name="getPolicys" servicecode="33.1039.getPolicys" timeout="12000"/>
+        <dubbo:method name="getPolicyByOfferId" servicecode="33.1039.getPolicyByOfferId" timeout="12000"/>
+        <dubbo:method name="addActivityPolicyRel" servicecode="33.1039.addActivityPolicyRel" timeout="12000"/>
+    </dubbo:reference>
+
+    <!-- 线上扫码、电话到家特殊逻辑 -->
+    <dubbo:reference registry="esb3" interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" id="iSaleService" version="1.0" check="false">
+        <dubbo:method name="queryCoverIdByAddr" servicecode="33.1103.queryCoverIdByAddr"/>
+        <dubbo:method name="queryResCoverInfoService" servicecode="33.1103.queryResCoverInfoService"/>
     </dubbo:reference>
 
 </beans>
