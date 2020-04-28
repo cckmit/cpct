@@ -394,19 +394,19 @@
         CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, RIGHT_OPERAND, CONDITION_TYPE,
         OPERATOR,SCOPE,TAG_ROW_ID,IS_SHARED,CATALOG_ID, CLASS_NAME
       from injection_label
-    <where>1!=2
-      <if test="null != injectionLabelIds and injectionLabelIds.size > 0">
-        AND INJECTION_LABEL_ID not in
-        <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
-          #{item}
-        </foreach>
-      </if>
-      <if test="labelName != null and labelName != ''">
-        and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
-      </if>
-    </where>
-
+      <where> 1 != 2
+        <if test="labelName != null and labelName != ''">
+          and INJECTION_LABEL_NAME LIKE CONCAT(CONCAT('%',#{labelName}),'%')
+        </if>
+      </where>
   </select>
+
+  <!--<if test="null != injectionLabelIds and injectionLabelIds.size > 0">
+    AND INJECTION_LABEL_ID not in
+    <foreach collection="injectionLabelIds" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </if>-->
 
   <select id="listLabelByIdList" parameterType="java.util.List" resultMap="BaseResultMap">
     select INJECTION_LABEL_ID, INJECTION_LABEL_CODE, INJECTION_LABEL_NAME, INJECTION_LABEL_DESC,

@@ -33,7 +33,7 @@ public class ApplicationStart implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
          //加载系统参数到redis
-        if(isTrue()) {
+      /*  if(isTrue()) {
             List<SysParams> sysParams = sysParamsMapper.selectAll(null, null);
             log.info("初始化系统参数到redis：" + JSONObject.toJSONString(JSON.toJSON(sysParams)));
             for (SysParams params : sysParams) {
@@ -47,7 +47,7 @@ public class ApplicationStart implements ApplicationRunner {
                 }
             }
             log.info("系统参数缓存完毕");
-        }
+        }*/
     }
 
     /**

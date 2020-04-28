@@ -55,26 +55,6 @@ public class EventApiTestController {
 
     @Autowired
     private MktCampaignService mktCampaignService;
-
-    @PostMapping("labelListByEventId")
-    public  Map<String,String> labelListByEventId(@RequestBody HashMap<String,String> key) {
-        Map<String,String> result = new HashMap<>();
-        List<MktCampaignDO> campaigns = new ArrayList<>();
-        try {
-            List<Long> idlIST = new ArrayList<>();
-            idlIST = ChannelUtil.StringToIdList(key.get("key"));
-            for (Long id : idlIST){
-                Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id );  //查询事件下使用的所有标签
-                if (null != mktAllLabels) {
-                    redisUtils.set("EVT_ALL_LABEL_" + id, mktAllLabels);
-                    result.put("EVENT_"+id,JSON.toJSONString(redisUtils.get("EVT_ALL_LABEL_"+id)));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
     @PostMapping(value = "/testIssuedSuccessMktCheck")
     @CrossOrigin
     public void testIssuedSuccessMktCheck() {

@@ -113,6 +113,11 @@
             <artifactId>es-service-info</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!--渠道协同接触任务id-->
         <!--<dependency>
             <groupId>com.ctzj.smt.bss</groupId>
