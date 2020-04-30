@@ -392,51 +392,30 @@
 
     <update id="modContactEvt" parameterType="com.zjtelcom.cpct.dto.event.ContactEvt">
         update event
-        set INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
-
-            EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
-
-            EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
-
-            EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
-
-            EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
-
-            EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
-
-            EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
-
-            EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
-
-            EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
-
-            EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
-
-            LOCATION_NBR = #{locationNbr,jdbcType=VARCHAR},
-
-            LONGITUDE = #{longitude,jdbcType=VARCHAR},
-
-            LATITUDE = #{latitude,jdbcType=VARCHAR},
-
-            LOCATION_SWITCH = #{locationSwitch,jdbcType=VARCHAR},
-
-            STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-
-            REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
-
-            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-
-            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-
-            CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-
-            STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
-
-            UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-
-            REMARK = #{remark,jdbcType=VARCHAR},
-
-            TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
+        set
+        INTERFACE_CFG_ID = #{interfaceCfgId,jdbcType=BIGINT},
+        EVENT_NBR = #{contactEvtCode,jdbcType=VARCHAR},
+        EVENT_NAME = #{contactEvtName,jdbcType=VARCHAR},
+        EVT_MAPPED_ADDR = #{evtMappedAddr,jdbcType=VARCHAR},
+        EVT_MAPPED_IP = #{evtMappedIp,jdbcType=VARCHAR},
+        EVT_PROCOTOL_TYPE = #{evtProcotolType,jdbcType=VARCHAR},
+        EVT_MAPPED_FUN_NAME = #{evtMappedFunName,jdbcType=VARCHAR},
+        EVENT_DESC = #{contactEvtDesc,jdbcType=VARCHAR},
+        EVT_TYPE_ID = #{contactEvtTypeId,jdbcType=BIGINT},
+        EVENT_TRIG_TYPE = #{evtTrigType,jdbcType=VARCHAR},
+        LOCATION_NBR = #{locationNbr,jdbcType=VARCHAR},
+        LONGITUDE = #{longitude,jdbcType=VARCHAR},
+        LATITUDE = #{latitude,jdbcType=VARCHAR},
+        LOCATION_SWITCH = #{locationSwitch,jdbcType=VARCHAR},
+        STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+        REC_CAMPAIGN_AMOUNT = #{recCampaignAmount,jdbcType=VARCHAR},
+        CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+        STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
         EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>

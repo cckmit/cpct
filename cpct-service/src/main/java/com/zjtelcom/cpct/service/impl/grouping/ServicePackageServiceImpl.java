@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.grouping.ServicePackageService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_es;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.zjtelcom.es.es.service.EsServicePackageService;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     private MqService mqService;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private RedisUtils_es redisUtils;
 
     @Value("${ctg.cpctSerpackageTopic}")
     private String cpctSerpackageTopic;
