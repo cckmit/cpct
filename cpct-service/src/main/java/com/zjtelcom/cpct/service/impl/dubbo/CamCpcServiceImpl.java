@@ -213,9 +213,11 @@ public class CamCpcServiceImpl implements CamCpcService {
                 FilterRule filterRule = null;
                 if (filterRuleRedis != null) {
                     filterRule = (FilterRule) filterRuleRedis.get("FILTER_RULE_" + filterRuleId);
-                    filterRuleList.add(filterRule);
-                    if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
-                        productFilter = true;
+                    if (filterRule!=null){
+                        filterRuleList.add(filterRule);
+                        if ("3000".equals(filterRule.getFilterType())) {  //销售品过滤
+                            productFilter = true;
+                        }
                     }
                 }
             }
