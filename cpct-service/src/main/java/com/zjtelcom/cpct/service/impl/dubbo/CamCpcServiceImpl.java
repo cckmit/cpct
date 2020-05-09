@@ -152,6 +152,7 @@ public class CamCpcServiceImpl implements CamCpcService {
 
         privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动Id
         privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
+        privateParams.put("skipDisturbed", mktCampaign.getSkipDisturbed()); //活动名称
         if ("1000".equals(mktCampaign.getMktCampaignType())) {
             privateParams.put("activityType", "0"); //营销
         } else if ("5000".equals(mktCampaign.getMktCampaignType())) {
@@ -1114,6 +1115,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                     ruleMap.put("ruleName", ruleName); //规则名称
                     ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
                     ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? "0" : "1"); // 是否随销规则标识
+                    ruleMap.put("skipDisturbed", privateParams.get("skipDisturbed")==null? "0" :  privateParams.get("skipDisturbed")); // 是否随销规则标识
                     if (context.get("AREA_ID") != null) {
                         ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
                     }
