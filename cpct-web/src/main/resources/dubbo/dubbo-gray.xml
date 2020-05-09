@@ -140,17 +140,5 @@
         <dubbo:method name="addActivityPolicyRel" servicecode="33.1039.addActivityPolicyRel" timeout="12000"/>
     </dubbo:reference>
 
-    <!-- 因子实时查询 -->
-    <dubbo:reference registry="esb3" interface="com.zjpii.biz.serv.YzServ" id="yzServ"
-                     version="2.0" retries="0" check="false">
-        <dubbo:method name="queryYz" servicecode="00.1083.queryYz" timeout="10000"/>
-    </dubbo:reference>
-
-    <!-- 线上扫码、电话到家特殊逻辑 -->
-    <dubbo:reference registry="esb3" interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" id="iSaleService" version="2.0" check="false">
-        <dubbo:method name="queryCoverIdByAddr" servicecode="33.1103.queryCoverIdByAddr"/>
-        <dubbo:method name="queryResCoverInfoService" servicecode="33.1103.queryResCoverInfoService"/>
-    </dubbo:reference>
-
 
 </beans>
