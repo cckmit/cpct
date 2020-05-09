@@ -126,8 +126,6 @@
         <dubbo:method name="queryBindByAccCard" servicecode="33.1037.queryBindByAccCard"  timeout="10000"/>
     </dubbo:reference>
 
-
-
     <dubbo:reference registry="esb3" id="iCacheProdIndexQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheIndexApi.ICacheProdIndexQryService" version="1.0" retries="0" check="false">
         <!-- 根据accNum查询prodInstId-->
         <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
