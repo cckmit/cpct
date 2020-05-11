@@ -83,6 +83,7 @@ public class SearchLabelServiceImpl extends BaseService implements SearchLabelSe
                 if (campaign==null){
                     continue;
                 }
+
                 //isale展示列
                 List<DisplayColumnLabel> isaleDisplays = (List<DisplayColumnLabel>) redisUtils.get("ISALE_LABEL_DTO_LIST" + id);
                 if (isaleDisplays == null) {

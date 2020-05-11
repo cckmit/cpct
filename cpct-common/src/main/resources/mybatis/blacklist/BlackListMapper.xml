@@ -75,10 +75,11 @@
     <select id="getAllBlackList"  resultMap="BaseResultMap">
         select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate,
         channel, staff_id, create_staff, create_date, update_staff,update_date
-         from mkt_blacklist <where>1!=2</where>
+         from mkt_blacklist
+        <where>1!=2</where>
     </select>
 
-    <!--    分页获取主题列表模糊搜索-->
+    <!--    分页获取黑名单模糊搜索-->
     <select id="getBlackListPageByKey" resultMap="BaseResultMap">
         select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id, create_staff, create_date, update_staff,update_date
         from mkt_blacklist

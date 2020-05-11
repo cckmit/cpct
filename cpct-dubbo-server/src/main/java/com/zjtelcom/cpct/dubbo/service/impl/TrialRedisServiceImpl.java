@@ -55,7 +55,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
      * @return
      */
     @Override
-    public Map<String, Object> updateOperationStatus(Long batchNum, String status) throws Exception {
+    public Map<String, Object> updateOperationStatus(Long batchNum, String status) {
         Map<String,Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByBatchNum(batchNum.toString());
         if (operation==null){
@@ -73,21 +73,29 @@ public class TrialRedisServiceImpl implements TrialRedisService {
             operation.setRemark("文件下发成功");
         }else if (status.equals(TrialStatus.ISEE_PUBLISH_FAIL.getValue())){
             //协同-下发失败
-            String sendMsg = "协同-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
-            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
-            if (send_msg!=null){
-                for (SysParams sysParams : send_msg) {
-                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+            try {
+                String sendMsg = "协同-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+                List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+                if (send_msg!=null){
+                    for (SysParams sysParams : send_msg) {
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }else if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
             //渠道-下发失败
-            String sendMsg = "渠道-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
-            List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
-            if (send_msg!=null){
-                for (SysParams sysParams : send_msg) {
-                    uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+            try {
+                String sendMsg = "渠道-下发失败 "+"批次号："+batchNum+"状态:"+TrialStatus.ISEE_PUBLISH_FAIL.getValue();
+                List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+                if (send_msg!=null){
+                    for (SysParams sysParams : send_msg) {
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }else {
             operation.setRemark("操作失败");

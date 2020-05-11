@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jcraft.jsch.ChannelSftp;
+import com.zjtelcom.cpct.bean.ResponseVO;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.blacklist.BlackListLogMapper;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
+import com.zjtelcom.cpct.domain.blacklist.BlackListLogDO;
 import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SftpUtils;
@@ -19,6 +22,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,12 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
 
     @Autowired
     private BlackListMapper blackListMapper;
+    @Autowired
+    ResponseVO responseVO;
+    @Autowired
+    BlackListLogMapper blackListLogMapper;
+    private static final String SUCCESS_CODE = "0";
+    private static final String FAIL_CODE = "1";
 
     /**
      * 从数据库导出黑名单上传ftp服务器
@@ -361,7 +371,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
     public void exportBlackListFileManage(HttpServletResponse response) throws IOException {
         try {
             //excel文件名
-            String fileName = "blacklist.xlsx";
+            String fileName = "blacklist.xls";
             //设置响应的编码格式
             response.setCharacterEncoding("UTF-8");
             //设置响应类型
@@ -386,7 +396,21 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
                 sublist.add(blackListDO.getStaffId());
                 list.add(sublist);
             }
-            writeExcel(list,outputStream);
+            HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
+            int  groupSize= 60000;
+            List<List<List>> newlist = splitList(list,groupSize);
+            for(List<List> ele: newlist){
+                hssfWorkbook = writeExcel(hssfWorkbook,ele);
+            }
+
+            //用输出流写到excel
+            try {
+                hssfWorkbook.write(outputStream);
+                outputStream.flush();
+                outputStream.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -398,7 +422,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         Map<String, Object> maps = new HashMap<>();
         InputStream inputStream = multipartFile.getInputStream();
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-        Sheet sheet = wb.getSheetAt(0);
+        XSSFSheet sheet = wb.getSheetAt(0);
         Integer rowNums = sheet.getLastRowNum() + 1;
         List<String> resultList = new ArrayList<>();
         for (int i = 1; i < rowNums; i++) {
@@ -526,5 +550,72 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public Map<String, Object> deleteBlackList(List<String> phoneNumsDeleted) {
+        try {
+            blackListMapper.deleteBlackListById(phoneNumsDeleted);
+
+            //添加操作日志
+            for(String phone: phoneNumsDeleted){
+                BlackListLogDO blackListLogDO = new BlackListLogDO();
+                blackListLogDO.setMethod("delete");
+                blackListLogDO.setAssetPhone(phone);
+                blackListLogMapper.addBlacklistlog(blackListLogDO);
+            }
+            return responseVO.response(SUCCESS_CODE,"删除黑名单成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            return responseVO.response(FAIL_CODE,"删除黑名单失败");
+        }
+    }
+    private List<List<List>> splitList(List<List> list , int groupSize){
+        int length = list.size();
+        // 计算可以分成多少组
+        int num = ( length + groupSize - 1 )/groupSize ; // TODO
+        List<List<List>> newList = new ArrayList<>(num);
+        for (int i = 0; i < num; i++) {
+            // 开始位置
+            int fromIndex = i * groupSize;
+            // 结束位置
+            int toIndex = (i+1) * groupSize < length ? ( i+1 ) * groupSize : length ;
+            newList.add(list.subList(fromIndex,toIndex)) ;
+        }
+        return  newList ;
+    }
+
+
+    private HSSFWorkbook writeExcel(HSSFWorkbook hssfWorkbook, List<List> list) {
+        //创建工作表
+        HSSFSheet hssfSheet;
+        hssfSheet = hssfWorkbook.createSheet();
+        //创建行
+        HSSFRow hssfRow = hssfSheet.createRow(0);
+        hssfRow.createCell(0).setCellValue("资产号码（assetPhone）");
+        hssfRow.createCell(1).setCellValue("服务类(serviceCate)");
+        hssfRow.createCell(2).setCellValue("营销类（maketingCate）");
+        hssfRow.createCell(3).setCellValue("公益类（publicBenefitCate）");
+        hssfRow.createCell(4).setCellValue("渠道（channel）");
+        hssfRow.createCell(5).setCellValue("员工id（staffId）");
+
+        // 设置单元格编码格式
+        //把List里面的数据写到excel中
+        for (int i = 0; i < list.size(); i++) {
+            //从第一行开始写入
+            hssfRow = hssfSheet.createRow(i + 1);
+            //创建每个单元格Cell，即列的数据
+            List sub_list = list.get(i);
+            for (int j = 0; j < sub_list.size(); j++) {
+                HSSFCell hssfCell = hssfRow.createCell(j); //创建单元格
+                hssfCell.setCellValue((String) sub_list.get(j)); //设置单元格内容
+            }
+        }
+        return hssfWorkbook;
+
+    }
+
+
+
 
 }
