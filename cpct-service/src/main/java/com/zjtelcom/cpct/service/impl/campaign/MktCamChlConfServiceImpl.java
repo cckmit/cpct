@@ -291,6 +291,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
             for (MktCamChlConfAttrDO mktCamChlConfAttrDO : mktCamChlConfAttrDOList) {
                 MktCamChlConfAttr mktCamChlConfAttr = new MktCamChlConfAttr();
                 CopyPropertiesUtil.copyBean2Bean(mktCamChlConfAttr, mktCamChlConfAttrDO);
+                // 专属团队属性名称从参数表中获取
+                if(ConfAttrEnum.DEDICATED_TEAM.getArrId().equals(mktCamChlConfAttr.getAttrId())){
+                    SysParams dedicatedTeam = sysParamsMapper.findParamsByValue("DEDICATED_TEAM", mktCamChlConfAttr.getAttrValue());
+                    mktCamChlConfAttr.setAttrValName(dedicatedTeam.getParamName());
+                }
                 // 协同规则
                 if (mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.RULE.getArrId())) {
                     //通过EvtContactConfId获取规则放入属性中
