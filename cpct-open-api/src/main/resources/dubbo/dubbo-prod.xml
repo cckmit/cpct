@@ -39,7 +39,7 @@
     <!--协同通过号码查活动-->
     <dubbo:reference registry="esb4" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IReportService" id="reportServiceImpl"
                      version="1.0" retries="0" check="false">
-        <dubbo:method name="queryCampaignByNum" servicecode="00.1079.queryValidCampaignByAccNum"/>
+        <dubbo:method name="queryCampaignByNum" servicecode="00.1079.queryValidCampaignByAccNum" timeout="10000"/>
     </dubbo:reference>
 
     <!-- 集团下发活动反馈接口 1.0 -->

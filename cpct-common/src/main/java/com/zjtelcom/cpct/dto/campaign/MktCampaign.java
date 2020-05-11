@@ -146,6 +146,16 @@ public class MktCampaign extends BaseEntity {
 
     private String regionFlg;//活动创建地市
 
+    private String  skipDisturbed;
+
+
+    public String getSkipDisturbed() {
+        return skipDisturbed;
+    }
+
+    public void setSkipDisturbed(String skipDisturbed) {
+        this.skipDisturbed = skipDisturbed;
+    }
 
     public Long getDirectoryId() {
         return directoryId;
