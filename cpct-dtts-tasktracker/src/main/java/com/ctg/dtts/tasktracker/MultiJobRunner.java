@@ -8,9 +8,11 @@ import com.ctg.dtts.tasktracker.runner.DttsLoggerFactory;
 import com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.LabelSaturationMapper;
+import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.LabelSaturation;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dubbo.out.CampaignService;
 import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
@@ -676,7 +678,7 @@ public class MultiJobRunner {
         String endTime = sdf2.format(d);
         System.out.println("格式化后的日期：" + endTime);
         List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
-        Arraylist<String> stringArraylist = new Arraylist<String>();
+        ArrayList<String> stringArraylist = new ArrayList<String>();
         if (trialOperationList!=null){
             for (TrialOperation operation : trialOperationList){
                 String statusCd = operation.getStatusCd();
@@ -691,8 +693,8 @@ public class MultiJobRunner {
                 try {
                     Map<String,Object> param =new HashMap<>();
                     param.put("idList",stringArraylist); //活动id集合
-                    param.put("perCampaign","PER_CAMPAIGN")//周期性活动标识
-                    result =  trialProdService.campaignIndexTask(param);
+                    param.put("perCampaign","PER_CAMPAIGN");//周期性活动标识
+                    trialProdService.campaignIndexTask(param);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -739,7 +741,7 @@ public class MultiJobRunner {
         if (map == null) return "调用sendShortMessage返回结果异常！";
         if (!map.get("code").equals("0000")) {
             // 短信发送成功记录数据
-            saveShortMessageLog(targPhone, sendContent);
+//            saveShortMessageLog(targPhone, sendContent);
             return map.get("msg").toString();
         } else {
             return "";
@@ -752,12 +754,22 @@ public class MultiJobRunner {
         return result;
     }
 
-    // 短信发送类型任务记录
-    public void saveShortMessageLog(String targPhone, String sendContent) {
-        try {
-            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
-        }catch (Exception e){
-            e.printStackTrace();
+
+    public static String getRandom(int length){
+        String val = "";
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            val += String.valueOf(random.nextInt(10));
         }
+        return val;
     }
+
+    // 短信发送类型任务记录
+//    public void saveShortMessageLog(String targPhone, String sendContent) {
+//        try {
+//            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 }

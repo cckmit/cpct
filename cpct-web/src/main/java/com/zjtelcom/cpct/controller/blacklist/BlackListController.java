@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.controller.blacklist;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
+
 import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,88 @@ public class BlackListController extends BaseController {
 
     @Autowired
     private BlackListCpctService blackListCpctService;
+
+    /**
+     * 导出黑名单
+     *
+     * @return
+     */
+    @PostMapping("/export")
+    @CrossOrigin
+    public Map<String, Object> export(){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = blackListCpctService.exportBlackListFile();
+        } catch (Exception e) {
+            logger.error("[op:BlackListController] fail to exportBlackListFile",e);
+        }
+        return result;
+    }
+
+    @PostMapping("/generateTemplate")
+    @CrossOrigin
+    public void generateTemplate() throws FileNotFoundException {
+        FileOutputStream inputStream = new FileOutputStream("");
+    }
+    /**
+     * 导入黑名单
+     *
+     * @return
+     */
+    @PostMapping("/import")
+    @CrossOrigin
+    public Map<String, Object> importBlackList(){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = blackListCpctService.importBlackListFile();
+        } catch (Exception e) {
+            logger.error("[op:BlackListController] fail to importBlackListFile",e);
+        }
+        return result;
+    }
+
+
+    /*导出模板*/
+    @RequestMapping("/exportTemplate")
+    @CrossOrigin
+    public void downloadExcel(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        String encode = "utf-8";
+        response.setContentType("text/html;charset=" + encode);
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        String downLoadPath = "下载模板.xlsx";
+        try {
+            File file = new File(downLoadPath);
+            long fileLength = file.length();
+            String fileName = file.getName();
+            response.setContentType("application/vnd.ms-excel;");
+            response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes(encode), "ISO8859-1"));
+            response.setHeader("Content-Length", String.valueOf(fileLength));
+            bis = new BufferedInputStream(new FileInputStream(downLoadPath));
+            bos = new BufferedOutputStream(response.getOutputStream());
+            byte[] buff = new byte[2048];
+            int len;
+            while (-1 != (len = bis.read(buff, 0, buff.length))) {
+                    bos.write(buff, 0, len);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        } finally {
+            if (bis != null)
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            if (bos != null)
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+        }
+
+    }
 
     /*导出黑名单*/
     @RequestMapping("/exportBlackListFileManage")
@@ -66,88 +150,20 @@ public class BlackListController extends BaseController {
         }
         return result;
     }
-
-
-    /**
-     * 导出黑名单
-     *
-     * @return
-     */
-    @PostMapping("/export")
+    /*根据业务号码删除黑名单*/
+    @PostMapping("/deleteBlackList")
     @CrossOrigin
-    public Map<String, Object> export(){
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result = blackListCpctService.exportBlackListFile();
-        } catch (Exception e) {
-            logger.error("[op:BlackListController] fail to exportBlackListFile",e);
-        }
-        return result;
-    }
+    public  Map<String,Object> deleteBlackListByAssetPhone(@RequestBody  List<String> phoneNumsDeleted){
+        Map<String,Object> result = new HashMap<>();
+        try{
 
-
-    /**
-     * 导入黑名单
-     *
-     * @return
-     */
-    @PostMapping("/import")
-    @CrossOrigin
-    public Map<String, Object> importBlackList(){
-        Map<String, Object> result = new HashMap<>();
-        try {
-            result = blackListCpctService.importBlackListFile();
-        } catch (Exception e) {
-            logger.error("[op:BlackListController] fail to importBlackListFile",e);
-        }
-        return result;
-    }
-
-
-    /*导出模板*/
-    @RequestMapping("/exportTemplate")
-    @CrossOrigin
-    public String downloadExcel(HttpServletResponse response, HttpServletRequest request) throws IOException {
-        OutputStream ouputStream = null;
-        try {
-            String fileName = "全局黑名单模板.xlsx";
-
-            byte[] buffer = new byte[1024];
-            FileInputStream fis = null; //文件输入流
-            BufferedInputStream bis = null;
-            fis = new FileInputStream("D:/blacklist_template.xlsx");
-            bis = new BufferedInputStream(fis);
-
-            //处理导出问题
-            response.reset();
-            response.setContentType(CommonConstant.CONTENTTYPE);
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-            ouputStream = response.getOutputStream();
-
-            int len = 0;
-            while ((len = bis.read(buffer)) > 0) {
-                ouputStream.write(buffer, 0, len);
-            }
-            int i = bis.read(buffer);
-//            while (i != -1) {
-//                ouputStream.write(buffer);
-//                i = bis.read(buffer);
-//            }
-            ouputStream.flush();
-        } catch (Exception e) {
+            result = blackListCpctService.deleteBlackList(phoneNumsDeleted);
+        }catch (Exception e){
+            logger.error("根据业务号码删除黑名单失败",e);
             e.printStackTrace();
-        } finally {
-            try {
-                ouputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        return initSuccRespInfo("导出成功");
-
+        return result;
     }
-
-
 
 
 
