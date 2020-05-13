@@ -29,5 +29,7 @@ public interface BlackListMapper {
 
     int getCountAll();
 
+    List<BlackListDO>  getBlackListPageByKey(@Param("assetPhone") String assetPhone, @Param("serviceCate") String serviceCate, @Param("maketingCate") String maketingCate, @Param("publicBenefitCate") String publicBenefitCate, @Param("channel") String channel, @Param("staffId") String staffId);
+
 }
 

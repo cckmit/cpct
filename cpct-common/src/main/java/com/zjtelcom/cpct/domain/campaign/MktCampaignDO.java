@@ -44,6 +44,16 @@ public class MktCampaignDO extends BaseEntity{
     private String theMe;//活动主题
     private String regionFlg;//活动创建地市
     private String batchType;
+    private String skipDisturbed;//是否屏蔽过扰
+
+
+    public String getSkipDisturbed() {
+        return skipDisturbed;
+    }
+
+    public void setSkipDisturbed(String skipDisturbed) {
+        this.skipDisturbed = skipDisturbed;
+    }
 
 
     public String getOneChannelFlg() {

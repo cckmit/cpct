@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
@@ -2046,7 +2047,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     // 同步活动信息到营服协同
     public void syncCamData2Synergy(MktCampaignDO mktCampaignDO) {
         try {
-            Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO), new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> stringObjectMap = JSON.parseObject(JSON.toJSONString(mktCampaignDO,SerializerFeature.WriteMapNullValue), new TypeReference<Map<String, Object>>() {});
             stringObjectMap.put("planBeginTime", date2StringDate(mktCampaignDO.getPlanBeginTime()));
             stringObjectMap.put("planEndTime", date2StringDate(mktCampaignDO.getPlanEndTime()));
             stringObjectMap.put("beginTime", date2StringDate(mktCampaignDO.getBeginTime()));
@@ -2054,7 +2055,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             stringObjectMap.put("createDate", date2StringDate(mktCampaignDO.getCreateDate()));
             stringObjectMap.put("statusDate", date2StringDate(mktCampaignDO.getStatusDate()));
             stringObjectMap.put("updateDate", date2StringDate(mktCampaignDO.getUpdateDate()));
+            stringObjectMap.put("manageType", mktCampaignDO.getMktCampaignCategory());
             Map resultMap = iCpcAPIService.mktCampaignSync(stringObjectMap);
+            logger.info(JSON.toJSONString(stringObjectMap));
             logger.info("resultCode:" + resultMap.get("resultCode") + ",resultMsg:" + resultMap.get("resultMsg") + ",reqId:" + resultMap.get("reqId"));
         }catch (Exception e) {
             logger.error("[op:MktCampaignServiceImpl] 发布活动营服调用失败。", e);
@@ -2993,7 +2996,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
                         String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
-                        System.out.println(sendContent);
+                        logger.info(sendContent);
                         if (lanId != null && lanId != 1) {
                             String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());
                             if (!resultMsg.isEmpty()) {
@@ -3014,7 +3017,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 e.printStackTrace();
             }
         }
-        System.out.println("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
+        logger.info("共发送数量=>" + i + ",发送失败活动：" + JSON.toJSONString(sendFailList));
         mktDttsLogService.saveMktDttsLog("6000", "成功", startDate, new Date(), "成功", JSON.toJSONString(sendFailList));
     }
 
