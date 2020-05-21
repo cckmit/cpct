@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
 import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
+import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
@@ -205,6 +206,9 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private CamCpcSpecialLogic camCpcSpecialLogic;
+
+    @Autowired
+    private OrgGridRelMapper orgGridRelMapper;
 
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
@@ -940,9 +944,16 @@ public class EventApiServiceImpl implements EventApiService {
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
                     // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
-                    String managerTel = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode,map.get("lanId"));
+                    Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    reultMap.put("CPCP_ACCS_NBR", managerTel);
+                    String wgbm = (String) onlineMap.get("wgbm");
+                    Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
+                    String c3Str = (String) c3AndC4Map.get("c3");
+                    String c4Str = (String) c3AndC4Map.get("c4");
+                    reultMap.put("400600000040", c3Str);
+                    reultMap.put("400600000041", c4Str);
+                    reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
+                    log.info("onlineScanCodeOrCallPhone4Home -->>>resultMap: " + JSON.toJSONString(reultMap));
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
@@ -954,6 +965,24 @@ public class EventApiServiceImpl implements EventApiService {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String commLvl5Id = (String) reultMap.get("COMM_LVL5_ID");
                     String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
+                    String commLvl3Id = (String) reultMap.get("COMM_LVL3_ID");
+
+                    reultMap.put("400600000040", "");
+                    if (commLvl3Id != null) {
+                        Long lvl3OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl3Id));
+                        if (lvl3OrgId != null) {
+                            reultMap.put("400600000040", lvl3OrgId.toString());
+                        }
+                    }
+
+                    reultMap.put("400600000041", "");
+                    if (commLvl4Id != null) {
+                        Long lvl4OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
+                        if (lvl4OrgId != null) {
+                            reultMap.put("400600000041", lvl4OrgId.toString());
+                        }
+                    }
+
                     log.info("4-获取到COMM_LVL5_ID标签的值为：" + commLvl5Id);
                     if (commLvl5Id != null) {
                         Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl5Id));
@@ -982,6 +1011,8 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                     }
+
+                    //
                     if (!isCommLvl5) {
                         // 从3A组织ID
 
