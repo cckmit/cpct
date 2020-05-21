@@ -913,15 +913,14 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
 
-                /*
+                 /*
                 * 满意度调查事件（装维）
-                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                * 2、如果资产不存在或标签未绑定，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                * 3、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                * 4、都不满足暂不推
+                * 1、先判断测评业务号码是否绑定“浙江电信”微信公众号，绑定则推送微厅，推送账号为业务号码
+                * 2、非绑定用户再根据联系电话判断是否有绑定，有则推联系号码，
+                * 3、没有则通过联系电话推送到IVR
                 *
                 * */
-                if ("EVTD000000091".equals(eventCode)) {
+                if ("EVTS000001121".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
                     Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
@@ -933,8 +932,21 @@ public class EventApiServiceImpl implements EventApiService {
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
                         reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                        reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                     } else {
-                        reultMap.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
+                        // 若资产号码为绑定微厅，查看联系号码是否绑定微厅
+                        Map<String, Object> telMap = new HashMap<>();
+                        telMap.put("tel", contactNumber);
+                        log.info("esServiceInfo.getAssetByTelFourYN入参 = " + JSON.toJSONString(telMap));
+                        Map<String, Object> assetByTelFourYN = esServiceInfo.getAssetByTelFourYN(telMap);
+                        log.info("结果assetByTelFourYN = " + JSON.toJSONString(assetByTelFourYN));
+                        if (assetByTelFourYN != null && "200".equals(assetByTelFourYN.get("resultCode")) && "true".equals(assetByTelFourYN.get("msg"))) {
+                            reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅, 2-短厅, 3-IVR
+                            reultMap.put("CPCP_ACCS_NBR", contactNumber);
+                        } else{
+                            reultMap.put("CPCP_PUSH_CHANNEL", "3"); // 1-微厅, 2-短厅, 3-IVR
+                            reultMap.put("CPCP_ACCS_NBR", contactNumber);
+                        }
                     }
                     log.info("222---reultMap --->" + reultMap);
                     resultMapList.clear();
