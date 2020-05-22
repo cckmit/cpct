@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,8 @@ public class EventApiController extends BaseController {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
     @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
     @Autowired
@@ -145,7 +148,7 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         // 打开日志开关
-        redisUtils.set("SYSYTEM_ESLOG_STATUS", "1");
+        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "1");
 
 
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
@@ -170,7 +173,7 @@ public class EventApiController extends BaseController {
             return JSON.toJSONString(resultMap);
         }
         // 关闭日志开关
-        redisUtils.set("SYSYTEM_ESLOG_STATUS", "0");
+        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "0");
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMsg",result);
         return JSON.toJSONString(resultMap);

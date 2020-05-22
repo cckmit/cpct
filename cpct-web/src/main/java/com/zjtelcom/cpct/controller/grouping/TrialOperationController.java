@@ -351,6 +351,49 @@ public class TrialOperationController extends BaseController {
     }
 
     /**
+     * 刷新列表(客户清单导入)
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("import")
+    @CrossOrigin
+    public Map<String, Object> importUserListByExcel( MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importExcelUserList(file);
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getTrialListByRuleId", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to getTrialListByRuleId");
+            return result;
+        }
+        return result;
+
+    }
+
+
+    @PostMapping("importex")
+    @CrossOrigin
+    public Map<String, Object> importex() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importUserListByExcel();
+        } catch (Exception e) {
+            logger.error("[op:ScriptController] fail to getTrialListByRuleId", e);
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", " fail to getTrialListByRuleId");
+            return result;
+        }
+        return result;
+
+    }
+
+
+
+
+
+    /**
      * 全量试算成功后抽样显示试算记录
      * @param param
      * @return

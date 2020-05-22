@@ -1140,6 +1140,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return result;
     }
 
+    @Override
     @Transactional(readOnly = false)
     public Map<String, Object> importExcelUserList(MultipartFile multipartFile) throws IOException {
         // 接单人标签索引
@@ -2480,8 +2481,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         try {
             for (String s : uploadList) {
                 logger.info("准备上传文件名称:" + s);
-                File file = new File(tempFilePath+s);
-//                File file = new File("D:/idea/cpc/CPCT/app/"+s);
+//                File file = new File(tempFilePath+s);
+                File file = new File("D:\\CPCT_BUSHU\\cpct\\app/"+s);
                 System.out.println("文件是否存在："+file.exists());
                 if (file.exists()) {
                     boolean uploadResult = sftpUtils.uploadFile(uploadExcelPath, s, new FileInputStream(file), sftp);

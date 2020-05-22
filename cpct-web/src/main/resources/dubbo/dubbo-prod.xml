@@ -108,6 +108,7 @@
         <!--<dubbo:method name="queryValidCampaign" servicecode="00.1079.queryValidCampaign" timeout="12000"/>-->
         <dubbo:method name="queryRptEventInstList" servicecode="00.1079.queryRptEventInstList" timeout="120000"/>
         <dubbo:method name="queryRptOrder" servicecode="00.1079.queryRptOrder" timeout="12000"/>
+        <dubbo:method name="queryEventOrder" servicecode="00.1079.queryEventOrder" timeout="12000"/>
     </dubbo:reference>
 
     <!-- eslog -->

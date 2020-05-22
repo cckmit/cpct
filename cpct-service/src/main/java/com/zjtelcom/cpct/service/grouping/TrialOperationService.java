@@ -53,4 +53,6 @@ public interface TrialOperationService  {
     Map<String,Object> insertMktCampaignByC4OfSysArea();
 
     TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample, List<TarGrpCondition> conditions);
+
+    Map<String,Object> importExcelUserList(MultipartFile file) throws IOException ;
 }
