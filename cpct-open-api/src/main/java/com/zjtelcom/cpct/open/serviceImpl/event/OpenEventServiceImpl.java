@@ -106,7 +106,6 @@ public class OpenEventServiceImpl extends BaseService implements OpenEventServic
                         resultMap.put("resultObject", resultObject);
                         return resultMap;
                     }
-                    openEventItem.setEventId(null);
                     ContactEvtItem contactEvtItem = BeanUtil.create(openEventItem, new ContactEvtItem());
                     contactEvtItem.setEvtItemId(null);
                     contactEvtItem.setContactEvtId(contactEvt.getContactEvtId());
