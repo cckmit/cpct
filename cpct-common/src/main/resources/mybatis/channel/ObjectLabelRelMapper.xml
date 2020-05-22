@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.ObjectLabelRelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.ObjectLabelRel">
+    <id column="OBJECT_LABEL_REL_ID" jdbcType="BIGINT" property="objectLabelRelId" />
+    <result column="LABEL_ID" jdbcType="BIGINT" property="labelId" />
+    <result column="LABEL_VALUE_ID" jdbcType="BIGINT" property="labelValueId" />
+    <result column="LABEL_VALUE" jdbcType="VARCHAR" property="labelValue" />
+    <result column="OBJ_TYPE" jdbcType="VARCHAR" property="objType" />
+    <result column="OBJ_ID" jdbcType="BIGINT" property="objId" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from object_label_rel
+    where OBJECT_LABEL_REL_ID = #{objectLabelRelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjectLabelRel">
+    insert into object_label_rel (OBJECT_LABEL_REL_ID, LABEL_ID, LABEL_VALUE_ID, 
+      LABEL_VALUE, OBJ_TYPE, OBJ_ID, 
+      STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
+      CREATE_DATE, STATUS_DATE, UPDATE_DATE, 
+      REMARK)
+    values (#{objectLabelRelId,jdbcType=BIGINT}, #{labelId,jdbcType=BIGINT}, #{labelValueId,jdbcType=BIGINT}, 
+      #{labelValue,jdbcType=VARCHAR}, #{objType,jdbcType=VARCHAR}, #{objId,jdbcType=BIGINT}, 
+      #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ObjectLabelRel">
+    update object_label_rel
+    set LABEL_ID = #{labelId,jdbcType=BIGINT},
+      LABEL_VALUE_ID = #{labelValueId,jdbcType=BIGINT},
+      LABEL_VALUE = #{labelValue,jdbcType=VARCHAR},
+      OBJ_TYPE = #{objType,jdbcType=VARCHAR},
+      OBJ_ID = #{objId,jdbcType=BIGINT},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where OBJECT_LABEL_REL_ID = #{objectLabelRelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select OBJECT_LABEL_REL_ID, LABEL_ID, LABEL_VALUE_ID, LABEL_VALUE, OBJ_TYPE, OBJ_ID, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from object_label_rel
+    where OBJECT_LABEL_REL_ID = #{objectLabelRelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select OBJECT_LABEL_REL_ID, LABEL_ID, LABEL_VALUE_ID, LABEL_VALUE, OBJ_TYPE, OBJ_ID, 
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from object_label_rel
+  </select>
+</mapper>
