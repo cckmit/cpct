@@ -74,7 +74,7 @@
   </select>
 
   <select id="getC3AndC4" resultType="java.util.Map">
-    select b.org_name_c3 as c3, b.org_name_c4 as c4
+    select b.org_name_c4 as c3, b.org_name_c5 as c4
     from org_grid_rel a,organization b
     where a.x_attrib = #{attrib}
     and a.status_cd = 1000
