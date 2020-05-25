@@ -249,6 +249,7 @@
     select ORG_ID
     from organization
     where org_id_4a = #{orgId4a}
+    AND STATUS_CD = 1000
   </select>
 
 
