@@ -11,6 +11,7 @@ public class OpenMktCamItemEntity {
     private String itemType;
     private String itemNbr;
     private Long itemId;
+    private String itemName;
     private Long priority;
     private Long itemGroup;
     private String statusCd;
@@ -21,6 +22,15 @@ public class OpenMktCamItemEntity {
     private Date updateDate;
     private String remark;
     private Long lanId;
+
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
 
     public String getActType() {
         return actType;

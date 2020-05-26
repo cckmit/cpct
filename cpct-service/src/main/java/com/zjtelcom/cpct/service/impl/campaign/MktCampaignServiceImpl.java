@@ -103,6 +103,7 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
+
     // 集团活动承接接口
     @Override
     public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
@@ -212,6 +213,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_es redisUtils_es;
 
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
@@ -662,6 +665,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
                     mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
+                redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+mktCampaignId);
             }
 
             //试运算展示列实例化
@@ -852,6 +856,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
                     mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
+                redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+mktCampaignId);
             }
 
             //重建展示列实例
@@ -2233,6 +2238,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         mktStrategyCloseRuleRelDO.setStrategyId(childMktCampaignId);
                         mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                     }
+                    redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+childMktCampaignId);
                     //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
                     generateRequest(mktCampaignDO, mktCamCityRelDO.getCityId());
                 }
@@ -2712,8 +2718,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (mktStrategyFilterRuleRelDOList != null && !mktStrategyFilterRuleRelDOList.isEmpty()) {
                 mktStrategyFilterRuleRelMapper.insertBatch(mktStrategyFilterRuleRelDOList);
             }
-
-
             // 获取关单规则集合
             List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(parentMktCampaignId);
             List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = new ArrayList<>();

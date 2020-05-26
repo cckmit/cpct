@@ -1,6 +1,5 @@
 package com.zjtelcom.cpct.domain.openApi.mktCamChlConf;
 
-import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamQuestEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamScriptEntity;
 
 import java.util.Date;
@@ -15,6 +14,7 @@ public class OpenMktCamChlConfEntity {
     private String mktActivityNbr;
     private Long contactChlId;
     private String contactChlCode;
+    private String contactChlName;
     private String pushType;
     private Long policyId;
     private String statusCd;
@@ -25,11 +25,15 @@ public class OpenMktCamChlConfEntity {
     private Date updateDate;
     //营服活动脚本
     private List<OpenMktCamScriptEntity> mktCamScripts;
-    //调查问卷
-    private List<OpenMktCamQuestEntity> mktCamQuests;
-    //营服活动执行渠道配置属性
-    private List<OpenMktCamChlConfAttrEntity> mktCamChlConfAttrs;
     private String remark;
+
+    public String getContactChlName() {
+        return contactChlName;
+    }
+
+    public void setContactChlName(String contactChlName) {
+        this.contactChlName = contactChlName;
+    }
 
     public String getActType() {
         return actType;
@@ -157,22 +161,6 @@ public class OpenMktCamChlConfEntity {
 
     public void setMktCamScripts(List<OpenMktCamScriptEntity> mktCamScripts) {
         this.mktCamScripts = mktCamScripts;
-    }
-
-    public List<OpenMktCamQuestEntity> getMktCamQuests() {
-        return mktCamQuests;
-    }
-
-    public void setMktCamQuests(List<OpenMktCamQuestEntity> mktCamQuests) {
-        this.mktCamQuests = mktCamQuests;
-    }
-
-    public List<OpenMktCamChlConfAttrEntity> getMktCamChlConfAttrs() {
-        return mktCamChlConfAttrs;
-    }
-
-    public void setMktCamChlConfAttrs(List<OpenMktCamChlConfAttrEntity> mktCamChlConfAttrs) {
-        this.mktCamChlConfAttrs = mktCamChlConfAttrs;
     }
 
     public String getRemark() {

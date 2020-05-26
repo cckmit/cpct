@@ -27,10 +27,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static com.zjtelcom.cpct.util.DateUtil.getFisrtDayOfMonth;
-import static com.zjtelcom.cpct.util.DateUtil.getLastDayOfMonth;
-import static com.zjtelcom.cpct.util.DateUtil.string2DateTime4Day;
-
 /**
  * @Description:
  * @author: linchao

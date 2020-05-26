@@ -59,4 +59,12 @@
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from object_label_rel
   </select>
+
+  <select id="selectByObjId" resultMap="BaseResultMap">
+    select OBJECT_LABEL_REL_ID, LABEL_ID, LABEL_VALUE_ID, LABEL_VALUE, OBJ_TYPE, OBJ_ID,
+    STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from object_label_rel where  OBJ_ID = #{objId} and  OBJ_TYPE = 1900
+  </select>
+
+
 </mapper>

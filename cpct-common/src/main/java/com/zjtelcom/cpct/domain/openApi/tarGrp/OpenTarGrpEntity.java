@@ -18,6 +18,15 @@ public class OpenTarGrpEntity {
     private Date updateDate;
     private List<OpenTarGrpConditionEntity> tarGrpConditions;
     private String remark;
+    private String tarGrpConditionExpression;
+
+    public String getTarGrpConditionExpression() {
+        return tarGrpConditionExpression;
+    }
+
+    public void setTarGrpConditionExpression(String tarGrpConditionExpression) {
+        this.tarGrpConditionExpression = tarGrpConditionExpression;
+    }
 
     public String getActType() {
         return actType;

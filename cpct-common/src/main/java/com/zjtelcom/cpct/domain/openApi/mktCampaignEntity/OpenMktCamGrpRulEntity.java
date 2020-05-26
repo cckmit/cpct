@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.domain.openApi.mktCampaignEntity;
 
-import com.zjtelcom.cpct.open.entity.tarGrp.OpenTarGrpEntity;
+
+import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpEntity;
 
 import java.util.Date;
 

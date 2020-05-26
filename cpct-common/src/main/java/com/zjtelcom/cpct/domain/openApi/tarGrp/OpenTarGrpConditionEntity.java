@@ -8,6 +8,7 @@ public class OpenTarGrpConditionEntity {
     private Long tarGrpId;
     private Long rootFlag;
     private String leftParam;
+    private String leftParamName;
     private String leftParamType;
     private String operType;
     private String rightParam;
@@ -20,6 +21,14 @@ public class OpenTarGrpConditionEntity {
     private Long updateStaff;
     private Date updateDate;
     private String remark;
+
+    public String getLeftParamName() {
+        return leftParamName;
+    }
+
+    public void setLeftParamName(String leftParamName) {
+        this.leftParamName = leftParamName;
+    }
 
     public Long getConditionId() {
         return conditionId;

@@ -8,6 +8,7 @@ public class OpenMktCamEvtRelEntity {
     private Long mktCampaignId;
     private Long eventId;
     private String eventNbr;
+    private String eventName;
     private String statusCd;
     private Date statusDate;
     private Long createStaff;
@@ -16,6 +17,14 @@ public class OpenMktCamEvtRelEntity {
     private Date updateDate;
     private String remark;
     private Long lanId;
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
     public Long getMktCampEvtRelId() {
         return mktCampEvtRelId;

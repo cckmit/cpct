@@ -27,4 +27,6 @@ public interface MktCamGrpRulMapper {
 
     int updateByPrimaryKey(MktCamGrpRul record);
 
+    List<MktCamGrpRul> selectByCampaignId(Long campaignId);
+
 }

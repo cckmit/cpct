@@ -7,6 +7,4 @@ public interface OpenCampaignScheService {
     Map<String,Object> openCampaignScheForDay(Long mktCampaignId);
 
 
-    Map<String,Object> openCampaignScheForMonth();
-
 }

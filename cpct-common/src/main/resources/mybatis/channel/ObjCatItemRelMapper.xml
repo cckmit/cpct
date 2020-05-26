@@ -13,8 +13,6 @@
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-    <result column="OBJ_NBR" jdbcType="VARCHAR" property="objNbr" />
-    <result column="CATALOG_ITEM_NBR" jdbcType="VARCHAR" property="catalogItemNbr" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from obj_cat_item_rel
@@ -24,13 +22,11 @@
     insert into obj_cat_item_rel (REL_ID, OBJ_TYPE, OBJ_ID, 
       CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, 
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
-      UPDATE_DATE, REMARK, OBJ_NBR, 
-      CATALOG_ITEM_NBR)
+      UPDATE_DATE, REMARK)
     values (#{relId,jdbcType=BIGINT}, #{objType,jdbcType=VARCHAR}, #{objId,jdbcType=BIGINT}, 
       #{catalogItemId,jdbcType=BIGINT}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
       #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
-      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{objNbr,jdbcType=VARCHAR}, 
-      #{catalogItemNbr,jdbcType=VARCHAR})
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.ObjCatItemRel">
     update obj_cat_item_rel
@@ -43,20 +39,27 @@
       CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
       STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
       UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      OBJ_NBR = #{objNbr,jdbcType=VARCHAR},
-      CATALOG_ITEM_NBR = #{catalogItemNbr,jdbcType=VARCHAR}
+      REMARK = #{remark,jdbcType=VARCHAR}}
     where REL_ID = #{relId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select REL_ID, OBJ_TYPE, OBJ_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, OBJ_NBR, CATALOG_ITEM_NBR
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from obj_cat_item_rel
     where REL_ID = #{relId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select REL_ID, OBJ_TYPE, OBJ_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
-    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK, OBJ_NBR, CATALOG_ITEM_NBR
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from obj_cat_item_rel
   </select>
+
+  <select id="selectByObjId" resultMap="BaseResultMap">
+    select REL_ID, OBJ_TYPE, OBJ_ID, CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF,
+    CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from obj_cat_item_rel where  OBJ_ID = #{objId} and  OBJ_TYPE = 6000
+  </select>
+
+
+
 </mapper>

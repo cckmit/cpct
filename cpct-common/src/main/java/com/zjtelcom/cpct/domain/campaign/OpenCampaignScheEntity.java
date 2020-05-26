@@ -3,6 +3,10 @@ package com.zjtelcom.cpct.domain.campaign;
 
 import com.zjtelcom.cpct.domain.channel.ObjCatItemRel;
 import com.zjtelcom.cpct.domain.channel.ObjectLabelRel;
+import com.zjtelcom.cpct.domain.openApi.mktCamChlConf.OpenMktCamChlConfEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenMktCamItemEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamEvtRelEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 
@@ -15,8 +19,8 @@ public class OpenCampaignScheEntity {
     private Long mktCampaignId;
     private String tiggerType;
     private String mktCampaignName;
-    private Date planBeginTime;
-    private Date planEndTime;
+    private String planBeginTime;
+    private String planEndTime;
     private Date beginTime;
     private Date endTime;
     private String mktCampaignType;
@@ -45,13 +49,13 @@ public class OpenCampaignScheEntity {
     private Long serviceCancleFlag;
     private Long lanId;
     //营服活动分群规则
-    private List<MktCamGrpRul> mktCamGrpRuls;//
+    private List<OpenMktCamGrpRulEntity> mktCamGrpRuls;//
     //营服活动推荐条目
-    private List<MktCamItem> mktCamItems;//
+    private List<OpenMktCamItemEntity> mktCamItems;//
     //营服活动渠道推送配置
-    private List<MktCamChlConf> mktCamChlConfs;//
+    private List<OpenMktCamChlConfEntity> mktCamChlConf;//
     //营服活动关联事件
-    private List<MktCamEvtRel> mktCamEvtRels;//
+    private List<OpenMktCamEvtRelEntity> mktCamEvtRels;//
     //对象区域关系
     private List<ObjRegionRelEntity> objRegionRels;//
     //对象目录节点关系
@@ -91,19 +95,19 @@ public class OpenCampaignScheEntity {
         this.mktCampaignName = mktCampaignName;
     }
 
-    public Date getPlanBeginTime() {
+    public String getPlanBeginTime() {
         return planBeginTime;
     }
 
-    public void setPlanBeginTime(Date planBeginTime) {
+    public void setPlanBeginTime(String planBeginTime) {
         this.planBeginTime = planBeginTime;
     }
 
-    public Date getPlanEndTime() {
+    public String getPlanEndTime() {
         return planEndTime;
     }
 
-    public void setPlanEndTime(Date planEndTime) {
+    public void setPlanEndTime(String planEndTime) {
         this.planEndTime = planEndTime;
     }
 
@@ -323,35 +327,36 @@ public class OpenCampaignScheEntity {
         this.lanId = lanId;
     }
 
-    public List<MktCamGrpRul> getMktCamGrpRuls() {
+    public List<OpenMktCamGrpRulEntity> getMktCamGrpRuls() {
         return mktCamGrpRuls;
     }
 
-    public void setMktCamGrpRuls(List<MktCamGrpRul> mktCamGrpRuls) {
+    public void setMktCamGrpRuls(List<OpenMktCamGrpRulEntity> mktCamGrpRuls) {
         this.mktCamGrpRuls = mktCamGrpRuls;
     }
 
-    public List<MktCamItem> getMktCamItems() {
+    public List<OpenMktCamItemEntity> getMktCamItems() {
         return mktCamItems;
     }
 
-    public void setMktCamItems(List<MktCamItem> mktCamItems) {
+    public void setMktCamItems(List<OpenMktCamItemEntity> mktCamItems) {
         this.mktCamItems = mktCamItems;
     }
 
-    public List<MktCamChlConf> getMktCamChlConfs() {
-        return mktCamChlConfs;
+
+    public List<OpenMktCamChlConfEntity> getMktCamChlConf() {
+        return mktCamChlConf;
     }
 
-    public void setMktCamChlConfs(List<MktCamChlConf> mktCamChlConfs) {
-        this.mktCamChlConfs = mktCamChlConfs;
+    public void setMktCamChlConf(List<OpenMktCamChlConfEntity> mktCamChlConf) {
+        this.mktCamChlConf = mktCamChlConf;
     }
 
-    public List<MktCamEvtRel> getMktCamEvtRels() {
+    public List<OpenMktCamEvtRelEntity> getMktCamEvtRels() {
         return mktCamEvtRels;
     }
 
-    public void setMktCamEvtRels(List<MktCamEvtRel> mktCamEvtRels) {
+    public void setMktCamEvtRels(List<OpenMktCamEvtRelEntity> mktCamEvtRels) {
         this.mktCamEvtRels = mktCamEvtRels;
     }
 

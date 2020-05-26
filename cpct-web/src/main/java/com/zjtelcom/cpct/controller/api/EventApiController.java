@@ -10,6 +10,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
+import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -63,6 +64,21 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private EventInstService eventInstService;
+    @Autowired
+    private OpenCampaignScheService openCampaignScheService;
+
+
+
+    @PostMapping("openCampaignScheForDay")
+    public  Map<String,Object> openCampaignScheForDay(@RequestBody Map<String,String> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openCampaignScheService.openCampaignScheForDay(Long.valueOf(param.get("campaignId")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("caculateTest")
