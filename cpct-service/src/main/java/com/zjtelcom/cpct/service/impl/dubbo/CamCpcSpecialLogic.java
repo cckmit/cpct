@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.dubbo;
 
 import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
-import com.ql.util.express.DefaultContext;
 import com.zjtelcom.cpct.dao.org.StaffGisRelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,8 @@ public class CamCpcSpecialLogic {
     private StaffGisRelMapper staffGisRelMapper;
 
     // 线上扫码、电话到家事件接入特殊逻辑,判断事件是这两个事件   DefaultContext<String, Object> context
-    public String onlineScanCodeOrCallPhone4Home(Map<String, Object> context, String eventCode,String lanId) {
+    public Map<String, Object> onlineScanCodeOrCallPhone4Home(Map<String, Object> context, String eventCode,String lanId) {
+        Map<String, Object> resultMap = new HashMap<>();
         String tel = "";
         try {
             // c4标识
@@ -62,7 +62,7 @@ public class CamCpcSpecialLogic {
                     "</WebService>";
             String respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
             if (null == respXml || "".equals(respXml)) {
-                return "GIS网格覆盖编码查询失败：地址不精确。";
+                resultMap.put("tel", "GIS网格覆盖编码查询失败：地址不精确。");
             }
             logger.info("onlineScanCodeOrCallPhone4Home-->respXml:" + respXml);
             List<Map<String, Object>> maps = parseData(respXml);
@@ -71,25 +71,27 @@ public class CamCpcSpecialLogic {
             // 获取GIS网格编码
             String wgbm = getValue4CycleMap(map, "Wgbm");
             if (null == wgbm || "".equals(wgbm)) {
-                return "地址查询网格编码为空";
+                resultMap.put("tel", "地址查询网格编码为空");
             }
+            resultMap.put("wgbm", wgbm);
             logger.info("onlineScanCodeOrCallPhone4Home-->wgbm:" + wgbm);
+
             List<String> list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
             if (null == list || list.size() == 0) {
-                return "GIS网格编码:" + wgbm + "对应专员编码为空";
+                resultMap.put("tel", "GIS网格编码:" + wgbm + "对应专员编码为空");
             }
             for (String s : list) {
                 if (s == null) {
                     continue;
                 }
-                tel = s;
+                resultMap.put("tel", s);
                 break;
             }
         }catch (Exception e) {
             logger.info("onlineScanCodeOrCallPhone4Home-->error!!!" );
             e.printStackTrace();
         }
-        return tel;
+        return resultMap;
     }
 
 
