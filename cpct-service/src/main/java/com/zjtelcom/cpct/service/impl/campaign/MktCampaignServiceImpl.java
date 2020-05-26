@@ -2874,7 +2874,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 柱状图
             List<Map> cityList = new ArrayList<>();
             // 营销活动
-            paramMap.put("mktCampaignType", "(1000, 2000, 3000, 4000)");
+            paramMap.put("mktCampaignType", "(1000, 2000, 3000, 4000,7000)");
             int marketingCount = mktCampaignMapper.countByStatus(paramMap);
             Map<String, Object> marketingCountMap = new HashMap<>();
             marketingCountMap.put("count", marketingCount);

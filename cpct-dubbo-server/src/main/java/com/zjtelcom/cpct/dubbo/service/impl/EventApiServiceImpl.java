@@ -958,12 +958,18 @@ public class EventApiServiceImpl implements EventApiService {
                     // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    String wgbm = (String) onlineMap.get("wgbm");
-                    Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
-                    String c3Str = (String) c3AndC4Map.get("c3");
-                    String c4Str = (String) c3AndC4Map.get("c4");
-                    reultMap.put("400600000040", c3Str);
-                    reultMap.put("400600000041", c4Str);
+                    reultMap.put("400600000040", "");
+                    reultMap.put("400600000041", "");
+                    if (onlineMap.get("wgbm")!=null){
+                        String wgbm = (String) onlineMap.get("wgbm");
+                        Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
+                        if (c3AndC4Map!=null && c3AndC4Map.get("c3")!=null && c3AndC4Map.get("c4")!=null){
+                            String c3Str = (String) c3AndC4Map.get("c3");
+                            String c4Str = (String) c3AndC4Map.get("c4");
+                            reultMap.put("400600000040", c3Str);
+                            reultMap.put("400600000041", c4Str);
+                        }
+                    }
                     reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
                     log.info("onlineScanCodeOrCallPhone4Home -->>>resultMap: " + JSON.toJSONString(reultMap));
                     resultMapList.clear();
