@@ -957,6 +957,7 @@ public class EventApiServiceImpl implements EventApiService {
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
                     // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
+                    log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String wgbm = (String) onlineMap.get("wgbm");
                     Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
@@ -965,7 +966,6 @@ public class EventApiServiceImpl implements EventApiService {
                     reultMap.put("400600000040", c3Str);
                     reultMap.put("400600000041", c4Str);
                     reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
-                    log.info("onlineScanCodeOrCallPhone4Home -->>>resultMap: " + JSON.toJSONString(reultMap));
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
