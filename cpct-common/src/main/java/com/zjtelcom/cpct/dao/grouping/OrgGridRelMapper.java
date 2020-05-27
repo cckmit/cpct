@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -23,4 +24,8 @@ public interface OrgGridRelMapper {
     List<OrgGridRel> fuzzySelectByGridName(String gridName);
 
     List<OrgGridRel> selectOrgGridByCode(@Param("list")List<String> codeList);
+
+    Map<String, Object> getC3AndC4(@Param("attrib")String attrib);
+
+
 }

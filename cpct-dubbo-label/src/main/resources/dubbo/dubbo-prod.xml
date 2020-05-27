@@ -116,5 +116,14 @@
         <dubbo:method name="getBlackListLog" servicecode="33.1083.getBlackListLog" timeout="10000"/>
     </dubbo:service>
 
+    <!--集团openApi定时任务接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.OpenApiScheService" ref="openApiScheServiceImpl"
+                   version="1.0">
+        <dubbo:method name="openCampaignScheForDay" servicecode="33.1083.openCampaignScheForDay" timeout="10000"/>
+        <dubbo:method name="openCampaignScheForMonth" servicecode="33.1083.openCampaignScheForMonth" timeout="10000"/>
+    </dubbo:service>
+
+
+
 
 </beans>

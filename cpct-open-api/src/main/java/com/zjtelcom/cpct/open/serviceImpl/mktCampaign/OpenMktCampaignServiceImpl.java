@@ -50,6 +50,7 @@ import com.zjtelcom.cpct.open.service.mktCampaign.MktDttsLogService;
 import com.zjtelcom.cpct.open.service.mktCampaign.OpenMktCampaignService;
 import com.zjtelcom.cpct.pojo.MktCamStrategyRel;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +138,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     private UCCPService uccpService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
 
     String GROUP_PROVINCIAL_CHANNEL_MAPPING = "GROUP_PROVINCIAL_CHANNEL_MAPPING";
     /**
@@ -310,32 +313,50 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         logger.info("活动列表查询");
         logger.info("活动编码：" + mktActivityNbr);
         logger.info("用户号码：" + accNum);
+        long starttime = System.currentTimeMillis();
         Map<String, Object> resultMap = new HashMap<>();
         List<OpenMktCampaign> mktCampaignDOList = new ArrayList<>();
         if(accNum != null) {
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("accNum", accNum);
-            //通过协同接口查活动id
-            Map<String, Object> map = iReportService.queryCampaignByNum(paramMap);
-            logger.info("用户号码协同查询结果：" + JSON.toJSONString(map));
-            List<String> campaignIdList = new ArrayList<>();
-            if(map != null) {
-                Object mktCampaignIds = map.get("mktCampaignIds");
-                if (mktCampaignIds != null) {
-                    campaignIdList = (List<String>) mktCampaignIds;
-                }
-            }
-            if(!campaignIdList.isEmpty()) {
-                for(String campaignId : campaignIdList) {
-                    MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(campaignId));
-                    if(mktCampaignDO != null) {
-                        if(mktActivityNbr != null && !mktCampaignDO.getMktActivityNbr().equals(mktActivityNbr)) {
-                            continue;
-                        }
-                        OpenMktCampaign campaign = getOpenCampaign(mktCampaignDO);
-                        mktCampaignDOList.add(campaign);
+            try {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("accNum", accNum);
+                //通过协同接口查活动id
+                Map<String, Object> map = iReportService.queryCampaignByNum(paramMap);
+                logger.info("用户号码协同查询结果：" + JSON.toJSONString(map));
+                long ss = System.currentTimeMillis() - starttime;
+                logger.info("用户号码：" + accNum+ "  查询协同接口耗时："+ss+"ms");
+                List<String> campaignIdList = new ArrayList<>();
+                if(map != null) {
+                    Object mktCampaignIds = map.get("mktCampaignIds");
+                    if (mktCampaignIds != null) {
+                        campaignIdList = (List<String>) mktCampaignIds;
                     }
                 }
+                if(!campaignIdList.isEmpty()) {
+                    for(String campaignId : campaignIdList) {
+                        if ("".equals(campaignId)){
+                            continue;
+                        }
+                        MktCampaignDO mktCampaignDO;
+                        //添加缓存
+                        String campaignKey = "MKT_CAMPAIGN_"+ campaignId;
+                        if (redisUtils_prd.get(campaignKey)!=null){
+                            mktCampaignDO = (MktCampaignDO)redisUtils.get(campaignKey);
+                        }else{
+                            mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(campaignId));
+                            redisUtils_prd.set(campaignKey,mktCampaignDO);
+                        }
+                        if(mktCampaignDO != null) {
+                            if(mktActivityNbr != null && !mktCampaignDO.getMktActivityNbr().equals(mktActivityNbr)) {
+                                continue;
+                            }
+                            OpenMktCampaign campaign = getOpenCampaign(mktCampaignDO);
+                            mktCampaignDOList.add(campaign);
+                        }
+                    }
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
         }else {
             if (mktActivityNbr != null) {
@@ -350,6 +371,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 }
             }
         }
+
         if (mktCampaignDOList.isEmpty()) {
             JSONObject json = new JSONObject();
             json.put("code","110152");
@@ -360,6 +382,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
         }else {
             resultMap.put("params", mktCampaignDOList);
         }
+        long end = System.currentTimeMillis() - starttime;
+        logger.info("用户号码：" + accNum+ "  查询总耗时："+end+"ms");
         return resultMap;
     }
 

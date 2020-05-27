@@ -14,13 +14,11 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.LabelSaturation;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dubbo.out.BlackListService;
 import com.zjtelcom.cpct.dubbo.out.CampaignService;
 import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Method;
@@ -47,16 +45,12 @@ public class MultiJobRunner {
     private TargetGroupService targetGroupService;
     @Autowired(required = false)
     private QuerySaturationService querySaturationService;
-    @Autowired(required = false)
+    @Autowired
     private LabelSaturationMapper labelSaturationMapper;
-    @Autowired(required = false)
+    @Autowired
     private TrialOperationMapper trialOperationMapper;
     @Autowired(required = false)
-    private UCCPSendService uCCPSendService;
-//    @Autowired(required = false)
-//    private MktDttsLogService mktDttsLogService;
-    @Autowired(required = false)
-    private BlackListService blackListService;
+    private TrialProdService trialProdService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -676,7 +670,6 @@ public class MultiJobRunner {
     //3-31 11:07 x
     //周期性活动定时任务添加校验接口若未执行的 二次执行
     public void playAgainPeriodicity(){
-        LOGGER.info("周期性活动定时任务添加校验接口若未执行的 二次执行启动");
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 01:00:00");
         String startTime = sdf.format(d);
@@ -684,34 +677,28 @@ public class MultiJobRunner {
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 05:00:00");
         String endTime = sdf2.format(d);
         System.out.println("格式化后的日期：" + endTime);
-//        Map<String,Object> dataParam =new HashMap<>();
-//        dataParam.put("startTime",startTime);
-//        dataParam.put("endTime",endTime);
-        List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime,endTime);
-        List<Integer> stringArraylist = new ArrayList<Integer>();
+        List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
+        ArrayList<String> stringArraylist = new ArrayList<String>();
         if (trialOperationList!=null){
             for (TrialOperation operation : trialOperationList){
                 String statusCd = operation.getStatusCd();
                 //判断状态
-                if (!statusCd.equals("7300") || !statusCd.equals("8100")){
-                    stringArraylist.add(Integer.valueOf(operation.getCampaignId().toString()));
-
+                if (!statusCd.equals("7300") || statusCd.equals("8100")){
+                    stringArraylist.add(operation.getId().toString());
                 }
             }
-            LOGGER.info("二次执行活动个数："+stringArraylist.size());
             //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
-            if (!stringArraylist.isEmpty()){
+            if (stringArraylist!=null){
                 //再次执行
                 try {
                     Map<String,Object> param =new HashMap<>();
                     param.put("idList",stringArraylist); //活动id集合
                     param.put("perCampaign","PER_CAMPAIGN");//周期性活动标识
-                    trialStatusUpService.campaignIndexTask(param);
+                    trialProdService.campaignIndexTask(param);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 //下发短信
-                LOGGER.info("周期性二次执行我去下发短信了");
                 String sendMsg = "周期性活动下发或试算失败，活动id为："+JSON.toJSONString(stringArraylist);
                 List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
                 for (SysParams sysParams : send_msg) {
@@ -761,6 +748,13 @@ public class MultiJobRunner {
         }
     }
 
+    public static String date2StringDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String result = sdf.format(date);
+        return result;
+    }
+
+
     public static String getRandom(int length){
         String val = "";
         Random random = new Random();
@@ -768,12 +762,6 @@ public class MultiJobRunner {
             val += String.valueOf(random.nextInt(10));
         }
         return val;
-    }
-
-    public static String date2StringDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String result = sdf.format(date);
-        return result;
     }
 
     // 短信发送类型任务记录
@@ -784,42 +772,4 @@ public class MultiJobRunner {
 //            e.printStackTrace();
 //        }
 //    }
-
-    /**
-     * 黑名单导出
-     */
-    public void exportBlackListFile() throws Throwable {
-        try {
-            LOGGER.info("黑名单导出exportBlackListFile执行");
-            springBean.hello();
-            String msg = "exportBlackListFile执行任务";
-            LOGGER.info(msg);
-            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
-            bizLogger.info(msg);
-            //黑名单导出
-            blackListService.exportBlackListFile();
-        } catch (Exception e) {
-            LOGGER.info("Run exportBlackListFile failed!", e);
-        }
-    }
-
-
-    /**
-     * 黑名单导入
-     */
-    public void importBlackListFile() throws Throwable {
-        try {
-            LOGGER.info("黑名单导入importBlackListFile执行");
-            springBean.hello();
-            String msg = "importBlackListFile执行任务";
-            LOGGER.info(msg);
-            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
-            bizLogger.info(msg);
-            //黑名单导入
-            blackListService.importBlackListFile();
-        } catch (Exception e) {
-            LOGGER.info("Run importBlackListFile failed!", e);
-        }
-    }
-
 }

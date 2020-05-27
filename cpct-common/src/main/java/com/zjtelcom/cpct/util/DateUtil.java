@@ -59,7 +59,7 @@ public class DateUtil {
      * @param month
      * @return
      */
-    public static String getFirstDayOfMonth(int month) {
+    public static Date getFirstDayOfMonth(int month) {
 
         Calendar cal = Calendar.getInstance();
         //设置月份
@@ -71,7 +71,7 @@ public class DateUtil {
         //格式化日期
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String firstDayOfMonth = sdf.format(cal.getTime());
-        return firstDayOfMonth;
+        return cal.getTime();
     }
 
     /**
@@ -100,7 +100,7 @@ public class DateUtil {
      * @param month
      * @return
      */
-    public static String getLastDayOfMonth(int month) {
+    public static Date getLastDayOfMonth(int month) {
         Calendar cal = Calendar.getInstance();
         //设置月份
         cal.set(Calendar.MONTH, month - 1);
@@ -111,7 +111,7 @@ public class DateUtil {
         //格式化日期
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String lastDayOfMonth = sdf.format(cal.getTime());
-        return lastDayOfMonth;
+        return cal.getTime();
     }
 
     /**
@@ -616,12 +616,15 @@ public class DateUtil {
     }
 
     /**
-     * 当日开始时间
+     * 前一日开始时间
      *
      * @return
      */
     public static Date getStartTime() {
         Calendar todayStart = Calendar.getInstance();
+
+        todayStart.add(Calendar.DAY_OF_YEAR,-1);
+
         todayStart.set(Calendar.HOUR_OF_DAY, 0);
         todayStart.set(Calendar.MINUTE, 0);
         todayStart.set(Calendar.SECOND, 0);
@@ -644,12 +647,13 @@ public class DateUtil {
     }
 
     /**
-     * 当日结束时间
+     * 前一日结束时间
      *
      * @return
      */
     public static Date getnowEndTime() {
         Calendar todayEnd = Calendar.getInstance();
+        todayEnd.add(Calendar.DAY_OF_YEAR,-1);
         todayEnd.set(Calendar.HOUR_OF_DAY, 23);
         todayEnd.set(Calendar.MINUTE, 59);
         todayEnd.set(Calendar.SECOND, 59);

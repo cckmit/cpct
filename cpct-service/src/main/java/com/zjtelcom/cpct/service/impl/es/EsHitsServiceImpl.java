@@ -12,6 +12,7 @@ import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.es.EsHitsService;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.es.es.service.EsService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -48,7 +49,7 @@ public class EsHitsServiceImpl implements EsHitsService {
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired
-    private RedisUtils redisUtils;
+    private RedisUtils_prd redisUtils;
 
     @Value("${ctg.cpctEsLogTopic}")
     private String cpctEsLogTopic;

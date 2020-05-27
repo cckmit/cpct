@@ -2,9 +2,13 @@ package com.zjtelcom.cpct.dao.channel;
 
 
 import com.zjtelcom.cpct.domain.channel.ObjCatItemRel;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
+@Mapper
 public interface ObjCatItemRelMapper {
     int deleteByPrimaryKey(Long relId);
 
@@ -15,4 +19,6 @@ public interface ObjCatItemRelMapper {
     List<ObjCatItemRel> selectAll();
 
     int updateByPrimaryKey(ObjCatItemRel record);
+
+    List<ObjCatItemRel> selectByObjId(Long objId);
 }

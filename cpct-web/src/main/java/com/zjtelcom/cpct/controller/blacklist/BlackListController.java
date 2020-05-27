@@ -76,7 +76,7 @@ public class BlackListController extends BaseController {
         response.setContentType("text/html;charset=" + encode);
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
-        String downLoadPath = "G:\\cpct-pst\\cpct\\cpct-web\\src\\main\\resources\\file\\blacklist_template.xlsx";
+        String downLoadPath = "下载模板.xlsx";
         try {
             File file = new File(downLoadPath);
             long fileLength = file.length();

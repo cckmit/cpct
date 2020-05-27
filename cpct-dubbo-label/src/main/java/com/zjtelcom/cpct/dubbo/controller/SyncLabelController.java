@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.SyncEventService;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,17 @@ public class SyncLabelController {
     private SyncLabelService syncLabelService;
     @Autowired
     private SyncEventService syncEventService;
+    @Autowired
+    private OpenApiScheService openApiScheService;
+
+
+    @RequestMapping(value = "openCampaignScheForDay", method = RequestMethod.POST)
+    @CrossOrigin
+    public String openCampaignScheForDay() {
+        Map result = new HashMap();
+        result = openApiScheService.openCampaignScheForDay();
+        return JSON.toJSON(result).toString();
+    }
 
 
     @RequestMapping(value = "syncLabel", method = RequestMethod.POST)

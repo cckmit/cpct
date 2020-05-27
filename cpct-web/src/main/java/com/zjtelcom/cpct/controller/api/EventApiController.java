@@ -8,13 +8,16 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
+import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +51,8 @@ public class EventApiController extends BaseController {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
     @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
     @Autowired
@@ -60,6 +65,43 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private EventInstService eventInstService;
+    @Autowired
+    private OpenCampaignScheService openCampaignScheService;
+    @Autowired
+    private OpenApiScheService openApiScheService;
+
+
+    @PostMapping("scheForDay")
+    public  Map<String,Object> openCampaignScheForDay() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openApiScheService.openCampaignScheForDay();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    @PostMapping("scheForMonth")
+    public  Map<String,Object> openCampaignScheForMonth() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openApiScheService.openCampaignScheForMonth();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @PostMapping("openCampaignScheForDay")
+    public  Map<String,Object> openCampaignScheForDay(@RequestBody Map<String,String> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openCampaignScheService.openCampaignScheForDay(Long.valueOf(param.get("campaignId")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("caculateTest")
@@ -145,7 +187,7 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         // 打开日志开关
-        redisUtils.set("SYSYTEM_ESLOG_STATUS", "1");
+        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "1");
 
 
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
@@ -170,7 +212,7 @@ public class EventApiController extends BaseController {
             return JSON.toJSONString(resultMap);
         }
         // 关闭日志开关
-        redisUtils.set("SYSYTEM_ESLOG_STATUS", "0");
+        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "0");
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMsg",result);
         return JSON.toJSONString(resultMap);

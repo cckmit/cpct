@@ -488,11 +488,11 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             PageHelper.startPage(Integer.parseInt(pageParams.get("page").toString()),Integer.parseInt(pageSize.toString()),orderBy);
             blackListDOS= blackListMapper.getBlackListPageByKey((String)pageParams.get("assetPhone"),(String)pageParams.get("serviceCate"),(String)pageParams.get("maketingCate"),
                     (String)pageParams.get("publicBenefitCate"),(String)pageParams.get("channel"),(String)pageParams.get("staffId"));
+            blackListDOS = transferChinese(blackListDOS);
             result.put("resultCode",CommonConstant.CODE_SUCCESS);
             result.put("resultMsg","请求成功");
             result.put("blackList",blackListDOS);
             result.put("pageInfo",new Page(new PageInfo<>(blackListDOS)));
-
         }catch (Exception e){
             result.put("resultCode", CommonConstant.CODE_FAIL);
             result.put("resultMsg","请求失败");
@@ -500,6 +500,20 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         }finally {
             return result;
         }
+    }
+
+
+    //    将1/0 转换为是/否
+    private List<BlackListDO> transferChinese(List<BlackListDO> blackListDOS){
+        for(BlackListDO blackListDO: blackListDOS){
+            String makeingCate = blackListDO.getMaketingCate().equals("1") ?"是":"否";
+            blackListDO.setMaketingCate(makeingCate);
+            String publicBenefitCate = blackListDO.getPublicBenefitCate().equals("1")?"是":"否";
+            blackListDO.setPublicBenefitCate(publicBenefitCate);
+            String serviceCate = blackListDO.getServiceCate().equals("1")?"是":"否";
+            blackListDO.setServiceCate(serviceCate);
+        }
+        return blackListDOS;
     }
 
     /**
