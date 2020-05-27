@@ -431,6 +431,12 @@
                 <version>${ctg-cache.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-openApi-out</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <!--<dependency>-->
                 <!--<groupId>com.google.guava</groupId>-->
                 <!--<artifactId>guava</artifactId>-->

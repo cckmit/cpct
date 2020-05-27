@@ -20,6 +20,14 @@
         <dubbo:method name="secondChannelSynergy" servicecode="00.1083.SecondChannelSynergy" timeout="5000"/>
     </dubbo:reference>
 
+    <!--集团openApi测试-->
+    <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.OpenApiScheService"
+                     id="openApiScheServiceImpl"
+                     version="1.0" retries="0" check="false">
+        <dubbo:method name="openCampaignScheForDay" servicecode="33.1083.openCampaignScheForDay" timeout="10000"/>
+        <dubbo:method name="openCampaignScheForMonth" servicecode="33.1083.openCampaignScheForMonth" timeout="10000"/>
+    </dubbo:reference>
+
     <!-- 订阅 -->
     <!-- cpc计算协同中心回调 -->
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService" id="iContactTaskReceiptService"

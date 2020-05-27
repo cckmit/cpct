@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
@@ -66,8 +67,30 @@ public class EventApiController extends BaseController {
     private EventInstService eventInstService;
     @Autowired
     private OpenCampaignScheService openCampaignScheService;
+    @Autowired
+    private OpenApiScheService openApiScheService;
 
 
+    @PostMapping("scheForDay")
+    public  Map<String,Object> openCampaignScheForDay() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openApiScheService.openCampaignScheForDay();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    @PostMapping("scheForMonth")
+    public  Map<String,Object> openCampaignScheForMonth() {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openApiScheService.openCampaignScheForMonth();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     @PostMapping("openCampaignScheForDay")
     public  Map<String,Object> openCampaignScheForDay(@RequestBody Map<String,String> param) {
