@@ -971,6 +971,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
                     reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
+                    resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
 
