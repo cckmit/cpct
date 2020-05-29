@@ -66,5 +66,12 @@
     from object_label_rel where  OBJ_ID = #{objId} and  OBJ_TYPE = 1900
   </select>
 
+  <delete id="deleteByObjId" parameterType="java.lang.Long">
+    delete from object_label_rel
+    where where  OBJ_ID = #{objId} and  OBJ_TYPE = 1900
+  </delete>
+
+
+
 
 </mapper>

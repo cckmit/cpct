@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.TopicLabelMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.TopicLabel">
+    <id column="LABEL_ID" jdbcType="BIGINT" property="labelId" />
+    <result column="LABEL_CODE" jdbcType="VARCHAR" property="labelCode" />
+    <result column="LABEL_NAME" jdbcType="VARCHAR" property="labelName" />
+    <result column="LABEL_DESC" jdbcType="VARCHAR" property="labelDesc" />
+    <result column="LABEL_TYPE" jdbcType="VARCHAR" property="labelType" />
+    <result column="LABEL_VALUE_TYPE" jdbcType="VARCHAR" property="labelValueType" />
+    <result column="LABEL_DATA_TYPE" jdbcType="VARCHAR" property="labelDataType" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="GRP_LABEL_CODE" jdbcType="VARCHAR" property="grpLabelCode" />
+    <result column="PUB_FLG" jdbcType="VARCHAR" property="pubFlg" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from label
+    where LABEL_ID = #{labelId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.TopicLabel">
+    insert into label (LABEL_ID, LABEL_CODE, LABEL_NAME, 
+      LABEL_DESC, LABEL_TYPE, LABEL_VALUE_TYPE, 
+      LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, 
+      UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+      UPDATE_DATE, REMARK, GRP_LABEL_CODE, 
+      PUB_FLG)
+    values (#{labelId,jdbcType=BIGINT}, #{labelCode,jdbcType=VARCHAR}, #{labelName,jdbcType=VARCHAR}, 
+      #{labelDesc,jdbcType=VARCHAR}, #{labelType,jdbcType=VARCHAR}, #{labelValueType,jdbcType=VARCHAR}, 
+      #{labelDataType,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT}, 
+      #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{statusDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{grpLabelCode,jdbcType=VARCHAR}, 
+      #{pubFlg,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.TopicLabel">
+    update label
+    set LABEL_CODE = #{labelCode,jdbcType=VARCHAR},
+      LABEL_NAME = #{labelName,jdbcType=VARCHAR},
+      LABEL_DESC = #{labelDesc,jdbcType=VARCHAR},
+      LABEL_TYPE = #{labelType,jdbcType=VARCHAR},
+      LABEL_VALUE_TYPE = #{labelValueType,jdbcType=VARCHAR},
+      LABEL_DATA_TYPE = #{labelDataType,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      GRP_LABEL_CODE = #{grpLabelCode,jdbcType=VARCHAR},
+      PUB_FLG = #{pubFlg,jdbcType=VARCHAR}
+    where LABEL_ID = #{labelId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select LABEL_ID, LABEL_CODE, LABEL_NAME, LABEL_DESC, LABEL_TYPE, LABEL_VALUE_TYPE, 
+    LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK, GRP_LABEL_CODE, PUB_FLG
+    from label
+    where LABEL_ID = #{labelId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LABEL_ID, LABEL_CODE, LABEL_NAME, LABEL_DESC, LABEL_TYPE, LABEL_VALUE_TYPE, 
+    LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 
+    UPDATE_DATE, REMARK, GRP_LABEL_CODE, PUB_FLG
+    from label
+  </select>
+  <select id="selectByLabelCode" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select LABEL_ID, LABEL_CODE, LABEL_NAME, LABEL_DESC, LABEL_TYPE, LABEL_VALUE_TYPE,
+    LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+    UPDATE_DATE, REMARK, GRP_LABEL_CODE, PUB_FLG
+    from label
+    where LABEL_CODE = #{labelCode,jdbcType=BIGINT} and  LABEL_TYPE = 70
+  </select>
+
+
+</mapper>

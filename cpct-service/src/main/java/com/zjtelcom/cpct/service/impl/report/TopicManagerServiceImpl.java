@@ -4,10 +4,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.ObjectLabelRelMapper;
+import com.zjtelcom.cpct.dao.channel.TopicLabelMapper;
 import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
+import com.zjtelcom.cpct.domain.channel.TopicLabel;
 import com.zjtelcom.cpct.domain.report.TopicDO;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.report.TopicManagerService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.EsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,10 @@ public class TopicManagerServiceImpl implements TopicManagerService {
 
     @Autowired
     private MktCamTopicMapper mktCamTopicMapper;
+    @Autowired
+    private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
     //  year,season,topicName,description
     @Override
     public Map<String, Object> addTopic(Map<String, Object> topicContent) {
@@ -41,7 +49,7 @@ public class TopicManagerServiceImpl implements TopicManagerService {
                 topicDO.setDescription((String)topicContent.get("description"));
             }
             //生成主题编码
-            String randomCode = EsUtil.getRandomStr(4);
+            String randomCode = DateUtil.Date2String(new Date()) + EsUtil.getRandomStr(4);
             topicDO.setTopicCode(randomCode);
 
             topicDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
@@ -54,6 +62,21 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             topicDO.setUpdateDate(new Date());
             affectRow = mktCamTopicMapper.insertTopic(topicDO);
 
+            TopicLabel topicLabel = topicLabelMapper.selectByLabelCode(topicDO.getTopicCode());
+            if (topicLabel==null){
+                TopicLabel label = new TopicLabel();
+                label.setCreateDate(new Date());
+                label.setLabelCode(topicDO.getTopicCode());
+                label.setLabelDesc(topicDO.getDescription());
+                label.setLabelName(topicDO.getTopicName());
+                label.setLabelType("70");
+                label.setStatusCd("10000");
+                label.setLabelValueType("4000");//查询型
+                label.setLabelDataType("1200");//字符型
+                label.setStatusDate(new Date());
+                label.setUpdateDate(new Date());
+                topicLabelMapper.insert(label);
+            }
         }catch (Exception e){
             e.printStackTrace();
             result.put("resultCode", CommonConstant.CODE_FAIL);
@@ -126,6 +149,14 @@ public class TopicManagerServiceImpl implements TopicManagerService {
             topicDO.setUpdateDate(new Date());
 
             affectRow = mktCamTopicMapper.updateTopic(topicDO);
+            TopicLabel label = topicLabelMapper.selectByLabelCode(topicDO.getTopicCode());
+            if (label!=null){
+                label.setLabelCode(topicDO.getTopicCode());
+                label.setLabelDesc(topicDO.getDescription());
+                label.setLabelName(topicDO.getTopicName());
+                label.setUpdateDate(new Date());
+                topicLabelMapper.updateByPrimaryKey(label);
+            }
 
         }catch (Exception e){
             e.printStackTrace();
@@ -167,7 +198,17 @@ public class TopicManagerServiceImpl implements TopicManagerService {
         int affectRow = 0;
 
         try {
+            TopicDO topicDO = mktCamTopicMapper.selectTopicInfoById(id);
+            if (topicDO==null){
+                result.put("resultCode", CommonConstant.CODE_FAIL);
+                result.put("content","主题不存在");
+                return result;
+            }
             affectRow = mktCamTopicMapper.deleteTopicById(id);
+            TopicLabel label = topicLabelMapper.selectByLabelCode(topicDO.getTopicCode());
+            if (label!=null){
+                topicLabelMapper.deleteByPrimaryKey(label.getLabelId());
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

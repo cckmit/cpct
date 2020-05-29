@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
      private  OpenCampaignScheService openCampaignScheService;
     @Autowired
     private MktCampaignMapper campaignMapper;
+
 
 
     @Override
@@ -69,7 +71,6 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
         Date lastDayOfMonth = DateUtil.getLastDayOfMonth(lastMonth);
         System.out.println("start"+DateUtil.date2StringDate(firstDayOfMonth));
         System.out.println("end"+DateUtil.date2StringDate(lastDayOfMonth));
-
         List<MktCampaignDO> campaignDOS = campaignMapper.listByCreateDate(firstDayOfMonth, lastDayOfMonth);
         Map<String ,Object> result = new HashMap<>();
         for (int i = 0 ; i< campaignDOS.size();i++){
@@ -83,6 +84,7 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                log.info("活动文件上传失败:"+campaignDOS.get(i).getMktCampaignId());
             }
         }
         return result;
@@ -109,6 +111,7 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
      * @param campaign
      * @return
      */
+
     private Map<String, Object> exportFile(OpenCampaignScheEntity campaign,String flg,String intNum) {
         Map<String, Object> resultMap = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
@@ -116,17 +119,16 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
         String dataFileName = "6001040005"+"1000000038"+ "BUS63001"+ Date + flg + intNum + ".txt";     //文件路径+名称+文件类型
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
-        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        final FTPClient ftp = sftpUtils.ftpConnect(ftpAddress, ftpPort, ftpName, ftpPassword);
         boolean uploadResult = false;
         if (!dataFile.exists()) {
             // 如果文件不存在，则创建新的文件
             try {
                 dataFile.createNewFile();
                 sftpUtils.writeFileContent(dataFile.getName(), JSON.toJSONString(campaign));
-                log.info("sftp已获得连接");
-                sftpUtils.cd(exportPath, sftp);
-                uploadResult = sftpUtils.uploadFile(exportPath, dataFile.getName(), new FileInputStream(dataFile), sftp);
-                sftp.disconnect();
+                log.info("ftp已获得连接");
+                sftpUtils.ftpUploadFile(ftp,exportPath, dataFile.getName(), new FileInputStream(dataFile));
+                sftpUtils.ftpDisConnect(ftp);
                 resultMap.put("resultMsg", "success");
             } catch (Exception e) {
                 log.error("活动文件上传失败！Expection = ", e);
@@ -139,11 +141,15 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 if (b1) {
                     log.info("删除本地文件成功！");
                 }
-                sftp.disconnect();
+                sftpUtils.ftpDisConnect(ftp);
             }
         } else {
             log.info(dataFileName + "文件已存在！");
         }
         return resultMap;
     }
+
+
+
+
 }

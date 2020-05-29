@@ -19,16 +19,14 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
-import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -325,6 +323,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private EventRedisService eventRedisService;
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
+    @Autowired
+    private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -547,6 +549,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             mktCampaignDO.setInitId(mktCampaignId);
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+            //创建主题关系
+            topicLabelRel(mktCampaignId, mktCampaignDO);
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.ADD.getOperatorValue());
 
@@ -665,7 +669,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
                     mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
-                redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+mktCampaignId);
             }
 
             //试运算展示列实例化
@@ -731,6 +734,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+
+            //创建主题关系
+            if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())){
+                objectLabelRelMapper.deleteByObjId(mktCampaignDO.getMktCampaignId());
+                TopicLabel label = topicLabelMapper.selectByLabelCode(mktCampaignDO.getTheMe());
+                if (label!=null){
+                    ObjectLabelRel objectLabelRel = new ObjectLabelRel();
+                    objectLabelRel.setCreateDate(new Date());
+                    objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    objectLabelRel.setObjId(mktCampaignDO.getMktCampaignId());
+                    objectLabelRel.setLabelId(label.getLabelId());
+                    objectLabelRel.setObjType("1900");
+                    objectLabelRel.setStatusCd("1000");
+                    objectLabelRel.setUpdateDate(new Date());
+                    objectLabelRelMapper.insert(objectLabelRel);
+                }
+            }
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
@@ -856,7 +876,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktStrategyCloseRuleRelDO.setUpdateDate(new Date());
                     mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                 }
-                redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+mktCampaignId);
             }
 
             //重建展示列实例
@@ -2165,7 +2184,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // initId
                     mktCampaignDO.setInitId(childMktCampaignId);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-
+                    //创建主题关系
+                    topicLabelRel(mktCampaignId, mktCampaignDO);
                     childMktCampaignIdList.add(childMktCampaignId);
                     // 与父活动进行关联
                     MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
@@ -2238,7 +2258,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         mktStrategyCloseRuleRelDO.setStrategyId(childMktCampaignId);
                         mktStrategyCloseRuleRelMapper.insert(mktStrategyCloseRuleRelDO);
                     }
-                    redisUtils_es.del("ES_LABEL_CLOSE_RULE_"+childMktCampaignId);
                     //如果是框架活动 生成子活动后  生成对应的子需求函 下发给指定岗位的指定人员
                     generateRequest(mktCampaignDO, mktCamCityRelDO.getCityId());
                 }
@@ -2276,6 +2295,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMap.put("resultMsg", "发布活动失败！");
         }
         return mktCampaignMap;
+    }
+
+    private void topicLabelRel(Long mktCampaignId, MktCampaignDO mktCampaignDO) {
+        //创建主题关系
+        if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())){
+            TopicLabel label = topicLabelMapper.selectByLabelCode(mktCampaignDO.getTheMe());
+            if (label!=null){
+                ObjectLabelRel objectLabelRel = new ObjectLabelRel();
+                objectLabelRel.setCreateDate(new Date());
+                objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                objectLabelRel.setObjId(mktCampaignId);
+                objectLabelRel.setLabelId(label.getLabelId());
+                objectLabelRel.setObjType("1900");
+                objectLabelRel.setStatusCd("1000");
+                objectLabelRel.setUpdateDate(new Date());
+                objectLabelRelMapper.insert(objectLabelRel);
+            }
+        }
     }
 
     private void UserListTemp(Long mktCampaignId, MktCampaignDO mktCampaignDO) {

@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
+import com.ctzj.smt.bss.core.util.UUIDUtil;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
@@ -19,6 +22,7 @@ import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamScriptEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpEntity;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -32,16 +36,28 @@ import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.RedisUtils_prd;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 @Service
 public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
+
+    Logger logger =  LoggerFactory.getLogger(OpenCampaignScheServiceImpl.class);
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
     @Autowired
@@ -240,9 +256,20 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         campaignScheEntity.setObjectLabelRels(objectLabelRels);
         if (campaignDO.getPlanBeginTime()!=null){
             campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaignDO.getPlanBeginTime()));
+            campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
         }
         if (campaignDO.getPlanEndTime()!=null){
             campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaignDO.getPlanEndTime()));
+            campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
+        }
+        if (campaignDO.getCreateDate()!=null){
+            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaignDO.getCreateDate()));
+        }
+        if (campaignDO.getStatusDate()!=null){
+            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaignDO.getStatusDate()));
+        }
+        if (campaignDO.getUpdateDate()!=null){
+            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaignDO.getUpdateDate()));
         }
         result.put("code","200");
         result.put("data",campaignScheEntity);
@@ -306,5 +333,80 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 express.append(" 小于等于 ").append(strArray2[1]);
         }
         return express.toString();
+    }
+
+    //营销活动许可证申请
+    @Override
+    public Map<String, Object> openApimktCampaignBorninfoOrder(MktCampaignDO campaign) {
+        Map<String,Object> result = new HashMap<>();
+        //设置集团营服活动反馈接口入参
+        Map<String,Object> inputMap = new HashMap<>();
+        //对象目录节点关系
+        List<ObjCatItemRel> objCatItemRels = new ArrayList<>();
+        //对象关联标签
+        List<ObjectLabelRel> objectLabelRels = new ArrayList<>();
+        List<OpenCampaignScheEntity> openCampaignScheEntities = new ArrayList<>();
+        OpenCampaignScheEntity campaignScheEntity = BeanUtil.create(campaign, new OpenCampaignScheEntity());
+        if (campaign.getPlanBeginTime()!=null){
+            campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaign.getPlanBeginTime()));
+            campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
+        }
+        if (campaign.getPlanEndTime()!=null){
+            campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaign.getPlanEndTime()));
+            campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
+        }
+        if (campaign.getCreateDate()!=null){
+            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaign.getCreateDate()));
+        }
+        if (campaign.getStatusDate()!=null){
+            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaign.getStatusDate()));
+        }
+        if (campaign.getUpdateDate()!=null){
+            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaign.getUpdateDate()));
+        }
+        //对象目录节点关系
+        objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+        //对象关联标签
+        objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+        campaignScheEntity.setObjCatItemRels(objCatItemRels);
+        campaignScheEntity.setObjectLabelRels(objectLabelRels);
+        Map<String,Object> paramMap = new HashMap<>();
+        openCampaignScheEntities.add(campaignScheEntity);
+        paramMap.put("mktCampaignBorninfoOrderDetails",openCampaignScheEntities);
+        inputMap.put("requestObject",paramMap);
+        String jsonString = JSON.toJSONString(inputMap);
+        logger.info("集团营销活动许可证：" + jsonString);
+
+        //调用集团营服活动反馈接口地址
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("OPENAPI_URL_XUKEZHENG");
+        String url = sysParamsList.get(0).getParamValue();
+        HttpPost ht = new HttpPost(url);
+        ht.setHeader("Content-Type", "application/json");
+        String uuid = UUIDUtil.getUUID();
+        ht.setHeader("X-CTG-Request-ID", uuid);
+        logger.info("集团活动反馈接口流水号：" + uuid);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll(null, "OPENAPI_HEADER");
+        JSONObject json = JSON.parseObject(sysParamList.get(0).getParamValue());
+        String appId = json.get("X-APP-ID").toString();
+        String appKey = json.get("X-APP-KEY").toString();
+        String reginId = json.get("X-CTG-Region-ID").toString();
+        ht.setHeader("X-CTG-Region-ID", reginId);
+        ht.setHeader("X-APP-ID", appId);
+        ht.setHeader("X-APP-KEY", appKey);
+        StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
+        logger.info(entity.toString());
+        ht.setEntity(entity);
+        String content = "";
+        try {
+            HttpResponse response = httpClient.execute(ht);
+            content = EntityUtils.toString(response.getEntity());
+            logger.info("集团返回结果：" + content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.put("message", "集团营销活动许可证");
+        result.put("inputMap", jsonString);
+        return result;
     }
 }
