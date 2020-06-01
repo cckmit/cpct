@@ -130,6 +130,11 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
     private ObjCatItemRelMapper objCatItemRelMapper;
     @Autowired
     private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
+    @Autowired
+    private CatalogItemMapper catalogItemMapper;
+
 
 
     /**
@@ -223,7 +228,7 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             }
             mktCamChlConf.add(openMktCamChlConfEntity);
         }
-        ////营服活动关联事件
+        //营服活动关联事件
         List<MktCamEvtRelDO> relDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
         for (MktCamEvtRelDO relDO : relDOList) {
             OpenMktCamEvtRelEntity openMktCamEvtRelEntity = BeanUtil.create(relDO, new OpenMktCamEvtRelEntity());
@@ -245,8 +250,23 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         objRegionRels.add(objRegionRel);
         //对象目录节点关系
         objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignId);
+        for (ObjCatItemRel objCatItemRel : objCatItemRels) {
+            objCatItemRel.setObjNbr(campaignDO.getMktActivityNbr());
+            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
+            if (catalogItem!=null){
+                objCatItemRel.setCatalogItemName(catalogItem.getCatalogItemName());
+                objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
+            }
+        }
         //对象关联标签
         objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignId);
+        for (ObjectLabelRel objectLabelRel : objectLabelRels) {
+            objectLabelRel.setObjNbr(campaignDO.getMktActivityNbr());
+            TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
+            if (label!=null){
+                objectLabelRel.setLabelName(label.getLabelName());
+            }
+        }
         campaignScheEntity.setMktCamGrpRuls(mktCamGrpRuls);
         campaignScheEntity.setMktCamItems(mktCamItems);
         campaignScheEntity.setMktCamChlConf(mktCamChlConf);

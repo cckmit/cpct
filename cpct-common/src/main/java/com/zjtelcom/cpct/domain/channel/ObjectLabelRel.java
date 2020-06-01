@@ -29,6 +29,26 @@ public class ObjectLabelRel {
 
     private String remark;
 
+    private String labelName;
+
+    private String objNbr;
+
+    public String getLabelName() {
+        return labelName;
+    }
+
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
+    }
+
+    public String getObjNbr() {
+        return objNbr;
+    }
+
+    public void setObjNbr(String objNbr) {
+        this.objNbr = objNbr;
+    }
+
     public Long getObjectLabelRelId() {
         return objectLabelRelId;
     }
