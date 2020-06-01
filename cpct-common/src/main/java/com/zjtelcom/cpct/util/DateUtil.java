@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.util;
 
 import com.zjtelcom.cpct.enums.DateUnit;
+import lombok.experimental.var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,23 @@ public class DateUtil {
         SimpleDateFormat dft = new SimpleDateFormat("MM");
         Integer lastMonth = Integer.valueOf(dft.format(cal.getTime()));
         return lastMonth;
+    }
+
+    public static  String getCurrentSeason(){
+        Integer currentMonth = getCurrentMonth();
+        if (currentMonth<3){
+            return "1000";
+        }
+        if (currentMonth>3 && currentMonth<6 ){
+            return "2000";
+        }
+        if (currentMonth>6 && currentMonth<9 ){
+            return "3000";
+        }
+        if (currentMonth>9){
+            return "4000";
+        }
+        return "1000";
     }
 
     /**

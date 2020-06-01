@@ -96,6 +96,5 @@
                 AND topic_code = #{topicCode}
             </if>
         </where>
-
     </select>
 </mapper>

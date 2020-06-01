@@ -21,8 +21,8 @@ public class OpenCampaignScheEntity {
     private String mktCampaignName;
     private String planBeginTime;
     private String planEndTime;
-    private Date beginTime;
-    private Date endTime;
+    private String beginTime;
+    private String endTime;
     private String mktCampaignType;
     private String mktActivityNbr;
     private String mktActivityTarget;
@@ -33,11 +33,11 @@ public class OpenCampaignScheEntity {
     private String manageType;
     private String extMktCampaignId;
     private String statusCd;
-    private Date statusDate;
+    private String statusDate;
     private Long createStaff;
-    private Date createDate;
+    private String createDate;
     private Long updateStaff;
-    private Date updateDate;
+    private String updateDate;
     private String remark;
     private Long regionId;
     private String regionNbr;
@@ -111,19 +111,19 @@ public class OpenCampaignScheEntity {
         this.planEndTime = planEndTime;
     }
 
-    public Date getBeginTime() {
+    public String getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(Date beginTime) {
+    public void setBeginTime(String beginTime) {
         this.beginTime = beginTime;
     }
 
-    public Date getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
@@ -207,11 +207,11 @@ public class OpenCampaignScheEntity {
         this.statusCd = statusCd;
     }
 
-    public Date getStatusDate() {
+    public String getStatusDate() {
         return statusDate;
     }
 
-    public void setStatusDate(Date statusDate) {
+    public void setStatusDate(String statusDate) {
         this.statusDate = statusDate;
     }
 
@@ -223,11 +223,11 @@ public class OpenCampaignScheEntity {
         this.createStaff = createStaff;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -239,11 +239,11 @@ public class OpenCampaignScheEntity {
         this.updateStaff = updateStaff;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

@@ -1,6 +1,9 @@
 package com.zjtelcom.cpct.service.impl.campaign;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
+import com.ctzj.smt.bss.core.util.UUIDUtil;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
@@ -19,6 +22,7 @@ import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamScriptEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpEntity;
+import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -31,17 +35,24 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.RedisUtils_prd;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
+
+    Logger logger =  LoggerFactory.getLogger(OpenCampaignScheServiceImpl.class);
     @Autowired
     private MktCampaignMapper mktCampaignMapper;
     @Autowired
@@ -114,6 +125,11 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
     private ObjCatItemRelMapper objCatItemRelMapper;
     @Autowired
     private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
+    @Autowired
+    private CatalogItemMapper catalogItemMapper;
+
 
 
     /**
@@ -207,7 +223,7 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             }
             mktCamChlConf.add(openMktCamChlConfEntity);
         }
-        ////营服活动关联事件
+        //营服活动关联事件
         List<MktCamEvtRelDO> relDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignId);
         for (MktCamEvtRelDO relDO : relDOList) {
             OpenMktCamEvtRelEntity openMktCamEvtRelEntity = BeanUtil.create(relDO, new OpenMktCamEvtRelEntity());
@@ -228,9 +244,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         objRegionRel.setStatusCd("1000");
         objRegionRels.add(objRegionRel);
         //对象目录节点关系
-        objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignId);
-        //对象关联标签
-        objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignId);
+        ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaignDO).invoke();
+        objCatItemRels = objInfoCreate.getObjCatItemRels();
+        objectLabelRels = objInfoCreate.getObjectLabelRels();
         campaignScheEntity.setMktCamGrpRuls(mktCamGrpRuls);
         campaignScheEntity.setMktCamItems(mktCamItems);
         campaignScheEntity.setMktCamChlConf(mktCamChlConf);
@@ -240,9 +256,20 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         campaignScheEntity.setObjectLabelRels(objectLabelRels);
         if (campaignDO.getPlanBeginTime()!=null){
             campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaignDO.getPlanBeginTime()));
+            campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
         }
         if (campaignDO.getPlanEndTime()!=null){
             campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaignDO.getPlanEndTime()));
+            campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
+        }
+        if (campaignDO.getCreateDate()!=null){
+            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaignDO.getCreateDate()));
+        }
+        if (campaignDO.getStatusDate()!=null){
+            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaignDO.getStatusDate()));
+        }
+        if (campaignDO.getUpdateDate()!=null){
+            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaignDO.getUpdateDate()));
         }
         result.put("code","200");
         result.put("data",campaignScheEntity);
@@ -306,5 +333,119 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 express.append(" 小于等于 ").append(strArray2[1]);
         }
         return express.toString();
+    }
+
+    //营销活动许可证申请
+    @Override
+    public Map<String, Object> openApimktCampaignBorninfoOrder(MktCampaignDO campaign) {
+        Map<String,Object> result = new HashMap<>();
+        //设置集团营服活动反馈接口入参
+        Map<String,Object> inputMap = new HashMap<>();
+        //对象目录节点关系
+        List<ObjCatItemRel> objCatItemRels = new ArrayList<>();
+        //对象关联标签
+        List<ObjectLabelRel> objectLabelRels = new ArrayList<>();
+        List<OpenCampaignScheEntity> openCampaignScheEntities = new ArrayList<>();
+        OpenCampaignScheEntity campaignScheEntity = BeanUtil.create(campaign, new OpenCampaignScheEntity());
+        if (campaign.getPlanBeginTime()!=null){
+            campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaign.getPlanBeginTime()));
+            campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
+        }
+        if (campaign.getPlanEndTime()!=null){
+            campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaign.getPlanEndTime()));
+            campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
+        }
+        if (campaign.getCreateDate()!=null){
+            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaign.getCreateDate()));
+        }
+        if (campaign.getStatusDate()!=null){
+            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaign.getStatusDate()));
+        }
+        if (campaign.getUpdateDate()!=null){
+            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaign.getUpdateDate()));
+        }
+        ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaign).invoke();
+        objCatItemRels = objInfoCreate.getObjCatItemRels();
+        objectLabelRels = objInfoCreate.getObjectLabelRels();
+        campaignScheEntity.setObjCatItemRels(objCatItemRels);
+        campaignScheEntity.setObjectLabelRels(objectLabelRels);
+        Map<String,Object> paramMap = new HashMap<>();
+        openCampaignScheEntities.add(campaignScheEntity);
+        paramMap.put("mktCampaignBorninfoOrderDetails",openCampaignScheEntities);
+        inputMap.put("requestObject",paramMap);
+        String jsonString = JSON.toJSONString(inputMap);
+        logger.info("集团营销活动许可证：" + jsonString);
+
+        //调用集团营服活动反馈接口地址
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("OPENAPI_URL_XUKEZHENG");
+        String url = sysParamsList.get(0).getParamValue();
+        HttpPost ht = new HttpPost(url);
+        ht.setHeader("Content-Type", "application/json");
+        String uuid = UUIDUtil.getUUID();
+        ht.setHeader("X-CTG-Request-ID", uuid);
+        logger.info("集团活动反馈接口流水号：" + uuid);
+        List<SysParams> sysParamList = sysParamsMapper.selectAll(null, "OPENAPI_HEADER");
+        JSONObject json = JSON.parseObject(sysParamList.get(0).getParamValue());
+        String appId = json.get("X-APP-ID").toString();
+        String appKey = json.get("X-APP-KEY").toString();
+        String reginId = json.get("X-CTG-Region-ID").toString();
+        ht.setHeader("X-CTG-Region-ID", reginId);
+        ht.setHeader("X-APP-ID", appId);
+        ht.setHeader("X-APP-KEY", appKey);
+        StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
+        logger.info(entity.toString());
+        ht.setEntity(entity);
+        String content = "";
+        try {
+            HttpResponse response = httpClient.execute(ht);
+            content = EntityUtils.toString(response.getEntity());
+            logger.info("集团返回结果：" + content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.put("message", "集团营销活动许可证");
+        result.put("inputMap", jsonString);
+        return result;
+    }
+
+    private class ObjInfoCreate {
+        private MktCampaignDO campaign;
+        private List<ObjCatItemRel> objCatItemRels;
+        private List<ObjectLabelRel> objectLabelRels;
+
+        public ObjInfoCreate(MktCampaignDO campaign) {
+            this.campaign = campaign;
+        }
+
+        public List<ObjCatItemRel> getObjCatItemRels() {
+            return objCatItemRels;
+        }
+
+        public List<ObjectLabelRel> getObjectLabelRels() {
+            return objectLabelRels;
+        }
+
+        public ObjInfoCreate invoke() {
+            objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+            for (ObjCatItemRel objCatItemRel : objCatItemRels) {
+                objCatItemRel.setObjNbr(campaign.getMktActivityNbr());
+                CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
+                if (catalogItem!=null){
+                    objCatItemRel.setCatalogItemName(catalogItem.getCatalogItemName());
+                    objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
+                }
+            }
+            //对象关联标签
+            objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+            for (ObjectLabelRel objectLabelRel : objectLabelRels) {
+                objectLabelRel.setObjNbr(campaign.getMktActivityNbr());
+                TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
+                if (label!=null){
+                    objectLabelRel.setLabelName(label.getLabelName());
+                }
+            }
+            return this;
+        }
     }
 }

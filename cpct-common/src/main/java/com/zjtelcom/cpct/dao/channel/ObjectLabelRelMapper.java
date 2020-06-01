@@ -22,4 +22,6 @@ public interface ObjectLabelRelMapper {
     int updateByPrimaryKey(ObjectLabelRel record);
 
     List<ObjectLabelRel> selectByObjId(Long objId);
+
+    int deleteByObjId(Long objId);
 }
