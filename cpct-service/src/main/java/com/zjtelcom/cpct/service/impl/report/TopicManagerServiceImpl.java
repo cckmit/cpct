@@ -49,16 +49,12 @@ public class TopicManagerServiceImpl implements TopicManagerService {
                 topicDO.setDescription((String)topicContent.get("description"));
             }
             //生成主题编码
-            String randomCode = DateUtil.Date2String(new Date()) + EsUtil.getRandomStr(4);
+            String randomCode = EsUtil.getRandomStr(4);
             topicDO.setTopicCode(randomCode);
 
             topicDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
             topicDO.setStatusDate(new Date());
-            //创建时间
-//            topicDO.setCreateStaff(new Long("1111"));
             topicDO.setCreateDate(new Date());
-            //更新
-//            topicDO.setUpdateStaff(new Long("2222"));
             topicDO.setUpdateDate(new Date());
             affectRow = mktCamTopicMapper.insertTopic(topicDO);
 

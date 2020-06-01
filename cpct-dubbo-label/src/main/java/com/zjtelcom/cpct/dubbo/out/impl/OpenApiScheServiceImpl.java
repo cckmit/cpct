@@ -28,8 +28,8 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
     private final static Logger log = LoggerFactory.getLogger(OpenApiScheServiceImpl.class);
 
     //600104 |user m600104 |passwd  Ftp_600104@2020 |path /jtppm/zc_mkt_campaign/600104
-    private String ftpAddress = "10.128.28.3";
-    private int ftpPort = 21;
+    private String ftpAddress = "134.108.5.141";
+    private int ftpPort = 2122;
     private String ftpName = "m600104";
     private String ftpPassword = "Ftp_600104@2020";
     private String exportPath = "/jtppm/zc_mkt_campaign/600104";

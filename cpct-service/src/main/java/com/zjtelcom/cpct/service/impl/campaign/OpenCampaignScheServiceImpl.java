@@ -35,7 +35,6 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.RedisUtils_prd;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -48,10 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 @Service
@@ -249,24 +244,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         objRegionRel.setStatusCd("1000");
         objRegionRels.add(objRegionRel);
         //对象目录节点关系
-        objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignId);
-        for (ObjCatItemRel objCatItemRel : objCatItemRels) {
-            objCatItemRel.setObjNbr(campaignDO.getMktActivityNbr());
-            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
-            if (catalogItem!=null){
-                objCatItemRel.setCatalogItemName(catalogItem.getCatalogItemName());
-                objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
-            }
-        }
-        //对象关联标签
-        objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignId);
-        for (ObjectLabelRel objectLabelRel : objectLabelRels) {
-            objectLabelRel.setObjNbr(campaignDO.getMktActivityNbr());
-            TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
-            if (label!=null){
-                objectLabelRel.setLabelName(label.getLabelName());
-            }
-        }
+        ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaignDO).invoke();
+        objCatItemRels = objInfoCreate.getObjCatItemRels();
+        objectLabelRels = objInfoCreate.getObjectLabelRels();
         campaignScheEntity.setMktCamGrpRuls(mktCamGrpRuls);
         campaignScheEntity.setMktCamItems(mktCamItems);
         campaignScheEntity.setMktCamChlConf(mktCamChlConf);
@@ -384,10 +364,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         if (campaign.getUpdateDate()!=null){
             campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaign.getUpdateDate()));
         }
-        //对象目录节点关系
-        objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
-        //对象关联标签
-        objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+        ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaign).invoke();
+        objCatItemRels = objInfoCreate.getObjCatItemRels();
+        objectLabelRels = objInfoCreate.getObjectLabelRels();
         campaignScheEntity.setObjCatItemRels(objCatItemRels);
         campaignScheEntity.setObjectLabelRels(objectLabelRels);
         Map<String,Object> paramMap = new HashMap<>();
@@ -428,5 +407,45 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         result.put("message", "集团营销活动许可证");
         result.put("inputMap", jsonString);
         return result;
+    }
+
+    private class ObjInfoCreate {
+        private MktCampaignDO campaign;
+        private List<ObjCatItemRel> objCatItemRels;
+        private List<ObjectLabelRel> objectLabelRels;
+
+        public ObjInfoCreate(MktCampaignDO campaign) {
+            this.campaign = campaign;
+        }
+
+        public List<ObjCatItemRel> getObjCatItemRels() {
+            return objCatItemRels;
+        }
+
+        public List<ObjectLabelRel> getObjectLabelRels() {
+            return objectLabelRels;
+        }
+
+        public ObjInfoCreate invoke() {
+            objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+            for (ObjCatItemRel objCatItemRel : objCatItemRels) {
+                objCatItemRel.setObjNbr(campaign.getMktActivityNbr());
+                CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
+                if (catalogItem!=null){
+                    objCatItemRel.setCatalogItemName(catalogItem.getCatalogItemName());
+                    objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
+                }
+            }
+            //对象关联标签
+            objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+            for (ObjectLabelRel objectLabelRel : objectLabelRels) {
+                objectLabelRel.setObjNbr(campaign.getMktActivityNbr());
+                TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
+                if (label!=null){
+                    objectLabelRel.setLabelName(label.getLabelName());
+                }
+            }
+            return this;
+        }
     }
 }
