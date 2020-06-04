@@ -975,28 +975,31 @@ public class EventApiServiceImpl implements EventApiService {
                 }
                 //103事件改造
                 if ("EVT0000000103".equals(eventCode)) {
-                    CacheResultObject<ProdInst>  prodInstCacheEntity = getProdInstCacheEntity(map.get("accNbr"));
-                    evtContent.put("addressDesc",prodInstCacheEntity.getResultObject().getAddressDesc());
-                    //获取c4
                     String c4Name = "";
-                    Long commonRegionId = prodInstCacheEntity.getResultObject().getRegionId();
-                    CommonRegion commonRegion = commonRegionMapper.selectByPrimaryKey(commonRegionId);
-                    if(commonRegion != null){
-                        Long c4RegionId = commonRegion.getC4RegionId();
-                        if(c4RegionId != null){
-                            commonRegion = commonRegionMapper.selectByPrimaryKey(c4RegionId);
-                            if (commonRegion != null){
+                    String addressDesc = "";
+                    CacheResultObject<ProdInst> prodInstCacheEntity = getProdInstCacheEntity(map.get("accNbr"));
+                    if (prodInstCacheEntity != null) {
+                        addressDesc = prodInstCacheEntity.getResultObject().getAddressDesc();
+                        //获取c4
+                        Long commonRegionId = prodInstCacheEntity.getResultObject().getRegionId();
+                        CommonRegion commonRegion = commonRegionMapper.selectByPrimaryKey(commonRegionId);
+                        if (commonRegion != null) {
+                            Long c4RegionId = commonRegion.getC4RegionId();
+                            if (c4RegionId != null) {
+                                commonRegion = commonRegionMapper.selectByPrimaryKey(c4RegionId);
+                                if (commonRegion != null) {
+                                    c4Name = commonRegion.getRegionName();
+                                }
+                            } else {
                                 c4Name = commonRegion.getRegionName();
                             }
-                        }else {
-                            c4Name = commonRegion.getRegionName();
+                            //如果字段为空，那么这个区域本身就是C4，如果不为空则取该字段值的区域名称为C4。
                         }
-                        //如果字段为空，那么这个区域本身就是C4，如果不为空则取该字段值的区域名称为C4。
                     }
-
-                    evtContent.put("c4",c4Name);
+                    evtContent.put("addressDesc",addressDesc);
+                    evtContent.put("c4Name",c4Name);
                     log.info("addressDesc" + prodInstCacheEntity.getResultObject().getAddressDesc());
-                    log.info("c4" + c4Name);
+                    log.info("c4Name" + c4Name);
 
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     log.info("onlineMap" + onlineMap);
@@ -1558,27 +1561,29 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
-private CacheResultObject<ProdInst> getProdInstCacheEntity(String accNbr){
-    CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
-    //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
-    if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
-        Long mainOfferInstId = null;
-        Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-        for (String prodInstId : prodInstIds) {
-            CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
-            log.info("555---prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
-            if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null) {
-                ProdInst prodInst = prodInstCacheEntity.getResultObject();
-                log.info("666---prodInst --->" + JSON.toJSONString(prodInst));
-                //1429768   WIRED_NBR("INT-MAN-0010"),//宽带
-                //1429838    ITV_NBR("OTH-MAN-0034"),//itv
-                if (prodInst != null && (prodInst.getProdId() == 1429768L || prodInst.getProdId() == 1429838L)) {
-                    //todo
-                    return prodInstCacheEntity;
+    private CacheResultObject<ProdInst> getProdInstCacheEntity(String accNbr) {
+        CacheResultObject<ProdInst> prodInstCacheEntity = null;
+        CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
+        //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+        if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
+            Long mainOfferInstId = null;
+            Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+            for (String prodInstId : prodInstIds) {
+                CacheResultObject<ProdInst> entity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
+                log.info("555---prodInstCacheEntity --->" + JSON.toJSONString(entity));
+                if (entity != null && entity.getResultObject() != null) {
+                    ProdInst prodInst = entity.getResultObject();
+                    log.info("666---prodInst --->" + JSON.toJSONString(prodInst));
+                    //1429768   WIRED_NBR("INT-MAN-0010"),//宽带
+                    //1429838    ITV_NBR("OTH-MAN-0034"),//itv
+                    if (prodInst != null && (prodInst.getProdId() == 1429768L || prodInst.getProdId() == 1429838L)) {
+                        prodInstCacheEntity = entity;
+                    }
                 }
             }
         }
-}
+        return  prodInstCacheEntity;
+    }
 
     public static String cpcLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();

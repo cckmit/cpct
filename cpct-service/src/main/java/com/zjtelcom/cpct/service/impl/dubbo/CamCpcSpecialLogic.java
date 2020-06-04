@@ -51,21 +51,26 @@ public class CamCpcSpecialLogic {
             }else if(context.get("addressDesc") != null){
                 addr = context.get("addressDesc").toString();
             }
+            String respXml = null;
 
-            // 本地网标识
-            String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
-            logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);
-            String resCoverIdXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                    "<WebService FuncName=\"QueryResCoverInfoService\" City=\"WT\">\n" +
-                    "\t<Root>\n" +
-                    "\t\t<AreaBm>" + lanId + "</AreaBm>\n" +
-                    "\t\t<Method>QueryResCoverInfo</Method>\n" +
-                    "\t\t<Query>\n" +
-                    "\t\t\t<ResCoverId>" + resCoverId + "</ResCoverId>\n" +
-                    "\t\t</Query>\n" +
-                    "\t</Root>\n" +
-                    "</WebService>";
-            String respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
+            try {
+                // 本地网标识
+                String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
+                logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);
+                String resCoverIdXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<WebService FuncName=\"QueryResCoverInfoService\" City=\"WT\">\n" +
+                        "\t<Root>\n" +
+                        "\t\t<AreaBm>" + lanId + "</AreaBm>\n" +
+                        "\t\t<Method>QueryResCoverInfo</Method>\n" +
+                        "\t\t<Query>\n" +
+                        "\t\t\t<ResCoverId>" + resCoverId + "</ResCoverId>\n" +
+                        "\t\t</Query>\n" +
+                        "\t</Root>\n" +
+                        "</WebService>";
+                respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (null == respXml || "".equals(respXml)) {
                 resultMap.put("tel", "GIS网格覆盖编码查询失败：地址不精确。");
             }
