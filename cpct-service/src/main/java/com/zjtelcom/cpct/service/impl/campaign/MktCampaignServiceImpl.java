@@ -1444,6 +1444,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
 
             campaignDO.setPlanEndTime(lastTime);
+            campaignDO.setStatusCd(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
             mktCampaignMapper.updateByPrimaryKey(campaignDO);
             //redisUtils.del("MKT_CAMPAIGN_" + campaignId);
 

@@ -49,7 +49,7 @@ public class EsHitsServiceImpl implements EsHitsService {
     @Autowired
     private SysParamsMapper sysParamsMapper;
     @Autowired
-    private RedisUtils_prd redisUtils;
+    private RedisUtils redisUtils;
 
     @Value("${ctg.cpctEsLogTopic}")
     private String cpctEsLogTopic;

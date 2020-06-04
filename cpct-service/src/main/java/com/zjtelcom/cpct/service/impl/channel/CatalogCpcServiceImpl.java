@@ -3,12 +3,18 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.dao.channel.CatalogItemMapper;
+import com.zjtelcom.cpct.dao.channel.CatalogMapper;
+import com.zjtelcom.cpct.dao.channel.ObjCatItemRelMapper;
 import com.zjtelcom.cpct.domain.channel.CatalogItem;
 import com.zjtelcom.cpct.domain.channel.Offer;
 import com.zjtelcom.cpct.domain.channel.PpmProduct;
+import com.zjtelcom.cpct.dto.channel.CatalogItemDetail;
 import com.zjtelcom.cpct.dto.channel.CatalogItemTree;
+import com.zjtelcom.cpct.dto.event.Catalog;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct_prod.dao.offer.CatalogItemProdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
@@ -27,6 +34,52 @@ public class CatalogCpcServiceImpl extends BaseService implements CatalogService
     private CatalogItemProdMapper catalogItemMapper;
     @Autowired
     private OfferProdMapper offerMapper;
+    @Autowired
+    private ObjCatItemRelMapper objCatItemRelMapper;
+    @Autowired
+    private CatalogMapper catalogMapper;
+    @Autowired
+    private CatalogItemMapper catItemMapper;
+
+    /**
+     * 营销活动目录
+     * @return
+     */
+    @Override
+    public Map<String, Object> listCatalogItemTree() {
+        Map<String,Object> result = new HashMap<>();
+        Catalog catalog = catalogMapper.selectByType("1800");
+        if (catalog==null){
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg","目录查询出错，请联系管理员");
+            return result;
+        }
+        List<CatalogItemDetail> resultList = new ArrayList<>();
+        List<CatalogItem> parentList = catItemMapper.selectByParentId(0L);
+        for (CatalogItem parent : parentList) {
+            CatalogItemDetail detail = BeanUtil.create(parent, new CatalogItemDetail());
+            list(detail);
+            resultList.add(detail);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",resultList);
+        return result;
+    }
+
+
+    private void  list(CatalogItemDetail cat){
+        List<CatalogItemDetail> childList = new ArrayList<>();
+        List<CatalogItem> list = catItemMapper.selectByParentId(cat.getCatalogItemId());
+        for (CatalogItem cata : list) {
+            CatalogItemDetail detail = BeanUtil.create(cata, new CatalogItemDetail());
+            List<CatalogItem> xxx = catItemMapper.selectByParentId(detail.getCatalogItemId());
+            if (!xxx.isEmpty()){
+                list(detail);
+            }
+            childList.add(detail);
+        }
+        cat.setChildList(childList);
+    }
 
 
     /**
