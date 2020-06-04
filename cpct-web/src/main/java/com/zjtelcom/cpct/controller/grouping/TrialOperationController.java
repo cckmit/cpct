@@ -35,6 +35,8 @@ public class TrialOperationController extends BaseController {
     @Autowired(required = false)
     private TrialProdService trialProdService;
 
+
+
     @PostMapping("yzservTest")
     @CrossOrigin
     public Map<String, Object> yzservTest( @RequestBody HashMap<String,Object> param){
@@ -49,6 +51,18 @@ public class TrialOperationController extends BaseController {
         }
         return result;
     }
+
+    @PostMapping("importUserList4File")
+    @CrossOrigin
+    public Map<String,Object> importUserList4File (MultipartFile file){
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = operationService.importUserList4File(file);
+        } catch (Exception e) {
+        }
+        return result;
+    }
+
 
     /**
      * ppm-导入清单

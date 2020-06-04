@@ -49,7 +49,7 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select GRP_ID, GRP_NAME, GRP_DESC, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
     STATUS_DATE, UPDATE_DATE, REMARK
-    from injection_label_grp
+    from injection_label_grp WHERE 1!=2
   </select>
 
   <select id="findByParams" resultMap="BaseResultMap">

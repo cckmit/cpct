@@ -78,7 +78,7 @@
     select EVT_ITEM_ID, EVENT_ID, EVT_TYPE_ID, EVT_ITEM_NAME, EVT_ITEM_CODE, VALUE_DATA_TYPE,
     EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF, IS_MAIN_PARAM,
     UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK,IS_LABEL
-    from event_item
+    from event_item WHERE 1!=2
   </select>
 
     <select id="listEventItem"  resultMap="BaseResultMap">

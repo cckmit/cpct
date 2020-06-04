@@ -29,7 +29,6 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
-import com.zjtelcom.cpct.elastic.service.EsHitService;
 import com.zjtelcom.cpct.service.dubbo.RuleTaskService;
 import com.zjtelcom.cpct.service.es.CoopruleService;
 import com.zjtelcom.cpct.service.es.EsHitsService;
@@ -42,7 +41,6 @@ import com.zjtelcom.cpct.util.ThreadPool;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,6 +112,7 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
         this.flagMap = (Map<String, Boolean>) hashMap.get("flagMap");
     }
 
+
 //    @Value("${table.infallible}")
     private String defaultInfallibleTable = "CPCP_CAM_DEFAULT";
 
@@ -148,6 +147,7 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
 //    private EventRedisService eventRedisService;
 
 //    Map<String, Boolean> flagMap = new ConcurrentHashMap();
+
 
     @Override
     public Object call() throws Exception {
@@ -251,7 +251,35 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                 realProdFilter = (String) realProdFilterRedis.get("REAL_PROD_FILTER");
             }
             if (realProdFilter != null && "1".equals(realProdFilter) && context.get("PROM_LIST") != null) {
-                productValidation();
+                List<String> prodList = new ArrayList<>();
+                log.info("111------accNbr --->" + privateParams.get("accNbr"));
+                CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
+                if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
+                    Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+                    for (String prodInstId : prodInstIds) {
+                        // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
+                        CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
+                        if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
+                            Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
+                            for (String offerProdInstRelId : offerProdInstRelIdSet) {
+                                // 查询销售品产品实例关系缓存实体
+                                CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                                if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                                    OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
+                                    // 查询销售品实例缓存实体
+                                    CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
+                                    if (offerInstCacheEntity != null && offerInstCacheEntity.getResultObject() != null) {
+                                        OfferInst offerInst = offerInstCacheEntity.getResultObject();
+                                        prodList.add(offerInst.getOfferId().toString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                String productString = ChannelUtil.StringList2String(prodList);
+                log.info("999------productStr --->" + JSON.toJSONString(productStr));
+                context.put("PROM_LIST", productString);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -287,10 +315,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                     express = (String) redisUtils.get("EXPRESS_" + tarGrpId);
                 }
             }
-            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL_KEY");
+            Map<String, Object> checkLabelRedis = eventRedisService.getRedis("CHECK_LABEL");
             sysParams = new SysParams();
             if (checkLabelRedis != null) {
-                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL_KEY");
+                sysParams = (SysParams) checkLabelRedis.get("CHECK_LABEL");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -526,7 +554,7 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
                 ruleMap.put("nowRuleId", ruleId); //新规则编码
                 ruleMap.put("ruleName", ruleName); //规则名称
                 ruleMap.put("promIntegId", promIntegId); // 销售品实例ID
-                log.info("flagMap = " +JSON.toJSONString(flagMap));
+
                 ruleMap.put("isMarketRule", flagMap.get(ruleId.toString()) == true ? "0" : "1"); // 是否随销规则标识
                 if (context.get("AREA_ID") != null) {
                     ruleMap.put("areaId", context.get("AREA_ID")); // 落地网格
@@ -534,7 +562,32 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
 
 
                 //查询销售品列表
-                selectProductList(productList);
+                if (productStr != null && !"".equals(productStr)) {
+                    // 推荐条目集合存入redis
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("productStr", productStr);
+                    Map<String, Object> mktCamItemListRedis = eventRedisService.getRedis("MKT_CAM_ITEM_LIST_", ruleId, params);
+                    List<MktCamItem> mktCamItemList = new ArrayList<>();
+                    if (mktCamItemListRedis != null) {
+                        mktCamItemList = (List<MktCamItem>) mktCamItemListRedis.get("MKT_CAM_ITEM_LIST_" + ruleId);
+                    }
+
+                    for (MktCamItem mktCamItem : mktCamItemList) {
+                        Map<String, String> product = new ConcurrentHashMap<>();
+                        product.put("productId", mktCamItem.getItemId().toString());
+                        product.put("productCode", mktCamItem.getOfferCode());
+                        product.put("productName", mktCamItem.getOfferName());
+                        product.put("productType", mktCamItem.getItemType());
+                        product.put("productFlag", "1000");  //todo 销售品标签
+                        //销售品优先级
+                        if (mktCamItem.getPriority() != null) {
+                            product.put("productPriority", mktCamItem.getPriority().toString());
+                        } else {
+                            product.put("productPriority", "0");
+                        }
+                        productList.add(product);
+                    }
+                }
                 jsonObject.put("productList", productList);
 
                 if (ruleResult.getResult() == null) {
@@ -644,10 +697,10 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
             String isaleCheck = eventRedisService.getRedis("ISALE_CHECK_FLG") == null ? "0" : eventRedisService.getRedis("ISALE_CHECK_FLG").toString();
             //isale预校验固定参数
             String loginId = "";
-            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID_KEY");
+            Map<String, Object> coolLoginIdRedis = eventRedisService.getRedis("COOL_LOGIN_ID");
             List<Map<String, String>> sysParam = new ArrayList<>();
             if (coolLoginIdRedis != null) {
-                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID_KEY");
+                sysParam = (List<Map<String, String>>) coolLoginIdRedis.get("COOL_LOGIN_ID");
             }
             if (sysParam != null && !sysParam.isEmpty()) {
                 loginId = sysParam.get(0).get("value");
@@ -672,67 +725,6 @@ public class RuleTaskServiceImpl implements RuleTaskService,Callable {
         }
 
         return ruleMap;
-    }
-
-    public void selectProductList(List<Map<String, String>> productList) {
-        if (productStr != null && !"".equals(productStr)) {
-            // 推荐条目集合存入redis
-            Map<String, Object> params = new HashMap<>();
-            params.put("productStr", productStr);
-            Map<String, Object> mktCamItemListRedis = eventRedisService.getRedis("MKT_CAM_ITEM_LIST_", ruleId, params);
-            List<MktCamItem> mktCamItemList = new ArrayList<>();
-            if (mktCamItemListRedis != null) {
-                mktCamItemList = (List<MktCamItem>) mktCamItemListRedis.get("MKT_CAM_ITEM_LIST_" + ruleId);
-            }
-
-            for (MktCamItem mktCamItem : mktCamItemList) {
-                Map<String, String> product = new ConcurrentHashMap<>();
-                product.put("productId", mktCamItem.getItemId().toString());
-                product.put("productCode", mktCamItem.getOfferCode());
-                product.put("productName", mktCamItem.getOfferName());
-                product.put("productType", mktCamItem.getItemType());
-                product.put("productFlag", "1000");  //todo 销售品标签
-                //销售品优先级
-                if (mktCamItem.getPriority() != null) {
-                    product.put("productPriority", mktCamItem.getPriority().toString());
-                } else {
-                    product.put("productPriority", "0");
-                }
-                productList.add(product);
-            }
-        }
-    }
-
-    public void productValidation() {
-        List<String> prodList = new ArrayList<>();
-        log.info("111------accNbr --->" + privateParams.get("accNbr"));
-        CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(privateParams.get("accNbr"));
-        if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
-            Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-            for (String prodInstId : prodInstIds) {
-                // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
-                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex2(prodInstId, "1000");
-                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null) {
-                    Set<String> offerProdInstRelIdSet = setCacheResultObject.getResultObject();
-                    for (String offerProdInstRelId : offerProdInstRelIdSet) {
-                        // 查询销售品产品实例关系缓存实体
-                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-                            OfferProdInstRel offerProdInstRel = offerProdInstRelCacheEntity.getResultObject();
-                            // 查询销售品实例缓存实体
-                            CacheResultObject<OfferInst> offerInstCacheEntity = iCacheOfferEntityQryService.getOfferInstCacheEntity(offerProdInstRel.getOfferInstId().toString());
-                            if (offerInstCacheEntity != null && offerInstCacheEntity.getResultObject() != null) {
-                                OfferInst offerInst = offerInstCacheEntity.getResultObject();
-                                prodList.add(offerInst.getOfferId().toString());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        String productString = ChannelUtil.StringList2String(prodList);
-        log.info("999------productStr --->" + JSON.toJSONString(productStr));
-        context.put("PROM_LIST", productString);
     }
 
     /**

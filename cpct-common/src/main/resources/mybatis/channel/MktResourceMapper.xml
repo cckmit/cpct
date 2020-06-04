@@ -77,7 +77,7 @@
            MKT_RES_NAME, MKT_RES_DESC, MKT_PRICING_PLAN_ID, UNIT, ORDERED_FLAG, MANAGE_REGION_ID,
            EFF_DATE, EXP_DATE, STATUS_DATE, STATUS_CD, REMARK, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF,
            UPDATE_DATE
-    from mkt_resource
+    from mkt_resource WHERE 1!=2
   </select>
   <select id="selectByResourceName" resultMap="BaseResultMap">
     select MKT_RES_ID, MKT_RES_NBR, MKT_RES_TYPE_ID, MKT_RES_EXTTYPE_ID,
