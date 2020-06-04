@@ -62,7 +62,11 @@
             <artifactId>zookeeper</artifactId>
         </dependency>
 
-
+ <!-- 引入协同中心dubbo服务jar包 -->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cooperate-service-api</artifactId>
+        </dependency>
         <!-- 引入门户模块 -->
         <dependency>
             <groupId>com.ctzj.smt.bss</groupId>

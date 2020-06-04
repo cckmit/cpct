@@ -45,17 +45,16 @@ platformConfig:
 
 #集团CPCT定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.40,134.108.0.41
+   ip: 134.108.0.40,134.108.0.41,134.108.0.208,134.108.0.209
    port: 9051
    database: 0
    password: CRM_CPCP_002_USER#bssCpc_ro
 
-#集团定制的redis配置生产环境
 redisConfig_Prd:
-   ip: 134.108.0.59
-   port: 41701
-   database: 4970
-   password: bss_cpcp_pocpro_user#bssCpc_ro
+   ip: 134.108.0.38,134.108.0.39
+   port: 9051
+   database: 0
+   password: CRM_CPCP_001_USER#Bsscpc!z3
 
 
 # cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
@@ -81,4 +80,7 @@ ctg:
   cpctEsLogTopic: cpct_eslog_prod
   cpctEsLogGroup: cpct_eslog_group_gray
 
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_gray
+  cpctSerpackageGroup: cpct_es_servicepackage_group_gray
 

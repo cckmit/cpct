@@ -48,7 +48,7 @@ spring:
 
 #集团CPCT定制的redis配置prod环境
 redisConfig:
-   ip: 134.108.0.40,134.108.0.41
+   ip: 134.108.0.40,134.108.0.41,134.108.0.208,134.108.0.209
    port: 9051
    database: 0
    password: CRM_CPCP_002_USER#bssCpc_ro
@@ -71,3 +71,7 @@ ctg:
   # 第四topic es日志添加队列中转
   cpctEsLogTopic: cpct_eslog_prod
   cpctEsLogGroup: cpct_eslog_group_gray
+
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_gray
+  cpctSerpackageGroup: cpct_es_servicepackage_group_gray

@@ -343,7 +343,7 @@
                 AND FILTER_TYPE = #{filterType}
             </when>
             <otherwise>
-                AND FILTER_TYPE  IN (3000,4000,5000,6000,8000,9000,8100)
+                AND FILTER_TYPE NOT IN (1000,2000)
             </otherwise>
         </choose>
         </where>
@@ -371,7 +371,7 @@
         from filter_rule
         <where>1!=2
         <if test="createStaff != null and createStaff != ''">
-            AND CREATE_STAFF = #{createStaff}
+            AND ((CREATE_STAFF = #{createStaff} AND FILTER_TYPE NOT IN (1000,2000)) OR (FILTER_TYPE IN (1000,2000)))
         </if>
         <if test="ruleName != null and ruleName != ''">
             AND RULE_NAME like concat('%',concat(#{ruleName},'%'))

@@ -84,13 +84,10 @@
         <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
             and e.EVT_TYPE_ID = #{contactEvtTypeId}
         </if>
-        <if test="contactEvtTypeId != null and contactEvtTypeId != 0">
-                and e.EVT_CAMPAIGN_TYPE = #{eventCampaignType}
-        </if>
         <if test="contactEvtCode != null and contactEvtCode != ''">
             and e.EVENT_NBR LIKE CONCAT(CONCAT('%',#{contactEvtCode}),'%')
         </if>
-        <if test=" EVENT_MANAGE_TYPE!= null and EVENT_MANAGE_TYPE != ''">
+        <if test=" eventManageType!= null and eventManageType != ''">
             and e.EVENT_MANAGE_TYPE = #{eventManageType}
         </if>
         </where>
@@ -126,7 +123,8 @@
 
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
-        select <include refid="entity"/> from event        <where>1!=2
+         select * from event
+        <where>1!=2
         <if test="id != null and id != 0">
             and id = #{id}
         </if>
@@ -271,7 +269,7 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventById" resultMap="resultMapper">
-        select <include refid="entity"/> from event
+        select * from event
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </select>
 
@@ -432,7 +430,7 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventByEventNbr" resultMap="resultMapper" parameterType="java.lang.String">
-        select <include refid="entity"/> from event
+        select * from event
         where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
     </select>
 
@@ -489,7 +487,7 @@
 
 
     <select id="selectBatchByCode"  parameterType="java.util.List" resultMap="resultMapper">
-        select <include refid="entity"/> from event
+        select * from event
         where EVENT_NBR IN
         <foreach collection="contactEvtCodeList" index="index" item="item" open="(" separator="," close=")">
             #{item}

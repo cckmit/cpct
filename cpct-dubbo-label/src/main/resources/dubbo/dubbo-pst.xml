@@ -86,7 +86,7 @@
         <dubbo:method name="tarGrpTemplateCountAndIssue" servicecode="00.1083.tarGrpTemplateCountAndIssue" timeout="120000"/>
     </dubbo:reference>
 
-    <dubbo:service  interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
         <!-- 营销活动详情服务 -->
         <dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetailApi" timeout="10000"/>
     </dubbo:service>
@@ -103,11 +103,6 @@
         <dubbo:method name="importBlackListFile" servicecode="33.1083.importBlackListFile" timeout="10000"/>
     </dubbo:service>
 
-    <!--黑名单日志查询接口-->
-    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.BlackListLogService" ref="blackListLogServiceImpl"
-                   version="1.0">
-        <dubbo:method name="getBlackListLog" servicecode="33.1083.getBlackListLog" timeout="10000"/>
-    </dubbo:service>
     <!--集团openApi定时任务接口-->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.OpenApiScheService" ref="openApiScheServiceImpl"
                    version="1.0">

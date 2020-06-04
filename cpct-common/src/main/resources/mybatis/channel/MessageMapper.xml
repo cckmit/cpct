@@ -50,6 +50,5 @@
     select MESSAGE_ID, MESSAGE_NAME, MESSAGE_CODE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 
     CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
     from message
-    WHERE 1 != 2
   </select>
 </mapper>

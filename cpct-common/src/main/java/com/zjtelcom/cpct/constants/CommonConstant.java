@@ -1,13 +1,10 @@
 package com.zjtelcom.cpct.constants;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Description: CommonConstant
  * author: pengy
  * date: 2018/3/26 20:31
  */
-@Component
 public class CommonConstant {
 
     public static final String CODE_SUCCESS = "200"; //成功
