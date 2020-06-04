@@ -8,10 +8,8 @@ import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
-import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
@@ -187,7 +185,7 @@ public class EventApiController extends BaseController {
     @CrossOrigin
     public String eventInputSync(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
         // 打开日志开关
-        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "1");
+        redisUtils.set("SYSYTEM_ESLOG_STATUS", "1");
 
 
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
@@ -212,7 +210,7 @@ public class EventApiController extends BaseController {
             return JSON.toJSONString(resultMap);
         }
         // 关闭日志开关
-        redisUtils_prd.set("SYSYTEM_ESLOG_STATUS", "0");
+        redisUtils.set("SYSYTEM_ESLOG_STATUS", "0");
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMsg",result);
         return JSON.toJSONString(resultMap);

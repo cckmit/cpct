@@ -8,6 +8,6 @@ public interface CatalogService {
 
     Map<String,Object> listOfferByCatalogId(Long catalogId,String productName,Integer page,Integer pageSize);
 
-
+    Map<String,Object> listCatalogItemTree();
 
 }

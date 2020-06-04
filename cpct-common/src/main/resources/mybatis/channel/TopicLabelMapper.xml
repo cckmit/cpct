@@ -69,12 +69,12 @@
     UPDATE_DATE, REMARK, GRP_LABEL_CODE, PUB_FLG
     from label
   </select>
-  <select id="selectByLabelCode" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <select id="selectByLabelCode"  resultMap="BaseResultMap">
     select LABEL_ID, LABEL_CODE, LABEL_NAME, LABEL_DESC, LABEL_TYPE, LABEL_VALUE_TYPE,
     LABEL_DATA_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
     UPDATE_DATE, REMARK, GRP_LABEL_CODE, PUB_FLG
     from label
-    where LABEL_CODE = #{labelCode,jdbcType=BIGINT} and  LABEL_TYPE = 70
+    where LABEL_CODE = #{labelCode,jdbcType=VARCHAR} and  LABEL_TYPE = 70
   </select>
 
 
