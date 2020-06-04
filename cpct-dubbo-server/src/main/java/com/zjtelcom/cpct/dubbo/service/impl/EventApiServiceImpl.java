@@ -26,10 +26,7 @@ import com.zjpii.biz.serv.YzServ;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
-import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
-import com.zjtelcom.cpct.dao.event.ContactEvtMatchRulMapper;
-import com.zjtelcom.cpct.dao.event.EventMatchRulConditionMapper;
+import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
@@ -39,6 +36,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
+import com.zjtelcom.cpct.domain.event.CommonRegion;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -209,7 +207,8 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private OrgGridRelMapper orgGridRelMapper;
-
+    @Autowired
+    private CommonRegionMapper commonRegionMapper;
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
 
@@ -839,14 +838,14 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 /*
-                 * 满意度调查事件（受理）
-                 * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
-                 * 2、如果资产未绑定公众号，则判断联系号码是否绑定公众号，推送微厅，推送账号为联系号码
-                 * 3、如果上面2者都未绑定微厅，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
-                 * 4、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
-                 * 5、都不满足暂不推
-                 *
-                 * */
+                * 满意度调查事件（受理）
+                * 1、先根据资产查大数据标签判断是否绑定公众号，绑定则推送微厅，推送账号为业务号码
+                * 2、如果资产未绑定公众号，则判断联系号码是否绑定公众号，推送微厅，推送账号为联系号码
+                * 3、如果上面2者都未绑定微厅，判断采集项：资产类型是否为移动电话，是则推送短厅，推送账号为业务号码
+                * 4、如果采集项：资产类型不是移动电话，则判断联系电话是否为本网移动电话，是则推送短厅，推送账号为联系电话
+                * 5、都不满足暂不推
+                *
+                * */
                 if ("EVTS000001120".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
@@ -914,12 +913,12 @@ public class EventApiServiceImpl implements EventApiService {
 
 
                 /*
-                 * 满意度调查事件（装维）
-                 * 1、先判断测评业务号码是否绑定“浙江电信”微信公众号，绑定则推送微厅，推送账号为业务号码
-                 * 2、非绑定用户再根据联系电话判断是否有绑定，有则推联系号码，
-                 * 3、没有则通过联系电话推送到IVR
-                 *
-                 * */
+                * 满意度调查事件（装维）
+                * 1、先判断测评业务号码是否绑定“浙江电信”微信公众号，绑定则推送微厅，推送账号为业务号码
+                * 2、非绑定用户再根据联系电话判断是否有绑定，有则推联系号码，
+                * 3、没有则通过联系电话推送到IVR
+                *
+                * */
                 if ("EVTS000001121".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
@@ -974,6 +973,53 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
+                //103事件改造
+                if ("EVT0000000103".equals(eventCode)) {
+                    CacheResultObject<ProdInst>  prodInstCacheEntity = getProdInstCacheEntity(map.get("accNbr"));
+                    evtContent.put("addressDesc",prodInstCacheEntity.getResultObject().getAddressDesc());
+                    //获取c4
+                    String c4Name = "";
+                    Long commonRegionId = prodInstCacheEntity.getResultObject().getRegionId();
+                    CommonRegion commonRegion = commonRegionMapper.selectByPrimaryKey(commonRegionId);
+                    if(commonRegion != null){
+                        Long c4RegionId = commonRegion.getC4RegionId();
+                        if(c4RegionId != null){
+                            commonRegion = commonRegionMapper.selectByPrimaryKey(c4RegionId);
+                            if (commonRegion != null){
+                                c4Name = commonRegion.getRegionName();
+                            }
+                        }else {
+                            c4Name = commonRegion.getRegionName();
+                        }
+                        //如果字段为空，那么这个区域本身就是C4，如果不为空则取该字段值的区域名称为C4。
+                    }
+
+                    evtContent.put("c4",c4Name);
+                    log.info("addressDesc" + prodInstCacheEntity.getResultObject().getAddressDesc());
+                    log.info("c4" + c4Name);
+
+                    Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
+                    log.info("onlineMap" + onlineMap);
+
+                    log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    evtContent.put("400600000040", "");
+                    evtContent.put("400600000041", "");
+                    if (onlineMap.get("wgbm")!=null){
+                        String wgbm = (String) onlineMap.get("wgbm");
+                        Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
+                        if (c3AndC4Map!=null && c3AndC4Map.get("c3")!=null && c3AndC4Map.get("c4")!=null){
+                            String c3Str = (String) c3AndC4Map.get("c3");
+                            String c4Str = (String) c3AndC4Map.get("c4");
+                            evtContent.put("400600000040", c3Str);
+                            evtContent.put("400600000041", c4Str);
+                        }
+                    }
+                    reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+                }
+
 
                 if ("EVT0000000103".equals(eventCode)) {
                     boolean isCommLvl5 = false;
@@ -1512,6 +1558,27 @@ public class EventApiServiceImpl implements EventApiService {
         }
     }
 
+private CacheResultObject<ProdInst> getProdInstCacheEntity(String accNbr){
+    CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
+    //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
+    if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
+        Long mainOfferInstId = null;
+        Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+        for (String prodInstId : prodInstIds) {
+            CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
+            log.info("555---prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
+            if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null) {
+                ProdInst prodInst = prodInstCacheEntity.getResultObject();
+                log.info("666---prodInst --->" + JSON.toJSONString(prodInst));
+                //1429768   WIRED_NBR("INT-MAN-0010"),//宽带
+                //1429838    ITV_NBR("OTH-MAN-0034"),//itv
+                if (prodInst != null && (prodInst.getProdId() == 1429768L || prodInst.getProdId() == 1429838L)) {
+                    //todo
+                    return prodInstCacheEntity;
+                }
+            }
+        }
+}
 
     public static String cpcLabel(Label label, String type, String rightParam) {
         StringBuilder express = new StringBuilder();

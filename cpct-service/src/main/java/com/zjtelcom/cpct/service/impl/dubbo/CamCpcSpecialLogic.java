@@ -37,16 +37,21 @@ public class CamCpcSpecialLogic {
             String c4 = "";
             if ("EVT0000000101".equals(eventCode)) {
                 c4 = context.get("400600000014").toString();
-            } else {
+            } else if ("EVT0000000102".equals(eventCode)) {
                 c4 = context.get("400600000026").toString();
+            }else{
+                c4 = context.get("c4Name").toString();
             }
             // 详细地址
             String addr = "";
-            if (context.get("400600000019") == null || context.get("400600000019").toString().equals("") ) {
+            if ("EVT0000000102".equals(eventCode) && context.get("400600000016") != null ) {
                 addr = context.get("400600000016").toString();
-            } else {
+            } else if("EVT0000000101".equals(eventCode) && context.get("400600000019") != null){
                 addr = context.get("400600000019").toString();
+            }else if(context.get("addressDesc") != null){
+                addr = context.get("addressDesc").toString();
             }
+
             // 本地网标识
             String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
             logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);

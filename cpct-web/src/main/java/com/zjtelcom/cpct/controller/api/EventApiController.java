@@ -4,6 +4,7 @@ package com.zjtelcom.cpct.controller.api;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
@@ -12,6 +13,7 @@ import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
+import com.zjtelcom.cpct.service.event.MktOfferEventService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -67,7 +69,11 @@ public class EventApiController extends BaseController {
     private OpenCampaignScheService openCampaignScheService;
     @Autowired
     private OpenApiScheService openApiScheService;
+    @Autowired
+    private MktOfferEventService mktOfferEventService;
 
+    @Autowired
+    private CommonConstant commonConstant;
 
     @PostMapping("scheForDay")
     public  Map<String,Object> openCampaignScheForDay() {
@@ -283,6 +289,18 @@ public class EventApiController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap = eventInstService.queryEventInstLog(params);
         return JSON.toJSONString(resultMap);
+    }
+
+    /*协同销售品获取事件列表*/
+    @RequestMapping(value = "/getEventListByOffer",method = RequestMethod.POST)
+    public Map<String,Object> getEventListByOffer(@RequestBody Map<String,Object> paramMap){
+        Map<String,Object> result = new HashMap<>();
+        try{
+            result = mktOfferEventService.getEventListByOffer(paramMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  result;
     }
 
 }

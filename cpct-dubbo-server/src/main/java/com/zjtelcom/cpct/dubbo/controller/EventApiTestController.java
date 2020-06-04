@@ -3,14 +3,17 @@ package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamEvtRelDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.event.MktOfferEventDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 import com.zjtelcom.cpct.dto.campaign.MktCampaign;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService;
+import com.zjtelcom.cpct.dubbo.service.MktOfferEventService;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
@@ -55,6 +58,13 @@ public class EventApiTestController {
 
     @Autowired
     private MktCampaignService mktCampaignService;
+
+    @Autowired
+    private MktOfferEventService mktOfferEventService;
+
+    @Autowired
+    private CommonConstant commonConstant;
+
     @PostMapping(value = "/testIssuedSuccessMktCheck")
     @CrossOrigin
     public void testIssuedSuccessMktCheck() {
@@ -245,5 +255,16 @@ public class EventApiTestController {
         return JSON.toJSONString(result);
     }
 
+    /*协同销售品获取事件列表*/
+    @RequestMapping(value = "/getEventListByOffer",method = RequestMethod.POST)
+    public Map<String,Object> getEventListByOffer(@RequestBody Map<String,Object> paramMap){
+        Map<String,Object> result = new HashMap<>();
+        try{
+            result = mktOfferEventService.getEventListByOffer(paramMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  result;
+    }
 
 }

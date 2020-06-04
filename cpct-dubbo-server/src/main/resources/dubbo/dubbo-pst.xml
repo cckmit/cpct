@@ -172,4 +172,16 @@
         <!--联系号码查询是否绑定微厅-->
         <dubbo:method name="getAssetByTelFourYN" servicecode="00.1083.getAssetByTelFourYN" timeout="120000"/>
     </dubbo:reference>
+
+    <!-- 线上扫码、电话到家特殊逻辑 -->
+    <dubbo:reference registry="esb3" interface="com.ccssoft.interfaceplatform.zj.module.service.ISaleService" id="iSaleService" version="1.0" check="false">
+        <dubbo:method name="queryCoverIdByAddr" servicecode="33.1103.queryCoverIdByAddr"/>
+        <dubbo:method name="queryResCoverInfoService" servicecode="33.1103.queryResCoverInfoService"/>
+    </dubbo:reference>
+
+<!--    根据销售品编码获取事件列表-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktOfferEventService" ref="MktOfferEventServiceImpl" version="1.0" >
+        <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
+    </dubbo:service>
+
 </beans>
