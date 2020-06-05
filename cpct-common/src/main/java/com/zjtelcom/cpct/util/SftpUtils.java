@@ -1,10 +1,15 @@
 package com.zjtelcom.cpct.util;
 
 import com.jcraft.jsch.*;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Base64Utils;
 
 import java.io.*;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +25,56 @@ import java.util.Vector;
  */
 public class SftpUtils {
     private Logger logger = LoggerFactory.getLogger(SftpUtils.class);
+
+
+    public  FTPClient ftpConnect ( String hostname,  int port,  String username,  String password) {
+        final FTPClient ftpClient = new FTPClient();
+        boolean connect = true;
+        try {
+            ftpClient.connect(hostname, port);
+            connect = ftpClient.login(username, password);
+            logger.info("-----" + connect);
+        } catch (SocketException e) {
+            logger.error("connect ftp failed", e);
+            connect = false;
+        } catch (IOException e) {
+            logger.error("login ftp failed", e);
+            connect = false;
+        }
+        return ftpClient;
+    }
+
+    public  boolean ftpDisConnect (FTPClient ftpClient ) {
+        boolean connect = false;
+        if (ftpClient != null) {
+            try {
+                ftpClient.disconnect();
+                connect = true;
+            } catch (IOException e) {
+                logger.error("ftp disconnect failed", e);
+            }
+        }
+        return connect;
+    }
+
+    public static boolean ftpUploadFile( FTPClient ftp ,String tempPath, String filename, InputStream input) {
+        boolean result = false;
+        try {
+            ftp.changeWorkingDirectory(tempPath);
+            //设置上传文件的类型为二进制类型
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+            //上传文件
+            if (!ftp.storeFile(filename, input)) {
+                return result;
+            }
+            input.close();
+            result = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 
     /**
      * 连接sftp服务器

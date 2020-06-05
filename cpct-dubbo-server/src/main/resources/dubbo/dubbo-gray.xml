@@ -166,6 +166,10 @@
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
         <dubbo:method name="msg2ESLogProducer" servicecode="00.1083.msg2ESLogProducer" timeout="120000"/>
     </dubbo:reference>
+    <!--    根据销售品编码获取事件列表-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktOfferEventService" ref="MktOfferEventServiceImpl" version="2.0" >
+        <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
+    </dubbo:service>
 
     <dubbo:reference registry="esb3" interface="com.zjtelcom.es.es.service.EsServiceInfo" id="esServiceInfoImpl" version="2.0" check="false">
         <!--联系号码查询是否绑定微厅-->

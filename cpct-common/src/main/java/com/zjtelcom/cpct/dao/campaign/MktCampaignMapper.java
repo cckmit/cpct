@@ -114,4 +114,7 @@ public interface MktCampaignMapper {
 
     String getCloseRuleNameFromMktCamId(Long mktCampaignId);
 
+
+    List<MktCampaignDO> listByCreateDate(@Param("createDateStart") Date createDateStart,@Param("createDateEnd") Date createDateEnd);
+
 }

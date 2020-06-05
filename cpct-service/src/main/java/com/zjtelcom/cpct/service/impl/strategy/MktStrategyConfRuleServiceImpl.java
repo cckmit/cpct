@@ -257,10 +257,12 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktCamGrpRulMapper.insert(mktCamGrpRul);
 
                 // 更新客户分群名字为规则名称
-                TarGrp tarGrp = new TarGrp();
-                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
-                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
-                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRule.getTarGrpId());
+                if (tarGrp!=null){
+                    tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                    tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                    tarGrpMapper.modTarGrp(tarGrp);
+                }
             }
 
             //如果是增存量联动并且是导入的用户分群模板 创建试算记录
@@ -380,8 +382,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
         String evtContactConfIds = "";
         try {
             if(mktStrategyConfRule.getTarGrpId()!=null){
-
-/*
                 MktCamGrpRul camGrpRul = mktCamGrpRulMapper.selectByTarGrpId(mktStrategyConfRule.getTarGrpId());
                 if (camGrpRul == null) {
                     //添加mkt_cam_grp_rul表
@@ -402,13 +402,13 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                     mktCamGrpRul.setUpdateStaff(UserUtil.loginId());
                     mktCamGrpRulMapper.insert(mktCamGrpRul);
                 }
-
-*/
                 // 更新客户分群名字为规则名称
-                TarGrp tarGrp = new TarGrp();
-                tarGrp.setTarGrpId(mktStrategyConfRule.getTarGrpId());
-                tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
-                tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(mktStrategyConfRule.getTarGrpId());
+                if (tarGrp!=null){
+                    tarGrp.setTarGrpName(mktStrategyConfRule.getMktStrategyConfRuleName());
+                    tarGrp.setTarGrpDesc(mktStrategyConfRule.getMktStrategyConfRuleName());
+                    tarGrpMapper.modTarGrp(tarGrp);
+                }
             }
             MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfRuleDO, mktStrategyConfRule);

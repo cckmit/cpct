@@ -62,7 +62,18 @@
         <dependency>
             <groupId>com.zjtelcom.cpct</groupId>
             <artifactId>cpct-trial</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.8</version>
+        </dependency>
+        <!--blackListService cpct-trial 1.0.7jar包-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjtelcom.cpct</groupId>-->
+            <!--<artifactId>cpct-blackservice</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.zjtelcom.cpct</groupId>
+            <artifactId>cpct-openApi-out</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.ctg.dtts</groupId>

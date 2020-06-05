@@ -19,16 +19,14 @@ import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
-import com.zjtelcom.cpct.dao.channel.DisplayColumnLabelMapper;
-import com.zjtelcom.cpct.dao.channel.MktVerbalMapper;
-import com.zjtelcom.cpct.dao.channel.ObjMktCampaignRelMapper;
-import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
+import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -102,6 +100,7 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
+
 
     // 集团活动承接接口
     @Override
@@ -212,6 +211,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_es redisUtils_es;
 
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
@@ -322,6 +323,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private EventRedisService eventRedisService;
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
+    @Autowired
+    private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -544,6 +549,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             mktCampaignDO.setInitId(mktCampaignId);
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+            //创建主题关系
+            topicLabelRel(mktCampaignId, mktCampaignDO);
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.ADD.getOperatorValue());
 
@@ -727,6 +734,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+
+            //创建主题关系
+            if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())){
+                objectLabelRelMapper.deleteByObjId(mktCampaignDO.getMktCampaignId());
+                TopicLabel label = topicLabelMapper.selectByLabelCode(mktCampaignDO.getTheMe());
+                if (label!=null){
+                    ObjectLabelRel objectLabelRel = new ObjectLabelRel();
+                    objectLabelRel.setCreateDate(new Date());
+                    objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                    objectLabelRel.setObjId(mktCampaignDO.getMktCampaignId());
+                    objectLabelRel.setLabelId(label.getLabelId());
+                    objectLabelRel.setObjType("1900");
+                    objectLabelRel.setStatusCd("1000");
+                    objectLabelRel.setUpdateDate(new Date());
+                    objectLabelRelMapper.insert(objectLabelRel);
+                }
+            }
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             MktCampaignDO campaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignId);
             // 记录活动操作
@@ -1420,6 +1444,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCamChlConfAttrMapper.updateByPrimaryKeyBatch(mktCamChlConfAttrDOList);
 
             campaignDO.setPlanEndTime(lastTime);
+            campaignDO.setStatusCd(StatusCode.STATUS_CODE_PUBLISHED.getStatusCode());
             mktCampaignMapper.updateByPrimaryKey(campaignDO);
             //redisUtils.del("MKT_CAMPAIGN_" + campaignId);
 
@@ -2160,7 +2185,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     // initId
                     mktCampaignDO.setInitId(childMktCampaignId);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-
+                    //创建主题关系
+                    topicLabelRel(mktCampaignId, mktCampaignDO);
                     childMktCampaignIdList.add(childMktCampaignId);
                     // 与父活动进行关联
                     MktCampaignRelDO mktCampaignRelDO = new MktCampaignRelDO();
@@ -2270,6 +2296,24 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMap.put("resultMsg", "发布活动失败！");
         }
         return mktCampaignMap;
+    }
+
+    private void topicLabelRel(Long mktCampaignId, MktCampaignDO mktCampaignDO) {
+        //创建主题关系
+        if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())){
+            TopicLabel label = topicLabelMapper.selectByLabelCode(mktCampaignDO.getTheMe());
+            if (label!=null){
+                ObjectLabelRel objectLabelRel = new ObjectLabelRel();
+                objectLabelRel.setCreateDate(new Date());
+                objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                objectLabelRel.setObjId(mktCampaignId);
+                objectLabelRel.setLabelId(label.getLabelId());
+                objectLabelRel.setObjType("1900");
+                objectLabelRel.setStatusCd("1000");
+                objectLabelRel.setUpdateDate(new Date());
+                objectLabelRelMapper.insert(objectLabelRel);
+            }
+        }
     }
 
     private void UserListTemp(Long mktCampaignId, MktCampaignDO mktCampaignDO) {
@@ -2712,8 +2756,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (mktStrategyFilterRuleRelDOList != null && !mktStrategyFilterRuleRelDOList.isEmpty()) {
                 mktStrategyFilterRuleRelMapper.insertBatch(mktStrategyFilterRuleRelDOList);
             }
-
-
             // 获取关单规则集合
             List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(parentMktCampaignId);
             List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = new ArrayList<>();
@@ -2870,7 +2912,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             // 柱状图
             List<Map> cityList = new ArrayList<>();
             // 营销活动
-            paramMap.put("mktCampaignType", "(1000, 2000, 3000, 4000)");
+            paramMap.put("mktCampaignType", "(1000, 2000, 3000, 4000,7000)");
             int marketingCount = mktCampaignMapper.countByStatus(paramMap);
             Map<String, Object> marketingCountMap = new HashMap<>();
             marketingCountMap.put("count", marketingCount);
@@ -2995,7 +3037,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
-                        String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                        String sendContent =
+                                "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                         logger.info(sendContent);
                         if (lanId != null && lanId != 1) {
                             String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());

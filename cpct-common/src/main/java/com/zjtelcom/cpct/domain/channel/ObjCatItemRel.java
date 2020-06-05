@@ -30,6 +30,17 @@ public class ObjCatItemRel implements Serializable {
 
     private String catalogItemNbr;
 
+    private String catalogItemName;
+
+
+    public String getCatalogItemName() {
+        return catalogItemName;
+    }
+
+    public void setCatalogItemName(String catalogItemName) {
+        this.catalogItemName = catalogItemName;
+    }
+
     public Long getRelId() {
         return relId;
     }

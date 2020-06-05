@@ -173,6 +173,36 @@ public class RedisUtils {
      * @param value
      * @return
      */
+    public boolean setRedisUnit(final String key, Object value,int seconds) {
+        boolean result = false;
+
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.set(key, serialize(value));
+                jedis.expire(key,seconds);
+                result = true;
+            } catch (Throwable je) {
+                System.out.println("REDIS*********" + key);
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIS2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @param value
+     * @return
+     */
     public boolean setRedis(final String key, Object value) {
         boolean result = false;
 

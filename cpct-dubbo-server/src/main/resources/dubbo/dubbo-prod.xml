@@ -102,7 +102,7 @@
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiSerService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="15000"/>
-        <dubbo:method name="ActivityXieTongTask" servicecode="00.1083.ActivityXieTongTask" timeout="20000"/>
+        <dubbo:method name="ActivityXieTongTask" servicecode="00.1083.ActivityXieTongTask" timeout="20000"/>   
     </dubbo:reference>
 
 
@@ -186,4 +186,10 @@
         <dubbo:method name="queryCoverIdByAddr" servicecode="33.1103.queryCoverIdByAddr"/>
         <dubbo:method name="queryResCoverInfoService" servicecode="33.1103.queryResCoverInfoService"/>
     </dubbo:reference>
+
+    <!--    根据销售品编码获取事件列表-->
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktOfferEventService" ref="MktOfferEventServiceImpl" version="1.0" >
+        <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
+    </dubbo:service>
+
 </beans>

@@ -1286,4 +1286,13 @@
         SELECT c.CLOSE_NAME FROM mkt_campaign m LEFT JOIN mkt_strategy_close_rule_rel ms ON m.MKT_CAMPAIGN_ID = ms.STRATEGY_ID
             LEFT JOIN close_rule c ON ms.RULE_ID = c.RULE_ID WHERE m.MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
+
+    <select id="listByCreateDate" resultMap="BaseResultMap">
+        select MKT_CAMPAIGN_ID
+        from mkt_campaign
+        where CREATE_DATE > #{createDateStart} and  #{createDateEnd} > CREATE_DATE
+        AND (STATUS_CD = 2002 or STATUS_CD = 2008)
+    </select>
+
+
 </mapper>

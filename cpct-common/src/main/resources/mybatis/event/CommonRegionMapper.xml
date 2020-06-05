@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.event.CommonRegionMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.event.CommonRegion">
+        <id column="common_region_id" jdbcType="BIGINT" property="commonRegionId" />
+        <result column="par_region_id" jdbcType="BIGINT" property="parRegionId" />
+        <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+        <result column="region_py_name" jdbcType="VARCHAR" property="regionPyName" />
+        <result column="region_nbr" jdbcType="VARCHAR" property="regionNbr" />
+        <result column="region_type" jdbcType="VARCHAR" property="regionType" />
+        <result column="region_desc" jdbcType="VARCHAR" property="regionDesc" />
+        <result column="region_level" jdbcType="BIGINT" property="regionLevel" />
+        <result column="region_sort" jdbcType="BIGINT" property="regionSort" />
+        <result column="province_nbr" jdbcType="VARCHAR" property="provinceNbr" />
+        <result column="city_flag" jdbcType="VARCHAR" property="cityFlag" />
+        <result column="status_cd" jdbcType="VARCHAR" property="statusCd" />
+        <result column="create_staff" jdbcType="BIGINT" property="createStaff" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="status_date" jdbcType="TIMESTAMP" property="statusDate" />
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="C4_REGION_ID" jdbcType="BIGINT" property="c4RegionId" />
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from common_region
+        where common_region_id = #{commonRegionId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.event.CommonRegion">
+        insert into common_region (common_region_id, par_region_id, region_name,
+        region_py_name, region_nbr, region_type,
+        region_desc, region_level, region_sort,
+        province_nbr, city_flag, status_cd,
+        create_staff, UPDATE_STAFF, create_date,
+        status_date, update_date, remark,
+        C4_REGION_ID)
+        values (#{commonRegionId,jdbcType=BIGINT}, #{parRegionId,jdbcType=BIGINT}, #{regionName,jdbcType=VARCHAR},
+        #{regionPyName,jdbcType=VARCHAR}, #{regionNbr,jdbcType=VARCHAR}, #{regionType,jdbcType=VARCHAR},
+        #{regionDesc,jdbcType=VARCHAR}, #{regionLevel,jdbcType=BIGINT}, #{regionSort,jdbcType=BIGINT},
+        #{provinceNbr,jdbcType=VARCHAR}, #{cityFlag,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR},
+        #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+        #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},
+        #{c4RegionId,jdbcType=BIGINT})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.event.CommonRegion">
+        update common_region
+        set par_region_id = #{parRegionId,jdbcType=BIGINT},
+        region_name = #{regionName,jdbcType=VARCHAR},
+        region_py_name = #{regionPyName,jdbcType=VARCHAR},
+        region_nbr = #{regionNbr,jdbcType=VARCHAR},
+        region_type = #{regionType,jdbcType=VARCHAR},
+        region_desc = #{regionDesc,jdbcType=VARCHAR},
+        region_level = #{regionLevel,jdbcType=BIGINT},
+        region_sort = #{regionSort,jdbcType=BIGINT},
+        province_nbr = #{provinceNbr,jdbcType=VARCHAR},
+        city_flag = #{cityFlag,jdbcType=VARCHAR},
+        status_cd = #{statusCd,jdbcType=VARCHAR},
+        create_staff = #{createStaff,jdbcType=BIGINT},
+        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+        status_date = #{statusDate,jdbcType=TIMESTAMP},
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+        remark = #{remark,jdbcType=VARCHAR},
+        C4_REGION_ID = #{c4RegionId,jdbcType=BIGINT}
+        where common_region_id = #{commonRegionId,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select common_region_id, par_region_id, region_name, region_py_name, region_nbr,
+        region_type, region_desc, region_level, region_sort, province_nbr, city_flag, status_cd,
+        create_staff, UPDATE_STAFF, create_date, status_date, update_date, remark, C4_REGION_ID
+        from common_region
+        where common_region_id = #{commonRegionId,jdbcType=BIGINT}
+    </select>
+    <select id="selectByC4RegionId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select common_region_id, par_region_id, region_name, region_py_name, region_nbr,
+        region_type, region_desc, region_level, region_sort, province_nbr, city_flag, status_cd,
+        create_staff, UPDATE_STAFF, create_date, status_date, update_date, remark, C4_REGION_ID
+        from common_region
+        where c4_region_id = #{c4RegionId,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select common_region_id, par_region_id, region_name, region_py_name, region_nbr,
+        region_type, region_desc, region_level, region_sort, province_nbr, city_flag, status_cd,
+        create_staff, UPDATE_STAFF, create_date, status_date, update_date, remark, C4_REGION_ID
+        from common_region
+    </select>
+
+
+</mapper>

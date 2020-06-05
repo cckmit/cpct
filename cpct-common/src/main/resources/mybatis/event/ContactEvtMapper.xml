@@ -28,6 +28,7 @@
         <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
         <result column="TOP_CAMPAIGN_NUM" jdbcType="BIGINT" property="topCampaignNum" />
+        <result column="EVENT_MANAGE_TYPE" jdbcType="VARCHAR" property="eventManageType" />
     </resultMap>
 
     <sql id="entity">EVENT_ID,
@@ -54,7 +55,8 @@
         UPDATE_DATE,
         REC_CAMPAIGN_AMOUNT,
         REMARK,
-        TOP_CAMPAIGN_NUM
+        TOP_CAMPAIGN_NUM,
+        EVENT_MANAGE_TYPE
         </sql>
 
     <sql id="eventJoin">
@@ -71,7 +73,8 @@
         e.EVENT_DESC contactEvtDesc,
         t.EVT_TYPE_NAME contactEvtTypeName,
         e.STATUS_CD statusCd,
-        e.TOP_CAMPAIGN_NUM topCampaignNum
+        e.TOP_CAMPAIGN_NUM topCampaignNum,
+        e.EVENT_MANAGE_TYPE eventManageType
         from event e
         <include refid="eventJoin"/>
         <where>1!=2
@@ -83,6 +86,9 @@
         </if>
         <if test="contactEvtCode != null and contactEvtCode != ''">
             and e.EVENT_NBR LIKE CONCAT(CONCAT('%',#{contactEvtCode}),'%')
+        </if>
+        <if test=" eventManageType!= null and eventManageType != ''">
+            and e.EVENT_MANAGE_TYPE = #{eventManageType}
         </if>
         </where>
         ORDER BY e.UPDATE_DATE DESC
@@ -117,7 +123,7 @@
 
     <!--查询方法(只设置id与name两个查询条件)-->
     <select id="query" resultMap="resultMapper">
-        select * from event
+         select * from event
         <where>1!=2
         <if test="id != null and id != 0">
             and id = #{id}
@@ -200,7 +206,8 @@
         UPDATE_DATE,
         REC_CAMPAIGN_AMOUNT,
         TOP_CAMPAIGN_NUM,
-        REMARK)
+        REMARK,
+        EVENT_MANAGE_TYPE)
         values (
         #{interfaceCfgId,jdbcType=BIGINT},
         #{contactEvtCode,jdbcType=VARCHAR},
@@ -225,7 +232,8 @@
         #{updateDate,jdbcType=TIMESTAMP},
         #{recCampaignAmount,jdbcType=VARCHAR},
         #{topCampaignNum,jdbcType=BIGINT},
-        #{remark,jdbcType=VARCHAR})
+        #{remark,jdbcType=VARCHAR},
+        #{eventManageType,jdbcType=VARCHAR})
     </insert>
 
     <!--更新操作-->

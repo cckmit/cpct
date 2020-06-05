@@ -13,6 +13,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -53,6 +54,27 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private MktCampaignApiService mktCampaignApiService;
+
+    @Autowired
+    private CatalogService catalogService;
+
+
+    /**
+     * 营销活动目录
+     *
+     * @return
+     */
+    @PostMapping("/listCatalogItemTree")
+    @CrossOrigin
+    public Map<String, Object> listCatalogItemTree(){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = catalogService.listCatalogItemTree();
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
 
 
 
