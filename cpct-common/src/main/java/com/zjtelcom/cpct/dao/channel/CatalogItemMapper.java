@@ -25,4 +25,6 @@ public interface CatalogItemMapper {
     List<CatalogItem> selectByParentId(@Param("parentId")Long parentId);
 
     int updateByPrimaryKey(CatalogItem record);
+
+    CatalogItem selectByCatlogItemCode(String catalogItemCode);
 }

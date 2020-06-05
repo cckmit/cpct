@@ -909,10 +909,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             if(itemRelEntities != null && itemRelEntities.size() > 0){
                 OpenMktObjCatItemRelEntity openMktObjCatItemRelEntity1 = itemRelEntities.get(0);
                 final ObjCatItemRel objCatItemRel = BeanUtil.create(openMktObjCatItemRelEntity1, new ObjCatItemRel());
-                objCatItemRel.setRelId(null);
+
                 objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
                 objCatItemRel.setCreateDate(new Date());
-                CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(Long.valueOf(openMktObjCatItemRelEntity1.getCatalogItemId()));
+                CatalogItem catalogItem = catalogItemMapper.selectByCatlogItemCode(openMktObjCatItemRelEntity1.getCatalogItemNbr());
                 if (catalogItem != null) {
                     objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
                 }
@@ -924,7 +924,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 objCatItemRelMapper.insert(objCatItemRel);
             }
             //新增主题
-            List<OpenMktObjectLabelRelEntity> labelRelEntities = openMktCampaignEntity.getObjectLabelRelEntities();
+            List<OpenMktObjectLabelRelEntity> labelRelEntities = openMktCampaignEntity.getObjectLabelRels();
             if(labelRelEntities != null && labelRelEntities.size() > 0){
                 OpenMktObjectLabelRelEntity openMktObjectLabelRelEntity = labelRelEntities.get(0);
                 ObjectLabelRel objectLabelRel = BeanUtil.create(openMktObjectLabelRelEntity, new ObjectLabelRel());
@@ -936,7 +936,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 objectLabelRel.setStatusDate(new Date());
                 objectLabelRel.setUpdateDate(new Date());
                 objectLabelRelMapper.insert(objectLabelRel);
-                TopicLabel topicLabel = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
+                TopicLabel topicLabel = topicLabelMapper.selectByLabelCode(openMktObjectLabelRelEntity.getLabelCode());
                 if (topicLabel!=null){
                     List<TopicDO> topicLists = mktCamTopicMapper.selectByKey(null,null,null,topicLabel.getLabelCode());
                     if (!topicLists.isEmpty()){

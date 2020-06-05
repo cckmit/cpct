@@ -18,7 +18,11 @@
     delete from obj_cat_item_rel
     where REL_ID = #{relId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjCatItemRel">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjCatItemRel"
+          useGeneratedKeys="true" keyProperty="relId" keyColumn="REL_ID">
+    <selectKey keyColumn="relId" keyProperty="relId" order="BEFORE" resultType="Long">
+      select smt_bss_cpc_sftt_sequence.nextval
+    </selectKey>
     insert into obj_cat_item_rel (REL_ID, OBJ_TYPE, OBJ_ID, 
       CATALOG_ITEM_ID, STATUS_CD, CREATE_STAFF, 
       UPDATE_STAFF, CREATE_DATE, STATUS_DATE, 

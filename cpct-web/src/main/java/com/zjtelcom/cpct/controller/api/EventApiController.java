@@ -13,9 +13,9 @@ import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
+import com.zjtelcom.cpct.service.channel.EventRelService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
-import com.zjtelcom.cpct.service.event.MktOfferEventService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -72,7 +72,7 @@ public class EventApiController extends BaseController {
     @Autowired
     private OpenApiScheService openApiScheService;
     @Autowired
-    private MktOfferEventService mktOfferEventService;
+    private EventRelService mktOfferEventService;
 
     @Autowired
     private CommonConstant commonConstant;

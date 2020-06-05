@@ -12,7 +12,7 @@ public class OpenMktObjectLabelRelEntity {
 
     private  String labelValue; //标签值
 
-    private Long objType; //对象类型
+    private String objType; //对象类型
 
     private Long objId; //对象标识
 
@@ -60,11 +60,11 @@ public class OpenMktObjectLabelRelEntity {
         this.labelValue = labelValue;
     }
 
-    public Long getObjType() {
+    public String getObjType() {
         return objType;
     }
 
-    public void setObjType(Long objType) {
+    public void setObjType(String objType) {
         this.objType = objType;
     }
 

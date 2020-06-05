@@ -20,7 +20,11 @@
     delete from object_label_rel
     where OBJECT_LABEL_REL_ID = #{objectLabelRelId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjectLabelRel">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.ObjectLabelRel"
+          useGeneratedKeys="true" keyProperty="objectLabelRelId" keyColumn="OBJECT_LABEL_REL_ID">
+    <selectKey keyColumn="objectLabelRelId" keyProperty="objectLabelRelId" order="BEFORE" resultType="Long">
+      select smt_bss_cpc_sftt_sequence.nextval
+    </selectKey>
     insert into object_label_rel (OBJECT_LABEL_REL_ID, LABEL_ID, LABEL_VALUE_ID, 
       LABEL_VALUE, OBJ_TYPE, OBJ_ID, 
       STATUS_CD, CREATE_STAFF, UPDATE_STAFF, 

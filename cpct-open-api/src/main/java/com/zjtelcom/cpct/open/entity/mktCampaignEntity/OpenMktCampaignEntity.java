@@ -65,7 +65,7 @@ public class OpenMktCampaignEntity {
     //
     private List<OpenMktObjCatItemRelEntity> objCatItemRels;
     //
-    private List<OpenMktObjectLabelRelEntity> objectLabelRelEntities;
+    private List<OpenMktObjectLabelRelEntity> objectLabelRels;
 
 
 
@@ -80,12 +80,13 @@ public class OpenMktCampaignEntity {
         this.objCatItemRels = objCatItemRels;
     }
 
-    public List<OpenMktObjectLabelRelEntity> getObjectLabelRelEntities() {
-        return objectLabelRelEntities;
+
+    public List<OpenMktObjectLabelRelEntity> getObjectLabelRels() {
+        return objectLabelRels;
     }
 
-    public void setObjectLabelRelEntities(List<OpenMktObjectLabelRelEntity> objectLabelRelEntities) {
-        this.objectLabelRelEntities = objectLabelRelEntities;
+    public void setObjectLabelRels(List<OpenMktObjectLabelRelEntity> objectLabelRels) {
+        this.objectLabelRels = objectLabelRels;
     }
 
     public String getActType() {
