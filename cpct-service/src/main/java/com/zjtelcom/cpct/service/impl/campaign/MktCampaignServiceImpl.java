@@ -3037,8 +3037,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                         Long lanId = mktCampaignDO.getLanId();
                         // TODO  调用发送短信接口
-                        String sendContent =
-                                "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
+                        String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）即将到期，且活动不可再延期，到期后即失效。如需继续活动内容，请新建活动！";
                         logger.info(sendContent);
                         if (lanId != null && lanId != 1) {
                             String resultMsg = uccpService.sendShortMessage(sysUserCode, sendContent, lanId.toString());

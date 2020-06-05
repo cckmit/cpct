@@ -33,6 +33,17 @@ public class ObjectLabelRel {
 
     private String objNbr;
 
+    private String labelCode;
+
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
+    }
+
     public String getLabelName() {
         return labelName;
     }

@@ -443,6 +443,7 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
                 if (label!=null){
                     objectLabelRel.setLabelName(label.getLabelName());
+                    objectLabelRel.setLabelCode(label.getLabelCode());
                 }
             }
             return this;

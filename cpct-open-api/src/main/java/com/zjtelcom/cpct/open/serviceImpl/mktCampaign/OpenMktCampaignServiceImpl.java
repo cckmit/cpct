@@ -909,7 +909,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             if(itemRelEntities != null && itemRelEntities.size() > 0){
                 OpenMktObjCatItemRelEntity openMktObjCatItemRelEntity1 = itemRelEntities.get(0);
                 final ObjCatItemRel objCatItemRel = BeanUtil.create(openMktObjCatItemRelEntity1, new ObjCatItemRel());
-
+                objCatItemRel.setCatalogItemId(Long.valueOf(openMktObjCatItemRelEntity1.getCatalogItemId()));
                 objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
                 objCatItemRel.setCreateDate(new Date());
                 CatalogItem catalogItem = catalogItemMapper.selectByCatlogItemCode(openMktObjCatItemRelEntity1.getCatalogItemNbr());
