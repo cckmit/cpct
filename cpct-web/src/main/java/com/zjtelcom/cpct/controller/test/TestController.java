@@ -376,7 +376,7 @@ public class TestController extends BaseController {
 
     @PostMapping("onlineScanCodeOrCallPhone4Home")
     @CrossOrigin
-    public String onlineScanCodeOrCallPhone4Home(@RequestBody  Map<String, Object> params) {
+    public Map<String, Object> onlineScanCodeOrCallPhone4Home(@RequestBody  Map<String, Object> params) {
         return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params, params.get("eventCode").toString(),params.get("lanId").toString());
     }
 

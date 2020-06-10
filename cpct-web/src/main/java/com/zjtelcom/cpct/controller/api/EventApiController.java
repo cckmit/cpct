@@ -4,17 +4,21 @@ package com.zjtelcom.cpct.controller.api;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IContactTaskReceiptService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
+import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
+import com.zjtelcom.cpct.service.channel.EventRelService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +52,8 @@ public class EventApiController extends BaseController {
     private MktCamEvtRelMapper evtRelMapper;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedisUtils_prd redisUtils_prd;
     @Autowired(required = false)
     private SynchronizeCampaignService synchronizeCampaignService;
     @Autowired
@@ -60,6 +66,23 @@ public class EventApiController extends BaseController {
 
     @Autowired(required = false)
     private EventInstService eventInstService;
+    @Autowired
+    private OpenCampaignScheService openCampaignScheService;
+    @Autowired
+    private EventRelService mktOfferEventService;
+
+
+
+    @PostMapping("openCampaignScheForDay")
+    public  Map<String,Object> openCampaignScheForDay(@RequestBody Map<String,String> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = openCampaignScheService.openCampaignScheForDay(Long.valueOf(param.get("campaignId")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("caculateTest")
@@ -243,6 +266,18 @@ public class EventApiController extends BaseController {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap = eventInstService.queryEventInstLog(params);
         return JSON.toJSONString(resultMap);
+    }
+
+    /*协同销售品获取事件列表*/
+    @RequestMapping(value = "/getEventListByOffer",method = RequestMethod.POST)
+    public Map<String,Object> getEventListByOffer(@RequestBody Map<String,Object> paramMap){
+        Map<String,Object> result = new HashMap<>();
+        try{
+            result = mktOfferEventService.getEventListByOffer(paramMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  result;
     }
 
 }

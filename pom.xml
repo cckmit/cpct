@@ -389,6 +389,8 @@
                 <version>${bss-cooperate.version}</version>
             </dependency>
 
+
+
             <!-- 黄懿慧dubbo服务jar包 -->
             <dependency>
                 <groupId>com.zjpii.biz</groupId>
@@ -429,6 +431,12 @@
                 <groupId>com.ctg.itrdc.cache</groupId>
                 <artifactId>ctg-cache-client</artifactId>
                 <version>${ctg-cache.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-openApi-out</artifactId>
+                <version>1.0.0</version>
             </dependency>
 
             <!--<dependency>-->

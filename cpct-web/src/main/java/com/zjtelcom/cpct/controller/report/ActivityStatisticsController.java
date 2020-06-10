@@ -464,7 +464,7 @@ public class ActivityStatisticsController extends BaseController {
 
 
     /**
-     * 分渠道报表导出成excel todo 未测试
+     * 分渠道报表导出成excel todo x
      */
     @GetMapping("/exportChannelExcel")
     @CrossOrigin

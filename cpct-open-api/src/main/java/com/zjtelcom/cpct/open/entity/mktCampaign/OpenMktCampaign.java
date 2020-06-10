@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.open.entity.mktCampaign;
 
+import com.zjtelcom.cpct.domain.channel.ObjCatItemRel;
+import com.zjtelcom.cpct.domain.channel.ObjectLabelRel;
 import com.zjtelcom.cpct.open.entity.mktCamItem.OpenMktCamItem;
 import com.zjtelcom.cpct.open.entity.mktStrategy.OpenMktStrategy;
 import com.zjtelcom.cpct.open.entity.script.OpenScript;
@@ -35,6 +37,26 @@ public class OpenMktCampaign {
     private List<OpenScript> mktScripts;
     //营销维挽策略列表
     private List<OpenMktStrategy> mktStrategys;
+    //对象目录节点关系
+    private List<ObjCatItemRel> objCatItemRels;//
+    //对象关联标签
+    private List<ObjectLabelRel> objectLabelRels;//
+
+    public List<ObjCatItemRel> getObjCatItemRels() {
+        return objCatItemRels;
+    }
+
+    public void setObjCatItemRels(List<ObjCatItemRel> objCatItemRels) {
+        this.objCatItemRels = objCatItemRels;
+    }
+
+    public List<ObjectLabelRel> getObjectLabelRels() {
+        return objectLabelRels;
+    }
+
+    public void setObjectLabelRels(List<ObjectLabelRel> objectLabelRels) {
+        this.objectLabelRels = objectLabelRels;
+    }
 
     public Integer getMktCampaignId() {
         return mktCampaignId;

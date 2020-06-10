@@ -4,6 +4,7 @@ import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
 import com.ctg.itrdc.cache.pool.ProxyJedis;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +14,7 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,6 +36,63 @@ public class RedisUtils_prd {
 
     @Value("${redisConfig_Prd.password}")
     private String redisPassword;
+
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
+
+
+    /**
+     * 更换集团redis方法
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean setRedisUnit(final String key, Object value,int seconds) {
+        boolean result = false;
+        CtgJedisPool ctgJedisPool = initCatch();
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.set(key, serialize(value));
+                jedis.expire(key,seconds);
+                result = true;
+            } catch (Throwable je) {
+                System.out.println("REDIS*********" + key);
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIS2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    public String getRedisOrSysParams(String key) {
+        String value = "";
+        Object status = get(key);
+        if (status != null) {
+            value = status.toString();
+        }else {
+            List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey(key);
+            if (sysFilList != null && !sysFilList.isEmpty()) {
+                value = sysFilList.get(0).get("value");
+                set(key, value);
+            }
+        }
+        return value;
+    }
+
+    public List<String> getListRedisOrSysParams(String key) {
+        String value = getRedisOrSysParams(key);
+        String[] split = value.split(",");
+        List<String> list = Arrays.asList(split);
+        return list;
+    }
 
     /**
      * 写入缓存

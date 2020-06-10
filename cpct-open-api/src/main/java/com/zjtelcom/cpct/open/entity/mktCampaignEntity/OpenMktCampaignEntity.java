@@ -62,6 +62,32 @@ public class OpenMktCampaignEntity {
     private List<OpenMktCamCheckruleEntity> mktCamCheckrules;
     //对象区域关系
     private List<ObjRegionRel> objRegionRels;
+    //
+    private List<OpenMktObjCatItemRelEntity> objCatItemRels;
+    //
+    private List<OpenMktObjectLabelRelEntity> objectLabelRels;
+
+
+
+
+
+
+    public List<OpenMktObjCatItemRelEntity> getObjCatItemRels() {
+        return objCatItemRels;
+    }
+
+    public void setObjCatItemRels(List<OpenMktObjCatItemRelEntity> objCatItemRels) {
+        this.objCatItemRels = objCatItemRels;
+    }
+
+
+    public List<OpenMktObjectLabelRelEntity> getObjectLabelRels() {
+        return objectLabelRels;
+    }
+
+    public void setObjectLabelRels(List<OpenMktObjectLabelRelEntity> objectLabelRels) {
+        this.objectLabelRels = objectLabelRels;
+    }
 
     public String getActType() {
         return actType;

@@ -26,6 +26,7 @@ import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 import com.zjtelcom.cpct.dto.filter.FilterRuleModel;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.MktCampaignResp;
 import com.zjtelcom.cpct.service.MktStrConfRuleResp;
@@ -191,7 +192,7 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
 //                                    String sendContent = "您好，您的销售品（" + mktCamItem.getOfferName() + "）马上将要到期，如要延期请登录延期页面进行延期。";
                                     String sendContent = "您好，活动编码："+mktCampaignDO.getMktActivityNbr()+" 活动名称："+mktCampaignDO.getMktCampaignName()+" 中配置的推荐条目:"+ mktCamItem.getOfferName()+"将于"+dateFormatStr+"下架，为保证活动营销正常，请您尽快修改活动配置。";
                                     try {
-                                        uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString());
+                                        uccpService.sendShortMessage(sysUserCode,sendContent,mktCampaignDO.getLanId().toString(),DttsMsgEnum.CAMPAIGN.getId());
                                         mktDttsLogService.saveMktDttsLog("9000","成功",date,new Date(),"成功",null);
                                         resuleMap.put("code","200");
                                     } catch (Exception e) {

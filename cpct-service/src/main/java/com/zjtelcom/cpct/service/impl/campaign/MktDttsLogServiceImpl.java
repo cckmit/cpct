@@ -124,7 +124,9 @@ public class MktDttsLogServiceImpl extends BaseService implements MktDttsLogServ
         for (MktDttsLog dttsLog : mktDttsLogList) {
             String dttsType1 = dttsLog.getDttsType();
             Map<String, String> task_time = sysParamsMapper.getParamsByValue("TASK_TIME", dttsType1);
-            dttsLog.setDttsType(task_time.get("PARAM_NAME"));
+            if (task_time != null) {
+                dttsLog.setDttsType(task_time.get("PARAM_NAME"));
+            }
         }
         Page pageInfo = new Page(new PageInfo(mktDttsLogList));
         result.put("resultCode",CODE_SUCCESS);

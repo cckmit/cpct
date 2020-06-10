@@ -15,4 +15,6 @@ public interface EventRelService {
 
     Map<String,Object> getEventRelList(Long userId, ContactEvt contactEvt);
 
+    Map<String,Object> getEventListByOffer(Map<String, Object> paramMap);
+
 }

@@ -33,4 +33,6 @@ public interface MktCamChlConfMapper {
     List<MktCamChlConfDO> selectByContactChlId(Long contactChlId);
 
     List<Long> countCamByChannel(@Param("map") Map<String,Object> map);
+
+    List<MktCamChlConfDO> listByMessageChannel(Long evtContactConfId);
 }

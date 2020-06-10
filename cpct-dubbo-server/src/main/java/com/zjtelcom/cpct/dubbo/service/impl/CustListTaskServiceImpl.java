@@ -376,7 +376,7 @@ public class CustListTaskServiceImpl implements CustListTaskService,Callable {
                                 } else if ("6000".equals(mktCampaignDO.getMktCampaignType())) {
                                     result.put("activityType", "2"); //随销
                                 } else if ("7000".equals(mktCampaignDO.getMktCampaignType())) {
-                                    result.put("activityType", "3"); //随销
+                                    result.put("activityType", "3"); //协同场景
                                 } else {
                                     result.put("activityType", "0"); //活动类型 默认营销
                                 }
