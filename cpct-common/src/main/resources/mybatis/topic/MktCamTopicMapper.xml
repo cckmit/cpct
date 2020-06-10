@@ -84,7 +84,7 @@
         from mkt_cam_topic
         <where>
             <if test = "year != null and year != ''">
-                AND year = #{year}
+                year = #{year}
             </if>
             <if test = "season != null and season != ''">
                 AND season = #{season}
@@ -96,5 +96,6 @@
                 AND topic_code = #{topicCode}
             </if>
         </where>
+
     </select>
 </mapper>
