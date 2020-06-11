@@ -467,6 +467,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     @Override
     public Map<String, Object> addByObject(Object object) {
         String s = JSON.toJSONString(object);
+        logger.info("集团新增活动入参"+s);
         mktDttsLogService.saveMktDttsLog("1111", "成功", new Date(), new Date(), "成功", s);
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> resultObject = new HashMap<>();
@@ -914,7 +915,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 objCatItemRel.setCreateDate(new Date());
                 CatalogItem catalogItem = catalogItemMapper.selectByCatlogItemCode(openMktObjCatItemRelEntity1.getCatalogItemNbr());
                 if (catalogItem != null) {
-                    objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
+                    objCatItemRel.setCatalogItemId(catalogItem.getCatalogItemId());
                 }
                 objCatItemRel.setCreateStaff(mktCampaignDO.getCreateStaff());
                 objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
@@ -938,6 +939,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                 objectLabelRelMapper.insert(objectLabelRel);
                 TopicLabel topicLabel = topicLabelMapper.selectByLabelCode(openMktObjectLabelRelEntity.getLabelCode());
                 if (topicLabel!=null){
+                    objectLabelRel.setLabelId(topicLabel.getLabelId());
+                    objectLabelRelMapper.updateByPrimaryKey(objectLabelRel);
                     List<TopicDO> topicLists = mktCamTopicMapper.selectByKey(null,null,null,topicLabel.getLabelCode());
                     if (!topicLists.isEmpty()){
                         mktCampaignDO.setTheMe(topicLists.get(0).getTopicCode());

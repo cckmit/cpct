@@ -57,7 +57,12 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 if (dataMap.get("code").toString().equals("200")){
                     campaign = (OpenCampaignScheEntity) dataMap.get("data");
                     String num = getNum(i);
-                    exportFile(campaign,"A",num);
+                    Map<String,Object>  map = new HashMap<>();
+                    List<OpenCampaignScheEntity> campaignScheEntities = new ArrayList<>();
+                    campaignScheEntities.add(campaign);
+                    map.put("totalCount",campaignDOS.size());
+                    map.put("mktCampaignDetails",campaignScheEntities);
+                    exportFile(map,"A",num,i);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -82,7 +87,12 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 if (dataMap.get("code").toString().equals("200")){
                     campaign = (OpenCampaignScheEntity) dataMap.get("data");
                     String num = getNum(i);
-                    exportFile(campaign,"F",num);
+                    Map<String,Object>  map = new HashMap<>();
+                    List<OpenCampaignScheEntity> campaignScheEntities = new ArrayList<>();
+                    campaignScheEntities.add(campaign);
+                    map.put("totalCount",campaignDOS.size());
+                    map.put("mktCampaignDetails",campaignScheEntities);
+                    exportFile(map,"F",num,i);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -114,11 +124,12 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
      * @return
      */
 
-    private Map<String, Object> exportFile(OpenCampaignScheEntity campaign,String flg,String intNum) {
+    private Map<String, Object> exportFile(Map<String,Object> campaign,String flg,String intNum,int i) {
+        System.out.println(JSON.toJSONString(campaign));
         Map<String, Object> resultMap = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         String Date = dateFormat.format(new Date());
-        String dataFileName = "6001040005"+"1000000038"+ "BUS63001"+ Date + flg + intNum + ".txt";     //文件路径+名称+文件类型
+        String dataFileName = "6001040005"+"1000000038"+ "BUS63001"+ Date + flg + intNum + ".json";     //文件路径+名称+文件类型
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final FTPClient ftp = sftpUtils.ftpConnect(ftpAddress, ftpPort, ftpName, ftpPassword);

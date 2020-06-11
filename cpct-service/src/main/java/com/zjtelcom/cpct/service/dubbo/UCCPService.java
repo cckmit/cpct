@@ -6,8 +6,8 @@ import java.util.Map;
 
 public interface UCCPService {
 
-    void sendShortMessage4CampaignStaff(MktCampaignDO mktCampaignDO, String sendContent);
+    void sendShortMessage4CampaignStaff(MktCampaignDO mktCampaignDO, String sendContent,Long scenceId);
 
-    String sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception;
+    String sendShortMessage(String targPhone, String sendContent, String lanId,Long scenceId) throws Exception;
 
 }

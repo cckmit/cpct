@@ -376,8 +376,15 @@ public class EventRedisServiceImpl implements EventRedisService {
                 redisUtils.set(key, followFlgType);
                 resutlt.put(key, followFlgType);
             }
+        }else if("REGION_LIST_EVENT".equals(key)){
+            List<String> regionList = new ArrayList<>();
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REGION_LIST");
+            for (SysParams sysParams : sysParamsList) {
+                regionList.add(sysParams.getParamValue());
+            }
+            redisUtils.set(key, regionList);
+            resutlt.put(key, regionList);
         }
-
         if ("EVENT_".equals(key)) {  // 事件
             String eventCode = (String) params.get("eventCode");
             ContactEvt event = contactEvtMapper.getEventByEventNbr(eventCode);

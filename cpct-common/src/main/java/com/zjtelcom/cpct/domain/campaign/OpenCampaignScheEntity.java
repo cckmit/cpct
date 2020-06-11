@@ -5,11 +5,14 @@ import com.zjtelcom.cpct.domain.channel.ObjCatItemRel;
 import com.zjtelcom.cpct.domain.channel.ObjectLabelRel;
 import com.zjtelcom.cpct.domain.openApi.mktCamChlConf.OpenMktCamChlConfEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenMktCamItemEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenObjCatItemRelEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenObjectLabelRelEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamEvtRelEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamEvtRel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,21 +50,20 @@ public class OpenCampaignScheEntity {
     private String serviceType;
     private String lifeStage;
     private Long serviceCancleFlag;
-    private Long lanId;
     //营服活动分群规则
     private List<OpenMktCamGrpRulEntity> mktCamGrpRuls;//
     //营服活动推荐条目
     private List<OpenMktCamItemEntity> mktCamItems;//
     //营服活动渠道推送配置
-    private List<OpenMktCamChlConfEntity> mktCamChlConf;//
+    private List<OpenMktCamChlConfEntity> mktCamChlConfs;//
     //营服活动关联事件
     private List<OpenMktCamEvtRelEntity> mktCamEvtRels;//
     //对象区域关系
     private List<ObjRegionRelEntity> objRegionRels;//
     //对象目录节点关系
-    private List<ObjCatItemRel> objCatItemRels;//
+    private List<OpenObjCatItemRelEntity> objCatItemRels;//
     //对象关联标签
-    private List<ObjectLabelRel> objectLabelRels;//
+    private List<OpenObjectLabelRelEntity> objectLabelRels;//
 
     public String getActType() {
         return actType;
@@ -319,14 +321,6 @@ public class OpenCampaignScheEntity {
         this.serviceCancleFlag = serviceCancleFlag;
     }
 
-    public Long getLanId() {
-        return lanId;
-    }
-
-    public void setLanId(Long lanId) {
-        this.lanId = lanId;
-    }
-
     public List<OpenMktCamGrpRulEntity> getMktCamGrpRuls() {
         return mktCamGrpRuls;
     }
@@ -344,12 +338,12 @@ public class OpenCampaignScheEntity {
     }
 
 
-    public List<OpenMktCamChlConfEntity> getMktCamChlConf() {
-        return mktCamChlConf;
+    public List<OpenMktCamChlConfEntity> getMktCamChlConfs() {
+        return mktCamChlConfs;
     }
 
-    public void setMktCamChlConf(List<OpenMktCamChlConfEntity> mktCamChlConf) {
-        this.mktCamChlConf = mktCamChlConf;
+    public void setMktCamChlConfs(List<OpenMktCamChlConfEntity> mktCamChlConfs) {
+        this.mktCamChlConfs = mktCamChlConfs;
     }
 
     public List<OpenMktCamEvtRelEntity> getMktCamEvtRels() {
@@ -368,19 +362,19 @@ public class OpenCampaignScheEntity {
         this.objRegionRels = objRegionRels;
     }
 
-    public List<ObjCatItemRel> getObjCatItemRels() {
+    public List<OpenObjCatItemRelEntity> getObjCatItemRels() {
         return objCatItemRels;
     }
 
-    public void setObjCatItemRels(List<ObjCatItemRel> objCatItemRels) {
+    public void setObjCatItemRels(List<OpenObjCatItemRelEntity> objCatItemRels) {
         this.objCatItemRels = objCatItemRels;
     }
 
-    public List<ObjectLabelRel> getObjectLabelRels() {
+    public List<OpenObjectLabelRelEntity> getObjectLabelRels() {
         return objectLabelRels;
     }
 
-    public void setObjectLabelRels(List<ObjectLabelRel> objectLabelRels) {
+    public void setObjectLabelRels(List<OpenObjectLabelRelEntity> objectLabelRels) {
         this.objectLabelRels = objectLabelRels;
     }
 }

@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.SyncEventService;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
+import com.zjtelcom.cpct.service.campaign.MktCamDirectoryService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,16 @@ public class SyncLabelController {
     private MktCampaignMapper campaignMapper;
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private MktCamDirectoryService mktCamDirectoryService;
+
+    @RequestMapping(value = "/listAllDirectoryTree", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listAllDirectoryTree() throws Exception {
+        Map<String, Object> directoryMap = mktCamDirectoryService.listAllDirectoryTree();
+        return JSON.toJSONString(directoryMap);
+    }
 
 
 
