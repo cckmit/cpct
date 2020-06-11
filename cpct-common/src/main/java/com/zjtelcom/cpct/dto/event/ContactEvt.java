@@ -37,6 +37,8 @@ public class ContactEvt extends BaseEntity implements Serializable {
     private Long topCampaignNum;// 事件允许关联最大活动数
     private String eventManageType;// 事件区分营销活动还是服务活动
 
+
+
     public String getEventManageType() {
         return eventManageType;
     }
