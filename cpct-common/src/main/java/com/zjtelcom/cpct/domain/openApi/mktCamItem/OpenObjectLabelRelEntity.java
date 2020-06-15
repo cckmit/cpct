@@ -1,8 +1,8 @@
-package com.zjtelcom.cpct.domain.channel;
+package com.zjtelcom.cpct.domain.openApi.mktCamItem;
 
 import java.util.Date;
 
-public class ObjectLabelRel {
+public class OpenObjectLabelRelEntity {
     private Long objectLabelRelId;
 
     private Long labelId;
@@ -21,11 +21,11 @@ public class ObjectLabelRel {
 
     private Long updateStaff;
 
-    private Date createDate;
+    private String createDate;
 
-    private Date statusDate;
+    private String statusDate;
 
-    private Date updateDate;
+    private String updateDate;
 
     private String remark;
 
@@ -132,27 +132,27 @@ public class ObjectLabelRel {
         this.updateStaff = updateStaff;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getStatusDate() {
+    public String getStatusDate() {
         return statusDate;
     }
 
-    public void setStatusDate(Date statusDate) {
+    public void setStatusDate(String statusDate) {
         this.statusDate = statusDate;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

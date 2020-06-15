@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.annotations;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -97,7 +98,7 @@ public class TimeoutMonitoringAOP {
                 JSONArray jsonArray = JSONArray.parseArray(recipient);
                 for (Object array : jsonArray) {
                     JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(array));
-                    String s = uccpService.sendShortMessage(jsonObject.get("phone").toString(), sendContent, jsonObject.get("lanId").toString());
+                    String s = uccpService.sendShortMessage(jsonObject.get("phone").toString(), sendContent, jsonObject.get("lanId").toString(),DttsMsgEnum.CAMPAIGN.getId());
                     if (null != null && !"".equals(s)) {
                         redisUtils.hset(timeOutMonitoring, name, x == null ? 1 : x + 1);
                     }

@@ -17,6 +17,8 @@ import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.openApi.mktCamChlConf.OpenMktCamChlConfEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenMktCamItemEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenObjCatItemRelEntity;
+import com.zjtelcom.cpct.domain.openApi.mktCamItem.OpenObjectLabelRelEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamEvtRelEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity;
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamScriptEntity;
@@ -42,6 +44,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +150,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             return result;
         }
         OpenCampaignScheEntity campaignScheEntity = BeanUtil.create(campaignDO, new OpenCampaignScheEntity());
+        campaignScheEntity.setManageType("6000");
+        campaignScheEntity.setRegionNbr("8330000");
+        campaignScheEntity.setRegionId(100008330000L);
         //营服活动分群规则
         List<OpenMktCamGrpRulEntity> mktCamGrpRuls = new ArrayList<>();
         //营服活动推荐条目
@@ -158,9 +164,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         //对象区域关系
         List<ObjRegionRelEntity> objRegionRels = new ArrayList<>();
         //对象目录节点关系
-        List<ObjCatItemRel> objCatItemRels = new ArrayList<>();
+        List<OpenObjCatItemRelEntity> objCatItemRels = new ArrayList<>();
         //对象关联标签
-        List<ObjectLabelRel> objectLabelRels = new ArrayList<>();
+        List<OpenObjectLabelRelEntity> objectLabelRels = new ArrayList<>();
 
         //营服活动分群规则
         List<MktCamGrpRul> mktCamGrpRuls1 = mktCamGrpRulMapper.selectByCampaignId(mktCampaignId);
@@ -178,6 +184,12 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 openTarGrpConditionEntity.setLeftParam(label.getInjectionLabelCode());
                 openTarGrpConditionEntity.setLeftParamName(label.getInjectionLabelName());
                 openTarGrpConditionEntity.setOperType(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
+                    if (condition.getCreateDate() != null) {
+                        openTarGrpConditionEntity.setCreateDate(DateUtil.Date2String(condition.getCreateDate()));
+                    }
+                    if (condition.getUpdateDate() != null) {
+                        openTarGrpConditionEntity.setUpdateDate(DateUtil.Date2String(condition.getUpdateDate()));
+                    }
                 openTarGrpConditionEntityList.add(openTarGrpConditionEntity);
                 expression.append(assLabel(label,condition.getOperType(),condition.getRightParam()));
                 }
@@ -185,6 +197,18 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             //todo
             openTarGrpEntity.setTarGrpConditionExpression(expression.toString());
             openTarGrpEntity.setTarGrpConditions(openTarGrpConditionEntityList);
+            if (tarGrp.getCreateDate() != null) {
+                openTarGrpEntity.setCreateDate(DateUtil.Date2String(tarGrp.getCreateDate()));
+            }
+            if (tarGrp.getUpdateDate() != null) {
+                openTarGrpEntity.setUpdateDate(DateUtil.Date2String(tarGrp.getUpdateDate()));
+            }
+            if (rul.getCreateDate() != null) {
+                openMktCamGrpRulEntity.setCreateDate(DateUtil.Date2String(rul.getCreateDate()));
+            }
+            if (rul.getUpdateDate() != null) {
+                openMktCamGrpRulEntity.setUpdateDate(DateUtil.Date2String(rul.getUpdateDate()));
+            }
             openMktCamGrpRulEntity.setTarGrp(openTarGrpEntity);
             openMktCamGrpRulEntity.setMktCampaignId(campaignDO.getMktCampaignId());
             openMktCamGrpRulEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
@@ -200,6 +224,12 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             openMktCamItemEntity.setPriority(0L);
             openMktCamItemEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
             openMktCamItemEntity.setMktCampaignId(campaignDO.getMktCampaignId());
+            if (item.getCreateDate() != null) {
+                openMktCamItemEntity.setCreateDate(DateUtil.Date2String(item.getCreateDate()));
+            }
+            if (item.getUpdateDate() != null) {
+                openMktCamItemEntity.setUpdateDate(DateUtil.Date2String(item.getUpdateDate()));
+            }
             mktCamItems.add(openMktCamItemEntity);
         }
         //营服活动渠道推送配置
@@ -210,6 +240,12 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             CamScript camScript = mktCamScriptMapper.selectByConfId(mktCamChlConfDO.getEvtContactConfId());
             if (camScript!=null){
                 OpenMktCamScriptEntity openMktCamScriptEntity = BeanUtil.create(camScript, new OpenMktCamScriptEntity());
+                if (camScript.getCreateDate() != null) {
+                    openMktCamScriptEntity.setCreateDate(DateUtil.Date2String(camScript.getCreateDate()));
+                }
+                if (camScript.getUpdateDate() != null) {
+                    openMktCamScriptEntity.setUpdateDate(DateUtil.Date2String(camScript.getUpdateDate()));
+                }
                 openMktCamScriptEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
                 mktCamScripts.add(openMktCamScriptEntity);
             }
@@ -221,6 +257,12 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 openMktCamChlConfEntity.setContactChlCode(channel.getContactChlCode());
                 openMktCamChlConfEntity.setContactChlName(channel.getContactChlName());
             }
+            if (mktCamChlConfDO.getCreateDate() != null) {
+                openMktCamChlConfEntity.setCreateDate(DateUtil.Date2String(mktCamChlConfDO.getCreateDate()));
+            }
+            if (mktCamChlConfDO.getUpdateDate() != null) {
+                openMktCamChlConfEntity.setUpdateDate(DateUtil.Date2String(mktCamChlConfDO.getUpdateDate()));
+            }
             mktCamChlConf.add(openMktCamChlConfEntity);
         }
         //营服活动关联事件
@@ -230,10 +272,17 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             ContactEvt eventById = contactEvtMapper.getEventById(relDO.getEventId());
             openMktCamEvtRelEntity.setEventNbr(eventById.getContactEvtCode());
             openMktCamEvtRelEntity.setEventName(eventById.getContactEvtName());
+            if (eventById.getCreateDate()!=null){
+                openMktCamEvtRelEntity.setCreateDate(DateUtil.Date2String(eventById.getCreateDate()));
+            }
+            if (eventById.getUpdateDate()!=null){
+                openMktCamEvtRelEntity.setUpdateDate(DateUtil.Date2String(eventById.getUpdateDate()));
+            }
             mktCamEvtRels.add(openMktCamEvtRelEntity);
         }
         //对象区域关系
         ObjRegionRelEntity objRegionRel = new ObjRegionRelEntity();
+        objRegionRel.setObjRegionRelId(campaignDO.getMktCampaignId());
         objRegionRel.setObjId(campaignDO.getInitId());
         objRegionRel.setObjNbr(campaignDO.getMktActivityNbr());
         Long regionId = AreaCodeEnum.getRegionIdByLandId(campaignDO.getLanId());
@@ -242,6 +291,8 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             objRegionRel.setApplyRegionId(regionId);
         }
         objRegionRel.setStatusCd("1000");
+        objRegionRel.setCreateDate(DateUtil.Date2String(campaignDO.getCreateDate()));
+        objRegionRel.setUpdateDate(DateUtil.Date2String(campaignDO.getUpdateDate()));
         objRegionRels.add(objRegionRel);
         //对象目录节点关系
         ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaignDO).invoke();
@@ -275,6 +326,7 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         result.put("data",campaignScheEntity);
         return result;
     }
+
 
     //表达式拼接
     public static String assLabel(Label label, String type, String rightParam) {
@@ -341,12 +393,13 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         Map<String,Object> result = new HashMap<>();
         //设置集团营服活动反馈接口入参
         Map<String,Object> inputMap = new HashMap<>();
-        //对象目录节点关系
-        List<ObjCatItemRel> objCatItemRels = new ArrayList<>();
+        List<OpenObjCatItemRelEntity> objCatItemRels = new ArrayList<>();
         //对象关联标签
-        List<ObjectLabelRel> objectLabelRels = new ArrayList<>();
+        List<OpenObjectLabelRelEntity> objectLabelRels = new ArrayList<>();
         List<OpenCampaignScheEntity> openCampaignScheEntities = new ArrayList<>();
         OpenCampaignScheEntity campaignScheEntity = BeanUtil.create(campaign, new OpenCampaignScheEntity());
+        campaignScheEntity.setManageType("6000");
+        campaignScheEntity.setRegionNbr("8330000");
         if (campaign.getPlanBeginTime()!=null){
             campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaign.getPlanBeginTime()));
             campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
@@ -365,6 +418,9 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaign.getUpdateDate()));
         }
         ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaign).invoke();
+
+
+
         objCatItemRels = objInfoCreate.getObjCatItemRels();
         objectLabelRels = objInfoCreate.getObjectLabelRels();
         campaignScheEntity.setObjCatItemRels(objCatItemRels);
@@ -384,7 +440,7 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         ht.setHeader("Content-Type", "application/json");
         String uuid = UUIDUtil.getUUID();
         ht.setHeader("X-CTG-Request-ID", uuid);
-        logger.info("集团活动反馈接口流水号：" + uuid);
+        logger.info("集团营销活动许可证流水号：" + uuid);
         List<SysParams> sysParamList = sysParamsMapper.selectAll(null, "OPENAPI_HEADER");
         JSONObject json = JSON.parseObject(sysParamList.get(0).getParamValue());
         String appId = json.get("X-APP-ID").toString();
@@ -411,40 +467,64 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
 
     private class ObjInfoCreate {
         private MktCampaignDO campaign;
-        private List<ObjCatItemRel> objCatItemRels;
-        private List<ObjectLabelRel> objectLabelRels;
+        private List<OpenObjCatItemRelEntity> catItemRelEntities;
+        private List<OpenObjectLabelRelEntity> labelRelEntityList;
 
         public ObjInfoCreate(MktCampaignDO campaign) {
             this.campaign = campaign;
         }
 
-        public List<ObjCatItemRel> getObjCatItemRels() {
-            return objCatItemRels;
+        public List<OpenObjCatItemRelEntity> getObjCatItemRels() {
+            return catItemRelEntities;
         }
 
-        public List<ObjectLabelRel> getObjectLabelRels() {
-            return objectLabelRels;
+        public List<OpenObjectLabelRelEntity> getObjectLabelRels() {
+
+            return labelRelEntityList;
         }
 
         public ObjInfoCreate invoke() {
-            objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+             List<OpenObjCatItemRelEntity> calList = new ArrayList<>();
+             List<OpenObjectLabelRelEntity> labellist = new ArrayList<>();
+            List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
             for (ObjCatItemRel objCatItemRel : objCatItemRels) {
-                objCatItemRel.setObjNbr(campaign.getMktActivityNbr());
+                OpenObjCatItemRelEntity openObjCatItemRelEntity = BeanUtil.create(objCatItemRel, new OpenObjCatItemRelEntity());
+                openObjCatItemRelEntity.setObjNbr(campaign.getMktActivityNbr());
                 CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
                 if (catalogItem!=null){
-                    objCatItemRel.setCatalogItemName(catalogItem.getCatalogItemName());
-                    objCatItemRel.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
+                    openObjCatItemRelEntity.setCatalogItemName(catalogItem.getCatalogItemName());
+                    openObjCatItemRelEntity.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
                 }
+                if (objCatItemRel.getCreateDate()!=null){
+                    openObjCatItemRelEntity.setCreateDate(DateUtil.Date2String(objCatItemRel.getCreateDate()));
+                }
+                if (objCatItemRel.getUpdateDate()!=null){
+                    openObjCatItemRelEntity.setUpdateDate(DateUtil.Date2String(objCatItemRel.getUpdateDate()));
+                }
+                calList.add(openObjCatItemRelEntity);
             }
+
+            catItemRelEntities = calList;
+
             //对象关联标签
-            objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+            List<ObjectLabelRel> objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
             for (ObjectLabelRel objectLabelRel : objectLabelRels) {
-                objectLabelRel.setObjNbr(campaign.getMktActivityNbr());
+                OpenObjectLabelRelEntity openObjectLabelRelEntity = BeanUtil.create(objectLabelRel, new OpenObjectLabelRelEntity());
+                openObjectLabelRelEntity.setObjNbr(campaign.getMktActivityNbr());
                 TopicLabel label = topicLabelMapper.selectByPrimaryKey(objectLabelRel.getLabelId());
                 if (label!=null){
-                    objectLabelRel.setLabelName(label.getLabelName());
+                    openObjectLabelRelEntity.setLabelName(label.getLabelName());
+                    openObjectLabelRelEntity.setLabelCode(label.getLabelCode());
                 }
+                if (objectLabelRel.getCreateDate()!=null){
+                    openObjectLabelRelEntity.setCreateDate(DateUtil.Date2String(objectLabelRel.getCreateDate()));
+                }
+                if (objectLabelRel.getUpdateDate()!=null){
+                    openObjectLabelRelEntity.setUpdateDate(DateUtil.Date2String(objectLabelRel.getUpdateDate()));
+                }
+                labellist.add(openObjectLabelRelEntity);
             }
+            labelRelEntityList = labellist;
             return this;
         }
     }

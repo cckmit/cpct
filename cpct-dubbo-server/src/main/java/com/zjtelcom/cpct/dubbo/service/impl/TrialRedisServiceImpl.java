@@ -14,6 +14,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.MessageLabelInfo;
 import com.zjtelcom.cpct.dubbo.service.TrialRedisService;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -78,7 +79,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
                 List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
                 if (send_msg!=null){
                     for (SysParams sysParams : send_msg) {
-                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571",DttsMsgEnum.TRIAL_FAIL.getId());
                     }
                 }
             } catch (Exception e) {
@@ -91,7 +92,7 @@ public class TrialRedisServiceImpl implements TrialRedisService {
                 List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
                 if (send_msg!=null){
                     for (SysParams sysParams : send_msg) {
-                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                        uccpService.sendShortMessage(sysParams.getParamValue(),sendMsg,"571",DttsMsgEnum.TRIAL_FAIL.getId());
                     }
                 }
             } catch (Exception e) {

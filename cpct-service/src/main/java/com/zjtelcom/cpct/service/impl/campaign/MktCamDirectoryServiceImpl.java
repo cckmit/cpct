@@ -8,8 +8,13 @@ package com.zjtelcom.cpct.service.impl.campaign;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamDirectoryMapper;
+import com.zjtelcom.cpct.dao.channel.CatalogItemMapper;
+import com.zjtelcom.cpct.dao.channel.CatalogMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamDirectoryDO;
+import com.zjtelcom.cpct.domain.channel.CatalogItem;
 import com.zjtelcom.cpct.dto.campaign.MktCamDirectory;
+import com.zjtelcom.cpct.dto.channel.CatalogItemDetail;
+import com.zjtelcom.cpct.dto.event.Catalog;
 import com.zjtelcom.cpct.service.campaign.MktCamDirectoryService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 /**
  * @Description:
@@ -33,6 +41,10 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
 
     @Autowired
     private MktCamDirectoryMapper mktCamDirectoryMapper;
+    @Autowired
+    private CatalogMapper catalogMapper;
+    @Autowired
+    private CatalogItemMapper catItemMapper;
 
     /**
      * 获取活动目录树
@@ -44,7 +56,7 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
         Map<String, Object> directoryMap = null;
         try {
             directoryMap = new HashMap<>();
-            List<MktCamDirectory> mktCamDirectoryList = getChildDirectory(0L);
+            List<MktCamDirectory> mktCamDirectoryList = listCatalogItemTree();
             directoryMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             directoryMap.put("resultMsg", "查询成功！");
             directoryMap.put("mktCamDirectoryList", mktCamDirectoryList);
@@ -67,5 +79,37 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
             }
         }
         return mktCamDirectoryList;
+    }
+
+    public  List<MktCamDirectory>  listCatalogItemTree() {
+        List<MktCamDirectory> resultList = new ArrayList<>();
+        List<CatalogItem> parentList = catItemMapper.selectByParentId(0L);
+        for (CatalogItem parent : parentList) {
+            MktCamDirectory detail = new MktCamDirectory();
+            detail.setMktCamDirectoryId(parent.getCatalogItemId());
+            detail.setMktCamDirectoryName(parent.getCatalogItemName());
+            detail.setMktCamDirectoryParentId(parent.getParCatalogItemId());
+            list(detail);
+            resultList.add(detail);
+        }
+        return resultList;
+    }
+
+
+    private void  list(MktCamDirectory cat){
+        List<MktCamDirectory> childList = new ArrayList<>();
+        List<CatalogItem> list = catItemMapper.selectByParentId(cat.getMktCamDirectoryId());
+        for (CatalogItem cata : list) {
+            MktCamDirectory detail = new MktCamDirectory();
+            detail.setMktCamDirectoryId(cata.getCatalogItemId());
+            detail.setMktCamDirectoryName(cata.getCatalogItemName());
+            detail.setMktCamDirectoryParentId(cata.getParCatalogItemId());
+            List<CatalogItem> xxx = catItemMapper.selectByParentId(detail.getMktCamDirectoryId());
+            if (!xxx.isEmpty()){
+                list(detail);
+            }
+            childList.add(detail);
+        }
+        cat.setChildMktCamDirectoryList(childList);
     }
 }

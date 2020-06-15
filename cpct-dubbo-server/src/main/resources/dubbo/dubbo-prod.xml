@@ -188,7 +188,7 @@
     </dubbo:reference>
 
     <!--    根据销售品编码获取事件列表-->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktOfferEventService" ref="MktOfferEventServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktOfferEventService" ref="mktOfferEventServiceImpl" version="1.0" >
         <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
     </dubbo:service>
 

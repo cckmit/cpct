@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.channel.StaffOrgRel;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.service.impl.querySaturation.QuerySaturationCpcServiceImpl;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
@@ -1153,7 +1154,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                 try {
                     mktCampaignMapper.changeMktCampaignStatus(mktCampaignDO.getMktCampaignId(), STATUS_CODE_PRE_PAUSE.getStatusCode(), new Date(), 0L);
                     String sendContent = "您创建的活动" + mktCampaignDO.getMktCampaignName() + "满足不活跃活动条件，当前活动已被自动过期。";
-                    uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, sendContent);
+                    uccpService.sendShortMessage4CampaignStaff(mktCampaignDO, sendContent,DttsMsgEnum.CAMPAIGN.getId());
                     sb.append(mktCampaignDO.getMktCampaignId());
                 } catch (Exception e) {
                     e.printStackTrace();

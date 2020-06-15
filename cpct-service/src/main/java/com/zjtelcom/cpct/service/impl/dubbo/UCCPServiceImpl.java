@@ -1,9 +1,11 @@
 package com.zjtelcom.cpct.service.impl.dubbo;
 
+import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -33,14 +35,14 @@ public class UCCPServiceImpl implements UCCPService {
 
     // 通过活动获取创建人，给活动创建人发送通知短信
     @Override
-    public void sendShortMessage4CampaignStaff(MktCampaignDO mktCampaignDO, String sendContent) {
+    public void sendShortMessage4CampaignStaff(MktCampaignDO mktCampaignDO, String sendContent,Long scenceId) {
         try {
             Long staff = mktCampaignDO.getCreateStaff();
             SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
             if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
                 String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
                 Long lanId = mktCampaignDO.getLanId();
-                sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                sendShortMessage(sysUserCode, sendContent, lanId.toString(),scenceId);
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +50,7 @@ public class UCCPServiceImpl implements UCCPService {
     }
 
     @Override
-    public String sendShortMessage(String targPhone, String sendContent, String lanId) throws Exception {
+    public String sendShortMessage(String targPhone, String sendContent, String lanId,Long scenceId) throws Exception {
         HashMap params = new HashMap();
         //请求消息流水，格式：系统编码（6位）+yyyymmddhhmiss+10位序列号
         params.put("TransactionId", userAcct + DateUtil.date2St4Trial(new Date()) + getRandom(10));
@@ -84,12 +86,13 @@ public class UCCPServiceImpl implements UCCPService {
         //System.out.println("-----------------------请求总耗时:"+(System.currentTimeMillis()-beginTime)+"-------------------");
         //System.exit(0);
         Map map = uCCPSendService.sendShortMessage(params);
+        System.out.println("sendShortMessage："+JSON.toJSONString(map));
         if (map == null) return "调用sendShortMessage返回结果异常！";
-        if (!map.get("code").equals("0000")) {
+        if (!"0000".equals(map.get("code"))) {
             // 短信发送成功记录数据
-            saveShortMessageLog(targPhone, sendContent);
             return map.get("msg").toString();
         } else {
+            saveShortMessageLog((String) map.get("code"),targPhone, sendContent);
             return "";
         }
     }
@@ -104,9 +107,10 @@ public class UCCPServiceImpl implements UCCPService {
     }
 
     // 短信发送类型任务记录
-    public void saveShortMessageLog(String targPhone, String sendContent) {
+    public void saveShortMessageLog(String code,String targPhone, String sendContent) {
         try {
-            mktDttsLogService.saveMktDttsLog("9010","成功", new Date(), new Date(), targPhone, sendContent);
+            mktDttsLogService.saveMktDttsLog("9010",code, new Date(), new Date(),
+                    targPhone, "场景id："+sceneId+"【"+sendContent+"】");
         }catch (Exception e){
             e.printStackTrace();
         }

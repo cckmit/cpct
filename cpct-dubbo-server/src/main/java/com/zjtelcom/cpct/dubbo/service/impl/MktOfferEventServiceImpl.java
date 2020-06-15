@@ -13,13 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
+
 @Service
 @Transactional
 public class MktOfferEventServiceImpl implements MktOfferEventService {
     private static final Logger log = LoggerFactory.getLogger(MktOfferEventServiceImpl.class);
 
-    @Autowired
-    private CommonConstant commonConstant;
     @Autowired
     private MktOfferEventMapper mktOfferEventMapper;
 
@@ -56,13 +57,13 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
             }
         }catch (Exception e){
             e.printStackTrace();
-            result.put("resultCode",commonConstant.CODE_FAIL);
+            result.put("resultCode",CODE_FAIL);
             result.put("resultMsg","获取销售品对应事件列表失败");
             result.put("data",e);
             return result;
         }
 
-        result.put("resultCode",commonConstant.CODE_SUCCESS);
+        result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","获取成功");
         result.put("data",data);
         log.info(" 结果：result" + result);
