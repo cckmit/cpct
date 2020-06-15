@@ -12,9 +12,9 @@ public class OpenMktCamEvtRelEntity {
     private String statusCd;
     private Date statusDate;
     private Long createStaff;
-    private Date createDate;
+    private String createDate;
     private Long updateStaff;
-    private Date updateDate;
+    private String updateDate;
     private String remark;
     private Long lanId;
 
@@ -82,11 +82,11 @@ public class OpenMktCamEvtRelEntity {
         this.createStaff = createStaff;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -98,11 +98,11 @@ public class OpenMktCamEvtRelEntity {
         this.updateStaff = updateStaff;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

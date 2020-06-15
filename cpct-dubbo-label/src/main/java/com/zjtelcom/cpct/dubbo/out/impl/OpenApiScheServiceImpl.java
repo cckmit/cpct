@@ -28,10 +28,10 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
     private final static Logger log = LoggerFactory.getLogger(OpenApiScheServiceImpl.class);
 
     //600104 |user m600104 |passwd  Ftp_600104@2020 |path /jtppm/zc_mkt_campaign/600104
-    private String ftpAddress = "10.128.28.3";
-    private int ftpPort = 21;
-//    private String ftpAddress = "134.108.5.141";
-//    private int ftpPort = 2122;
+//    private String ftpAddress = "10.128.28.3";
+//    private int ftpPort = 21;
+    private String ftpAddress = "134.108.5.141";
+    private int ftpPort = 2122;
     private String ftpName = "m600104";
     private String ftpPassword = "Ftp_600104@2020";
     private String exportPath = "/jtppm/zc_mkt_campaign/600104";
@@ -57,7 +57,12 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 if (dataMap.get("code").toString().equals("200")){
                     campaign = (OpenCampaignScheEntity) dataMap.get("data");
                     String num = getNum(i);
-                    exportFile(campaign,"A",num);
+                    Map<String,Object>  map = new HashMap<>();
+                    List<OpenCampaignScheEntity> campaignScheEntities = new ArrayList<>();
+                    campaignScheEntities.add(campaign);
+                    map.put("totalCount",campaignDOS.size());
+                    map.put("mktCampaignDetails",campaignScheEntities);
+                    exportFile(map,"A",num,i);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -82,7 +87,12 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
                 if (dataMap.get("code").toString().equals("200")){
                     campaign = (OpenCampaignScheEntity) dataMap.get("data");
                     String num = getNum(i);
-                    exportFile(campaign,"F",num);
+                    Map<String,Object>  map = new HashMap<>();
+                    List<OpenCampaignScheEntity> campaignScheEntities = new ArrayList<>();
+                    campaignScheEntities.add(campaign);
+                    map.put("totalCount",campaignDOS.size());
+                    map.put("mktCampaignDetails",campaignScheEntities);
+                    exportFile(map,"F",num,i);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -114,11 +124,11 @@ public class OpenApiScheServiceImpl implements OpenApiScheService {
      * @return
      */
 
-    private Map<String, Object> exportFile(OpenCampaignScheEntity campaign,String flg,String intNum) {
+    private Map<String, Object> exportFile(Map<String,Object> campaign,String flg,String intNum,int i) {
         Map<String, Object> resultMap = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMdd");
         String Date = dateFormat.format(new Date());
-        String dataFileName = "6001040005"+"1000000038"+ "BUS63001"+ Date + flg + intNum + ".txt";     //文件路径+名称+文件类型
+        String dataFileName = "6001040005"+"1000000038"+ "BUS63001"+ Date + flg + intNum + ".json";     //文件路径+名称+文件类型
         File dataFile = new File(dataFileName);
         SftpUtils sftpUtils = new SftpUtils();
         final FTPClient ftp = sftpUtils.ftpConnect(ftpAddress, ftpPort, ftpName, ftpPassword);

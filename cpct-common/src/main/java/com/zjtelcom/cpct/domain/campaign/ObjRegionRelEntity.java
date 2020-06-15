@@ -15,9 +15,9 @@ public class ObjRegionRelEntity {
     private Long updateStaff;
     private String createStaffCode;//创建人编码
     private String updateStaffCode;//修改人编码
-    private Date statusDate;
-    private Date createDate;
-    private Date updateDate;
+    private String statusDate;
+    private String createDate;
+    private String updateDate;
     private String remark;
 
     public String getActType() {
@@ -108,27 +108,27 @@ public class ObjRegionRelEntity {
         this.updateStaffCode = updateStaffCode;
     }
 
-    public Date getStatusDate() {
+    public String getStatusDate() {
         return statusDate;
     }
 
-    public void setStatusDate(Date statusDate) {
+    public void setStatusDate(String statusDate) {
         this.statusDate = statusDate;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

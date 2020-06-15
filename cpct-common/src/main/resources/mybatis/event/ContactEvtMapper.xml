@@ -87,7 +87,7 @@
         <if test="contactEvtCode != null and contactEvtCode != ''">
             and e.EVENT_NBR LIKE CONCAT(CONCAT('%',#{contactEvtCode}),'%')
         </if>
-        <if test=" eventManageType!= null and eventManageType != ''">
+        <if test="eventManageType!= null and eventManageType != ''">
             and e.EVENT_MANAGE_TYPE = #{eventManageType}
         </if>
         </where>
