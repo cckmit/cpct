@@ -551,6 +551,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignDO.setLanIdFour((Long) landFourAndFiveMap.get("C4"));
                 mktCampaignDO.setLanIdFive((Long) landFourAndFiveMap.get("C5"));
             }
+
+            // 保存活动活动名称默认拼上地市信息
+            if (mktCampaignDO.getLanIdFour() != null) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                if (sysArea != null) {
+                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+                } else {
+                    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                    if (organization != null) {
+                        mktCampaignDO.setMktCampaignName("【" + organization.getOrgName() + "】" + mktCampaignDO.getMktCampaignName());
+                    }
+                }
+            } else if (mktCampaignDO.getLanId() != null) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanId().intValue());
+                if (sysArea != null) {
+                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+                }
+            }
+
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码
