@@ -23,5 +23,5 @@ public interface TopicLabelMapper {
 
     TopicLabel selectByLabelCode(@Param("labelCode") String labelCode);
 
-    TopicLabel selectByCampaignType();
+    List<TopicLabel> selectByCampaignType();
 }

@@ -7,13 +7,14 @@
         <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"></result>
         <result column="EVENT_ID" jdbcType="BIGINT" property="eventId"></result>
         <result column="EVENT_NAME" jdbcType="VARCHAR" property="eventName"></result>
+        <result column="EVENT_NBR" jdbcType="VARCHAR" property="eventNbr"></result>
     </resultMap>
 
 
-    <select id="getEventIdByOfferNbr" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        SELECT b.OBJ_ID,b.MKT_CAMPAIGN_ID,e.EVENT_ID,e.EVENT_NAME FROM
-        (SELECT a.MKT_CAMPAIGN_ID,a.OBJ_ID  FROM  obj_mkt_campaign_rel a WHERE a.OBJ_ID = (SELECT offer.OFFER_ID FROM `offer` WHERE offer_nbr = #{offerNbr,jdbcType = BIGINT} )) b
-        LEFT JOIN (SELECT c.MKT_CAMPAIGN_ID, c.EVENT_ID,d.EVENT_NAME FROM mkt_cam_evt_rel c,event d WHERE c.EVENT_ID= d.EVENT_ID AND d.EVT_TYPE_ID = #{eventType,jdbcType = BIGINT}) e
+    <select id="getEventIdByOfferNbr"  resultMap="BaseResultMap">
+        SELECT b.OBJ_ID,b.MKT_CAMPAIGN_ID,e.EVENT_ID,e.EVENT_NAME,e.EVENT_NBR FROM
+        (SELECT a.MKT_CAMPAIGN_ID,a.OBJ_ID  FROM  obj_mkt_campaign_rel a WHERE a.OBJ_ID = (SELECT offer.OFFER_ID FROM `offer` WHERE offer_nbr = #{offerNbr,jdbcType = VARCHAR}) ) b
+        LEFT JOIN (SELECT c.MKT_CAMPAIGN_ID, c.EVENT_ID,d.EVENT_NAME,d.EVENT_NBR FROM mkt_cam_evt_rel c,event d WHERE c.EVENT_ID= d.EVENT_ID  AND d.EVT_TYPE_ID= #{eventType,jdbcType = BIGINT}) e
         ON b.MKT_CAMPAIGN_ID = e.MKT_CAMPAIGN_ID
         ORDER BY b.OBJ_ID,b.MKT_CAMPAIGN_ID;
 

@@ -251,5 +251,10 @@
         EVT_ITEM_ID = #{evtItemId}
         where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
     </update>
+    <select id="selectEvtItemCodeByEventId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select EVT_ITEM_CODE
+        from event_item
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
+    </select>
 
 </mapper>

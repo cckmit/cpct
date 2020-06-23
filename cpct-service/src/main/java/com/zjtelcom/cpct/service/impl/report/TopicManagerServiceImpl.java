@@ -259,7 +259,13 @@ public class TopicManagerServiceImpl implements TopicManagerService {
         List<Map<String, Object>> resultLists = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         try {
-            TopicLabel topicLabel = topicLabelMapper.selectByCampaignType();
+            List<TopicLabel> list = topicLabelMapper.selectByCampaignType();
+            if (list==null || list.isEmpty()){
+                result.put("resultCode", CommonConstant.CODE_FAIL);
+                result.put("resultMsg", "集团主题数据缺失，请联系管理员");
+                return result;
+            }
+            TopicLabel topicLabel = list.get(0);
             if (topicLabel!=null){
                 List<TopicLabelValue> topicLabelValues = labelValueMapper.selectByLabelId(topicLabel.getLabelId());
                 for (TopicLabelValue topicLabelValue : topicLabelValues) {

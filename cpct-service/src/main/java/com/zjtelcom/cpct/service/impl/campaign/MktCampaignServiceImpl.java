@@ -337,6 +337,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private TopicLabelMapper topicLabelMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
+    @Autowired
+    private LabelValueMapper labelValueMapper;
+    @Autowired
+    private ObjCatItemRelMapper objCatItemRelMapper;
 
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
@@ -582,6 +586,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
             //创建主题关系
             topicLabelRel(mktCampaignId, mktCampaignDO);
+            if (mktCampaignDO.getDirectoryId()!=null){
+                CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                if(catalogItem!=null){
+                    ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                    objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
+                    objCatItemRel.setCatalogItemId(catalogItem.getCatalogItemId());
+                    objCatItemRel.setStatusCd("1000");
+                    objCatItemRel.setObjType("6000");
+                    objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                    objCatItemRel.setCreateDate(new Date());
+                    objCatItemRel.setStatusDate(new Date());
+                    objCatItemRel.setUpdateDate(new Date());
+                    objCatItemRelMapper.insert(objCatItemRel);
+                }
+            }
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), null, mktCampaignDO.getStatusCd(), UserUtil.loginId(), OperatorLogEnum.ADD.getOperatorValue());
 
@@ -722,6 +741,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamDisplayColumnRelMapper.insert(mktCamDisplayColumnRel);
                 }
             }
+            //创建主题关系
+            ObjLabelRelCreate(mktCampaignDO);
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -740,6 +761,36 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
         }
         return maps;
+    }
+
+    //创建活动主题关系
+    private void ObjLabelRelCreate(MktCampaignDO mktCampaignDO) {
+        try {
+            if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())) {
+                List<TopicLabel> list = topicLabelMapper.selectByCampaignType();
+                if (!list.isEmpty()){
+                    TopicLabel label = list.get(0);
+                    if (label != null) {
+                        objectLabelRelMapper.deleteByObjId(mktCampaignDO.getMktCampaignId());
+                        TopicLabelValue labelValue = labelValueMapper.selectByValue(mktCampaignDO.getTheMe());
+                        ObjectLabelRel objectLabelRel = new ObjectLabelRel();
+                        objectLabelRel.setCreateDate(new Date());
+                        objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
+                        objectLabelRel.setObjId(mktCampaignDO.getMktCampaignId());
+                        objectLabelRel.setLabelId(label.getLabelId());
+                        objectLabelRel.setLabelValue(labelValue.getLabelValue());
+                        objectLabelRel.setLabelValueId(labelValue.getLabelValueId());
+                        objectLabelRel.setObjType("1900");
+                        objectLabelRel.setStatusCd("1000");
+                        objectLabelRel.setUpdateDate(new Date());
+                        objectLabelRelMapper.insert(objectLabelRel);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("活动主题关系创建失败");
+        }
     }
 
     /**
@@ -765,21 +816,22 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignDO.setUpdateDate(new Date());
             mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-
             //创建主题关系
-            if (StringUtils.isNotBlank(mktCampaignDO.getTheMe())) {
-                TopicLabel label = topicLabelMapper.selectByLabelCode(mktCampaignDO.getTheMe());
-                if (label != null) {
-                    objectLabelRelMapper.deleteByObjId(mktCampaignDO.getMktCampaignId());
-                    ObjectLabelRel objectLabelRel = new ObjectLabelRel();
-                    objectLabelRel.setCreateDate(new Date());
-                    objectLabelRel.setCreateStaff(mktCampaignDO.getCreateStaff());
-                    objectLabelRel.setObjId(mktCampaignDO.getMktCampaignId());
-                    objectLabelRel.setLabelId(label.getLabelId());
-                    objectLabelRel.setObjType("1900");
-                    objectLabelRel.setStatusCd("1000");
-                    objectLabelRel.setUpdateDate(new Date());
-                    objectLabelRelMapper.insert(objectLabelRel);
+            ObjLabelRelCreate(mktCampaignDO);
+            if (mktCampaignDO.getDirectoryId()!=null){
+                CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                if(catalogItem!=null){
+                    objCatItemRelMapper.deleteByCampaignId(mktCampaignDO.getMktCampaignId());
+                    ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                    objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
+                    objCatItemRel.setCatalogItemId(catalogItem.getCatalogItemId());
+                    objCatItemRel.setStatusCd("1000");
+                    objCatItemRel.setObjType("6000");
+                    objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                    objCatItemRel.setCreateDate(new Date());
+                    objCatItemRel.setStatusDate(new Date());
+                    objCatItemRel.setUpdateDate(new Date());
+                    objCatItemRelMapper.insert(objCatItemRel);
                 }
             }
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
@@ -813,8 +865,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     //redisUtils.del("MKT_CAM_STRATEGY_" + mktCampaignId);
                 }
             }
-
-
             //更新推荐条目
             if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());

@@ -21,4 +21,6 @@ public interface LabelValueMapper {
     int updateByPrimaryKey(TopicLabelValue record);
 
     List<TopicLabelValue> selectByLabelId(@Param("labelId")Long labelId);
+
+    TopicLabelValue selectByValue(@Param("value")String value);
 }
