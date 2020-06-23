@@ -1948,7 +1948,34 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             label.put("labelDataType",labelDTOList.get(i).getLabelDataType());
             labelList.add(label);
         }
-
+        try {
+            //指定渠道添加默认展示列
+            logger.info("指定渠道添加默认展示列1");
+            List<MktCamChlConfDO> mktCamChlConfDOList = mktCamChlConfMapper.selectByCampaignId(trialOperation.getCampaignId());
+            logger.info("指定渠道添加默认展示列2 mktCamChlConfDOList" + mktCamChlConfDOList);
+            Iterator itrator = mktCamChlConfDOList.iterator();
+            while (itrator.hasNext()){
+                MktCamChlConfDO mktCamChlConfDO = (MktCamChlConfDO)itrator.next();
+                Long contactChlId = mktCamChlConfDO.getContactChlId();
+                String contactChlCode =  channelMapper.selectByPrimaryKey(contactChlId).getContactChlCode();
+                SysParams sysParams = sysParamsMapper.selectByParamKey("defaultDisplayLabelOnSpecifiedChannel");
+                List<Map<String,Object>> displayLabelList = (List<Map<String,Object>>)JSON.parse(sysParams.getParamValue());
+                Iterator displayIteraor = displayLabelList.iterator();
+                while (displayIteraor.hasNext()){
+                    Map<String,Object> displayLabel = (Map<String,Object>)displayIteraor.next();
+                    logger.info("默认展示列contactChlCode" + contactChlCode);
+                    logger.info("默认展示列displayLabel 3" + displayLabel);
+                    logger.info("默认展示列displayLabel.get(\"contactChlCode\").toString()" + displayLabel.get("contactChlCode").toString());
+                    if(contactChlCode.equals(displayLabel.get("contactChlCode").toString())){
+                        logger.info("默认展示列displayLabel4:" + displayLabel);
+                        labelList.add(displayLabel);
+                    }
+                }
+            }
+            logger.info("展示列labelList:" + labelList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         for (int i = labelDTOList.size(); i< labelDTOList.size()+attrValue.size();i++){
             fieldList[i] = attrValue.get(i-labelDTOList.size());
         }

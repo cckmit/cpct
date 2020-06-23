@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
+import com.zjtelcom.cpct.dto.channel.LabelDTO;
 import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.elastic.config.IndexList;
@@ -536,6 +537,40 @@ public class CamCpcServiceImpl implements CamCpcService {
                         }
                     }
                 }
+
+                // 试运算展示列
+                try {
+                    List<LabelDTO> calcDisplay = new ArrayList<>();
+                    Map<String, Object> calcDisplayRedis = eventRedisService.getRedis("CAM_LABEL_DTO_LIST", mktCampaign.getMktCampaignId());
+                    if (calcDisplayRedis != null) {
+                        calcDisplay = (List<LabelDTO>) calcDisplayRedis.get("CAM_LABEL_DTO_LIST" + mktCampaign.getMktCampaignId());
+                    }
+                    log.info("calcDisplay --->>>" + JSON.toJSONString(calcDisplay));
+                    for (Map<String, Object> ruleMap : ruleList) {
+                        List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
+                        for (Map<String, Object> map : ChlMap) {
+                            List<Map<String, Object>> calcDisplayList = new ArrayList<>();
+                            if (calcDisplay != null) {
+                                for (LabelDTO labelDTO : calcDisplay) {
+                                    for (Map.Entry<String,Object> stringObjectEntry : context.entrySet()) {
+                                        if(stringObjectEntry.getKey().equals( labelDTO.getLabelCode())){
+                                            Map<String, Object> calcLabel = new HashMap<>();
+                                            calcLabel.put("key", labelDTO.getLabelCode());
+                                            calcLabel.put("value", stringObjectEntry.getValue());
+                                            calcDisplayList.add(calcLabel);
+                                        }
+                                    }
+                                }
+                            }
+                            log.info("calcDisplayList --->>>" + JSON.toJSONString(calcDisplayList));
+                            map.put("calcDisplay", calcDisplayList);
+                            log.info("map --->>>" + JSON.toJSONString(map));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
             } else {
                 //判断是否有命中
@@ -623,6 +658,40 @@ public class CamCpcServiceImpl implements CamCpcService {
                             }
                         }
                     }
+
+                    try {
+                        // 试运算展示列
+                        List<LabelDTO> calcDisplay = new ArrayList<>();
+                        Map<String, Object> calcDisplayRedis = eventRedisService.getRedis("CAM_LABEL_DTO_LIST", mktCampaign.getMktCampaignId());
+                        if (calcDisplayRedis != null) {
+                            calcDisplay = (List<LabelDTO>) calcDisplayRedis.get("CAM_LABEL_DTO_LIST" + mktCampaign.getMktCampaignId());
+                        }
+                        log.info("calcDisplay --->>>" + JSON.toJSONString(calcDisplay));
+                        for (Map<String, Object> ruleMap : ruleList) {
+                            List<Map<String, Object>> ChlMap = (List<Map<String, Object>>) ruleMap.get("taskChlList");
+                            for (Map<String, Object> map : ChlMap) {
+                                List<Map<String, Object>> calcDisplayList = new ArrayList<>();
+                                if (calcDisplay != null) {
+                                    for (LabelDTO labelDTO : calcDisplay) {
+                                        for (Map.Entry<String,Object> stringObjectEntry : context.entrySet()) {
+                                            if(stringObjectEntry.getKey().equals( labelDTO.getLabelCode())){
+                                                Map<String, Object> calcLabel = new HashMap<>();
+                                                calcLabel.put("key", labelDTO.getLabelCode());
+                                                calcLabel.put("value", stringObjectEntry.getValue());
+                                                calcDisplayList.add(calcLabel);
+                                            }
+                                        }
+                                    }
+                                }
+                                log.info("calcDisplayList --->>>" + JSON.toJSONString(calcDisplayList));
+                                map.put("calcDisplay", calcDisplayList);
+                                log.info("map --->>>" + JSON.toJSONString(map));
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
                     esJson.put("hit", false);
                     esJson.put("msg", "策略均未命中");

@@ -114,4 +114,11 @@
         DELETE FROM consumer_log WHERE  #{createDate} > CREATE_DATE
     </delete>
 
+    <select id="selectByParamKey"  parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        PARAM_VALUE
+        from sys_params
+        where PARAM_KEY = #{paramKey};
+    </select>
+
 </mapper>

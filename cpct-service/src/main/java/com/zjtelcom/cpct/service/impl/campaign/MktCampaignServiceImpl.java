@@ -555,6 +555,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignDO.setLanIdFour((Long) landFourAndFiveMap.get("C4"));
                 mktCampaignDO.setLanIdFive((Long) landFourAndFiveMap.get("C5"));
             }
+
+            // 保存活动活动名称默认拼上地市信息
+            if (mktCampaignDO.getLanIdFour() != null) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+                if (sysArea != null) {
+                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+                } else {
+                    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+                    if (organization != null) {
+                        mktCampaignDO.setMktCampaignName("【" + organization.getOrgName() + "】" + mktCampaignDO.getMktCampaignName());
+                    }
+                }
+            } else if (mktCampaignDO.getLanId() != null) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanId().intValue());
+                if (sysArea != null) {
+                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+                }
+            }
+
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码
@@ -1958,6 +1977,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(), UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
             if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
+                try {
+                    eventRedisService.deleteByCampaign(mktCampaignId);
+                    logger.info("【活动缓存清理成功】：" + mktCampaignDO.getMktCampaignName());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("【活动缓存清理失败】：" + mktCampaignDO.getMktCampaignName());
+                }
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
                 List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
@@ -1997,13 +2023,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
-                }
-                try {
-                    eventRedisService.deleteByCampaign(mktCampaignId);
-                    logger.info("【活动缓存清理成功】：" + mktCampaignDO.getMktCampaignName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("【活动缓存清理失败】：" + mktCampaignDO.getMktCampaignName());
                 }
                 syncCamData2Synergy(mktCampaignDO);
                 // 对象转换

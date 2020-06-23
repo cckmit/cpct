@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dubbo.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.LabelServerApplication;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -13,6 +14,7 @@ import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.service.campaign.MktCamDirectoryService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.EventRelService;
+import com.zjtelcom.cpct.service.report.TopicManagerService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -69,6 +71,24 @@ public class SyncLabelController {
     private TopicLabelMapper topicLabelMapper;
     @Autowired
     private LabelValueMapper labelValueMapper;
+    @Autowired
+    private TopicManagerService topicManagerService;
+
+
+    //查看所有主题
+    @PostMapping("/getTopicList")
+    @CrossOrigin
+    public Map<String, Object> getTopicList(){
+
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = topicManagerService.getAllTopic();
+        }catch (Exception e){
+            logger.error("[TopicManageController 主题管理  deleteTopic] fail to listEvents for getTopicList = {}! Exception: ", JSONArray.toJSON(""), e);
+            e.printStackTrace();
+        }
+        return  result;
+    }
 
 
 
