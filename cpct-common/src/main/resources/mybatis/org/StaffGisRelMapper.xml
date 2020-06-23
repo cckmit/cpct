@@ -9,4 +9,13 @@
         WHERE r.GIS_CODE = #{gisCode} and r.status_cd = 1000 and r.rel_type = 1100
     </select>
 
+
+    <select id="selectStaffTelByGisCodeOne" resultType="string">
+        SELECT s.STAFF_CODE
+        FROM staff_gis_rel r
+        LEFT JOIN staff s ON r.staff_id = s.staff_id
+        LEFT JOIN staff_ext t ON t.staff_code = s.staff_code
+        WHERE r.GIS_CODE = #{gisCode} and r.status_cd = 1000 and r.rel_type = 1100 and t.POSITIONZJ = #{postionzj}
+    </select>
+
 </mapper>

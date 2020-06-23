@@ -148,4 +148,18 @@ WHERE
   </select>
 
 
+  <select id="listTarGrpByCampaignId" resultType="java.util.List" parameterType="Long">
+  SELECT
+  p3.TAR_GRP_ID
+  FROM
+  MKT_CAM_STRATEGY_CONF_REL p1
+  LEFT JOIN mkt_strategy_conf_rule_rel p2 ON p1.STRATEGY_CONF_ID = p2.MKT_STRATEGY_CONF_ID
+  LEFT JOIN mkt_strategy_conf_rule p3 ON p3.MKT_STRATEGY_CONF_RULE_ID = p2.MKT_STRATEGY_CONF_RULE_ID
+  WHERE
+  p1.MKT_CAMPAIGN_ID = #{campaignId}
+  </select>
+
+
+
+
 </mapper>

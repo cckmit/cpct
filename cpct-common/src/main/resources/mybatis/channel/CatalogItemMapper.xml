@@ -91,6 +91,14 @@
     where CATALOG_ITEM_NBR = #{catalogItemCode} and  CATALOG_ID = 12
   </select>
 
+  <select id="selectCatalogItemIdByCatalogItemDesc" resultType="java.lang.Long" >
+    select CATALOG_ITEM_ID
+    from catalog_item
+    where CATALOG_ITEM_DESC = #{desc} and  CATALOG_ID = 12
+  </select>
+
+
+
 
 
 

@@ -1287,12 +1287,49 @@
             LEFT JOIN close_rule c ON ms.RULE_ID = c.RULE_ID WHERE m.MKT_CAMPAIGN_ID = #{mktCampaignId}
     </select>
 
+    <!--<select id="listByCreateDate" resultMap="BaseResultMap">-->
+        <!--select *-->
+        <!--from mkt_campaign-->
+        <!--where CREATE_DATE > #{createDateStart} and  #{createDateEnd} > CREATE_DATE-->
+        <!--AND STATUS_CD = 2002-->
+    <!--</select>-->
+
+
     <select id="listByCreateDate" resultMap="BaseResultMap">
-        select MKT_CAMPAIGN_ID
-        from mkt_campaign
-        where CREATE_DATE > #{createDateStart} and  #{createDateEnd} > CREATE_DATE
-        AND (STATUS_CD = 2002 or STATUS_CD = 2008)
+         SELECT
+    t.*
+    FROM
+    mkt_campaign t
+    LEFT JOIN trial_operation p1 ON p1.CAMPAIGN_ID = t.MKT_CAMPAIGN_ID
+    WHERE
+    (t.STATUS_CD = 2002 or  t.STATUS_CD = 2010)
+    AND t.CREATE_DATE > #{createDateStart}
+    and  #{createDateEnd} > t.CREATE_DATE
+    AND (p1.STATUS_CD = 7300 or p1.STATUS_CD = 8100) GROUP BY t.INIT_ID
     </select>
 
+
+
+    <select id="listByCode" resultMap="BaseResultMap">
+        select *
+        from mkt_campaign
+        where MKT_ACTIVITY_NBR = #{code}
+    </select>
+
+    <select id="getAllTheme" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select *
+        from mkt_campaign
+        where 1=1
+        <if test="theme != null and theme != ''">
+        and  THE_ME in (${theme})
+        </if>
+    </select>
+
+
+    <select id="getCampaignList" resultMap="BaseResultMap">
+        select *
+        from mkt_campaign
+        where STATUS_CD = 2002
+    </select>
 
 </mapper>

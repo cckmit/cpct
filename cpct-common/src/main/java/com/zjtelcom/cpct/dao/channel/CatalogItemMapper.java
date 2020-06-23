@@ -27,4 +27,9 @@ public interface CatalogItemMapper {
     int updateByPrimaryKey(CatalogItem record);
 
     CatalogItem selectByCatlogItemCode(String catalogItemCode);
+
+
+    Long selectCatalogItemIdByCatalogItemDesc(String desc);
+
+
 }

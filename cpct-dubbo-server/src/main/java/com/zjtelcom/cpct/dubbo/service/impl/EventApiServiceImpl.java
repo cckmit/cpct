@@ -1005,6 +1005,8 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                         evtContent.put("addressDesc",addressDesc);
                         evtContent.put("c4Name",c4Name);
+                        evtContent.put("400600000016",addressDesc);
+                        evtContent.put("400600000014",c4Name);
                         log.info("addressDesc" +addressDesc);
                         log.info("c4Name" + c4Name);
 

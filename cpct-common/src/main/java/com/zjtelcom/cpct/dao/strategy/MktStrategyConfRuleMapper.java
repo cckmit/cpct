@@ -40,4 +40,6 @@ public interface MktStrategyConfRuleMapper {
 
     List<Map<String,String>> selectAllLabelByStrategyConfId(Long mktStrategyConfRuleId);
 
+    List<Long> listTarGrpByCampaignId(@Param("campaignId")Long campaignId);
+
 }
