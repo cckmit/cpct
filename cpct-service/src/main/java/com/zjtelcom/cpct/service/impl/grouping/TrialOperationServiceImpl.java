@@ -2099,7 +2099,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByRuleId(Long ruleId) {
         Map<String, Object> result = new HashMap<>();
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(ruleId,TrialCreateType.IMPORT_USER_LIST.getValue());
+        MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
+        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(ruleDO.getInitId(),TrialCreateType.IMPORT_USER_LIST.getValue());
         List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", operationDetailList);

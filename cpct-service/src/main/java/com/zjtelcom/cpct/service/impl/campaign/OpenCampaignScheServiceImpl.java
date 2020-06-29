@@ -244,11 +244,11 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             openMktCamGrpRulEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
             mktCamGrpRuls.add(openMktCamGrpRulEntity);
         }
-        if (mktCamGrpRuls.isEmpty()){
-            result.put("code","500");
-            result.put("data","不存在");
-            return result;
-        }
+//        if (mktCamGrpRuls.isEmpty()){
+//            result.put("code","500");
+//            result.put("data","不存在");
+//            return result;
+//        }
 
         ////营服活动推荐条目
         List<MktCamItem> camItemList = mktCamItemMapper.selectByCampaignId(mktCampaignId);
