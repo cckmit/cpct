@@ -64,7 +64,8 @@
 
     <!--根据选业务号码获取黑名单-->
     <select id="getBlackListById" parameterType="java.util.List" resultMap="BaseResultMap">
-        select * from mkt_blacklist where asset_phone in
+        select black_id, asset_phone, service_cate, marketing_cate, public_benefit_cate, channel, staff_id, create_staff, create_date, update_staff,update_date
+        from mkt_blacklist where asset_phone in
             <foreach collection="list" index="index" item = "item" open="(" separator="," close=")">
                 #{item}
             </foreach>

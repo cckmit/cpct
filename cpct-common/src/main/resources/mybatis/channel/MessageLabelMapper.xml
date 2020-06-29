@@ -49,7 +49,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
     select MESSAGE_LABEL_ID, MESSAGE_ID, INJECTION_LABEL_ID, STATUS_CD, CREATE_STAFF, 
     UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
-    from message_label
+    from message_label WHERE 1!=2
   </select>
 
     <select id="qureyMessageLabel" parameterType="com.zjtelcom.cpct.domain.channel.Message" resultMap="BaseResultMap">

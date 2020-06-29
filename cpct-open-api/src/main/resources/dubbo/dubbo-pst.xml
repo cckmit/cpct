@@ -14,7 +14,7 @@
 
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30809"/>
+    <dubbo:protocol name="dubbo" port="30813"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 因子实时查询 -->

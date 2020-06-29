@@ -65,7 +65,7 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select MKT_CAM_CHL_RESULT_ID, MKT_CAM_CHL_RESULT_NAME, RESULT_TYPE, RESULT, REASON, CREATE_STAFF,
     CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,SOURCE_CHANNEL_ID
-    from mkt_cam_chl_result
+    from mkt_cam_chl_result WHERE 1!=2
   </select>
   <select id="selectResultByMktCampaignId" resultMap="BaseResultMap">
     select t.MKT_CAM_CHL_RESULT_ID, t.MKT_CAM_CHL_RESULT_NAME, t.RESULT_TYPE, t.RESULT, t.REASON,
