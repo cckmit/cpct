@@ -561,23 +561,46 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
 
             // 保存活动活动名称默认拼上地市信息
-            if (mktCampaignDO.getLanIdFour() != null) {
-                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
-                if (sysArea != null) {
-                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
-                } else {
-                    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
-                    if (organization != null) {
-                        mktCampaignDO.setMktCampaignName("【" + organization.getOrgName() + "】" + mktCampaignDO.getMktCampaignName());
-                    }
-                }
-            } else if (mktCampaignDO.getLanId() != null) {
-                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanId().intValue());
-                if (sysArea != null) {
-                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
-                }
-            }
+//            if (mktCampaignDO.getLanIdFour() != null) {
+//                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour().intValue());
+//                if (sysArea != null) {
+//                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+//                } else {
+//                    Organization organization = organizationMapper.selectByPrimaryKey(mktCampaignDO.getLanIdFour());
+//                    if (organization != null) {
+//                        mktCampaignDO.setMktCampaignName("【" + organization.getOrgName() + "】" + mktCampaignDO.getMktCampaignName());
+//                    }
+//                }
+//            } else if (mktCampaignDO.getLanId() != null) {
+//                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCampaignDO.getLanId().intValue());
+//                if (sysArea != null) {
+//                    mktCampaignDO.setMktCampaignName("【" + sysArea.getName() + "】" + mktCampaignDO.getMktCampaignName());
+//                }
+//            }
 
+            String creatChannel = mktCampaignDO.getCreateChannel() == null ? "" : mktCampaignDO.getCreateChannel();
+            String sysPostCode = "";
+            if (creatChannel.equals(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())) {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            } else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())) {
+                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+            } else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())) {
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+            } else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())) {
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+            } else if (creatChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())) {
+                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+            } else {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }
+            mktCampaignDO.setRegionFlg(sysPostCode);
+            if ("C1".equals(mktCampaignDO.getRegionFlg()) || "C2".equals(mktCampaignDO.getRegionFlg())){
+                mktCampaignDO.setMktCampaignName("【省】" + mktCampaignDO.getMktCampaignName());
+            }else if ("C3".equals(mktCampaignDO.getRegionFlg())){
+                mktCampaignDO.setMktCampaignName("【市】" + mktCampaignDO.getMktCampaignName());
+            }else if ("C4".equals(mktCampaignDO.getRegionFlg())){
+                mktCampaignDO.setMktCampaignName("【县】" + mktCampaignDO.getMktCampaignName());
+            }
             mktCampaignMapper.insert(mktCampaignDO);
             Long mktCampaignId = mktCampaignDO.getMktCampaignId();
             // 活动编码

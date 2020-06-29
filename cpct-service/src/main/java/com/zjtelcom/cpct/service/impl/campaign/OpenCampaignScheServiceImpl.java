@@ -174,14 +174,16 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         if (mktCamGrpRuls1 == null || mktCamGrpRuls1.isEmpty()) {
             List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignId);
             for (MktStrategyConfRuleDO aLong : ruleDOList) {
-                MktCamGrpRul mktCamGrpRul =new MktCamGrpRul();
-                mktCamGrpRul.setMktCampaignId(mktCampaignId);
-                mktCamGrpRul.setTarGrpId(aLong.getTarGrpId());
-                mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
-                mktCamGrpRul.setStatusDate(new Date());
-                mktCamGrpRul.setCreateDate(new Date());
-                mktCamGrpRul.setUpdateDate(new Date());
-                mktCamGrpRulMapper.insert(mktCamGrpRul);
+                if (aLong.getTarGrpId()!=null){
+                    MktCamGrpRul mktCamGrpRul =new MktCamGrpRul();
+                    mktCamGrpRul.setMktCampaignId(mktCampaignId);
+                    mktCamGrpRul.setTarGrpId(aLong.getTarGrpId());
+                    mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamGrpRul.setStatusDate(new Date());
+                    mktCamGrpRul.setCreateDate(new Date());
+                    mktCamGrpRul.setUpdateDate(new Date());
+                    mktCamGrpRulMapper.insert(mktCamGrpRul);
+                }
             }
             mktCamGrpRuls1 = mktCamGrpRulMapper.selectByCampaignId(mktCampaignId);
         }

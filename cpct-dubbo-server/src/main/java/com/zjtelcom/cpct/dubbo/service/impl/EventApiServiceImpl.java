@@ -753,9 +753,8 @@ public class EventApiServiceImpl implements EventApiService {
                         reultMap.putAll(assetLabelMap);
                     }
                     resultMapList.add(reultMap);
-                    if (map.get("custId")==null || "0".equals(map.get("custId"))){
-                        custId = reultMap.get("CCUST_ID")==null ? custId : reultMap.get("CCUST_ID").toString();
-                    }
+                    //资产级查询客户id替换
+                    custId = reultMap.get("CCUST_ID")==null ? custId : reultMap.get("CCUST_ID").toString();
                 }
                 // 是客户级的
                 if (hasCust) {

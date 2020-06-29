@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.LabelServerApplication;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.campaign.OpenCampaignScheEntity;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.service.SyncEventService;
@@ -74,6 +75,20 @@ public class SyncLabelController {
     @Autowired
     private TopicManagerService topicManagerService;
 
+    private String gaotao = "2200,1400,1100,3299,3656,1900,9932,8946";
+    private String sishengwu = "1600,8444";
+    private String huoyue = "1500,2793,2827";
+    private String kuandai = "1800";
+    private String liuliang = "7544";
+    private String qita = "8354,1700,3734,2769,2752,3864,6382,7637,2100,1200,2300";
+    private String quanyi = "1300,7967";
+    private String ronghe = "3423,6749,6229,3999,8939";
+
+    @Test
+    public void aa() {
+        String[] positionzj = new String []{"35","36","37"};
+        System.out.println(JSON.toJSONString(positionzj));
+    }
 
     //查看所有主题
     @PostMapping("/getTopicList")
@@ -97,32 +112,69 @@ public class SyncLabelController {
     public Map<String, Object> topicLabel(@RequestBody Map<String,Object> param){
         Map<String,Object> result = new HashMap<>();
         try {
-            List<MktCampaignDO> allTheme = mktCampaignMapper.getAllTheme(param.get("theme").toString());
+            List<MktCampaignDO> allTheme = mktCampaignMapper.getAllTheme("");
             if (!allTheme.isEmpty()) {
-                for (MktCampaignDO mktCampaignDO : allTheme) {
-                    List<ObjectLabelRel> objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
-                    TopicLabelValue id = labelValueMapper.selectByPrimaryKey(Long.valueOf(param.get("id").toString()));
-                    String  value = "";
-                    if (id!=null){
-                        value = id.getLabelValue();
-                    }
-                    mktCampaignDO.setTheMe(value);
-                    mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-                    if (objectLabelRels.isEmpty()){
-                        ObjectLabelRel aaa = new ObjectLabelRel();
-                        aaa.setObjId(mktCampaignDO.getMktCampaignId());
-                        aaa.setLabelId(613861134L);
-                        aaa.setLabelValue(value);
-                        aaa.setLabelValueId(Long.valueOf(param.get("id").toString()));
-                        aaa.setStatusCd("1000");
-                        aaa.setObjType("1900");
-                        aaa.setObjNbr(mktCampaignDO.getMktActivityNbr());
-                        aaa.setCreateDate(new Date());
-                        aaa.setStatusDate(new Date());
-                        aaa.setUpdateDate(new Date());
-                        objectLabelRelMapper.insert(aaa);
-                    }
+                List<List<MktCampaignDO>> lists = ChannelUtil.averageAssign(allTheme, 10);
+                for (List<MktCampaignDO> list : lists) {
+                    new Thread(){
+                        public void run(){
+                            for (MktCampaignDO mktCampaignDO : list) {
+                                if (mktCampaignDO.getTheMe()==null || mktCampaignDO.getTheMe().length()< 3){
+                                    continue;
+                                }
+                                Long id = 613861144L;
+                                if (gaotao.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861142L;
+                                }
+                                if (sishengwu.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861136L;
+                                }
+                                if (huoyue.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861143L;
+                                }
+                                if (kuandai.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861138L;
+                                }
+                                if (liuliang.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861137L;
+                                }
+                                if (qita.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861144L;
+                                }
+                                if (quanyi.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861141L;
+                                }
+                                if (ronghe.contains(mktCampaignDO.getTheMe())){
+                                    id = 613861135L;
+                                }
+
+                                List<ObjectLabelRel> objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
+                                TopicLabelValue topicLabelValue = labelValueMapper.selectByPrimaryKey(id);
+                                String  value = "";
+                                if (topicLabelValue!=null){
+                                    value = topicLabelValue.getLabelValue();
+                                }
+                                mktCampaignDO.setTheMe(value);
+                                mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                                if (!mktCampaignDO.getStatusCd().equals("2007") && objectLabelRels.isEmpty()){
+                                    ObjectLabelRel aaa = new ObjectLabelRel();
+                                    aaa.setObjId(mktCampaignDO.getMktCampaignId());
+                                    aaa.setLabelId(613861134L);
+                                    aaa.setLabelValue(value);
+                                    aaa.setLabelValueId(id);
+                                    aaa.setStatusCd("1000");
+                                    aaa.setObjType("1900");
+                                    aaa.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                                    aaa.setCreateDate(new Date());
+                                    aaa.setStatusDate(new Date());
+                                    aaa.setUpdateDate(new Date());
+                                    objectLabelRelMapper.insert(aaa);
+                                }
+                            }
+                        }
+                    }.start();
                 }
+
             }
         } catch (Exception e) {
             logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
@@ -139,28 +191,35 @@ public class SyncLabelController {
         try {
             List<MktCampaignDO> allTheme = mktCampaignMapper.getAllTheme("");
             if (!allTheme.isEmpty()) {
-                for (MktCampaignDO mktCampaignDO : allTheme) {
-                    Long aLong = catalogItemMapper.selectCatalogItemIdByCatalogItemDesc(mktCampaignDO.getTheMe());
-                    if (aLong==null)
-                    {
-                        aLong = 614406331L;
-                    }
-                    mktCampaignDO.setDirectoryId(aLong);
-                    mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
-                    final List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
-                    if (objCatItemRels.isEmpty()){
-                        ObjCatItemRel objCatItemRel = new ObjCatItemRel();
-                        objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
-                        objCatItemRel.setCatalogItemId(aLong);
-                        objCatItemRel.setStatusCd("1000");
-                        objCatItemRel.setObjType("6000");
-                        objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
-                        objCatItemRel.setCreateDate(new Date());
-                        objCatItemRel.setStatusDate(new Date());
-                        objCatItemRel.setUpdateDate(new Date());
-                        objCatItemRelMapper.insert(objCatItemRel);
-                    }
+                List<List<MktCampaignDO>> lists = ChannelUtil.averageAssign(allTheme, 10);
+                for (List<MktCampaignDO> list : lists) {
+                    new Thread(){
+                        public void run(){
+                            for (MktCampaignDO mktCampaignDO : list) {
+                                Long aLong = catalogItemMapper.selectCatalogItemIdByCatalogItemDesc(mktCampaignDO.getTheMe());
+                                if (aLong==null)
+                                {
+                                    aLong = 614406331L;
+                                }
+                                mktCampaignDO.setDirectoryId(aLong);
+                                mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                                final List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
+                                if (!mktCampaignDO.getStatusCd().equals("2007") && objCatItemRels.isEmpty()){
+                                    ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                                    objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
+                                    objCatItemRel.setCatalogItemId(aLong);
+                                    objCatItemRel.setStatusCd("1000");
+                                    objCatItemRel.setObjType("6000");
+                                    objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                                    objCatItemRel.setCreateDate(new Date());
+                                    objCatItemRel.setStatusDate(new Date());
+                                    objCatItemRel.setUpdateDate(new Date());
+                                    objCatItemRelMapper.insert(objCatItemRel);
+                                }
 
+                            }
+                        }
+                    }.start();
                 }
             }
         } catch (Exception e) {
