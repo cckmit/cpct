@@ -295,7 +295,9 @@ public class ActivityStatisticsController extends BaseController {
                             }
                             // 获取批次号
                             String batchNum = content[i][9];
+                            logger.info("batchNum--->"  + batchNum );
                             TrialOperation trialOperation = trialOperationService.selectByBatchNum(batchNum);
+                            logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
                             // 短信过扰差值
                             content[i][24] = trialOperation.getSubNum();
                             // 黑名单过滤个数
