@@ -34,7 +34,7 @@
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select area_id, parent_area, name, area_level
-    from sys_area where  1!=2
+    from sys_area WHERE  1!=2
   </select>
   <select id="selectByAreaLevel"  parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select area_id, parent_area, name, area_level

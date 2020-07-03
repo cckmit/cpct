@@ -3,13 +3,18 @@ package com.zjtelcom.cpct.controller.campaign;
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
-import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.ObjCatItemRel;
+import com.zjtelcom.cpct.domain.channel.ObjectLabelRel;
+import com.zjtelcom.cpct.domain.channel.TopicLabelValue;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
@@ -18,6 +23,7 @@ import com.zjtelcom.cpct.service.strategy.MktStrategyConfService;
 import com.zjtelcom.cpct.service.thread.TarGrpRule;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +63,16 @@ public class CampaignController extends BaseController {
 
     @Autowired
     private CatalogService catalogService;
+    @Autowired(required = false)
+    private OpenApiScheService openApiScheService;
+
+    @RequestMapping(value = "openCampaignScheForDay", method = RequestMethod.POST)
+    @CrossOrigin
+    public String openCampaignScheForDay() {
+        Map result = new HashMap();
+        result = openApiScheService.openCampaignScheForMonth();
+        return JSON.toJSON(result).toString();
+    }
 
 
     /**
@@ -75,6 +91,98 @@ public class CampaignController extends BaseController {
         }
         return result;
     }
+
+
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+    @Autowired
+    private ObjCatItemRelMapper objCatItemRelMapper;
+    @Autowired
+    private CatalogItemMapper catalogItemMapper;
+    @Autowired
+    private ObjectLabelRelMapper objectLabelRelMapper;
+    @Autowired
+    private TopicLabelMapper topicLabelMapper;
+    @Autowired
+    private LabelValueMapper labelValueMapper;
+
+
+
+    @PostMapping("/topicLabel")
+    @CrossOrigin
+    public Map<String, Object> topicLabel(@RequestBody Map<String,Object> param){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<MktCampaignDO> allTheme = mktCampaignMapper.getAllTheme(param.get("theme").toString());
+            if (!allTheme.isEmpty()) {
+                for (MktCampaignDO mktCampaignDO : allTheme) {
+                    List<ObjectLabelRel> objectLabelRels = objectLabelRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
+                    if (objectLabelRels.isEmpty()){
+                        ObjectLabelRel aaa = new ObjectLabelRel();
+                        aaa.setObjId(mktCampaignDO.getMktCampaignId());
+                        aaa.setLabelId(613861134L);
+
+                        TopicLabelValue id = labelValueMapper.selectByPrimaryKey(Long.valueOf(param.get("id").toString()));
+                        if (id!=null){
+                            aaa.setLabelValue(id.getLabelValue());
+                        }
+                        aaa.setLabelId(Long.valueOf(param.get("id").toString()));
+                        aaa.setStatusCd("1000");
+                        aaa.setObjType("1900");
+                        aaa.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                        aaa.setCreateDate(new Date());
+                        aaa.setStatusDate(new Date());
+                        aaa.setUpdateDate(new Date());
+                        objectLabelRelMapper.insert(aaa);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
+
+
+
+    @PostMapping("/selectByObjId")
+    @CrossOrigin
+    public Map<String, Object> selectByObjId(){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<MktCampaignDO> allTheme = mktCampaignMapper.getAllTheme("");
+            if (!allTheme.isEmpty()) {
+                for (MktCampaignDO mktCampaignDO : allTheme) {
+                    Long aLong = catalogItemMapper.selectCatalogItemIdByCatalogItemDesc(mktCampaignDO.getTheMe());
+                    if (aLong==null)
+                    {
+                        aLong = 614406331L;
+                    }
+                        final List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
+                        if (objCatItemRels.isEmpty()){
+                            ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                            objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
+                            objCatItemRel.setCatalogItemId(aLong);
+                            objCatItemRel.setStatusCd("1000");
+                            objCatItemRel.setObjType("6000");
+                            objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                            objCatItemRel.setCreateDate(new Date());
+                            objCatItemRel.setStatusDate(new Date());
+                            objCatItemRel.setUpdateDate(new Date());
+                            objCatItemRelMapper.insert(objCatItemRel);
+                        }
+
+                }
+            }
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] fail to channelEffectDateCheck",e);
+        }
+        return result;
+    }
+
+
+
+
 
 
 

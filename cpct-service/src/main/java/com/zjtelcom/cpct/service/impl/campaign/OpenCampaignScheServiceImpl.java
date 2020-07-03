@@ -24,19 +24,18 @@ import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamGrpRulEntity
 import com.zjtelcom.cpct.domain.openApi.mktCampaignEntity.OpenMktCamScriptEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpConditionEntity;
 import com.zjtelcom.cpct.domain.openApi.tarGrp.OpenTarGrpEntity;
+import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.Operator;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.dubbo.UCCPService;
-import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.RedisUtils;
-import com.zjtelcom.cpct.util.RedisUtils_prd;
+import com.zjtelcom.cpct.util.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -132,6 +131,8 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
     private TopicLabelMapper topicLabelMapper;
     @Autowired
     private CatalogItemMapper catalogItemMapper;
+    @Autowired
+    private LabelValueMapper labelValueMapper;
 
 
 
@@ -170,13 +171,36 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
 
         //营服活动分群规则
         List<MktCamGrpRul> mktCamGrpRuls1 = mktCamGrpRulMapper.selectByCampaignId(mktCampaignId);
+        if (mktCamGrpRuls1 == null || mktCamGrpRuls1.isEmpty()) {
+            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(mktCampaignId);
+            for (MktStrategyConfRuleDO aLong : ruleDOList) {
+                if (aLong.getTarGrpId()!=null){
+                    MktCamGrpRul mktCamGrpRul =new MktCamGrpRul();
+                    mktCamGrpRul.setMktCampaignId(mktCampaignId);
+                    mktCamGrpRul.setTarGrpId(aLong.getTarGrpId());
+                    mktCamGrpRul.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                    mktCamGrpRul.setStatusDate(new Date());
+                    mktCamGrpRul.setCreateDate(new Date());
+                    mktCamGrpRul.setUpdateDate(new Date());
+                    mktCamGrpRulMapper.insert(mktCamGrpRul);
+                }
+            }
+            mktCamGrpRuls1 = mktCamGrpRulMapper.selectByCampaignId(mktCampaignId);
+        }
         for (MktCamGrpRul rul : mktCamGrpRuls1) {
             OpenMktCamGrpRulEntity openMktCamGrpRulEntity = BeanUtil.create(rul, new OpenMktCamGrpRulEntity());
             TarGrp tarGrp = tarGrpMapper.selectByPrimaryKey(rul.getTarGrpId());
+            if (tarGrp==null){
+                continue;
+            }
             OpenTarGrpEntity openTarGrpEntity = BeanUtil.create(tarGrp,new OpenTarGrpEntity());
+            openTarGrpEntity.setTarGrpName(tarGrp.getTarGrpName()==null || tarGrp.getTarGrpName().equals("") ? "目标分群"+rul.getMktStrategyConfRuleId(): tarGrp.getTarGrpName() );
             List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(rul.getTarGrpId());
             List<OpenTarGrpConditionEntity> openTarGrpConditionEntityList = new ArrayList<>();
             StringBuilder expression = new StringBuilder();
+            if (conditions.isEmpty()){
+                continue;
+            }
             for (TarGrpCondition condition : conditions) {
                 OpenTarGrpConditionEntity openTarGrpConditionEntity = BeanUtil.create(condition, new OpenTarGrpConditionEntity());
                 Label label = injectionLabelMapper.selectByPrimaryKey(Long.valueOf(condition.getLeftParam()));
@@ -185,39 +209,56 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 openTarGrpConditionEntity.setLeftParamName(label.getInjectionLabelName());
                 openTarGrpConditionEntity.setOperType(Operator.getOperator(Integer.valueOf(condition.getOperType())).getDescription());
                     if (condition.getCreateDate() != null) {
-                        openTarGrpConditionEntity.setCreateDate(DateUtil.Date2String(condition.getCreateDate()));
+                        openTarGrpConditionEntity.setCreateDate(DateUtil.date2St4Trial(condition.getCreateDate()));
                     }
                     if (condition.getUpdateDate() != null) {
-                        openTarGrpConditionEntity.setUpdateDate(DateUtil.Date2String(condition.getUpdateDate()));
+                        openTarGrpConditionEntity.setUpdateDate(DateUtil.date2St4Trial(condition.getUpdateDate()));
+                    }
+                    if (condition.getRightParam().length() > 390 ) {
+                        continue;
                     }
                 openTarGrpConditionEntityList.add(openTarGrpConditionEntity);
                 expression.append(assLabel(label,condition.getOperType(),condition.getRightParam()));
                 }
             }
+            if (expression.toString().equals("") || expression.toString().length()<5 ){
+                continue;
+            }
             //todo
             openTarGrpEntity.setTarGrpConditionExpression(expression.toString());
             openTarGrpEntity.setTarGrpConditions(openTarGrpConditionEntityList);
             if (tarGrp.getCreateDate() != null) {
-                openTarGrpEntity.setCreateDate(DateUtil.Date2String(tarGrp.getCreateDate()));
+                openTarGrpEntity.setCreateDate(DateUtil.date2St4Trial(tarGrp.getCreateDate()));
             }
             if (tarGrp.getUpdateDate() != null) {
-                openTarGrpEntity.setUpdateDate(DateUtil.Date2String(tarGrp.getUpdateDate()));
+                openTarGrpEntity.setUpdateDate(DateUtil.date2St4Trial(tarGrp.getUpdateDate()));
             }
             if (rul.getCreateDate() != null) {
-                openMktCamGrpRulEntity.setCreateDate(DateUtil.Date2String(rul.getCreateDate()));
+                openMktCamGrpRulEntity.setCreateDate(DateUtil.date2St4Trial(rul.getCreateDate()));
             }
             if (rul.getUpdateDate() != null) {
-                openMktCamGrpRulEntity.setUpdateDate(DateUtil.Date2String(rul.getUpdateDate()));
+                openMktCamGrpRulEntity.setUpdateDate(DateUtil.date2St4Trial(rul.getUpdateDate()));
             }
             openMktCamGrpRulEntity.setTarGrp(openTarGrpEntity);
             openMktCamGrpRulEntity.setMktCampaignId(campaignDO.getMktCampaignId());
             openMktCamGrpRulEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
             mktCamGrpRuls.add(openMktCamGrpRulEntity);
         }
+//        if (mktCamGrpRuls.isEmpty()){
+//            result.put("code","500");
+//            result.put("data","不存在");
+//            return result;
+//        }
 
         ////营服活动推荐条目
         List<MktCamItem> camItemList = mktCamItemMapper.selectByCampaignId(mktCampaignId);
         for (MktCamItem item : camItemList) {
+            if (item.getOfferName()==null || item.getOfferName().equals("")){
+                continue;
+            }
+            if (item.getOfferCode()==null || item.getOfferCode().equals("")){
+                continue;
+            }
             OpenMktCamItemEntity openMktCamItemEntity = BeanUtil.create(item, new OpenMktCamItemEntity());
             openMktCamItemEntity.setItemNbr(item.getOfferCode());
             openMktCamItemEntity.setItemName(item.getOfferName());
@@ -225,10 +266,10 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             openMktCamItemEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
             openMktCamItemEntity.setMktCampaignId(campaignDO.getMktCampaignId());
             if (item.getCreateDate() != null) {
-                openMktCamItemEntity.setCreateDate(DateUtil.Date2String(item.getCreateDate()));
+                openMktCamItemEntity.setCreateDate(DateUtil.date2St4Trial(item.getCreateDate()));
             }
             if (item.getUpdateDate() != null) {
-                openMktCamItemEntity.setUpdateDate(DateUtil.Date2String(item.getUpdateDate()));
+                openMktCamItemEntity.setUpdateDate(DateUtil.date2St4Trial(item.getUpdateDate()));
             }
             mktCamItems.add(openMktCamItemEntity);
         }
@@ -241,11 +282,16 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             if (camScript!=null){
                 OpenMktCamScriptEntity openMktCamScriptEntity = BeanUtil.create(camScript, new OpenMktCamScriptEntity());
                 if (camScript.getCreateDate() != null) {
-                    openMktCamScriptEntity.setCreateDate(DateUtil.Date2String(camScript.getCreateDate()));
+                    openMktCamScriptEntity.setCreateDate(DateUtil.date2St4Trial(camScript.getCreateDate()));
                 }
                 if (camScript.getUpdateDate() != null) {
-                    openMktCamScriptEntity.setUpdateDate(DateUtil.Date2String(camScript.getUpdateDate()));
+                    openMktCamScriptEntity.setUpdateDate(DateUtil.date2St4Trial(camScript.getUpdateDate()));
                 }
+                openMktCamScriptEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
+                if(openMktCamScriptEntity.getScriptDesc()==null || openMktCamScriptEntity.getScriptDesc().equals("")  ){
+                    openMktCamScriptEntity.setScriptDesc("未配置脚本");
+                }
+                openMktCamScriptEntity.setMktCampaignId(mktCampaignId);
                 openMktCamScriptEntity.setMktActivityNbr(campaignDO.getMktActivityNbr());
                 mktCamScripts.add(openMktCamScriptEntity);
             }
@@ -258,10 +304,10 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                 openMktCamChlConfEntity.setContactChlName(channel.getContactChlName());
             }
             if (mktCamChlConfDO.getCreateDate() != null) {
-                openMktCamChlConfEntity.setCreateDate(DateUtil.Date2String(mktCamChlConfDO.getCreateDate()));
+                openMktCamChlConfEntity.setCreateDate(DateUtil.date2St4Trial(mktCamChlConfDO.getCreateDate()));
             }
             if (mktCamChlConfDO.getUpdateDate() != null) {
-                openMktCamChlConfEntity.setUpdateDate(DateUtil.Date2String(mktCamChlConfDO.getUpdateDate()));
+                openMktCamChlConfEntity.setUpdateDate(DateUtil.date2St4Trial(mktCamChlConfDO.getUpdateDate()));
             }
             mktCamChlConf.add(openMktCamChlConfEntity);
         }
@@ -272,18 +318,21 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             ContactEvt eventById = contactEvtMapper.getEventById(relDO.getEventId());
             openMktCamEvtRelEntity.setEventNbr(eventById.getContactEvtCode());
             openMktCamEvtRelEntity.setEventName(eventById.getContactEvtName());
-            if (eventById.getCreateDate()!=null){
-                openMktCamEvtRelEntity.setCreateDate(DateUtil.Date2String(eventById.getCreateDate()));
+            if (relDO.getCreateDate()!=null){
+                openMktCamEvtRelEntity.setCreateDate(DateUtil.date2St4Trial(relDO.getCreateDate()));
             }
-            if (eventById.getUpdateDate()!=null){
-                openMktCamEvtRelEntity.setUpdateDate(DateUtil.Date2String(eventById.getUpdateDate()));
+            if (relDO.getUpdateDate()!=null){
+                openMktCamEvtRelEntity.setUpdateDate(DateUtil.date2St4Trial(relDO.getUpdateDate()));
+            }
+            if (relDO.getStatusDate()!=null){
+                openMktCamEvtRelEntity.setUpdateDate(DateUtil.date2St4Trial(relDO.getUpdateDate()));
             }
             mktCamEvtRels.add(openMktCamEvtRelEntity);
         }
         //对象区域关系
         ObjRegionRelEntity objRegionRel = new ObjRegionRelEntity();
         objRegionRel.setObjRegionRelId(campaignDO.getMktCampaignId());
-        objRegionRel.setObjId(campaignDO.getInitId());
+        objRegionRel.setObjId(campaignDO.getMktCampaignId());
         objRegionRel.setObjNbr(campaignDO.getMktActivityNbr());
         Long regionId = AreaCodeEnum.getRegionIdByLandId(campaignDO.getLanId());
         if(regionId != null) {
@@ -291,36 +340,33 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             objRegionRel.setApplyRegionId(regionId);
         }
         objRegionRel.setStatusCd("1000");
-        objRegionRel.setCreateDate(DateUtil.Date2String(campaignDO.getCreateDate()));
-        objRegionRel.setUpdateDate(DateUtil.Date2String(campaignDO.getUpdateDate()));
+        objRegionRel.setCreateDate(DateUtil.date2St4Trial(campaignDO.getCreateDate()));
+        objRegionRel.setUpdateDate(DateUtil.date2St4Trial(campaignDO.getUpdateDate()));
         objRegionRels.add(objRegionRel);
         //对象目录节点关系
         ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaignDO).invoke();
         objCatItemRels = objInfoCreate.getObjCatItemRels();
         objectLabelRels = objInfoCreate.getObjectLabelRels();
+        campaignScheEntity.setExecType(campaignScheEntity.getExecType()==null || campaignScheEntity.getExecType().equals("") ? "1000" : campaignScheEntity.getExecType());
         campaignScheEntity.setMktCamGrpRuls(mktCamGrpRuls);
         campaignScheEntity.setMktCamItems(mktCamItems);
-        campaignScheEntity.setMktCamChlConf(mktCamChlConf);
+        campaignScheEntity.setMktCamChlConfs(mktCamChlConf);
         campaignScheEntity.setMktCamEvtRels(mktCamEvtRels);
         campaignScheEntity.setObjRegionRels(objRegionRels);
         campaignScheEntity.setObjCatItemRels(objCatItemRels);
         campaignScheEntity.setObjectLabelRels(objectLabelRels);
-        if (campaignDO.getPlanBeginTime()!=null){
-            campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaignDO.getPlanBeginTime()));
-            campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
-        }
-        if (campaignDO.getPlanEndTime()!=null){
-            campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaignDO.getPlanEndTime()));
-            campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
-        }
+        campaignScheEntity.setPlanBeginTime(DateUtil.date2St4Trial(campaignDO.getPlanBeginTime() == null ? campaignDO.getCreateDate() : campaignDO.getPlanBeginTime()));
+        campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
+        campaignScheEntity.setPlanEndTime(DateUtil.date2St4Trial(campaignDO.getPlanEndTime() == null ? campaignDO.getUpdateDate() : campaignDO.getPlanEndTime()));
+        campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
         if (campaignDO.getCreateDate()!=null){
-            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaignDO.getCreateDate()));
+            campaignScheEntity.setCreateDate(DateUtil.date2St4Trial(campaignDO.getCreateDate()));
         }
         if (campaignDO.getStatusDate()!=null){
-            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaignDO.getStatusDate()));
+            campaignScheEntity.setStatusDate(DateUtil.date2St4Trial(campaignDO.getStatusDate()));
         }
         if (campaignDO.getUpdateDate()!=null){
-            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaignDO.getUpdateDate()));
+            campaignScheEntity.setUpdateDate(DateUtil.date2St4Trial(campaignDO.getUpdateDate()));
         }
         result.put("code","200");
         result.put("data",campaignScheEntity);
@@ -401,21 +447,21 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
         campaignScheEntity.setManageType("6000");
         campaignScheEntity.setRegionNbr("8330000");
         if (campaign.getPlanBeginTime()!=null){
-            campaignScheEntity.setPlanBeginTime(DateUtil.Date2String(campaign.getPlanBeginTime()));
+            campaignScheEntity.setPlanBeginTime(DateUtil.date2St4Trial(campaign.getPlanBeginTime()));
             campaignScheEntity.setBeginTime(campaignScheEntity.getPlanBeginTime());
         }
         if (campaign.getPlanEndTime()!=null){
-            campaignScheEntity.setPlanEndTime(DateUtil.Date2String(campaign.getPlanEndTime()));
+            campaignScheEntity.setPlanEndTime(DateUtil.date2St4Trial(campaign.getPlanEndTime()));
             campaignScheEntity.setEndTime(campaignScheEntity.getPlanEndTime());
         }
         if (campaign.getCreateDate()!=null){
-            campaignScheEntity.setCreateDate(DateUtil.Date2String(campaign.getCreateDate()));
+            campaignScheEntity.setCreateDate(DateUtil.date2St4Trial(campaign.getCreateDate()));
         }
         if (campaign.getStatusDate()!=null){
-            campaignScheEntity.setStatusDate(DateUtil.Date2String(campaign.getStatusDate()));
+            campaignScheEntity.setStatusDate(DateUtil.date2St4Trial(campaign.getStatusDate()));
         }
         if (campaign.getUpdateDate()!=null){
-            campaignScheEntity.setUpdateDate(DateUtil.Date2String(campaign.getUpdateDate()));
+            campaignScheEntity.setUpdateDate(DateUtil.date2St4Trial(campaign.getUpdateDate()));
         }
         ObjInfoCreate objInfoCreate = new ObjInfoCreate(campaign).invoke();
 
@@ -487,19 +533,33 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
              List<OpenObjCatItemRelEntity> calList = new ArrayList<>();
              List<OpenObjectLabelRelEntity> labellist = new ArrayList<>();
             List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+            if (objCatItemRels.isEmpty()) {
+
+                ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                objCatItemRel.setObjId(campaign.getMktCampaignId());
+                objCatItemRel.setCatalogItemId(614406331L);
+                objCatItemRel.setStatusCd("1000");
+                objCatItemRel.setObjType("6000");
+                objCatItemRel.setObjNbr(campaign.getMktActivityNbr());
+                objCatItemRel.setCreateDate(new Date());
+                objCatItemRel.setStatusDate(new Date());
+                objCatItemRel.setUpdateDate(new Date());
+                objCatItemRelMapper.insert(objCatItemRel);
+                objCatItemRels = objCatItemRelMapper.selectByObjId(campaign.getMktCampaignId());
+            }
             for (ObjCatItemRel objCatItemRel : objCatItemRels) {
                 OpenObjCatItemRelEntity openObjCatItemRelEntity = BeanUtil.create(objCatItemRel, new OpenObjCatItemRelEntity());
                 openObjCatItemRelEntity.setObjNbr(campaign.getMktActivityNbr());
                 CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(objCatItemRel.getCatalogItemId());
-                if (catalogItem!=null){
+                if (catalogItem != null) {
                     openObjCatItemRelEntity.setCatalogItemName(catalogItem.getCatalogItemName());
                     openObjCatItemRelEntity.setCatalogItemNbr(catalogItem.getCatalogItemNbr());
                 }
-                if (objCatItemRel.getCreateDate()!=null){
-                    openObjCatItemRelEntity.setCreateDate(DateUtil.Date2String(objCatItemRel.getCreateDate()));
+                if (objCatItemRel.getCreateDate() != null) {
+                    openObjCatItemRelEntity.setCreateDate(DateUtil.date2St4Trial(objCatItemRel.getCreateDate()));
                 }
-                if (objCatItemRel.getUpdateDate()!=null){
-                    openObjCatItemRelEntity.setUpdateDate(DateUtil.Date2String(objCatItemRel.getUpdateDate()));
+                if (objCatItemRel.getUpdateDate() != null) {
+                    openObjCatItemRelEntity.setUpdateDate(DateUtil.date2St4Trial(objCatItemRel.getUpdateDate()));
                 }
                 calList.add(openObjCatItemRelEntity);
             }
@@ -508,6 +568,22 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
 
             //对象关联标签
             List<ObjectLabelRel> objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+            if (objectLabelRels.isEmpty()){
+                ObjectLabelRel aaa = new ObjectLabelRel();
+                aaa.setObjId(campaign.getMktCampaignId());
+                aaa.setLabelId(613861134L);
+                aaa.setLabelValue("99");
+                aaa.setLabelValueId(613861134L);
+                aaa.setStatusCd("1000");
+                aaa.setObjType("1900");
+                aaa.setObjNbr(campaign.getMktActivityNbr());
+                aaa.setCreateDate(new Date());
+                aaa.setStatusDate(new Date());
+                aaa.setUpdateDate(new Date());
+                objectLabelRelMapper.insert(aaa);
+                objectLabelRels = objectLabelRelMapper.selectByObjId(campaign.getMktCampaignId());
+            }
+
             for (ObjectLabelRel objectLabelRel : objectLabelRels) {
                 OpenObjectLabelRelEntity openObjectLabelRelEntity = BeanUtil.create(objectLabelRel, new OpenObjectLabelRelEntity());
                 openObjectLabelRelEntity.setObjNbr(campaign.getMktActivityNbr());
@@ -517,10 +593,10 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
                     openObjectLabelRelEntity.setLabelCode(label.getLabelCode());
                 }
                 if (objectLabelRel.getCreateDate()!=null){
-                    openObjectLabelRelEntity.setCreateDate(DateUtil.Date2String(objectLabelRel.getCreateDate()));
+                    openObjectLabelRelEntity.setCreateDate(DateUtil.date2St4Trial(objectLabelRel.getCreateDate()));
                 }
                 if (objectLabelRel.getUpdateDate()!=null){
-                    openObjectLabelRelEntity.setUpdateDate(DateUtil.Date2String(objectLabelRel.getUpdateDate()));
+                    openObjectLabelRelEntity.setUpdateDate(DateUtil.date2St4Trial(objectLabelRel.getUpdateDate()));
                 }
                 labellist.add(openObjectLabelRelEntity);
             }

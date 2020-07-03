@@ -123,7 +123,7 @@ public class EventRelServiceImpl implements EventRelService {
         List<Map<String,Object>> data = new ArrayList<>();
         try{
             for(String offerCode :offerCodeList){
-                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(Integer.parseInt(offerCode),Integer.parseInt(eventType));
+                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
                 log.info(" 数据库返回：mktOfferEventDOList" + mktOfferEventDOList);
                 HashMap<String,Object> dataMap = new HashMap<String,Object>();
                 if(mktOfferEventDOList.size() == 0){

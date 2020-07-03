@@ -65,5 +65,11 @@
   </select>
 
 
+  <delete id="deleteByCampaignId" parameterType="java.lang.Long">
+    delete from obj_cat_item_rel
+    where OBJ_ID = #{campaignId} and  OBJ_TYPE = 6000
+  </delete>
+
+
 
 </mapper>

@@ -26,7 +26,7 @@
         select LOG_ID, METHOD,ARGS,RETURNVALUE,ASSETPHONE,SERVICECATE,MAKETINGCATE,PUBLICBENEFITCATE,CHANNEL,STAFFID,CREATE_STAFF,CREATE_DATE,
         UPDATE_STAFF,UPDATE_DATE,OPERTYPE,REMARK
         from mkt_blacklist_log
-        <where>
+        <where>1!=2
             <if test="assetPhone != null and  assetPhone != ''">
                 AND assetPhone = #{assetPhone}
             </if>

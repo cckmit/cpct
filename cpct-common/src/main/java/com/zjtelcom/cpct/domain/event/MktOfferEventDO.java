@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class MktOfferEventDO {
-    private int offerId;
-    private int mktCampaignId;
-    private int eventId;
+    private Long offerId;
+    private Long mktCampaignId;
+    private Long eventId;
     private String eventName;
+    private String eventNbr;
 }

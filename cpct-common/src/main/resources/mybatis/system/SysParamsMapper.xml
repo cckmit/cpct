@@ -53,7 +53,7 @@
         select PARAM_ID, PARAM_NAME, PARAM_VALUE, CONFIG_TYPE, MODIFY_FLAG, DESCRIPTION,
         PARAM_KEY, CREATE_DATE, CREATE_STAFF, UPDATE_DATE, UPDATE_STAFF
         from sys_params
-        <where>
+        <where>1!=2
         <if test="paramName != null and paramName != ''">
             and PARAM_NAME like CONCAT('%',#{paramName,jdbcType=VARCHAR},'%')
         </if>
@@ -113,5 +113,12 @@
     <delete id="delectConsumerlogByDate" parameterType="java.lang.String" >
         DELETE FROM consumer_log WHERE  #{createDate} > CREATE_DATE
     </delete>
+
+    <select id="selectByParamKey"  parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        PARAM_VALUE
+        from sys_params
+        where PARAM_KEY = #{paramKey};
+    </select>
 
 </mapper>

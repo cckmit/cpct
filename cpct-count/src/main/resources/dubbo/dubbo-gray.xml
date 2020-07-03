@@ -12,7 +12,7 @@
     <dubbo:registry id="esb3" protocol="dubbo" address="134.96.249.149:8001"/>
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.161.20:8001"/>
 
-    <dubbo:protocol name="dubbo" port="30810"/>
+    <dubbo:protocol name="dubbo" port="30814"/>
     <dubbo:monitor protocol="registry" />
 
 

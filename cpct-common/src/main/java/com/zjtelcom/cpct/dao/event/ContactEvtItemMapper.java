@@ -37,4 +37,6 @@ public interface ContactEvtItemMapper {
 
     int modEventItem(EventItem record);
 
+    List<String> selectEvtItemCodeByEventId(Long eventId);
+
 }

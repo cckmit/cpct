@@ -4,10 +4,12 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.LabelValueMapper;
 import com.zjtelcom.cpct.dao.channel.ObjectLabelRelMapper;
 import com.zjtelcom.cpct.dao.channel.TopicLabelMapper;
 import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
 import com.zjtelcom.cpct.domain.channel.TopicLabel;
+import com.zjtelcom.cpct.domain.channel.TopicLabelValue;
 import com.zjtelcom.cpct.domain.report.TopicDO;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.report.TopicManagerService;
@@ -29,6 +31,8 @@ public class TopicManagerServiceImpl implements TopicManagerService {
     private ObjectLabelRelMapper objectLabelRelMapper;
     @Autowired
     private TopicLabelMapper topicLabelMapper;
+    @Autowired
+    private LabelValueMapper labelValueMapper;
     //  year,season,topicName,description
     @Override
     public Map<String, Object> addTopic(Map<String, Object> topicContent) {
@@ -255,18 +259,24 @@ public class TopicManagerServiceImpl implements TopicManagerService {
         List<Map<String, Object>> resultLists = new ArrayList<>();
         Map<String, Object> result = new HashMap<>();
         try {
-            List<TopicDO> topicLists = mktCamTopicMapper.selectAllTopicInfo();
-            for (TopicDO topicDO : topicLists) {
-                Map<String, Object> temp = new HashMap<>();
-                temp.put("id", topicDO.getTopicId());
-                temp.put("year", topicDO.getYear());
-                temp.put("season", topicDO.getSeason());
-                temp.put("topicName", topicDO.getTopicName());
-                temp.put("topicCode", topicDO.getTopicCode());
-                temp.put("stateCd", topicDO.getStatusCd());
-                temp.put("description", topicDO.getDescription());
-                temp.put("seasonChinese",sesonInChinese(topicDO));
-                resultLists.add(temp);
+            List<TopicLabel> list = topicLabelMapper.selectByCampaignType();
+            if (list==null || list.isEmpty()){
+                result.put("resultCode", CommonConstant.CODE_FAIL);
+                result.put("resultMsg", "集团主题数据缺失，请联系管理员");
+                return result;
+            }
+            TopicLabel topicLabel = list.get(0);
+            if (topicLabel!=null){
+                List<TopicLabelValue> topicLabelValues = labelValueMapper.selectByLabelId(topicLabel.getLabelId());
+                for (TopicLabelValue topicLabelValue : topicLabelValues) {
+                    Map<String, Object> temp = new HashMap<>();
+                    temp.put("id", topicLabelValue.getLabelValueId());
+                    temp.put("topicName", topicLabelValue.getValueName());
+                    temp.put("topicCode", topicLabelValue.getLabelValue());
+                    temp.put("stateCd", topicLabelValue.getStatusCd());
+                    temp.put("description", topicLabelValue.getValueDesc());
+                    resultLists.add(temp);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

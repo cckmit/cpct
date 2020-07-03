@@ -571,6 +571,20 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktCpcAlgorithmsRulDO.setUpdateStaff(UserUtil.loginId());
                 mktCpcAlgorithmsRulDO.setUpdateDate(new Date());
                 mktCpcAlgorithmsRulMapper.updateByPrimaryKey(mktCpcAlgorithmsRulDO);
+            }else {
+                //添加cpc算法规则
+                mktCpcAlgorithmsRulDO = new MktCpcAlgorithmsRulDO();
+                mktCpcAlgorithmsRulDO.setAlgorithmsRulId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                mktCpcAlgorithmsRulDO.setAlgorithmsRulName(mktStrategyConfRuleDO.getMktStrategyConfRuleName());
+                mktCpcAlgorithmsRulDO.setRuleExpression(
+                        "{" + mktStrategyConfRule.getTarGrpId() +"}通过{" + mktStrategyConfRule.getStrategyConfId() +"}推送{" + mktStrategyConfRule.getProductIdlist() + "}");
+                mktCpcAlgorithmsRulDO.setStatusCd(StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+                mktCpcAlgorithmsRulDO.setStatusDate(new Date());
+                mktCpcAlgorithmsRulDO.setCreateDate(new Date());
+                mktCpcAlgorithmsRulDO.setCreateStaff(UserUtil.loginId());
+                mktCpcAlgorithmsRulDO.setUpdateStaff(UserUtil.loginId());
+                mktCpcAlgorithmsRulDO.setUpdateDate(new Date());
+                mktCpcAlgorithmsRulMapper.insert(mktCpcAlgorithmsRulDO);
             }
 
             //cpc算法规则关联表

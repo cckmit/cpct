@@ -102,7 +102,7 @@
     <dubbo:reference interface="com.zjtelcom.cpct.dubbo.service.CamApiSerService" id="camApiSerService"
                      version="1.0" retries="0" check="false">
         <dubbo:method name="ActivitySerTask" servicecode="00.1083.ActivityTask_zsc" timeout="15000"/>
-        <dubbo:method name="ActivityXieTongTask" servicecode="00.1083.ActivityXieTongTask" timeout="20000"/>   
+        <dubbo:method name="ActivityXieTongTask" servicecode="00.1083.ActivityXieTongTask" timeout="20000"/>
     </dubbo:reference>
 
 

@@ -15,10 +15,16 @@
     <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate" />
     <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="BEFORE_NUM" jdbcType="VARCHAR" property="beforeNum" />
+    <result column="END_NUM" jdbcType="VARCHAR" property="endNum" />
+    <result column="SUB_NUM" jdbcType="VARCHAR" property="subNum" />
   </resultMap>
 
   <sql id="selectColumn">
-    ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+     UPDATE_DATE, REMARK,START_TIME,END_TIME,BEFORE_NUM,END_NUM,SUB_NUM
   </sql>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -29,13 +35,15 @@
     insert into trial_operation (ID, CAMPAIGN_ID, CAMPAIGN_NAME, 
       STRATEGY_ID, STRATEGY_NAME, BATCH_NUM,  STATUS_CD,
       CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, 
-      STATUS_DATE, UPDATE_DATE, REMARK
+      STATUS_DATE, UPDATE_DATE, REMARK,START_TIME,END_TIME,BEFORE_NUM,END_NUM,SUB_NUM
       )
     values (#{id,jdbcType=BIGINT}, #{campaignId,jdbcType=BIGINT}, #{campaignName,jdbcType=VARCHAR}, 
       #{strategyId,jdbcType=BIGINT}, #{strategyName,jdbcType=VARCHAR}, #{batchNum,jdbcType=BIGINT}, 
       #{statusCd,jdbcType=VARCHAR},
       #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, now(3),
-      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      #{statusDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{beforeNum,jdbcType=VARCHAR},
+      #{endNum,jdbcType=VARCHAR},#{subNum,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.grouping.TrialOperation">
@@ -74,9 +82,25 @@
     <if test="remark != null and remark != ''">
       REMARK = #{remark,jdbcType=VARCHAR},
     </if>
+    <if test="beforeNum != null and beforeNum != ''">
+      BEFORE_NUM = #{beforeNum,jdbcType=VARCHAR},
+    </if>
+    <if test="endNum != null and endNum != ''">
+      END_NUM = #{endNum,jdbcType=VARCHAR},
+    </if>
+    <if test="subNum != null and subNum != ''">
+      SUB_NUM = #{subNum,jdbcType=VARCHAR},
+    </if>
+    <if test="createDate != null">
+      START_TIME = #{startTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="statusDate != null">
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+    </if>
     UPDATE_DATE = now(3)
     where ID = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select <include refid="selectColumn"/>
     from trial_operation

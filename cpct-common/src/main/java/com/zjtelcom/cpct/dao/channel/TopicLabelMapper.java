@@ -22,4 +22,6 @@ public interface TopicLabelMapper {
     int updateByPrimaryKey(TopicLabel record);
 
     TopicLabel selectByLabelCode(@Param("labelCode") String labelCode);
+
+    List<TopicLabel> selectByCampaignType();
 }

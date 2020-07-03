@@ -513,7 +513,6 @@ public class SynchronizeCampaignServiceImpl extends BaseService implements Synch
                     @Override
                     public void run() {
                         // 删除策略关系缓存
-
                         redisUtils.del("MKT_STRATEGY_REL_" + mktCamStrategyConfRelDO.getStrategyConfId());
                         List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = mktStrategyConfRuleMapper.selectByMktStrategyConfId(mktCamStrategyConfRelDO.getStrategyConfId());
                         for (MktStrategyConfRuleDO mktStrategyConfRuleDO : mktStrategyConfRuleDOList) {

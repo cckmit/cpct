@@ -61,6 +61,7 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
             directoryMap.put("resultMsg", "查询成功！");
             directoryMap.put("mktCamDirectoryList", mktCamDirectoryList);
         } catch (Exception e) {
+            e.printStackTrace();
             directoryMap.put("resultCode", CommonConstant.CODE_FAIL);
             directoryMap.put("resultMsg", "查询失败！");
         }

@@ -117,4 +117,14 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> listByCreateDate(@Param("createDateStart") Date createDateStart,@Param("createDateEnd") Date createDateEnd);
 
+
+    List<MktCampaignDO> listByCode(@Param("code") String code);
+
+    List<MktCampaignDO> getAllTheme( @Param("theme") String theme);
+
+    List<MktCampaignDO> getCampaignList();
+
+
+
+
 }

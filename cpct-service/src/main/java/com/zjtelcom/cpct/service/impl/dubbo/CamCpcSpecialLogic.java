@@ -35,22 +35,30 @@ public class CamCpcSpecialLogic {
         try {
             // c4标识
             String c4 = "";
-            if ("EVT0000000101".equals(eventCode)) {
-                c4 = context.get("400600000014").toString();
-            } else if ("EVT0000000102".equals(eventCode)) {
+            if (!"EVT0000000103".equals(eventCode) && context.get("400600000026")!=null) {
                 c4 = context.get("400600000026").toString();
-            }else{
+            } else if (!"EVT0000000103".equals(eventCode) && context.get("400600000014")!=null) {
+                c4 = context.get("400600000014").toString();
+            }else if(context.get("c4Name")!=null){
                 c4 = context.get("c4Name").toString();
+            }else{
+                c4 = "无c4信息";
             }
-            // 详细地址
+            // 19:配送地址 16：装机详细地址
             String addr = "";
-            if ("EVT0000000102".equals(eventCode) && context.get("400600000016") != null ) {
-                addr = context.get("400600000016").toString();
-            } else if("EVT0000000101".equals(eventCode) && context.get("400600000019") != null){
+            //19:配送地址  16：装机详细地址
+            String type = "";
+            if (!"EVT0000000103".equals(eventCode) && context.get("400600000019") != null ) {
                 addr = context.get("400600000019").toString();
+                type= "1";
+            } else if(!"EVT0000000103".equals(eventCode) && context.get("400600000016") != null){
+                addr = context.get("400600000016").toString();
+                type= "2";
             }else if(context.get("addressDesc") != null){
                 addr = context.get("addressDesc").toString();
             }
+
+
             String respXml = null;
 
             try {
@@ -78,6 +86,7 @@ public class CamCpcSpecialLogic {
             List<Map<String, Object>> maps = parseData(respXml);
             logger.info("onlineScanCodeOrCallPhone4Home-->maps:" + maps);
             Map<String, Object> map = maps.get(0);
+
             // 获取GIS网格编码
             String wgbm = getValue4CycleMap(map, "Wgbm");
             if (null == wgbm || "".equals(wgbm)) {
@@ -86,7 +95,29 @@ public class CamCpcSpecialLogic {
             resultMap.put("wgbm", wgbm);
             logger.info("onlineScanCodeOrCallPhone4Home-->wgbm:" + wgbm);
 
-            List<String> list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
+            List<String> list = new ArrayList<>();
+            //35：社区经理 36：装维经理 37：装机经理
+            if("1".equals(type)){
+                String[] positionzj = new String []{"35","36","37"};
+                for(String p:positionzj){
+                    System.out.println("35：社区经理 36：装维经理 37：装机经理********"+p);
+                    list = staffGisRelMapper.selectStaffTelByGisCodeOne(wgbm,p);
+                    if(!list.isEmpty()){
+                        break;
+                    }
+                }
+            }else if ("2".equals(type)){
+                String[] positionzj = new String []{"37","36"};
+                for(String p:positionzj){
+                    list = staffGisRelMapper.selectStaffTelByGisCodeOne(wgbm,p);
+                    if(!list.isEmpty()){
+                        break;
+                    }
+                }
+            }else{
+                list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
+            }
+
             if (null == list || list.size() == 0) {
                 resultMap.put("tel", "GIS网格编码:" + wgbm + "对应专员编码为空");
             }

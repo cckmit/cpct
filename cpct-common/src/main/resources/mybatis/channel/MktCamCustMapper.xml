@@ -59,7 +59,7 @@
     select MKT_CAM_CUST_ID, MKT_CAMPAIGN_ID, TARGET_OBJ_TYPE, TARGET_OBJ_NBR, ATTR_VALUE, 
     STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE, REMARK, 
     LAN_ID
-    from mkt_cam_cust
+    from mkt_cam_cust WHERE 1!=2
   </select>
 
   <select id="selectByTarGrpTempId" resultMap="BaseResultMap">

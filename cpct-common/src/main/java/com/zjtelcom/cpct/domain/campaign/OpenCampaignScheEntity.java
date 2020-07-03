@@ -50,13 +50,12 @@ public class OpenCampaignScheEntity {
     private String serviceType;
     private String lifeStage;
     private Long serviceCancleFlag;
-    private Long lanId;
     //营服活动分群规则
     private List<OpenMktCamGrpRulEntity> mktCamGrpRuls;//
     //营服活动推荐条目
     private List<OpenMktCamItemEntity> mktCamItems;//
     //营服活动渠道推送配置
-    private List<OpenMktCamChlConfEntity> mktCamChlConf;//
+    private List<OpenMktCamChlConfEntity> mktCamChlConfs;//
     //营服活动关联事件
     private List<OpenMktCamEvtRelEntity> mktCamEvtRels;//
     //对象区域关系
@@ -322,14 +321,6 @@ public class OpenCampaignScheEntity {
         this.serviceCancleFlag = serviceCancleFlag;
     }
 
-    public Long getLanId() {
-        return lanId;
-    }
-
-    public void setLanId(Long lanId) {
-        this.lanId = lanId;
-    }
-
     public List<OpenMktCamGrpRulEntity> getMktCamGrpRuls() {
         return mktCamGrpRuls;
     }
@@ -347,12 +338,12 @@ public class OpenCampaignScheEntity {
     }
 
 
-    public List<OpenMktCamChlConfEntity> getMktCamChlConf() {
-        return mktCamChlConf;
+    public List<OpenMktCamChlConfEntity> getMktCamChlConfs() {
+        return mktCamChlConfs;
     }
 
-    public void setMktCamChlConf(List<OpenMktCamChlConfEntity> mktCamChlConf) {
-        this.mktCamChlConf = mktCamChlConf;
+    public void setMktCamChlConfs(List<OpenMktCamChlConfEntity> mktCamChlConfs) {
+        this.mktCamChlConfs = mktCamChlConfs;
     }
 
     public List<OpenMktCamEvtRelEntity> getMktCamEvtRels() {

@@ -86,11 +86,7 @@
         EVT_ITEM_FORMAT, IS_NULLABLE, EVT_ITEM_LENGTH, STANDARD_SORT, STATUS_CD, CREATE_STAFF,IS_MAIN_PARAM, IS_LABEL,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
         from event_item
-        <where>1!=2
-        <if test="contactEvtId != null and contactEvtId != 0 ">
-            AND EVENT_ID = #{contactEvtId}
-        </if>
-        </where>
+         where EVENT_ID = #{contactEvtId}
     </select>
 
     <select id="listMainItem"  resultMap="BaseResultMap">
@@ -251,5 +247,10 @@
         EVT_ITEM_ID = #{evtItemId}
         where EVT_ITEM_ID = #{evtItemId,jdbcType=BIGINT}
     </update>
+    <select id="selectEvtItemCodeByEventId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select EVT_ITEM_CODE
+        from event_item
+        where EVENT_ID = #{eventId,jdbcType=BIGINT}
+    </select>
 
 </mapper>
