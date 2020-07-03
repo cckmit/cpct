@@ -2,6 +2,8 @@ package com.zjtelcom.cpct.domain.grouping;
 
 import com.zjtelcom.cpct.BaseEntity;
 
+import java.util.Date;
+
 public class TrialOperation extends BaseEntity {
     /**
      * 试运算标识
@@ -28,7 +30,52 @@ public class TrialOperation extends BaseEntity {
      */
     private Long batchNum;
 
+    private Date startTime;
+    private Date endTime;
+    private String beforeNum;
+    private String endNum;
+    private String subNum;
 
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getBeforeNum() {
+        return beforeNum;
+    }
+
+    public void setBeforeNum(String beforeNum) {
+        this.beforeNum = beforeNum;
+    }
+
+    public String getEndNum() {
+        return endNum;
+    }
+
+    public void setEndNum(String endNum) {
+        this.endNum = endNum;
+    }
+
+    public String getSubNum() {
+        return subNum;
+    }
+
+    public void setSubNum(String subNum) {
+        this.subNum = subNum;
+    }
 
     /**
      * 状态  1000 试算中；2000 试算异常；3000 试算成功

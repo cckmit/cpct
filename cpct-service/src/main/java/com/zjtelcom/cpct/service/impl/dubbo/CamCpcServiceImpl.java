@@ -150,7 +150,18 @@ public class CamCpcServiceImpl implements CamCpcService {
             nonPassedMsg.put("cam_" + activityId, "活动信息查询失败");
             return nonPassedMsg;
         }
-
+        //装维事件接入 补充是否集团活动参数
+        Map<String, Object> evtContent1 = (Map<String, Object>) JSON.parse(params.get("evtContent"));
+        String eventCode = params.get("eventCode");
+        if ("EVTD000000051".equals(eventCode) || "EVTD000000052".equals(eventCode) || "EVTD000000053".equals(eventCode) || "EVTD000000054".equals(eventCode)){
+            //是否集团活动 1：是  0：否
+            if (mktCampaign.getSrcId()!=null){
+                evtContent1.put("GROUP_FLAG","1");
+            }else {
+                evtContent1.put("GROUP_FLAG","0");
+            }
+            params.put("evtContent",JSON.toJSONString(evtContent1));
+        }
         privateParams.put("activityId", mktCampaign.getMktCampaignId().toString()); //活动Id
         privateParams.put("activityName", mktCampaign.getMktCampaignName()); //活动名称
         privateParams.put("skipDisturbed", mktCampaign.getSkipDisturbed()); //活动名称
@@ -319,6 +330,17 @@ public class CamCpcServiceImpl implements CamCpcService {
                     } else if ("4000".equals(filterRule.getFilterType())) {  //表达式过滤
                         //暂不处理
                         //do something
+                    } else if ("5000".equals(filterRule.getFilterType())) {//时间段过滤
+                        String now = DateUtil.date2StringDate(new Date());
+                        String start = DateUtil.date2StringDate(filterRule.getDayStart());
+                        String end = DateUtil.date2StringDate(filterRule.getDayEnd());
+                        if ( !DateUtil.isEffectiveDate(now,start,end)) {
+                            esJson.put("hit", "false");
+                            esJson.put("msg", "时间段过绕规则校验未通过");
+                            esHitService.save(esJson, IndexList.ACTIVITY_MODULE, params.get("reqId") + activityId + privateParams.get("accNbr"));
+                            nonPassedMsg.put("cam_" + activityId, "时间段过绕规则校验未通过");
+                            return nonPassedMsg;
+                        }
                     } else if ("6000".equals(filterRule.getFilterType())) {  //过扰规则
                         //将过扰规则的标签放到iSale展示列
                         //获取过扰标签
@@ -721,6 +743,9 @@ public class CamCpcServiceImpl implements CamCpcService {
         //    log.info("222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
             Set<String> prodInstIds = prodInstIdsObject.getResultObject();
+            if (prodInstIds.size()>1000){
+                return "";
+            }
             for (String prodInstId : prodInstIds) {
                 // 根据prodInstId 和 statusCd(1000-有效)查询offerProdInstRelId
                 //            log.info("333------prodInstId --->" + prodInstId);
@@ -1936,6 +1961,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                 lr.setOperType(type);
                 lr.setLabelCode(labelMap.get("code"));
                 lr.setLabelName(labelMap.get("name"));
+                String rightParam = labelMap.get("rightParam");
                 if ("PROM_LIST".equals(labelMap.get("code"))) {
                     Long filterRuleId = Long.valueOf(labelMap.get("rightParam"));
                     Map<String, Object> filterRuleRedis = eventRedisService.getRedis("FILTER_RULE_", filterRuleId);
@@ -1949,6 +1975,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                         checkProduct = filterRule.getChooseProductCode();
                     }
                     lr.setRightOperand(checkProduct);
+                    rightParam = checkProduct;
                 } else {
                     lr.setRightOperand(labelMap.get("rightParam"));
                 }
@@ -1979,7 +2006,7 @@ public class CamCpcServiceImpl implements CamCpcService {
                                     lr.setResult(false);
                                 }
                             } else {
-                                RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, labelMap.get("rightParam")), context, true, true);
+                                RuleResult ruleResultOne = runner.executeRule(cpcLabel(labelMap.get("code"), type, rightParam), context, true, true);
                                 if (null != ruleResultOne.getResult()) {
                                     lr.setResult((Boolean) ruleResultOne.getResult());
                                 } else {

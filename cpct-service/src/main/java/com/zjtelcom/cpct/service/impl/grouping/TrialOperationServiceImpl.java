@@ -1694,14 +1694,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             System.out.println(JSON.toJSONString(requests));
             response = esService.searchBatchInfo(requests);
 //            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
-            //同时调用统计查询的功能
-
-//             countResponse = esService.searchCountInfo(requests);
-//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
-
-//            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-//                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

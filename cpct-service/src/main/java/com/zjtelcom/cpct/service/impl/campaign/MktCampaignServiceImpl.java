@@ -2609,11 +2609,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 requestInfo.setCreateStaff(user.getStaffId());   //创建人,目前指定到承接人的工号
                 mktCampaignDO.setCreateStaff(user.getSysUserId());
 
-
-                requestInfo.setContName(o.getString("name"));
-                requestInfo.setDeptCode(o.getString("department"));
-                requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
-                mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
+//                requestInfo.setContName(o.getString("name"));
+//                requestInfo.setDeptCode(o.getString("department"));
+//                requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+//                mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
                 mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                 //break;
                 //}
