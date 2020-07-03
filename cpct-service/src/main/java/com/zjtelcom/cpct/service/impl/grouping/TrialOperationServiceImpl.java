@@ -2558,4 +2558,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return true;
     }
 
+    @Override
+    public TrialOperation selectByBatchNum(String batchNum) {
+        return trialOperationMapper.selectByBatchNum(batchNum);
+    }
 }
