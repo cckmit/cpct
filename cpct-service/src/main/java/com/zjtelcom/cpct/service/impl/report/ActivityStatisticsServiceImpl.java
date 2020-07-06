@@ -610,19 +610,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             stringObjectMap = addParams(stringObjectMap, page, pageSize, mktCampaignType);
             Object reqId = stringObjectMap.get("reqId");
             Object total = stringObjectMap.get("total");
-            // 获取批次号
-            String batchNum = (String) stringObjectMap.get("batchNum");
-            logger.info("batchNum--->"  + batchNum );
-            TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
-            if (trialOperation!=null){
-                logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
-                // 短信过扰差值
-                stringObjectMap.put("subNum", trialOperation.getSubNum() ==null ? "" : trialOperation.getSubNum());
-                // 黑名单过滤个数
-                stringObjectMap.put("beforeNum", trialOperation.getBeforeNum() ==null ? "" : trialOperation.getBeforeNum());
-                // 销售品过滤个数
-                stringObjectMap.put("endNum", trialOperation.getEndNum() ==null ? "" : trialOperation.getEndNum());
-            }
             paramMap.put("pageSize", total);
             paramMap.put("page", "1");
             if (reqId != null && reqId != "") {
@@ -975,6 +962,28 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         resultMap.put("mktCloseRuleName", "空");
                                     }
                                 }
+                            }
+
+                            // 获取批次号
+                            String batchNum = (String) map.get("batchNbr");
+                            TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
+                            if (trialOperation != null) {
+                                // 短信过扰差值
+                                HashMap<String, Object> subNumMap = new HashMap<>();
+                                subNumMap.put("name", "短信过扰差值");
+                                subNumMap.put("nub", trialOperation.getSubNum());
+                                statisicts.add(subNumMap);
+                                // 黑名单过滤个数
+                                HashMap<String, Object> beforeNumMap = new HashMap<>();
+                                beforeNumMap.put("name", "黑名单过滤数");
+                                beforeNumMap.put("nub", trialOperation.getBeforeNum());
+                                statisicts.add(beforeNumMap);
+                                // 销售品过滤个数
+                                HashMap<String, Object> endNumMap = new HashMap<>();
+                                endNumMap.put("name", "销售品过滤数");
+                                endNumMap.put("nub", trialOperation.getEndNum());
+                                statisicts.add(endNumMap);
+                                logger.info("statisicts --->>>" + JSON.toJSONString(statisicts));
                             }
                             resultMap.put("statistics", statisicts);
                             hashMaps.add(resultMap);
