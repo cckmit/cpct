@@ -294,17 +294,17 @@ public class ActivityStatisticsController extends BaseController {
                                 }
                             }
                             // 获取批次号
-                            String batchNum = content[i][9];
+                            String batchNum = content[i][9] == null ? "" : content[i][9];
                             logger.info("batchNum--->"  + batchNum );
                             TrialOperation trialOperation = trialOperationService.selectByBatchNum(batchNum);
-                            logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
-                            // 短信过扰差值
-                            content[i][24] = trialOperation.getSubNum();
-                            // 黑名单过滤个数
-                            content[i][25] = trialOperation.getBeforeNum();
-                            // 销售品过滤个数
-                            content[i][26] = trialOperation.getEndNum();
-
+                            if (trialOperation!=null){
+                                // 短信过扰差值
+                                content[i][24] = trialOperation.getSubNum() ==null ? "" : trialOperation.getSubNum();
+                                // 黑名单过滤个数
+                                content[i][25] = trialOperation.getBeforeNum() ==null ? "" : trialOperation.getBeforeNum();
+                                // 销售品过滤个数
+                                content[i][26] = trialOperation.getEndNum() ==null ? "" : trialOperation.getEndNum();
+                            }
                         }
                     }catch (Exception e) {
                         e.printStackTrace();

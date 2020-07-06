@@ -370,7 +370,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         System.out.println("活动id" + campaignId);
         List<MktCamChlConfAttrDO> startDoList = mktCamChlConfAttrMapper.selectAttrStartDateByCampaignId(Long.valueOf(campaignId));
         for (MktCamChlConfAttrDO attrDO : startDoList) {
-            if (attrDO.getAttrValue() == null) {
+            if (attrDO.getAttrValue() == null || attrDO.getAttrValue().equals("")) {
                 continue;
             }
             if (new Date(Long.valueOf(attrDO.getAttrValue())).before(camStart)) {
