@@ -610,24 +610,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             stringObjectMap = addParams(stringObjectMap, page, pageSize, mktCampaignType);
             Object reqId = stringObjectMap.get("reqId");
             Object total = stringObjectMap.get("total");
-
-/*            List<Map<String,String>> rptBatchOrderList = (List<Map<String,String>>) stringObjectMap.get("rptBatchOrderList");
-            for (Map<String, String> rptBatchOrderMap : rptBatchOrderList) {
-                // 获取批次号
-                String batchNum = (String) rptBatchOrderMap.get("batchNum");
-                logger.info("batchNum--->"  + batchNum );
-                TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
-                logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
-                // 短信过扰差值
-                rptBatchOrderMap.put("subNum", trialOperation.getSubNum());
-                // 黑名单过滤个数
-                rptBatchOrderMap.put("beforeNum", trialOperation.getBeforeNum());
-                // 销售品过滤个数
-                rptBatchOrderMap.put("endNum", trialOperation.getEndNum());
-            }*/
-
-
-
             paramMap.put("pageSize", total);
             paramMap.put("page", "1");
             if (reqId != null && reqId != "") {
@@ -987,21 +969,24 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             logger.info("batchNum--->"  + batchNum );
                             TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
                             logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
-                            // 短信过扰差值
-                            HashMap<String, Object> subNumMap = new HashMap<>();
-                            subNumMap.put("name", "短信过扰差值");
-                            subNumMap.put("nub", trialOperation.getSubNum());
-                            statisicts.add(subNumMap);
-                            // 黑名单过滤个数
-                            HashMap<String, Object> beforeNumMap = new HashMap<>();
-                            beforeNumMap.put("name", "黑名单过滤数");
-                            beforeNumMap.put("nub", trialOperation.getBeforeNum());
-                            statisicts.add(beforeNumMap);
-                            // 销售品过滤个数
-                            HashMap<String, Object> endNumMap = new HashMap<>();
-                            endNumMap.put("name", "销售品过滤数");
-                            endNumMap.put("nub", trialOperation.getEndNum());
-                            statisicts.add(endNumMap);
+                            if (trialOperation != null) {
+                                // 短信过扰差值
+                                HashMap<String, Object> subNumMap = new HashMap<>();
+                                subNumMap.put("name", "短信过扰差值");
+                                subNumMap.put("nub", trialOperation.getSubNum());
+                                statisicts.add(subNumMap);
+                                // 黑名单过滤个数
+                                HashMap<String, Object> beforeNumMap = new HashMap<>();
+                                beforeNumMap.put("name", "黑名单过滤数");
+                                beforeNumMap.put("nub", trialOperation.getBeforeNum());
+                                statisicts.add(beforeNumMap);
+                                // 销售品过滤个数
+                                HashMap<String, Object> endNumMap = new HashMap<>();
+                                endNumMap.put("name", "销售品过滤数");
+                                endNumMap.put("nub", trialOperation.getEndNum());
+                                statisicts.add(endNumMap);
+                                logger.info("statisicts --->>>" + JSON.toJSONString(statisicts));
+                            }
                             resultMap.put("statistics", statisicts);
                             hashMaps.add(resultMap);
                         } catch (NumberFormatException e) {
