@@ -610,6 +610,18 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
             stringObjectMap = addParams(stringObjectMap, page, pageSize, mktCampaignType);
             Object reqId = stringObjectMap.get("reqId");
             Object total = stringObjectMap.get("total");
+            // 获取批次号
+            String batchNum = (String) stringObjectMap.get("batchNum");
+            logger.info("batchNum--->"  + batchNum );
+            TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
+            logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
+            // 短信过扰差值
+            stringObjectMap.put("subNum", trialOperation.getSubNum());
+            // 黑名单过滤个数
+            stringObjectMap.put("beforeNum", trialOperation.getBeforeNum());
+            // 销售品过滤个数
+            stringObjectMap.put("endNum", trialOperation.getEndNum());
+
             paramMap.put("pageSize", total);
             paramMap.put("page", "1");
             if (reqId != null && reqId != "") {

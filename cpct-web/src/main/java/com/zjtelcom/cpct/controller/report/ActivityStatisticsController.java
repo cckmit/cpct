@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.domain.channel.Channel;
+import com.zjtelcom.cpct.domain.grouping.TrialOperation;
+import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.report.ActivityStatisticsService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
@@ -39,6 +41,8 @@ public class ActivityStatisticsController extends BaseController {
     ActivityStatisticsService activityStatisticsService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private TrialOperationService trialOperationService;
 
     /**
      *
@@ -245,7 +249,7 @@ public class ActivityStatisticsController extends BaseController {
                 String sheetName = "派单报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
                         "关单规则名称","所属地市","批次编码","派单方式","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
-                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","处理数","处理率"};
+                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","处理数","处理率","短信过扰差值","黑名单过滤个数","销售品过滤个数"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -289,6 +293,18 @@ public class ActivityStatisticsController extends BaseController {
                                     content[i][23] = String.valueOf(map3.get("nub"));
                                 }
                             }
+                            // 获取批次号
+                            String batchNum = content[i][9];
+                            logger.info("batchNum--->"  + batchNum );
+                            TrialOperation trialOperation = trialOperationService.selectByBatchNum(batchNum);
+                            logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
+                            // 短信过扰差值
+                            content[i][24] = trialOperation.getSubNum();
+                            // 黑名单过滤个数
+                            content[i][25] = trialOperation.getBeforeNum();
+                            // 销售品过滤个数
+                            content[i][26] = trialOperation.getEndNum();
+
                         }
                     }catch (Exception e) {
                         e.printStackTrace();
