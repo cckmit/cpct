@@ -269,7 +269,9 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventById" resultMap="resultMapper">
-        select INTERFACE_CFG_ID,
+        select
+        EVENT_ID,
+        INTERFACE_CFG_ID,
         EVENT_NBR,
         EVENT_NAME,
         EVT_MAPPED_ADDR,
