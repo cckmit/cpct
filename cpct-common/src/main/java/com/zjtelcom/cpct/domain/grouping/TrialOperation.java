@@ -35,15 +35,16 @@ public class TrialOperation extends BaseEntity {
     private String beforeNum;
     private String endNum;
     private String subNum;
+    private String specifiedNum;
 
-
-    public Date getStartTime() {
-        return startTime;
+    public String getSpecifiedNum() {
+        return specifiedNum;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setSpecifiedNum(String specifiedNum) {
+        this.specifiedNum = specifiedNum;
     }
+
 
     public Date getEndTime() {
         return endTime;
@@ -75,6 +76,14 @@ public class TrialOperation extends BaseEntity {
 
     public void setSubNum(String subNum) {
         this.subNum = subNum;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     /**
