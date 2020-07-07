@@ -173,7 +173,9 @@
   </select>
 
   <select id="listByMessageChannel" parameterType="java.lang.Long" resultMap="BaseResultMap" >
-    SELECT * FROM mkt_cam_chl_conf p1 LEFT JOIN contact_channel p2 on p1.CONTACT_CHL_ID  = p2.CONTACT_CHL_ID
+    SELECT  EVT_CONTACT_CONF_ID, EVT_CONTACT_CONF_NAME, MKT_CAMPAIGN_ID, CONTACT_CHL_ID,
+    PUSH_TYPE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, UPDATE_DATE, STATUS_DATE,
+    REMARK  FROM mkt_cam_chl_conf p1 LEFT JOIN contact_channel p2 on p1.CONTACT_CHL_ID  = p2.CONTACT_CHL_ID
     WHERE p1.EVT_CONTACT_CONF_ID = #{evtContactConfId} and p2.CONTACT_CHL_CODE in ('QD00034','QD00002')
   </select>
 

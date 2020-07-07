@@ -28,7 +28,15 @@ public class TrialOperation extends BaseEntity {
      */
     private Long batchNum;
 
+    private String specifiedNum;
 
+    public String getSpecifiedNum() {
+        return specifiedNum;
+    }
+
+    public void setSpecifiedNum(String specifiedNum) {
+        this.specifiedNum = specifiedNum;
+    }
 
     /**
      * 状态  1000 试算中；2000 试算异常；3000 试算成功

@@ -350,9 +350,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      * @return
      */
     @Override
-    public Map<String, Object> uploadFile(Long batchId) {
+    public Map<String, Object> uploadFile(Long batchId, Long type) {
         Map<String, Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
+
+        if(type.toString().equals("1") && redisUtils_es.get( "SPECIFIEDNUM_" + operation.getBatchNum()) == null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "没有选择合并数目，无法进行预下发，请直接全量下发");
+            return result;
+        }
         if (operation == null) {
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "试运算记录不存在");
@@ -369,6 +375,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         request.setCampaignId(operation.getCampaignId());
         request.setStrategyId(operation.getStrategyId());
         request.setBatchNum(operation.getBatchNum());
+        //区分预下发Y与全量下发
+        redisUtils_es.set("TYPE_" + operation.getBatchNum().toString(),type);
+        if(type.toString().equals("1")){
+            redisUtils.set("SPECIAL_NUM_" + operation.getBatchNum().toString(),"1000");
+        }else {
+            redisUtils.set("SPECIAL_NUM_" + operation.getBatchNum().toString(),"2000");
+        }
         new Thread(){
             public void  run(){
                 try {
@@ -1876,13 +1889,23 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Override
     public Map<String, Object> issueTrialResult(TrialOperation trialOperation) {
+
         Map<String, Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByPrimaryKey(trialOperation.getId());
-        if (operation==null){
+
+        if (operation == null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
+//        将预下发指定条目数specifiedNum存到redis
+        Long batchNum = operation.getBatchNum();
+        String specifiedNum = trialOperation.getSpecifiedNum();
+        if (!specifiedNum.equals("")){
+            redisUtils_es.set( "SPECIFIEDNUM_" + batchNum, specifiedNum);
+        }
+
+        
         BeanUtil.copy(operation,trialOperation);
         // 通过活动id获取关联的标签字段数组
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());

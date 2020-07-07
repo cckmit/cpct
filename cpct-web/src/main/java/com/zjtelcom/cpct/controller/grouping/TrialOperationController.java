@@ -108,7 +108,6 @@ public class TrialOperationController extends BaseController {
         }
         return result;
     }
-
     /**
      * 下发文件到生产sftp
      * @param param
@@ -116,10 +115,10 @@ public class TrialOperationController extends BaseController {
      */
     @PostMapping("uploadFile")
     @CrossOrigin
-    public Map<String, Object> uploadFile( @RequestBody HashMap<String, Long> param){
+    public Map<String, Object> uploadFile( @RequestBody HashMap<String,Long> param){
         Map<String, Object> result = new HashMap<>();
         try {
-            result = operationService.uploadFile(param.get("batchId"));
+            result = operationService.uploadFile(param.get("batchId"), param.get("type"));
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to uploadFile", e);
             result.put("resultCode", CODE_FAIL);
