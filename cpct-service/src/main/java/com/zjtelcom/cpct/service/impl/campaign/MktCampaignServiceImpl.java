@@ -3866,5 +3866,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return null;
     }
 
+    /**
+     * 提供接口入参C3 返回配置了自动派单（auotTrail=1）得已发布活动（2002,2008）
+     * @param c3
+     * @return
+     */
+    @Override
+    public Map<String, Object> getByC3AndAuto(Long c3){
+        List<MktCampaignDO> byC3AndAuto = mktCampaignMapper.getByC3AndAuto(c3);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("mktCampaignList", byC3AndAuto);
+        resultMap.put("resultCode", CODE_SUCCESS);
+        resultMap.put("resultMsg", "查询成功");
+        return resultMap;
+    }
 
 }
