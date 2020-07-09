@@ -45,6 +45,7 @@ public class MktCampaignDO extends BaseEntity{
     private String regionFlg;//活动创建地市
     private String batchType;
     private String skipDisturbed;//是否屏蔽过扰
+    private Integer autoTrial; // 是否自动派单（0-否，1-是）
 
 
     public String getSkipDisturbed() {
@@ -359,5 +360,13 @@ public class MktCampaignDO extends BaseEntity{
 
     public void setBatchType(String batchType) {
         this.batchType = batchType;
+    }
+
+    public Integer getAutoTrial() {
+        return autoTrial;
+    }
+
+    public void setAutoTrial(Integer autoTrial) {
+        this.autoTrial = autoTrial;
     }
 }

@@ -28,6 +28,35 @@ public class DateUtil {
     public static String formatDate(Date date) {
         return ldf.format(date);
     }
+
+
+    public static boolean isEffectiveDate(String nowDate, String startDate, String endDate) {
+        String format = "HH:mm:ss";
+        Date startTime = null;
+        Date endTime = null;
+        Date nowTime = null;
+        try {
+            startTime = new SimpleDateFormat(format).parse(startDate);
+            endTime = new SimpleDateFormat(format).parse(endDate);
+            nowTime = new SimpleDateFormat(format).parse(nowDate);
+            if (nowTime.getTime() == startTime.getTime()
+                    || nowTime.getTime() == endTime.getTime()) {
+                return true;
+            }
+            long now = nowTime.getTime();
+            long begin = startTime.getTime();
+            long end = endTime.getTime();
+
+            if (now > begin && now < end) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     /**
      * 获取上一个月的月份
      *

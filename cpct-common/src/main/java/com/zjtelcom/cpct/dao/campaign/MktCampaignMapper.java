@@ -125,6 +125,6 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> getCampaignList();
 
 
-
+    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId);
 
 }
