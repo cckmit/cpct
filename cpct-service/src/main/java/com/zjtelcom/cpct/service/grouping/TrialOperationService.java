@@ -33,7 +33,7 @@ public interface TrialOperationService  {
 
     Map<String,Object> searchCountByLabelList(String labelCodes);
 
-    Map<String,Object> uploadFile(Long batchId);
+    Map<String,Object> uploadFile(Long batchId, Long type);
 
     Map<String,Object> trialLog(Long batchId);
 

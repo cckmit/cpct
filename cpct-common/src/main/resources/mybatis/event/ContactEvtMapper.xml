@@ -269,7 +269,9 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventById" resultMap="resultMapper">
-        select INTERFACE_CFG_ID,
+        select
+        EVENT_ID,
+        INTERFACE_CFG_ID,
         EVENT_NBR,
         EVENT_NAME,
         EVT_MAPPED_ADDR,
@@ -454,7 +456,32 @@
 
     <!--查询方法，通过id查询-->
     <select id="getEventByEventNbr" resultMap="resultMapper" parameterType="java.lang.String">
-        select * from event
+        select EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REC_CAMPAIGN_AMOUNT,
+        TOP_CAMPAIGN_NUM,
+        REMARK,
+        EVENT_MANAGE_TYPE from event
         where EVENT_NBR = #{eventNbr,jdbcType=VARCHAR}
     </select>
 
@@ -511,7 +538,32 @@
 
 
     <select id="selectBatchByCode"  parameterType="java.util.List" resultMap="resultMapper">
-        select * from event
+        select EVENT_ID,
+        INTERFACE_CFG_ID,
+        EVENT_NBR,
+        EVENT_NAME,
+        EVT_MAPPED_ADDR,
+        EVT_MAPPED_IP,
+        EVT_PROCOTOL_TYPE,
+        EVT_MAPPED_FUN_NAME,
+        EVENT_DESC,
+        EVT_TYPE_ID,
+        EVENT_TRIG_TYPE,
+        EXT_EVENT_ID,
+        LOCATION_NBR,
+        LONGITUDE,
+        LATITUDE,
+        LOCATION_SWITCH,
+        STATUS_CD,
+        CREATE_STAFF,
+        UPDATE_STAFF,
+        CREATE_DATE,
+        STATUS_DATE,
+        UPDATE_DATE,
+        REC_CAMPAIGN_AMOUNT,
+        TOP_CAMPAIGN_NUM,
+        REMARK,
+        EVENT_MANAGE_TYPE from event
         where EVENT_NBR IN
         <foreach collection="contactEvtCodeList" index="index" item="item" open="(" separator="," close=")">
             #{item}
