@@ -3873,11 +3873,22 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
      */
     @Override
     public Map<String, Object> getByC3AndAuto(Long c3){
-        List<MktCampaignDO> byC3AndAuto = mktCampaignMapper.getByC3AndAuto(c3);
+        List<MktCampaignDO> mktCampaignList = null;
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("mktCampaignList", byC3AndAuto);
-        resultMap.put("resultCode", CODE_SUCCESS);
-        resultMap.put("resultMsg", "查询成功");
+        try {
+            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3);
+            resultMap.put("mktCampaignList", mktCampaignList);
+            resultMap.put("resultCode", CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("getByC3AndAuto -- >" + e);
+            resultMap.put("mktCampaignList", mktCampaignList);
+            resultMap.put("resultCode", CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败");
+        }
+
+
         return resultMap;
     }
 
