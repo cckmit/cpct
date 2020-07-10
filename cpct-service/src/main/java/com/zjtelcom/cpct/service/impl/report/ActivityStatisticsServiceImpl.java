@@ -966,9 +966,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 
                             // 获取批次号
                             String batchNum = (String) map.get("batchNbr");
-                            logger.info("batchNum--->"  + batchNum );
                             TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
-                            logger.info("trialOperation--->"  + JSON.toJSONString(trialOperation) );
                             if (trialOperation != null) {
                                 // 短信过扰差值
                                 HashMap<String, Object> subNumMap = new HashMap<>();
