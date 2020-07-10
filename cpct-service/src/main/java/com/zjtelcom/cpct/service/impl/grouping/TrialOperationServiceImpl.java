@@ -1897,7 +1897,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             redisUtils_es.set( "SPECIFIEDNUM_" + batchNum, specifiedNum);
         }
 
-        
+
         BeanUtil.copy(operation,trialOperation);
         // 通过活动id获取关联的标签字段数组
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
@@ -2095,6 +2095,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
         if (strategyIdList!=null){
             List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            trialOperations.forEach(trialOperation -> {
+                if (trialOperation.getStatusCd().equals("7300") || trialOperation.getStatusCd().equals("8100")){
+                    Object o = redisUtils.get("SPECIAL_NUM_" + trialOperation.getBatchNum());
+                    if ( o != null && "1000".equals(o.toString())){
+                        trialOperation.setStatusCd(TrialStatus.SPECIAL_PUBLISH_SUCCESS.getValue());
+                        trialOperationMapper.updateByPrimaryKey(trialOperation);
+                    }
+                }
+            });
+            trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", operationDetailList);
@@ -2102,7 +2112,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "strategyIdList isEmpty");
         }
-//        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
         return result;
     }
 
