@@ -88,9 +88,9 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaignFromDate(HashMap<String, Object> paramMap);
 
-    List<MktCampaignDO> selectCampaignTheme(@Param("value") String value, @Param("date") String date,@Param("type") String type);
+    List<MktCampaignDO> selectCampaignTheme(@Param("directoryId") Long directoryId, @Param("date") String date,@Param("type") String type);
 
-    List<MktCampaignDO> selectCampaignThemeByC3(@Param("value") String value, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
+    List<MktCampaignDO> selectCampaignThemeByC3(@Param("directoryId") Long directoryId, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
 
     Integer getCountFromActivityTheme(@Param("startDate") String startDate,@Param("type") String type,@Param("endDate")String endDate);
 

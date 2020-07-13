@@ -159,6 +159,21 @@ WHERE
   p1.MKT_CAMPAIGN_ID = #{campaignId}
   </select>
 
+  <select id="selectByIdForInitId" resultType="java.lang.String">
+  SELECT
+	MKT_STRATEGY_CONF_RULE_ID
+FROM
+	mkt_strategy_conf_rule
+WHERE
+	INIT_ID IN (
+		SELECT
+			INIT_ID
+		FROM
+			mkt_strategy_conf_rule
+		WHERE
+			MKT_STRATEGY_CONF_RULE_ID = #{strategyId,jdbcType=BIGINT})
+  </select>
+
 
 
 

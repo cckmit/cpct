@@ -164,6 +164,7 @@
           SELECT
               MKT_CAMPAIGN_ID
           FROM
+
               mkt_cam_chl_conf
           WHERE
               CONTACT_CHL_ID = #{map.contactChlId}
