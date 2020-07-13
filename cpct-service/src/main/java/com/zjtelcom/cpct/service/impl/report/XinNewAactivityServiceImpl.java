@@ -233,7 +233,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 //主题百分比
                 double num = (double) mktCampaignList.size() / (double)count;
                 //返回拼装
-                themeMap.put("name",stringStringMap.get("label"));
+                themeMap.put("name", catalogItem.getCatalogItemName());
                 themeMap.put("number",mktCampaignList.size());
                 themeMap.put("value",getPercentFormat(Double.valueOf(num), 2, 2));
                 themeMap.put("conversionList",rptList);
