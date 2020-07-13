@@ -31,5 +31,7 @@ public interface CatalogItemMapper {
 
     Long selectCatalogItemIdByCatalogItemDesc(String desc);
 
+    List<CatalogItem> selectChild();
+
 
 }
