@@ -29,6 +29,8 @@ public enum TrialStatus {
     CHANNEL_PUBLISH_SUCCESS("8100", "渠道-下发成功"),
     CHANNEL_PUBLISH_FAIL("8200","渠道-下发失败"),
 
+    SPECIAL_PUBLISH_SUCCESS("8300","预下发成功"),
+
     UPLOAD_GOING("7000", "下发中"),
     UPLOAD_SUCCESS("8000","下发成功"),
     UPLOAD_FAIL("9000","下发失败"),

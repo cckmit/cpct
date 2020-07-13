@@ -370,7 +370,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         System.out.println("活动id" + campaignId);
         List<MktCamChlConfAttrDO> startDoList = mktCamChlConfAttrMapper.selectAttrStartDateByCampaignId(Long.valueOf(campaignId));
         for (MktCamChlConfAttrDO attrDO : startDoList) {
-            if (attrDO.getAttrValue() == null) {
+            if (attrDO.getAttrValue() == null || attrDO.getAttrValue().equals("")) {
                 continue;
             }
             if (new Date(Long.valueOf(attrDO.getAttrValue())).before(camStart)) {
@@ -2609,11 +2609,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 requestInfo.setCreateStaff(user.getStaffId());   //创建人,目前指定到承接人的工号
                 mktCampaignDO.setCreateStaff(user.getSysUserId());
 
-
-                requestInfo.setContName(o.getString("name"));
-                requestInfo.setDeptCode(o.getString("department"));
-                requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
-                mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
+//                requestInfo.setContName(o.getString("name"));
+//                requestInfo.setDeptCode(o.getString("department"));
+//                requestInfo.setCreateStaff(o.getLong("employeeId"));   //创建人,目前指定到承接人的工号
+//                mktCampaignDO.setCreateStaff(o.getLong("systemUserId"));
                 mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
                 //break;
                 //}

@@ -353,7 +353,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> uploadFile(Long batchId, Long type) {
         Map<String, Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
-
+        if (type==null){
+            type = 0L;
+        }
         if(type.toString().equals("1") && redisUtils_es.get( "SPECIFIEDNUM_" + operation.getBatchNum()) == null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "没有选择合并数目，无法进行预下发，请直接全量下发");
@@ -364,7 +366,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd()) && !TrialStatus.IMPORT_SUCCESS.getValue().equals(operation.getStatusCd())){
+        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd()) &&
+                !TrialStatus.IMPORT_SUCCESS.getValue().equals(operation.getStatusCd())&&
+                !TrialStatus.SPECIAL_PUBLISH_SUCCESS.getValue().equals(operation.getStatusCd())){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "不满足下发条件，无法操作");
             return result;
@@ -1707,14 +1711,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             System.out.println(JSON.toJSONString(requests));
             response = esService.searchBatchInfo(requests);
 //            response = restTemplate.postForObject("http://localhost:8080/es/searchBatchInfo", requests, TrialResponseES.class);
-            //同时调用统计查询的功能
-
-//             countResponse = esService.searchCountInfo(requests);
-//            countResponse = restTemplate.postForObject(countInfo,request,TrialResponse.class);
-
-//            if (countResponse.getResultCode().equals(CODE_SUCCESS)){
-//                redisUtils.set("HITS_COUNT_INFO_"+request.getBatchNum(),countResponse.getHitsList());
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1905,7 +1901,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             redisUtils_es.set( "SPECIFIEDNUM_" + batchNum, specifiedNum);
         }
 
-        
+
         BeanUtil.copy(operation,trialOperation);
         // 通过活动id获取关联的标签字段数组
         MktCampaignDO campaignDO = campaignMapper.selectByPrimaryKey(trialOperation.getCampaignId());
@@ -2103,6 +2099,16 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
         if (strategyIdList!=null){
             List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            trialOperations.forEach(trialOperation -> {
+                if (trialOperation.getStatusCd().equals("7300") || trialOperation.getStatusCd().equals("8100")){
+                    Object o = redisUtils.get("SPECIAL_NUM_" + trialOperation.getBatchNum());
+                    if ( o != null && "1000".equals(o.toString())){
+                        trialOperation.setStatusCd(TrialStatus.SPECIAL_PUBLISH_SUCCESS.getValue());
+                        trialOperationMapper.updateByPrimaryKey(trialOperation);
+                    }
+                }
+            });
+            trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", operationDetailList);
@@ -2110,7 +2116,6 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "strategyIdList isEmpty");
         }
-//        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(strategyId,TrialCreateType.TRIAL_OPERATION.getValue());
         return result;
     }
 
@@ -2122,8 +2127,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByRuleId(Long ruleId) {
         Map<String, Object> result = new HashMap<>();
-        MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(ruleDO.getInitId(),TrialCreateType.IMPORT_USER_LIST.getValue());
+        List<String> strategyIdList = ruleMapper.selectByIdForInitId(ruleId);
+        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
         List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", operationDetailList);
@@ -2589,4 +2594,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         return true;
     }
 
+    @Override
+    public TrialOperation selectByBatchNum(String batchNum) {
+        return trialOperationMapper.selectByBatchNum(batchNum);
+    }
 }

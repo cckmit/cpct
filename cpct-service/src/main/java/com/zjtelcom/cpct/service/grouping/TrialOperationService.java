@@ -53,4 +53,6 @@ public interface TrialOperationService  {
     Map<String,Object> insertMktCampaignByC4OfSysArea();
 
     TrialOperationParamES getTrialOperationParamES(TrialOperationVO operationVO, Long batchNum, Long ruleId, boolean isSample, List<TarGrpCondition> conditions);
+
+    TrialOperation selectByBatchNum(String batchNum);
 }

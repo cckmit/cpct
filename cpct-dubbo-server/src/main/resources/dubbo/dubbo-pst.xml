@@ -128,6 +128,7 @@
         <dubbo:method name="qryProdInstIndex2" servicecode="00.1074.qryProdInstIndex2"  timeout="10000"/>
         <!-- 根据accNum和statusCd查询prodInstId -->
         <dubbo:method name="qryProdInstIndex3" servicecode="00.1074.qryProdInstIndex3"  timeout="10000"/>
+
         <dubbo:method name="qryProdInstIndex5" servicecode="00.1074.qryProdInstIndex5"  timeout="10000"/>
     </dubbo:reference>
 
