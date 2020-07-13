@@ -151,7 +151,21 @@ public class OpenCampaignScheServiceImpl  implements OpenCampaignScheService {
             return result;
         }
         OpenCampaignScheEntity campaignScheEntity = BeanUtil.create(campaignDO, new OpenCampaignScheEntity());
-        campaignScheEntity.setManageType("6000");
+        String manageType = "6300";
+        if (campaignDO.getMktCampaignCategory()!=null){
+            if (campaignDO.getMktCampaignCategory().equals("1000")){
+                manageType = "6100";
+            }else
+            if (campaignDO.getMktCampaignCategory().equals("2000")){
+                manageType = "6200";
+            }else
+            if (campaignDO.getMktCampaignCategory().equals("3000")){
+                manageType = "6300";
+            }else {
+                manageType = campaignDO.getMktCampaignCategory();
+            }
+        }
+        campaignScheEntity.setManageType(manageType);
         campaignScheEntity.setRegionNbr("8330000");
         campaignScheEntity.setRegionId(100008330000L);
         //营服活动分群规则

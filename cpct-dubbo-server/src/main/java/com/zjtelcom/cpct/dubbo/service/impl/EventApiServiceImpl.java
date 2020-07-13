@@ -782,7 +782,7 @@ public class EventApiServiceImpl implements EventApiService {
                         Map<String, Object> dubboResult = yzServ.queryYz(JSON.toJSONString(param));
                         if ("0".equals(dubboResult.get("result_code").toString())) {
                             accArray = new JSONArray((List<Object>) dubboResult.get("msgbody"));
-                            //successCust = true;
+                            log.info("【客户级查询资产列表返回】："+JSON.toJSONString(accArray));
                         }
 
                         // 查询客户级的标签
@@ -3237,123 +3237,136 @@ public class EventApiServiceImpl implements EventApiService {
         return isMatch;
     }
 
+
     //套餐级业务号码查询资产列表
+//    private List<Map<String, Object>> getAccNbrList(String accNbr) {
+//        List<String> accNbrList = new ArrayList<>();
+//        List<Map<String, Object>> accNbrMapList = new ArrayList<>();
+//        // 根据accNum查询prodInstId
+//        try {
+//            log.info("11111------prodInstIdsObject --->" + accNbr);
+//            CacheResultObject<Set<String>> prodInstIdsObject1 = iCacheProdIndexQryService.qryProdInstIndex3(accNbr,"100000");
+//            CacheResultObject<Set<String>> prodInstIdsObject2 = iCacheProdIndexQryService.qryProdInstIndex3(accNbr,"120000");
+//
+//            Set<String> prodInstIds = Sets.newHashSet();
+//            if(prodInstIdsObject1!=null&&prodInstIdsObject1.getResultObject()!=null){
+////                log.info("100000------qryProdInstIndex3 --->" + JSON.toJSONString(prodInstIdsObject1));
+//                prodInstIds.addAll(prodInstIdsObject1.getResultObject());
+//            }
+//            if(prodInstIdsObject2!=null&&prodInstIdsObject2.getResultObject()!=null){
+////                log.info("120000------qryProdInstIndex3 --->" + JSON.toJSONString(prodInstIdsObject2));
+//                prodInstIds.addAll(prodInstIdsObject2.getResultObject());
+//            }
+//            log.info("产品实例id列表-----prodInstIds：" + JSON.toJSONString(prodInstIds));
+//            if (prodInstIds.size()>0) {
+//                Long mainOfferInstId = null;
+//                for (String prodInstId : prodInstIds) {
+//                    // 查询产品实例实体缓存 取主产品（1000）的一个
+//                    CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
+//                    if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null && "1000".equals(prodInstCacheEntity.getResultObject().getProdUseType())) {
+//                        log.info("主产品实例对象-----prodInstCacheEntity：" + JSON.toJSONString(prodInstCacheEntity));
+//                        mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
+//                        break;
+//                    }
+//                }
+//                // 根据offerInstId和statusCd查询prodInstEntity
+//                if (mainOfferInstId != null) {
+//                    CacheResultObject<Set<String>> setCacheResultObject1 = iCacheProdIndexQryService.qryProdInstIndex5(mainOfferInstId.toString(), "100000");
+//                    CacheResultObject<Set<String>> setCacheResultObject2 = iCacheProdIndexQryService.qryProdInstIndex5(mainOfferInstId.toString(), "120000");
+//                    Set<String> prodInstIdsNew = Sets.newHashSet();
+//                    if(setCacheResultObject1!=null&&setCacheResultObject1.getResultObject()!=null){
+//                        prodInstIdsNew.addAll(setCacheResultObject1.getResultObject());
+//                    }
+//                    if(setCacheResultObject2!=null&&setCacheResultObject2.getResultObject()!=null){
+//                        prodInstIdsNew.addAll(setCacheResultObject2.getResultObject());
+//                    }
+//                    log.info("【根据offerInstId和statusCd查询prodInstIds】-----prodInstIdsNew：" + JSON.toJSONString(prodInstIdsNew));
+//                    if(prodInstIdsNew.size()>0){
+//                        prodInstIdsNew.forEach(prodInstIdNew->{
+//                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew);
+//                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
+//                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+////                                log.info("【根据prodInstIdsNew查询ACC_NBR】-----prodInstIdsNew：" + JSON.toJSONString(prodInstCacheEntityNew));
+//                                if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
+////                                    log.info("【根据prodInstIdsNew查询ASSET_INTEG_ID】-----prodInstIdMappingCacheEntity：" + JSON.toJSONString(prodInstIdMappingCacheEntity));
+//                                    String accNum = prodInstCacheEntityNew.getResultObject().getAccNum();
+//                                    if (!"661".equals(accNum) && !"662".equals(accNum) && !"663".equals(accNum) && !"664".equals(accNum) && !"665".equals(accNum)){
+//                                        Map<String, Object> accNbrMap = new HashMap<>(10);
+//                                        accNbrMap.put("ACC_NBR", accNum);
+//                                        accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+//                                        accNbrMapList.add(accNbrMap);
+//
+//                                    }
+//                                }
+//                            }
+//                        });
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            log.info("------套餐级资产查询失败--->" + JSON.toJSONString(accNbrMapList));
+//        }
+//        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
+//        return accNbrMapList;
+//    }
+
+
     private List<Map<String, Object>> getAccNbrList(String accNbr) {
         List<String> accNbrList = new ArrayList<>();
         List<Map<String, Object>> accNbrMapList = new ArrayList<>();
         // 根据accNum查询prodInstId
-        log.info("11111------prodInstIdsObject --->" + accNbr);
+        //log.info("11111------prodInstIdsObject --->" + accNbr);
         CacheResultObject<Set<String>> prodInstIdsObject1 = iCacheProdIndexQryService.qryProdInstIndex3(accNbr,"100000");
         CacheResultObject<Set<String>> prodInstIdsObject2 = iCacheProdIndexQryService.qryProdInstIndex3(accNbr,"120000");
-
         Set<String> prodInstIds = Sets.newHashSet();
         if(prodInstIdsObject1!=null&&prodInstIdsObject1.getResultObject()!=null){
-            log.info("100000------qryProdInstIndex3 --->" + JSON.toJSONString(prodInstIdsObject1));
             prodInstIds.addAll(prodInstIdsObject1.getResultObject());
         }
         if(prodInstIdsObject2!=null&&prodInstIdsObject2.getResultObject()!=null){
-            log.info("120000------qryProdInstIndex3 --->" + JSON.toJSONString(prodInstIdsObject2));
             prodInstIds.addAll(prodInstIdsObject2.getResultObject());
         }
-        log.info("产品实例id列表-----prodInstIds：" + JSON.toJSONString(prodInstIds));
+        //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
         if (prodInstIds.size()>0) {
             Long mainOfferInstId = null;
             for (String prodInstId : prodInstIds) {
                 // 查询产品实例实体缓存 取主产品（1000）的一个
                 CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
+                //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
                 if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null && "1000".equals(prodInstCacheEntity.getResultObject().getProdUseType())) {
-                    log.info("主产品实例对象-----prodInstCacheEntity：" + JSON.toJSONString(prodInstCacheEntity));
                     mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
                     break;
                 }
             }
-            // 根据offerInstId和statusCd查询prodInstEntity
+            // 根据offerInstId和statusCd查询offerProdInstRelId
             if (mainOfferInstId != null) {
-                CacheResultObject<Set<String>> setCacheResultObject1 = iCacheProdIndexQryService.qryProdInstIndex5(mainOfferInstId.toString(), "100000");
-                CacheResultObject<Set<String>> setCacheResultObject2 = iCacheProdIndexQryService.qryProdInstIndex5(mainOfferInstId.toString(), "120000");
-                Set<String> prodInstIdsNew = Sets.newHashSet();
-                if(setCacheResultObject1!=null&&setCacheResultObject1.getResultObject()!=null){
-                    prodInstIdsNew.addAll(setCacheResultObject1.getResultObject());
-                }
-                if(setCacheResultObject2!=null&&setCacheResultObject2.getResultObject()!=null){
-                    prodInstIdsNew.addAll(setCacheResultObject2.getResultObject());
-                }
-                log.info("【根据offerInstId和statusCd查询prodInstIds】-----prodInstIdsNew：" + JSON.toJSONString(prodInstIdsNew));
-                if(prodInstIdsNew.size()>0){
-                    prodInstIdsNew.forEach(prodInstIdNew->{
-                        CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew);
-                        if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-                            final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
-                            log.info("【根据prodInstIdsNew查询ACC_NBR】-----prodInstIdsNew：" + JSON.toJSONString(prodInstCacheEntityNew));
-                            if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
-                                log.info("【根据prodInstIdsNew查询ASSET_INTEG_ID】-----prodInstIdMappingCacheEntity：" + JSON.toJSONString(prodInstIdMappingCacheEntity));
-                                Map<String, Object> accNbrMap = new HashMap<>(10);
-                                accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-                                accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
-                                accNbrMapList.add(accNbrMap);
+                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
+                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
+                    Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
+                    for (String offerProdInstRelId : offerProdInstRelIds) {
+                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
+                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
+                            Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
+                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
+                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
+                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
+                                String accNum = prodInstCacheEntityNew.getResultObject().getAccNum();
+                                if (!"661".equals(accNum) && !"662".equals(accNum) && !"663".equals(accNum) && !"664".equals(accNum) && !"665".equals(accNum)){
+                                    Map<String, Object> accNbrMap = new HashMap<>(10);
+                                    accNbrMap.put("ACC_NBR", accNum);
+                                    accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
+                                    accNbrMapList.add(accNbrMap);
+
+                                }
                             }
                         }
-                    });
+                    }
                 }
             }
         }
         log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
         return accNbrMapList;
     }
-
-//    private List<Map<String, Object>> getAccNbrList(String accNbr) {
-//        List<String> accNbrList = new ArrayList<>();
-//        List<Map<String, Object>> accNbrMapList = new ArrayList<>();
-//        // 根据accNum查询prodInstId
-//        //log.info("11111------prodInstIdsObject --->" + accNbr);
-//        CacheResultObject<Set<String>> prodInstIdsObject = iCacheProdIndexQryService.qryProdInstIndex2(accNbr);
-//        //log.info("22222------prodInstIdsObject --->" + JSON.toJSONString(prodInstIdsObject));
-//        if (prodInstIdsObject != null && prodInstIdsObject.getResultObject() != null) {
-//            Long mainOfferInstId = null;
-//            Set<String> prodInstIds = prodInstIdsObject.getResultObject();
-//            for (String prodInstId : prodInstIds) {
-//                // 查询产品实例实体缓存 取主产品（1000）的一个
-//                CacheResultObject<ProdInst> prodInstCacheEntity = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstId);
-//                //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
-//                if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null && "1000".equals(prodInstCacheEntity.getResultObject().getProdUseType())) {
-//                    mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
-//                    break;
-//                }
-//            }
-//
-//            // 根据offerInstId和statusCd查询offerProdInstRelId
-//            if (mainOfferInstId != null) {
-//                CacheResultObject<Set<String>> setCacheResultObject = iCacheOfferRelIndexQryService.qryOfferProdInstRelIndex1(mainOfferInstId.toString(), "1000");
-//                //            log.info("444444------setCacheResultObject --->" + JSON.toJSONString(setCacheResultObject));
-//                if (setCacheResultObject != null && setCacheResultObject.getResultObject() != null && setCacheResultObject.getResultObject().size() > 0) {
-//                    Set<String> offerProdInstRelIds = setCacheResultObject.getResultObject();
-//                    for (String offerProdInstRelId : offerProdInstRelIds) {
-//                        CacheResultObject<OfferProdInstRel> offerProdInstRelCacheEntity = iCacheRelEntityQryService.getOfferProdInstRelCacheEntity(offerProdInstRelId);
-//                        //                    log.info("55555------offerProdInstRelCacheEntity --->" + JSON.toJSONString(offerProdInstRelCacheEntity));
-//                        if (offerProdInstRelCacheEntity != null && offerProdInstRelCacheEntity.getResultObject() != null) {
-//                            Long prodInstIdNew = offerProdInstRelCacheEntity.getResultObject().getProdInstId();
-//                            CacheResultObject<ProdInst> prodInstCacheEntityNew = iCacheProdEntityQryService.getProdInstCacheEntity(prodInstIdNew.toString());
-//                            //                        log.info("6666666------prodInstCacheEntityNew --->" + JSON.toJSONString(prodInstCacheEntityNew));
-//                            if (prodInstCacheEntityNew != null && prodInstCacheEntityNew.getResultObject() != null) {
-//                                //                            log.info("777777------AccNum --->" + prodInstCacheEntityNew.getResultObject().getAccNum());
-//                                final CacheResultObject<RowIdMapping> prodInstIdMappingCacheEntity = iCacheIdMappingEntityQryService.getProdInstIdMappingCacheEntity(prodInstIdNew.toString());
-//                                //                               log.info("888888------prodInstIdMappingCacheEntity --->" + JSON.toJSONString(prodInstIdMappingCacheEntity));
-//                                if (prodInstIdMappingCacheEntity != null && prodInstIdMappingCacheEntity.getResultObject() != null) {
-//                                    Map<String, Object> accNbrMap = new HashMap<>();
-//                                    accNbrMap.put("ACC_NBR", prodInstCacheEntityNew.getResultObject().getAccNum());
-//                                    accNbrMap.put("ASSET_INTEG_ID", prodInstIdMappingCacheEntity.getResultObject().getCrmRowId());
-//                                    //                                    log.info("999999------accNbrMap --->" + JSON.toJSONString(accNbrMap));
-//                                    accNbrMapList.add(accNbrMap);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        log.info("10101010------accNbrMapList --->" + JSON.toJSONString(accNbrMapList));
-//        return accNbrMapList;
-//    }
 
 
     /**
