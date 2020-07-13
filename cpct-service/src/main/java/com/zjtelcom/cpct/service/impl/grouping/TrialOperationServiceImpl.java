@@ -353,7 +353,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     public Map<String, Object> uploadFile(Long batchId, Long type) {
         Map<String, Object> result = new HashMap<>();
         TrialOperation operation = trialOperationMapper.selectByPrimaryKey(batchId);
-
+        if (type==null){
+            type = 0L;
+        }
         if(type.toString().equals("1") && redisUtils_es.get( "SPECIFIEDNUM_" + operation.getBatchNum()) == null){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "没有选择合并数目，无法进行预下发，请直接全量下发");
@@ -364,7 +366,9 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "试运算记录不存在");
             return result;
         }
-        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd()) && !TrialStatus.IMPORT_SUCCESS.getValue().equals(operation.getStatusCd())){
+        if (!TrialStatus.ALL_SAMPEL_SUCCESS.getValue().equals(operation.getStatusCd()) &&
+                !TrialStatus.IMPORT_SUCCESS.getValue().equals(operation.getStatusCd())&&
+                !TrialStatus.SPECIAL_PUBLISH_SUCCESS.getValue().equals(operation.getStatusCd())){
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "不满足下发条件，无法操作");
             return result;
@@ -2123,8 +2127,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     @Override
     public Map<String, Object> getTrialListByRuleId(Long ruleId) {
         Map<String, Object> result = new HashMap<>();
-        MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(ruleId);
-        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyId(ruleDO.getInitId(),TrialCreateType.IMPORT_USER_LIST.getValue());
+        List<String> strategyIdList = ruleMapper.selectByIdForInitId(ruleId);
+        List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
         List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", operationDetailList);

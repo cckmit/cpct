@@ -105,6 +105,9 @@ public class CamCpcSpecialLogic {
                     if(!list.isEmpty()){
                         break;
                     }
+                    if ("37".equals(p)){
+                        list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
+                    }
                 }
             }else if ("2".equals(type)){
                 String[] positionzj = new String []{"37","36"};
@@ -112,6 +115,9 @@ public class CamCpcSpecialLogic {
                     list = staffGisRelMapper.selectStaffTelByGisCodeOne(wgbm,p);
                     if(!list.isEmpty()){
                         break;
+                    }
+                    if ("36".equals(p)){
+                        list = staffGisRelMapper.selectStaffTelByGisCode(wgbm);
                     }
                 }
             }else{
