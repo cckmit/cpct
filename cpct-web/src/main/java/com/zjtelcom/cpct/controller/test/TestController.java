@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.User;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
@@ -305,7 +306,7 @@ public class TestController extends BaseController {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("1000")) {
+                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }

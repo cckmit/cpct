@@ -158,6 +158,10 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     public Map<String, Object> listEventsForCam(ContactEvt contactEvt, Page pageInfo) {
         Map<String, Object> map = new HashMap<>();
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
+//      活动事件只区分1000，5000
+        if(!contactEvt.getEventManageType().equals("1000")){
+            contactEvt.setEventManageType("5000");
+        }
         List<ContactEvt> contactEvtList = contactEvtMapper.listEvents(contactEvt);
         Iterator<ContactEvt> iterator = contactEvtList.iterator();
         while (iterator.hasNext()){

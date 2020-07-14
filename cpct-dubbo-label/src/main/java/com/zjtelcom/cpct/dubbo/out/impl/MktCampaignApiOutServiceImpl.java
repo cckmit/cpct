@@ -24,6 +24,7 @@ import com.zjtelcom.cpct.dubbo.model.MktStrategyConfResp;
 import com.zjtelcom.cpct.dubbo.model.RetCamResp;
 import com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
+import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import org.slf4j.Logger;
@@ -87,6 +88,9 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
     @Autowired
     private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
 
+    @Autowired
+    private MktCampaignService mktCampaignService;
+
     //同步表名
     private static final String tableName = "mkt_campaign";
 
@@ -143,6 +147,11 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
             ret.setData(mktCampaignResp);
         }
         return ret;
+    }
+
+    @Override
+    public Map<String, Object> getByC3(Long C3) {
+        return mktCampaignService.getByC3AndAuto(C3);
     }
 
     /**
@@ -224,5 +233,9 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
         MktCamChlConfDetail mktCamChlConfDetail = BeanUtil.create(mktCamChlConfDO, new MktCamChlConfDetail());
         return mktCamChlConfDetail;
     }
+
+
+
+
 
 }

@@ -91,6 +91,7 @@
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="1.0" >
         <!-- 营销活动详情服务 -->
         <dubbo:method name="qryMktCampaignDetail" servicecode="33.1083.qryMktCampaignDetailApi" timeout="10000"/>
+        <dubbo:method name="getByC3" servicecode="33.1083.getByC3" timeout="10000"/>
     </dubbo:service>
 
     <!--客户id查询资产信息对外接口-->

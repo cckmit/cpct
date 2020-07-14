@@ -54,6 +54,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
+    MktCampaignDO selectByInitId3(@Param("initId")Long initId);
+
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
 
     MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);
@@ -86,9 +88,9 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> queryRptBatchOrderForMktCampaignFromDate(HashMap<String, Object> paramMap);
 
-    List<MktCampaignDO> selectCampaignTheme(@Param("value") String value, @Param("date") String date,@Param("type") String type);
+    List<MktCampaignDO> selectCampaignTheme(@Param("directoryId") Long directoryId, @Param("date") String date,@Param("type") String type);
 
-    List<MktCampaignDO> selectCampaignThemeByC3(@Param("value") String value, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
+    List<MktCampaignDO> selectCampaignThemeByC3(@Param("directoryId") Long directoryId, @Param("startDate") String startDate,@Param("endDate") String endDate,@Param("type") String type,@Param("lanId") String lanId,@Param("regionFlg")String regionFlg);
 
     Integer getCountFromActivityTheme(@Param("startDate") String startDate,@Param("type") String type,@Param("endDate")String endDate);
 
@@ -103,6 +105,8 @@ public interface MktCampaignMapper {
     List<MktCampaignDO> getQuarterActivities(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
     MktCampaignDO selectByInitIdFromOne(@Param("initId")Long initId);
+
+
 
     List<MktCampaignDO> getQuarterActivitiesIsEnd(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
@@ -124,7 +128,9 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getCampaignList();
 
+    List<MktCampaignDO> listDisturbedCampaignForlanId(@Param("lanId") Long lanId, @Param("tiggerType") String tiggerType);
 
+    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId);
 
 
 }
