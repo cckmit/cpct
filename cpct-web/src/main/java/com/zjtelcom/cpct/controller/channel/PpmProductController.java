@@ -130,6 +130,24 @@ public class PpmProductController extends BaseController  {
     }
 
     /**
+     * 销售品模糊查询
+     */
+    @PostMapping("getPackageOfferListByName")
+    @CrossOrigin
+    public Map<String,Object> getPackageOfferListByName(@RequestBody HashMap<String,Object> params) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.getProductListByName(params);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to getPackageOfferListByName",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to getPackageOfferListByName");
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 添加规则下的销售品
      * @param
      * @return

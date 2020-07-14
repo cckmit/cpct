@@ -125,8 +125,28 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             productList = offerProdMapper.findProductByType(productName,statusCd, producetIdList);
         }else {
             PageHelper.startPage(page,pageSize);
-            productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList);
+            productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList,"offer");
         }
+        Page pageInfo = new Page(new PageInfo(productList));
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productList);
+        result.put("page",pageInfo);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getPackageOfferListByName(Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        List<Offer> productList = new ArrayList<>();
+        Integer page = MapUtil.getIntNum(params.get("page"));
+        Integer pageSize = MapUtil.getIntNum(params.get("pageSize"));
+        String produtType = MapUtil.getString(params.get("type"));
+        String productName = MapUtil.getString(params.get("productName"));
+        // 1000查所有；空查有效
+        String statusCd = MapUtil.getString(params.get("statusCd") == null? "":params.get("statusCd"));
+        List<Long> producetIdList = (List<Long>)params.get("productIdList");
+        PageHelper.startPage(page,pageSize);
+        productList = offerProdMapper.findByType(productName, produtType, statusCd, producetIdList,"package");
         Page pageInfo = new Page(new PageInfo(productList));
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productList);
@@ -232,7 +252,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         List<MktCamItem> mktCamItems = new ArrayList<>();
 
         //销售品
-        if (param.getItemType().equals("1000")){
+        if (param.getItemType().equals("1000") || param.getItemType().equals("2000")){
             for (Long productId : param.getIdList()){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
@@ -359,7 +379,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 continue;
             }
             //销售品
-            if (item.getItemType().equals("1000")){
+            if (item.getItemType().equals("1000") || item.getItemType().equals("2000")){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
                 if (product==null){
                     continue;

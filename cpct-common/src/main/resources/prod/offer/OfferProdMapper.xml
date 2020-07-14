@@ -195,6 +195,12 @@
     <if test="offerName != null and offerName != ''">
       and a.OFFER_NAME  LIKE CONCAT(CONCAT('%',#{offerName}),'%')
     </if>
+     <if test="offerType != null and offerType != '' and offerType == 'offer'">
+       and a.OFFER_TYPE != 15
+     </if>
+     <if test="offerType != null and offerType != '' and offerType == 'package'">
+       and a.OFFER_TYPE == 15
+     </if>
    </where>
   </select>
 
