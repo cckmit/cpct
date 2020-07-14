@@ -23,6 +23,8 @@ public interface ProductService {
 
     Map<String,Object> getProductListByName( Map<String,Object> params);
 
+    Map<String,Object> getPackageOfferListByName( Map<String,Object> params);
+
     Map<String,Object> getProductRuleListByCampaign(ProductParam param);
 
     Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId, String mktCampaignCategory);
