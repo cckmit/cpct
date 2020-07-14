@@ -3,12 +3,14 @@ package com.zjtelcom.cpct.service.impl.report;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.IReportService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.CatalogItemMapper;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.OrganizationMapper;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.CatalogItem;
 import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.domain.channel.Organization;
 import com.zjtelcom.cpct.domain.system.SysParams;
@@ -50,7 +52,8 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
     private ContactChannelMapper channelMapper;
     @Autowired
     private SysAreaMapper sysAreaMapper;
-
+    @Autowired
+    private CatalogItemMapper catalogItemMapper;
 
     /**
      * 活动匹配地市
@@ -102,7 +105,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         HashMap<String, Object> result = new HashMap<>();
         Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
         if (paramMapToSuccess(result, paramMap)) return result;
-        List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+        //  List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+        // 查询二级目录
+        List<CatalogItem> catalogItemList = catalogItemMapper.selectChild();
         String startDate = params.get("startDate").toString();
         String endDate = params.get("endDate").toString();
         String type = paramMap.get("mktCampaignType").toString();
@@ -122,13 +127,12 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
         Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
         log.info("【count】："+JSON.toJSONString(count));
         List<Map<String,Object>> dataMap = new ArrayList<>();
-        if (campaignTheme.size()>0 && campaignTheme!=null){
+        if (catalogItemList != null && catalogItemList.size() > 0) {
             //主题列表
-            for (Map<String, String> stringStringMap : campaignTheme) {
+            for (CatalogItem catalogItem : catalogItemList) {
                 Map<String,Object> themeMap = new HashMap<>();
-                String value = stringStringMap.get("value");
                 //每个主题个数
-                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, startDate,endDate ,type, lanId,regionFlg);
+                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(catalogItem.getCatalogId(), startDate,endDate ,type, lanId,regionFlg);
                 String substring = null;
                 StringBuilder stringBuilder = new StringBuilder();
                 if (mktCampaignList!=null && mktCampaignList.size()>0){
@@ -229,7 +233,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
                 //主题百分比
                 double num = (double) mktCampaignList.size() / (double)count;
                 //返回拼装
-                themeMap.put("name",stringStringMap.get("label"));
+                themeMap.put("name", catalogItem.getCatalogItemName());
                 themeMap.put("number",mktCampaignList.size());
                 themeMap.put("value",getPercentFormat(Double.valueOf(num), 2, 2));
                 themeMap.put("conversionList",rptList);
@@ -1056,23 +1060,25 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             ArrayList<Object> list = new ArrayList<>();
             Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
             if (paramMapToSuccess(resultMap, paramMap)) return resultMap;
-            List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            // List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            // 查询二级目录
+            List<CatalogItem> catalogItemList = catalogItemMapper.selectChild();
             String date = params.get("startDate").toString();
             String startDate = params.get("startDate").toString();
 
             String type = paramMap.get("mktCampaignType").toString();
             //总数
             Integer count = mktCampaignMapper.getCountFromActivityTheme(date,type,startDate);
-            if (campaignTheme.size()>0 && campaignTheme!=null){
-                for (Map<String, String> stringStringMap : campaignTheme) {
-                    String value = stringStringMap.get("value");
-                    String label = stringStringMap.get("label");
+            if ( catalogItemList!=null && catalogItemList.size()>0){
+                for (CatalogItem catalogItem : catalogItemList) {
+                    Long catalogItemId = catalogItem.getCatalogItemId();
+                    String catalogItemName = catalogItem.getCatalogItemName();
                     //每个主题个数
-                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(value, date, type);
+                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignTheme(catalogItemId, date, type);
                     HashMap<String, Object> map = new HashMap<>();
-                    map.put("name",label);
+                    map.put("name",catalogItemName);
                     map.put("value",mktCampaignList.size());
-                    map.put("type",value);
+                    map.put("type",catalogItemId.toString());
                     list.add(map);
                 }
             }
@@ -1098,7 +1104,9 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             ArrayList<Object> list = new ArrayList<>();
             Map<String, Object> paramMap = AcitvityParams.ActivityParamsByMap(params);
             if (paramMapToSuccess(resultMap, paramMap)) return resultMap;
-            List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            // List<Map<String, String>> campaignTheme = sysParamsMapper.listParamsByKey("CAMPAIGN_THEME");
+            // 查询二级目录
+            List<CatalogItem> catalogItemList = catalogItemMapper.selectChild();
             String startDate = params.get("startDate").toString();
             String endDate = params.get("endDate").toString();
             String type = paramMap.get("mktCampaignType").toString();
@@ -1127,16 +1135,16 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
 
             //总数
             Integer count = mktCampaignMapper.getCountFromActivityThemeByC3(startDate,type,endDate,lanId,regionFlg);
-            if (campaignTheme.size()>0 && campaignTheme!=null){
-                for (Map<String, String> stringStringMap : campaignTheme) {
-                    String value = stringStringMap.get("value");
-                    String label = stringStringMap.get("label");
+            if (catalogItemList != null && catalogItemList.size() > 0) {
+                for (CatalogItem catalogItem : catalogItemList) {
+                    Long catalogItemId = catalogItem.getCatalogItemId();
+                    String catalogItemName = catalogItem.getCatalogItemName();
                     //每个主题个数
-                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(value, startDate,endDate ,type, lanId,regionFlg);
+                    List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(catalogItemId, startDate,endDate ,type, lanId,regionFlg);
                     HashMap<String, Object> map = new HashMap<>();
-                    map.put("name",label);
+                    map.put("name",catalogItemName);
                     map.put("value",mktCampaignList.size());
-                    map.put("type",value);
+                    map.put("type",catalogItemId.toString());
                     list.add(map);
                 }
             }

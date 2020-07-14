@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.EventRelMapper;
+import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
 import com.zjtelcom.cpct.dao.event.MktOfferEventMapper;
 import com.zjtelcom.cpct.domain.channel.EventRel;
@@ -13,6 +14,8 @@ import com.zjtelcom.cpct.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,8 @@ public class EventRelServiceImpl implements EventRelService {
     private EventRelMapper eventRelMapper;
     @Autowired
     private ContactEvtMapper contactEvtMapper;
+    @Autowired
+    private ContactEvtItemMapper contactEvtItemMapper;
 
     /*
     ** 获取未被当前事件关联的事件
@@ -108,7 +113,6 @@ public class EventRelServiceImpl implements EventRelService {
         return resultMap;
     }
 
-
     @Autowired
     private MktOfferEventMapper mktOfferEventMapper;
 
@@ -128,16 +132,28 @@ public class EventRelServiceImpl implements EventRelService {
                 HashMap<String,Object> dataMap = new HashMap<String,Object>();
                 if(mktOfferEventDOList.size() == 0){
                     List<String> eventList = new ArrayList<>();
-                    dataMap.put(offerCode, eventList);
+                    dataMap.put("offerCode", offerCode);
+                    dataMap.put("eventList",eventList);
                     data.add(dataMap);
                     continue;
                 }else {
-                    List<String> eventList = new ArrayList<>();
+                    dataMap.put("offerCode",offerCode);
+                    List<Map<String,Object>> eventList = new ArrayList<>();
                     for (MktOfferEventDO mktOfferEventDO : mktOfferEventDOList){
-                        String eventName = mktOfferEventDO.getEventName();
-                        eventList.add(eventName);
+                        Map<String,Object> eventMap = new HashMap();
+                        if(mktOfferEventDO.getEventNbr() != null){
+                            eventMap.put("eventCode",mktOfferEventDO.getEventNbr());
+                            List<String> evtItemCodeList = new ArrayList<>();
+
+                            if(mktOfferEventDO.getEventId() != null){
+                                long eventId = mktOfferEventDO.getEventId();
+                                evtItemCodeList = contactEvtItemMapper.selectEvtItemCodeByEventId(eventId);
+                            }
+                            eventMap.put("evtItemCodeList",evtItemCodeList);
+                        }
+                        eventList.add(eventMap);
                     }
-                    dataMap.put(offerCode,eventList);
+                    dataMap.put("eventList",eventList);
                     data.add(dataMap);
                 }
             }
