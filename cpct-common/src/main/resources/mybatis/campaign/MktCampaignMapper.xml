@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct.dao.campaign.selectCampaignThemeByC3MktCampaignMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCampaignMapper">
     <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
         <id column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId"/>
         <result column="INIT_ID" jdbcType="BIGINT" property="initId"/>
@@ -1341,43 +1341,33 @@
 
 
     <select id="listByCode" resultMap="BaseResultMap">
-        select *
-        from mkt_campaign
-        where MKT_ACTIVITY_NBR = #{code}
+        select t.*
+        from mkt_campaign t
+        where t.MKT_ACTIVITY_NBR = #{code}
     </select>
 
     <select id="getAllTheme" resultMap="BaseResultMap" parameterType="java.lang.String">
-        select *
-        from mkt_campaign
+        select t.*
+        from mkt_campaign t
         where 1=1
         <if test="theme != null and theme != ''">
-        and  THE_ME in (${theme})
+        and  t.THE_ME in (${theme})
         </if>
     </select>
 
 
     <select id="getCampaignList" resultMap="BaseResultMap">
-        select *
-        from mkt_campaign
-        where STATUS_CD = 2002
+        select t.*
+        from mkt_campaign t
+        where t.STATUS_CD = 2002
     </select>
     
     <select id="listDisturbedCampaignForlanId"  resultMap="BaseResultMap">
-        select *
-        from mkt_campaign
-        where LAN_ID = #{lanId} and TIGGER_TYPE = #{tiggerType}
-    </select>
-    
-    <select id="getByC3AndAuto" resultMap="BaseResultMap">
         select t.*
         from mkt_campaign t
-        where (STATUS_CD = 2002 OR STATUS_CD = 2008)
-        and t.LAN_ID = #{lanId,jdbcType=BIGINT}
-        and t.AUTO_TRIAL = 1
+        where t.LAN_ID = #{lanId} and t.TIGGER_TYPE = #{tiggerType}
     </select>
-
-
-
+    
     <select id="getByC3AndAuto" resultMap="BaseResultMap">
         select t.*
         from mkt_campaign t

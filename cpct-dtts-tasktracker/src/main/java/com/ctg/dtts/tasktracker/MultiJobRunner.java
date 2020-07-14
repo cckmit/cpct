@@ -20,6 +20,7 @@ import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
+import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Method;
@@ -50,8 +51,8 @@ public class MultiJobRunner {
     private LabelSaturationMapper labelSaturationMapper;
     @Autowired
     private TrialOperationMapper trialOperationMapper;
-    @Autowired(required = false)
-    private TrialProdService trialProdService;
+    @Autowired
+    private UCCPSendService uccpSendService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -695,7 +696,7 @@ public class MultiJobRunner {
                     Map<String,Object> param =new HashMap<>();
                     param.put("idList",stringArraylist); //活动id集合
                     param.put("perCampaign","PER_CAMPAIGN");//周期性活动标识
-                    trialProdService.campaignIndexTask(param);
+                    trialStatusUpService.campaignIndexTask(param);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -738,7 +739,7 @@ public class MultiJobRunner {
         params.put("OrderContent",sendContent);
         //本地网/辖区
         params.put("LanId",lanId);
-        Map map = uCCPSendService.sendShortMessage(params);
+        Map map = uccpSendService.sendShortMessage(params);
         if (map == null) return "调用sendShortMessage返回结果异常！";
         if (!map.get("code").equals("0000")) {
             // 短信发送成功记录数据
