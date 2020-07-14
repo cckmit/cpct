@@ -1573,6 +1573,33 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return maps;
     }
 
+    private  String getUserLevl(){
+        SystemUserDto user = UserUtil.getUser();
+        String sysPostCode = null;
+        ArrayList<String> arrayList = new ArrayList<>();
+        List<SystemPostDto> systemPostDtoList = user.getSystemPostDtoList();
+        //岗位信息查看最大权限作为岗位信息
+        if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
+            for (SystemPostDto systemPostDto : systemPostDtoList) {
+                arrayList.add(systemPostDto.getSysPostCode());
+            }
+        }
+        if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+        }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        }else {
+            sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        }
+        return sysPostCode;
+    }
+
     /**
      * 查询活动列表（分页） -- 活动模板
      */
@@ -1589,7 +1616,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
-
+            String userLevl = getUserLevl();
+            if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
+                mktCampaignDO.setMktCampaignType("1000");
+            }
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
                 Long landId = Long.valueOf(landIdList.get(landIdList.size() - 1));
