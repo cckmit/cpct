@@ -18,10 +18,7 @@ import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignRelDO;
-import com.zjtelcom.cpct.domain.channel.Channel;
-import com.zjtelcom.cpct.domain.channel.OrgRel;
-import com.zjtelcom.cpct.domain.channel.Organization;
-import com.zjtelcom.cpct.domain.channel.StaffOrgRel;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.DttsMsgEnum;
@@ -84,6 +81,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
     private CloseRuleMapper closeRuleMapper;
     @Autowired(required = false)
     private StaffOrgRelMapper staffOrgRelMapper;
+    @Autowired
+    private LabelValueMapper labelValueMapper;
+    @Autowired
+    private CatalogItemMapper catalogItemMapper;
 
 
     /**
@@ -648,7 +649,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                         try {
                             HashMap<String, Object> resultMap = new HashMap<>();
                             String mktCampaignId1 = map.get("mktCampaignId").toString();
-                            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId(Long.valueOf(mktCampaignId1));
+                            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByInitId3(Long.valueOf(mktCampaignId1));
                             if (mktCampaignDO == null) {
                                 // 如果有为空 跳过
                                 continue;
@@ -668,6 +669,31 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                             resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                             resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+                            // 查询主题
+                            resultMap.put("theMeValue", "");
+                            TopicLabelValue topicLabelValue = labelValueMapper.selectByValue(mktCampaignDO.getTheMe());
+                            if (topicLabelValue != null) {
+                                resultMap.put("theMeValue", topicLabelValue.getValueName());
+                            }
+
+                            // 查询目录
+                            resultMap.put("catalogItemName", "");
+                            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                            if (catalogItem != null) {
+                                resultMap.put("catalogItemName", catalogItem.getCatalogItemName());
+                            }
+
+                            // 查询父活动
+                            List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignDO.getMktCampaignId(), "1000");
+                            if (mktCampaignRelDOS != null && mktCampaignRelDOS.size() > 0 && mktCampaignRelDOS.get(0)!=null) {
+                                MktCampaignDO mktCampaign = mktCampaignMapper.selectByPrimaryKey(mktCampaignRelDOS.get(0).getaMktCampaignId());
+                                if (mktCampaign != null) {
+                                    resultMap.put("parentActivityNbr", mktCampaign.getMktActivityNbr()==null?"":mktCampaign.getMktActivityNbr());
+                                    resultMap.put("parentStartTime", mktCampaign.getPlanBeginTime()==null?"":mktCampaign.getPlanBeginTime());
+                                    resultMap.put("parentEndTime", mktCampaign.getPlanEndTime()==null?"":mktCampaign.getPlanBeginTime());
+                                }
+                            }
+
                             //关单规则名称
 //                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
 //                        resultMap.put("mktCloseRuleName", CloseRuleName);
@@ -780,6 +806,78 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         statisicts.add(msgMap);
                                     }
                                 }
+                                if (key.equals("orderSuccessNum2")) {
+                                    msgMap.put("name", "批次成功数");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("disturbNum")) {
+                                    msgMap.put("name", "过扰关单数");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("orderSuccessNum2")) {
+                                    msgMap.put("name", "过扰关单率");
+                                    String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
+                                    msgMap.put("nub", percentFormat);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result1001")) {
+                                    msgMap.put("name", "成功/已接触,成功办理");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result1002")) {
+                                    msgMap.put("name", "成功/转商机单");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result1003")) {
+                                    msgMap.put("name", "失败/没有需求");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result1004")) {
+                                    msgMap.put("name", "失败/价格太高");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result1005")) {
+                                    msgMap.put("name", "失败/已转他网");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result2000")) {
+                                    msgMap.put("name", "失败/拒绝");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result3000")) {
+                                    msgMap.put("name", "营销过滤/已办理");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result4000")) {
+                                    msgMap.put("name", "二次营销/有意向");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result5000")) {
+                                    msgMap.put("name", "二次营销/犹豫中");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result6000")) {
+                                    msgMap.put("name", "二次营销/接触失败");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("result7000")) {
+                                    msgMap.put("name", "二次营销/二次营销");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+
                                 // todo 新加关单编码 2020 1/2 x
                                 if (key.equals("batchNbr")) {
                                     resultMap.put("batchNum", o.toString());
@@ -812,6 +910,28 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
                                 }
+                            }
+
+                            // 获取批次号
+                            String batchNum = (String) map.get("batchNbr");
+                            TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
+                            if (trialOperation != null) {
+                                // 短信过扰差值
+                                HashMap<String, Object> subNumMap = new HashMap<>();
+                                subNumMap.put("name", "短信过扰差值");
+                                subNumMap.put("nub", trialOperation.getSubNum());
+                                statisicts.add(subNumMap);
+                                // 黑名单过滤个数
+                                HashMap<String, Object> beforeNumMap = new HashMap<>();
+                                beforeNumMap.put("name", "黑名单过滤数");
+                                beforeNumMap.put("nub", trialOperation.getBeforeNum());
+                                statisicts.add(beforeNumMap);
+                                // 销售品过滤个数
+                                HashMap<String, Object> endNumMap = new HashMap<>();
+                                endNumMap.put("name", "销售品过滤数");
+                                endNumMap.put("nub", trialOperation.getEndNum());
+                                statisicts.add(endNumMap);
+                                logger.info("statisicts --->>>" + JSON.toJSONString(statisicts));
                             }
                             resultMap.put("statistics", statisicts);
                             hashMaps.add(resultMap);
@@ -848,6 +968,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                             resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                             resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+
                             //关单规则名称
 //                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
 //                        resultMap.put("mktCloseRuleName", CloseRuleName);
@@ -962,28 +1083,6 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         resultMap.put("mktCloseRuleName", "空");
                                     }
                                 }
-                            }
-
-                            // 获取批次号
-                            String batchNum = (String) map.get("batchNbr");
-                            TrialOperation trialOperation = trialOperationMapper.selectByBatchNum(batchNum);
-                            if (trialOperation != null) {
-                                // 短信过扰差值
-                                HashMap<String, Object> subNumMap = new HashMap<>();
-                                subNumMap.put("name", "短信过扰差值");
-                                subNumMap.put("nub", trialOperation.getSubNum());
-                                statisicts.add(subNumMap);
-                                // 黑名单过滤个数
-                                HashMap<String, Object> beforeNumMap = new HashMap<>();
-                                beforeNumMap.put("name", "黑名单过滤数");
-                                beforeNumMap.put("nub", trialOperation.getBeforeNum());
-                                statisicts.add(beforeNumMap);
-                                // 销售品过滤个数
-                                HashMap<String, Object> endNumMap = new HashMap<>();
-                                endNumMap.put("name", "销售品过滤数");
-                                endNumMap.put("nub", trialOperation.getEndNum());
-                                statisicts.add(endNumMap);
-                                logger.info("statisicts --->>>" + JSON.toJSONString(statisicts));
                             }
                             resultMap.put("statistics", statisicts);
                             hashMaps.add(resultMap);

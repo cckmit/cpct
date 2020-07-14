@@ -97,9 +97,14 @@
     where CATALOG_ITEM_DESC = #{desc} and  CATALOG_ID = 12
   </select>
 
-
-
-
+  <!-- 查询二级目录 -->
+  <select id="selectChild" resultMap="BaseResultMap">
+    select CATALOG_ITEM_ID, CATALOG_ID, PAR_CATALOG_ITEM_ID, CATALOG_ITEM_NAME, CATALOG_ITEM_DESC,
+    CATALOG_ITEM_TYPE, CATALOG_ITEM_NBR, CATALOG_ITEM_SORT, STATUS_CD, CREATE_STAFF,
+    UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    from catalog_item
+    where PAR_CATALOG_ITEM_ID != 0 and  CATALOG_ID = 12
+  </select>
 
 
 </mapper>

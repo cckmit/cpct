@@ -249,7 +249,9 @@ public class ActivityStatisticsController extends BaseController {
                 String sheetName = "派单报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动渠道", "活动生效时间", "活动失效时间",
                         "关单规则名称","所属地市","批次编码","派单方式","派单数", "接单数","外呼数","成功数","接单率","外呼率","转化率",
-                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","处理数","处理率","短信过扰差值","黑名单过滤个数","销售品过滤个数"};
+                        "收入低迁数","收入低迁率","门店有销率","是否框架子活动","处理数","处理率", "批次成功数","过扰关单数","过扰关单率",
+                        "成功/已接触,成功办理","成功/转商机单","失败/没有需求","失败/价格太高","失败/已转他网", "失败/拒绝","营销过滤/已办理",
+                        "二次营销/有意向","二次营销/犹豫中","二次营销/接触失败","二次营销/二次营销","短信过扰差值","黑名单过滤个数","销售品过滤个数"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -291,6 +293,34 @@ public class ActivityStatisticsController extends BaseController {
                                     content[i][22] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("处理率")){
                                     content[i][23] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("批次成功数")){
+                                    content[i][24] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("过扰关单数")){
+                                    content[i][25] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("过扰关单率")){
+                                    content[i][26] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("成功/已接触,成功办理")){
+                                    content[i][27] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("成功/转商机单")){
+                                    content[i][28] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("失败/没有需求")){
+                                    content[i][29] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("失败/价格太高")){
+                                    content[i][30] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("失败/已转他网")){
+                                    content[i][31] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("失败/拒绝")){
+                                    content[i][32] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("营销过滤/已办理")){
+                                    content[i][33] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("二次营销/有意向")){
+                                    content[i][34] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("二次营销/犹豫中")){
+                                    content[i][35] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("二次营销/接触失败")){
+                                    content[i][36] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("二次营销/二次营销")){
+                                    content[i][37] = String.valueOf(map3.get("nub"));
                                 }
                             }
                             // 获取批次号
@@ -299,11 +329,11 @@ public class ActivityStatisticsController extends BaseController {
                             TrialOperation trialOperation = trialOperationService.selectByBatchNum(batchNum);
                             if (trialOperation!=null){
                                 // 短信过扰差值
-                                content[i][24] = trialOperation.getSubNum() ==null ? "" : trialOperation.getSubNum();
+                                content[i][38] = trialOperation.getSubNum() ==null ? "" : trialOperation.getSubNum();
                                 // 黑名单过滤个数
-                                content[i][25] = trialOperation.getBeforeNum() ==null ? "" : trialOperation.getBeforeNum();
+                                content[i][39] = trialOperation.getBeforeNum() ==null ? "" : trialOperation.getBeforeNum();
                                 // 销售品过滤个数
-                                content[i][26] = trialOperation.getEndNum() ==null ? "" : trialOperation.getEndNum();
+                                content[i][40] = trialOperation.getEndNum() ==null ? "" : trialOperation.getEndNum();
                             }
                         }
                     }catch (Exception e) {
