@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dubbo.out.CampaignService;
 import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("1000")) {
+                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -105,7 +106,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("5000")) {
+                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -134,7 +135,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("6000")) {
+                if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -204,7 +205,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("1000")) {
+                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -233,7 +234,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("5000")) {
+                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -262,7 +263,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("6000")) {
+                if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -341,7 +342,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("1000")) {
+                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -370,7 +371,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("5000")) {
+                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }
@@ -399,7 +400,7 @@ public class MultiJobRunner {
                 if (execInvl.length < 2) {
                     continue;
                 }
-                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals("3000") && mktCampaignDO.getMktCampaignType().equals("6000")) {
+                if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
                     mktCampaignDOs.add(mktCampaignDO);
                 }
             }

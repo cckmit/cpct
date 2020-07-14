@@ -54,6 +54,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
+    MktCampaignDO selectByInitId3(@Param("initId")Long initId);
+
     MktCampaignDO selectPrimaryKeyByInitId(@Param("initId")Long initId, @Param("statusCd")String statusCd);
 
     MktCampaignDO selectByInitForRollBack(@Param("initId")Long initId);
@@ -104,6 +106,8 @@ public interface MktCampaignMapper {
 
     MktCampaignDO selectByInitIdFromOne(@Param("initId")Long initId);
 
+
+
     List<MktCampaignDO> getQuarterActivitiesIsEnd(@Param("value")String value, @Param("statusCd")String statusCd, @Param("startDate")String startDate,@Param("endDate") String endDate, @Param("type")String type,@Param("lanId") String lanId, @Param("regionFlg")String regionFlg);
 
     List<MktCampaignCountDO> qryMktCampaignListPage4Count(MktCampaignDO mktCampaignDO);
@@ -124,7 +128,9 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getCampaignList();
 
+    List<MktCampaignDO> listDisturbedCampaignForlanId(@Param("lanId") Long lanId, @Param("tiggerType") String tiggerType);
 
+    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId);
 
 
 }

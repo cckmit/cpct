@@ -737,4 +737,26 @@ public class CampaignController extends BaseController {
         }
         return result;
     }
+
+    /*批量活动活动派单过扰，c3级校验是否超过5个*/
+    @PostMapping(value = "/isOpenDisturb")
+    @CrossOrigin
+    public Map<String, Object> isOpenDisturb(@RequestBody MktCampaignDO mktCampaignDO) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean isOverFive = mktCampaignService.isOpenDisturb(mktCampaignDO);
+            if(isOverFive == false){
+                result.put("info", "当前地市过扰活动达到阈值，禁止开启过扰");
+            }
+            result.put("isOverFive",isOverFive);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
 }
