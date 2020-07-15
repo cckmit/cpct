@@ -1474,16 +1474,17 @@ public class EventApiServiceImpl implements EventApiService {
         @Override
         public Map<String, Object> call() {
             Map<String, Object> activityTaskResultMap = new HashMap<>();
-/*
-            boolean isBlack = checkBlackList(privateParams.get("accNbr"), type);
-            if (isBlack) {
-                Map<String, Object> nonPassedMsg = (Map<String, Object>) activityTaskResultMap.get("nonPassedMsg");
-                if (nonPassedMsg != null) {
-                    nonPassedMsg.put("cam_" + activityId, "该资产已被黑名单过滤");
+            try {
+                boolean isBlack = checkBlackList(privateParams.get("accNbr"), type);
+                if (isBlack) {
+                    activityTaskResultMap.put("cam_" + activityId,"【" + privateParams.get("accNbr") + "】该资产已被黑名单过滤");
+                    return activityTaskResultMap;
                 }
-                return activityTaskResultMap;
+            } catch (Exception e) {
+                log.error("【全局黑名单校验失败】");
+                e.printStackTrace();
             }
-*/
+
 
             if (StatusCode.SERVICE_CAMPAIGN.getStatusCode().equals(type) || StatusCode.SERVICE_SALES_CAMPAIGN.getStatusCode().equals(type)) {
                 log.info("服务活动进入camApiSerService.ActivitySerTask");
@@ -2507,6 +2508,9 @@ public class EventApiServiceImpl implements EventApiService {
                 MktCampaignDO mktCampaign = new MktCampaignDO();
                 if (mktCampaignRedis != null) {
                     mktCampaign = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + mktCampaginId);
+                    if ("3000".equals(mktCampaign.getMktCampaignCategory())){
+                        redisUtils.del("MKT_CAMPAIGN_"+mktCampaginId);
+                    }
                 }
 
                 Date now = null;
@@ -2553,7 +2557,8 @@ public class EventApiServiceImpl implements EventApiService {
                 }
 
                 // 判断活动类型
-                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())) {
+                if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())
+                        && !"3000".equals(mktCampaign.getMktCampaignCategory())) {
                     esJson.put("hit", false);
                     esJson.put("msg", "活动类型不符");
                     log.info("活动类型不符");
@@ -3425,13 +3430,14 @@ public class EventApiServiceImpl implements EventApiService {
      * @return
      */
     private boolean checkBlackList(String accNbr, String type) {
-        BlackListDO blackListDO = new BlackListDO();
+        List<String> assetPhoneList = new ArrayList<>();
         if (StatusCode.MARKETING_CAMPAIGN.getStatusCode().equals(type)) {
-            blackListDO.setMaketingCate("1");  // 营销类活动
+            Map<String, Object> market = eventRedisService.getRedis("BLACK_LIST_MARKET");
+            assetPhoneList = (List<String>) market.get("BLACK_LIST_MARKET");
         } else {
-            blackListDO.setServiceCate("1");   // 服务类活动
+            Map<String, Object> market = eventRedisService.getRedis("BLACK_LIST_SERVICE");
+            assetPhoneList = (List<String>) market.get("BLACK_LIST_SERVICE");
         }
-        List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
         // 被黑名单过滤
         if (assetPhoneList != null && assetPhoneList.contains(accNbr)) {
             log.info(accNbr + "该资产号码在黑名单中，被过滤了");
