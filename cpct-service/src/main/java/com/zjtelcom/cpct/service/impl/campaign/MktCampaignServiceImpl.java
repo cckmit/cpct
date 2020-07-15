@@ -1858,7 +1858,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
                     MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(mktCampaignCountDO.getPreMktCampaignId());
                     if (mktCampaignDOPre != null) {
-
+                        String msgByCode = StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory());
+                        mktCampaignVO.setPreMktCampaignType(msgByCode==null ? "" : msgByCode);
                     }
                     // 集团活动补丁逻辑（现去除）
                     /*List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
