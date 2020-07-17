@@ -258,9 +258,9 @@ public class TrialProdServiceImpl implements TrialProdService {
                 System.out.println(JSON.toJSONString(res));
             }
         }
-        result.put("resultCode", CODE_FAIL);
+        result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "全量试算中");
-        result.put("res",resList);
+        result.put("result",resList);
         return result;
     }
 
@@ -369,10 +369,9 @@ public class TrialProdServiceImpl implements TrialProdService {
         trialOperation.setStatusDate(new Date());
         trialOperation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
         trialOperationMapper.updateByPrimaryKey(trialOperation);
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", campaignDO.getMktCampaignName() + "&&&" + strategyConfDO.getMktStrategyConfName());
+        result.put("name", campaignDO.getMktCampaignName() + "&&&" + strategyConfDO.getMktStrategyConfName());
+        result.put("batchNum",trialOperation.getBatchNum());
         return result;
-
     }
 
     private String getCreater(Long createStaff){
