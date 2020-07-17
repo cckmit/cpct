@@ -158,7 +158,7 @@
         <if test= "statusDate!=null">STATUS_DATE = #{statusDate,jdbcType=TIMESTAMP},</if>
         <if test= "createStaff!=null">CREATE_STAFF = #{createStaff,jdbcType=BIGINT},</if>
         <if test= "createDate!=null">CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},</if>
-        <if test= "updateStaff!=null">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
+        <if test= "updateStaff!=null and updateStaff != 1">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
         REMARK = #{remark,jdbcType=VARCHAR},
         <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
         DIRECTORY_ID = #{directoryId,jdbcType=BIGINT},
@@ -1367,7 +1367,7 @@
     <select id="listDisturbedCampaignForlanId"  resultMap="BaseResultMap">
         select t.*
         from mkt_campaign t
-        where t.LAN_ID = #{lanId} and t.TIGGER_TYPE = #{tiggerType}
+        where t.LAN_ID = #{lanId} and t.TIGGER_TYPE = #{tiggerType} and t.SKIP_DISTURBED = 1
     </select>
     
     <select id="getByC3AndAuto" resultMap="BaseResultMap">
