@@ -148,6 +148,15 @@ public class MktCampaign extends BaseEntity {
 
     private String  skipDisturbed;
 
+    private Integer autoTrial;
+
+    public Integer getAutoTrial() {
+        return autoTrial;
+    }
+
+    public void setAutoTrial(Integer autoTrial) {
+        this.autoTrial = autoTrial;
+    }
 
     public String getSkipDisturbed() {
         return skipDisturbed;
