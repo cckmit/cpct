@@ -2125,7 +2125,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long initId = mktCampaignDO.getInitId();
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.loginId(), statusCd);
-            mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(),null);
+            mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(),UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
             if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                 try {

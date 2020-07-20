@@ -531,7 +531,9 @@
         update mkt_campaign
         set STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         STATUS_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        <if test= "updateStaff!=null and updateStaff != 1">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
