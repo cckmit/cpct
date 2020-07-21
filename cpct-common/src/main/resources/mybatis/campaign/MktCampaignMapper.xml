@@ -1201,8 +1201,8 @@
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
         </if>
-        <if test="value != null and value != '' ">
-            AND THE_ME = #{value}
+        <if test="value != null ">
+            AND DIRECTORY_ID = #{value}
         </if>
         <if test="lanId != null and lanId != ''">
             AND LAN_ID = #{lanId}
@@ -1225,8 +1225,8 @@
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
         </if>
-        <if test="value != null and value != '' ">
-            AND THE_ME = #{value}
+        <if test="value != null ">
+            AND DIRECTORY_ID = #{value}
         </if>
         <if test="lanId != null and lanId != ''">
             AND LAN_ID = #{lanId}

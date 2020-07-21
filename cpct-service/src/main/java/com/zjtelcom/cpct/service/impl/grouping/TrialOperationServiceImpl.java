@@ -2149,6 +2149,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     detail.setCost(cost+"ms");
                 }
             }
+            //如果是预下发并且状态是全量试算成功给前端一个标记
+            Object o = redisUtils_es.get("SPECIFIEDNUM_" + trialOperation.getBatchNum());
+            if (trialOperation.getStatusCd().equals("5000")){
+                if ( o != null && !"".equals(o.toString())){
+                    detail.setFlg("true");
+                }
+            }
             operationDetailList.add(detail);
         }
         return operationDetailList;

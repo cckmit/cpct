@@ -628,7 +628,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
 
             if ("C1".equals(mktCampaignDO.getRegionFlg()) || "C2".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【省】" + "-" + catalogName +"-" +  mktCampaignDO.getMktCampaignNameEdit()  +"-"+ mktCampaignDO.getMktActivityNbr() + "-" +  datestr);
+                mktCampaignDO.setMktCampaignName("【省】" + "-" + catalogName +"-" +  mktCampaignDO.getMktCampaignNameEdit() +"-"+ mktCampaignDO.getMktActivityNbr() + "-" +  datestr);
             }else if ("C3".equals(mktCampaignDO.getRegionFlg())){
                 mktCampaignDO.setMktCampaignName("【市】" + c3Name +"-" + catalogName +"-" + mktCampaignDO.getMktCampaignNameEdit()  +"-"+ mktCampaignDO.getMktActivityNbr()  + "-" +  datestr);
             }else if ("C4".equals(mktCampaignDO.getRegionFlg())){

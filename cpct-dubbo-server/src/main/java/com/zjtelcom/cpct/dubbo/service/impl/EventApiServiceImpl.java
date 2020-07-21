@@ -2508,9 +2508,9 @@ public class EventApiServiceImpl implements EventApiService {
                 MktCampaignDO mktCampaign = new MktCampaignDO();
                 if (mktCampaignRedis != null) {
                     mktCampaign = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + mktCampaginId);
-                    if ("3000".equals(mktCampaign.getMktCampaignCategory())){
-                        redisUtils.del("MKT_CAMPAIGN_"+mktCampaginId);
-                    }
+//                    if ("3000".equals(mktCampaign.getMktCampaignCategory())){
+//                        redisUtils.del("MKT_CAMPAIGN_"+mktCampaginId);
+//                    }
                 }
 
                 Date now = null;
