@@ -8,6 +8,15 @@ public class TrialOperationDetail extends TrialOperation implements Serializable
     private String cost;
     private Long ruleId;
     private String ruleName;
+    private String flg;
+
+    public String getFlg() {
+        return flg;
+    }
+
+    public void setFlg(String flg) {
+        this.flg = flg;
+    }
 
     public Long getRuleId() {
         return ruleId;

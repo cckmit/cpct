@@ -106,4 +106,11 @@
         where Z_MKT_CAMPAIGN_ID = #{zMktCampaignId}
         AND REL_TYPE = '1000'
     </select>
+
+
+    <select id="selectZid" resultType="java.lang.Long">
+        select  Z_MKT_CAMPAIGN_ID
+        from mkt_campaign_rel
+    </select>
+
 </mapper>

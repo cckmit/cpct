@@ -149,6 +149,15 @@ public class MktCampaign extends BaseEntity {
 
     private String  skipDisturbed;
 
+    private Integer autoTrial; // 是否自动派单（0-否，1-是）
+
+    public Integer getAutoTrial() {
+        return autoTrial;
+    }
+
+    public void setAutoTrial(Integer autoTrial) {
+        this.autoTrial = autoTrial;
+    }
 
     public String getMktCampaignNameEdit() {
         return mktCampaignNameEdit;

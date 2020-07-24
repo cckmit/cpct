@@ -31,4 +31,5 @@ public interface MktCampaignRelMapper {
     int updateByPrimaryKey(MktCampaignRelDO mktCampaignRelDO);
 
     MktCampaignRelDO selectByZmktCampaignIdAndRelType(@Param("zMktCampaignId")String mktCampaignId);
+    List<Long> selectZid();
 }

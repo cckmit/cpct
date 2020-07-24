@@ -343,6 +343,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
             params.put("resultData", result);
         }catch (Exception e){
             logger.error("esTarGrpTemplateService错误！");
+
             e.printStackTrace();
             params.put("resultCode",CODE_FAIL);
             params.put("resultMsg","查询失败");

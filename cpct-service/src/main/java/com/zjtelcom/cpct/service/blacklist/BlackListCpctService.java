@@ -17,5 +17,7 @@ public interface BlackListCpctService {
     Map<String,Object> getBlackListPageByKey( Map<String,Object> pageParams);
     void exportBlackListFileManage(HttpServletResponse response) throws IOException;
     Map<String, Object> importBlackListFileManage(MultipartFile multipartFile) throws IOException;
+    Map<String,Object> addBlackList(List<Map<String, Object>> blackListContent);
+
 
 }

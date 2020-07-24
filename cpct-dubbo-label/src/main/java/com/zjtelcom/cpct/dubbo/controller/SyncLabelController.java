@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.campaign.OpenCampaignScheEntity;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
+import com.zjtelcom.cpct.dubbo.out.TarGrpCheckApiService;
 import com.zjtelcom.cpct.dubbo.service.SyncEventService;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 
@@ -74,6 +75,8 @@ public class SyncLabelController {
     private LabelValueMapper labelValueMapper;
     @Autowired
     private TopicManagerService topicManagerService;
+    @Autowired
+    private TarGrpCheckApiService tarGrpCheckApiService;
 
     private String gaotao = "2200,1400,1100,3299,3656,1900,9932,8946";
     private String sishengwu = "1600,8444";
@@ -89,6 +92,21 @@ public class SyncLabelController {
         String[] positionzj = new String []{"35","36","37"};
         System.out.println(JSON.toJSONString(positionzj));
     }
+
+    //查看所有主题
+    @PostMapping("/cpcTarGrpCheck")
+    @CrossOrigin
+    public Map<String, Object> cpcTarGrpCheck(@RequestBody Map<String,Object> param){
+
+        Map<String,Object> result = new HashMap<>();
+        try {
+            result = tarGrpCheckApiService.cpcTarGrpCheck(param);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  result;
+    }
+
 
     //查看所有主题
     @PostMapping("/getTopicList")

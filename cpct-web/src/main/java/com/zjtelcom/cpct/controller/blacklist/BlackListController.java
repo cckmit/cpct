@@ -50,6 +50,7 @@ public class BlackListController extends BaseController {
     public void generateTemplate() throws FileNotFoundException {
         FileOutputStream inputStream = new FileOutputStream("");
     }
+
     /**
      * 导入黑名单
      *
@@ -150,6 +151,7 @@ public class BlackListController extends BaseController {
         }
         return result;
     }
+
     /*根据业务号码删除黑名单*/
     @PostMapping("/deleteBlackList")
     @CrossOrigin
@@ -165,6 +167,19 @@ public class BlackListController extends BaseController {
         return result;
     }
 
+    /*根据业务号码删除黑名单*/
+    @PostMapping("/addBlackList")
+    @CrossOrigin
+    public  Map<String,Object> addBlackList(@RequestBody  List<Map<String, Object>> blackListContent){
+        Map<String,Object> result = new HashMap<>();
+        try{
+            result = blackListCpctService.addBlackList(blackListContent);
+        }catch (Exception e){
+            logger.error("根据业务号码删除黑名单失败",e);
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
 }
