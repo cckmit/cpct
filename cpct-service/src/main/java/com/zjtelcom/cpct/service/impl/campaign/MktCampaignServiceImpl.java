@@ -934,9 +934,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     campaignName = sourceName;
                 }
 
-                if(mktCampaignDO.getMktCampaignNameEdit() != "" || mktCampaignDO.getMktCampaignNameEdit() != null){
+                if(mktCampaignDO.getMktCampaignNameEdit() != null && !mktCampaignDO.getMktCampaignNameEdit().equals("")){
+                    logger.info("流程6`");
                     campaignName =  mktCampaignDO.getMktCampaignNameEdit();
                 }
+                String campaignNameLast = campaignName.replace("_","-");
                /* if(mktCampaignDO.getMktCampaignNameEdit() != "" || mktCampaignDO.getMktCampaignNameEdit() != null){
                     //如果用户输入新名字
                     logger.info("流程1`");
@@ -974,11 +976,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 String mktActivityNbr = mktCampaignDO1.getMktActivityNbr();
 
                 if ("C1".equals(mktCampaignDO1.getRegionFlg()) || "C2".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" + campaignName  +"_"+ mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" + campaignNameLast  +"_"+ mktActivityNbr + "_" +  datestr);
                 }else if ("C3".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" +campaignName +"_"+  mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" +campaignNameLast +"_"+  mktActivityNbr + "_" +  datestr);
                 }else if ("C4".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + campaignName +"_"+  mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + campaignNameLast +"_"+  mktActivityNbr + "_" +  datestr);
                 }
 
                 if(isFrame && regionName != ""){
@@ -989,7 +991,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }else{
                 logger.info( "名称走新活动，原先名称" + mktCampaignDO1.getMktCampaignName());
                 campaignNameArray[1] = catalogName;
-                campaignNameArray[2] = mktCampaignDO.getMktCampaignNameEdit();
+                campaignNameArray[2] = mktCampaignDO.getMktCampaignNameEdit().replace("_","-");
                 String newCampaignName = StringUtils.join(campaignNameArray,"_");
                 logger.info( "名称走新活动，修改后名称" + newCampaignName);
                 mktCampaignDO.setMktCampaignName(newCampaignName);
