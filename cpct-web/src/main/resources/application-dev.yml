@@ -7,16 +7,23 @@ spring:
 # 第一数据源
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.96.253.29:8801/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    url: jdbc:mysql://134.108.27.240:15001/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user
     password: cpc_user_123
+#    url: jdbc:mysql://134.108.1.12:8903/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+#    username: cpct_prod
+#    password: DWdtV7Wy
 
 # 第二数据源
   datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.108.1.12:8803/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
-    username: cpc_user_cpct_zsc
-    password: cpc_user_cpct_zsc_prod
+#    url: jdbc:mysql://134.108.1.12:8903/smt_bss_cpc_zsc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+#    username: cpc_user_cpct_zsc
+#    password: cpc_user_cpct_zsc_prod
+    url: jdbc:mysql://134.108.1.12:8903/smt_bss_cpc?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: cpct_prod
+    password: DWdtV7Wy
+
 
 # 第三数据源
   datasourcethird:
@@ -92,5 +99,9 @@ ctg:
   tenantID: 2
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
+  # 服务包队列
+  cpctSerpackageTopic: cpct_es_servicepackage_dev
+  cpctSerpackageGroup: cpct_es_servicepackage_group_dev
+
 
 
