@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.service.impl.event;
 
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
@@ -11,6 +12,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
+import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.CamScript;
 import com.zjtelcom.cpct.domain.channel.Channel;
@@ -26,6 +28,7 @@ import com.zjtelcom.cpct.dto.channel.VerbalVO;
 import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.BeanUtil;
@@ -91,6 +94,8 @@ public class EventRedisServiceImpl implements EventRedisService {
     private MktCamScriptMapper mktCamScriptMapper;  //营销脚本
     @Autowired
     private MktVerbalMapper mktVerbalMapper;  //话术
+    @Autowired
+    private BlackListMapper blackListMapper;
 
 
     /**
@@ -400,6 +405,18 @@ public class EventRedisServiceImpl implements EventRedisService {
             Channel channelMessage = contactChannelMapper.selectByCode(eventCode);
             redisUtils.set(key + eventCode, channelMessage);
             resutlt.put(key + eventCode, channelMessage);
+        }else if ("BLACK_LIST_MARKET".equals(key)) {  //营销类全局黑名单
+            BlackListDO blackListDO = new BlackListDO();
+            blackListDO.setMaketingCate("1");
+            List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
+            redisUtils.setRedisUnit(key , assetPhoneList,86400);
+            resutlt.put(key , assetPhoneList);
+        }else if ("BLACK_LIST_SERVICE".equals(key)) {  //服务类全局黑名单
+            BlackListDO blackListDO = new BlackListDO();
+            blackListDO.setServiceCate("1");
+            List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
+            redisUtils.setRedisUnit(key , assetPhoneList,86400);
+            resutlt.put(key , assetPhoneList);
         }
         return resutlt;
     }

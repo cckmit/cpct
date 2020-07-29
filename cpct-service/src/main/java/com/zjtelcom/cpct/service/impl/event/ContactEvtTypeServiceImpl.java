@@ -314,4 +314,8 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         return childList;
     }
 
+
+
 }
+
+

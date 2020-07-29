@@ -88,4 +88,6 @@ public interface MktCampaignService {
 
     Map<String, Object> getByC3AndAuto(Long c3);
 
+    boolean isOpenDisturb(MktCampaignDO mktCampaignDO);
+
 }

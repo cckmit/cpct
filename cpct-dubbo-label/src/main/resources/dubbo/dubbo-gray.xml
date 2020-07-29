@@ -102,4 +102,9 @@
         <dubbo:method name="getBlackListLog" servicecode="33.1083.getBlackListLog" timeout="10000"/>
     </dubbo:service>
 
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService" ref="mktCampaignApiOutServiceImpl" version="2.0" >
+        <dubbo:method name="getByC3" servicecode="33.1083.getByC3" timeout="10000"/>
+        <dubbo:method name="issueTrialResultOut" servicecode="33.1083.issueTrialResultOut" timeout="10000"/>
+    </dubbo:service>
+
 </beans>

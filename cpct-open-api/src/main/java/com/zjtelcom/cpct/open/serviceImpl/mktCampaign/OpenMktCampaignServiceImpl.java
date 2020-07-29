@@ -492,7 +492,11 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             //新增营服活动
             MktCampaignDO mktCampaignDO = BeanUtil.create(openMktCampaignEntity, new MktCampaignDO());
             mktCampaignDO.setMktCampaignId(null);
-            mktCampaignDO.setMktCampaignCategory("3000");
+            if (openMktCampaignEntity.getManageType()==null || "".equals(openMktCampaignEntity.getManageType())){
+                mktCampaignDO.setMktCampaignCategory( StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());
+            }else {
+                mktCampaignDO.setMktCampaignCategory(openMktCampaignEntity.getManageType());
+            }
             mktCampaignDO.setExecType("1000");
             if(openMktCampaignEntity.getMktCampaignType() == null) {
                 mktCampaignDO.setMktCampaignType(StatusCode.FRAMEWORK_CAMPAIGN.getStatusCode());

@@ -94,7 +94,7 @@
         from mkt_blacklist
         <where>
             <if test = "assetPhone != null and assetPhone != ''">
-                AND asset_phone = #{assetPhone}
+                AND asset_phone like concat('%',#{assetPhone},'%')
             </if>
             <if test = "serviceCate != null and serviceCate != ''">
                 AND service_cate = #{serviceCate}

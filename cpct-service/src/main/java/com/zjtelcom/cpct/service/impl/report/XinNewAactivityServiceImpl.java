@@ -132,7 +132,7 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             for (CatalogItem catalogItem : catalogItemList) {
                 Map<String,Object> themeMap = new HashMap<>();
                 //每个主题个数
-                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(catalogItem.getCatalogId(), startDate,endDate ,type, lanId,regionFlg);
+                List<MktCampaignDO> mktCampaignList = mktCampaignMapper.selectCampaignThemeByC3(catalogItem.getCatalogItemId(), startDate,endDate ,type, lanId,regionFlg);
                 String substring = null;
                 StringBuilder stringBuilder = new StringBuilder();
                 if (mktCampaignList!=null && mktCampaignList.size()>0){
@@ -1337,10 +1337,10 @@ public class XinNewAactivityServiceImpl implements XinNewAactivityService {
             if (statusCd!=null && ""!=statusCd){
                 status = statusCd.toString();
             }
-            String value = null;
+            Long value = null;
             if (theMe!=null && ""!=theMe){
                 if (!theMe.toString().equals("all")) {
-                    value = theMe.toString();
+                    value = Long.valueOf(theMe.toString());
                 }
             }
 //            List<MktCampaignDO> mktCampaignList =null;

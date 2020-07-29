@@ -63,6 +63,13 @@ redisConfig_Prd:
       port: 40201
       database: 4970
       password: bss_cpct_common_user#bss_cpct_common_user123
+#集团定制的redis配置pst环境
+redisConfig_ES:
+      ip: 134.96.231.228
+      port: 40201
+      database: 4970
+      password: bss_cpct_common_user#bss_cpct_common_user123
+
 
 # cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
 # cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer

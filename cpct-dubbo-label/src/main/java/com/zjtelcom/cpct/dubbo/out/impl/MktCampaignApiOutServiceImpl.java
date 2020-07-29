@@ -25,8 +25,11 @@ import com.zjtelcom.cpct.dubbo.model.RetCamResp;
 import com.zjtelcom.cpct.dubbo.out.MktCampaignApiOutService;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.grouping.TrialProdService;
+import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
+import com.zjtelcom.cpct.util.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,11 +93,46 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
 
     @Autowired
     private MktCampaignService mktCampaignService;
+    @Autowired
+    private TrialProdService trialProdService;
+    @Autowired
+    private MktStrategyConfRuleService ruleService;
 
     //同步表名
     private static final String tableName = "mkt_campaign";
 
+    @Override
+    public Map<String, Object> issueTrialResultOut(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            Long initId = MapUtil.getLongNum(param.get("initId"));
+            Long areaId = MapUtil.getLongNum(param.get("areaId"));
 
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(initId);
+            if (campaignDO==null){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "未查询到有效活动");
+                return result;
+            }
+            List<Long> orgIdList = new ArrayList<>();
+            orgIdList.add(areaId);
+            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
+            ruleDOList.forEach(ruleDO -> {
+                ruleService.test(ruleDO.getMktStrategyConfRuleId(),orgIdList);
+            });
+            List<Integer> campaignIdList = new ArrayList<>();
+            Map<String, Object> campaignMap = new HashMap<>();
+            campaignIdList.add(Integer.valueOf(initId.toString()));
+            campaignMap.put("idList", campaignIdList);
+            campaignMap.put("perCampaign", "PER_CAMPAIGN");
+            result = trialProdService.campaignIndexTask(campaignMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "自动派发失败");
+        }
+        return result;
+    }
 
     @Override
     public RetCamResp qryMktCampaignDetail(Long initId) throws Exception {

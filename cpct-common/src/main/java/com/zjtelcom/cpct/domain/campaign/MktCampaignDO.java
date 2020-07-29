@@ -10,6 +10,7 @@ public class MktCampaignDO extends BaseEntity{
     private Long initId;
     private String tiggerType;
     private String mktCampaignName;
+    private String mktCampaignNameEdit;
     private Date planBeginTime;
     private Date planEndTime;
     private Date beginTime;
@@ -47,6 +48,13 @@ public class MktCampaignDO extends BaseEntity{
     private String skipDisturbed;//是否屏蔽过扰
     private Integer autoTrial; // 是否自动派单（0-否，1-是）
 
+    public String getMktCampaignNameEdit() {
+        return mktCampaignNameEdit;
+    }
+
+    public void setMktCampaignNameEdit(String mktCampaignNameEdit) {
+        this.mktCampaignNameEdit = mktCampaignNameEdit;
+    }
 
     public String getSkipDisturbed() {
         return skipDisturbed;
