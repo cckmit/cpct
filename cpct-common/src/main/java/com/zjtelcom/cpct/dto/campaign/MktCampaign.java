@@ -25,7 +25,8 @@ public class MktCampaign extends BaseEntity {
      * 营销活动名称
      */
     private String mktCampaignName;
-
+    /*营销活动编辑名称*/
+    private  String mktCampaignNameEdit;
     /**
      * 计划开始时间
      */
@@ -156,6 +157,14 @@ public class MktCampaign extends BaseEntity {
 
     public void setAutoTrial(Integer autoTrial) {
         this.autoTrial = autoTrial;
+    }
+
+    public String getMktCampaignNameEdit() {
+        return mktCampaignNameEdit;
+    }
+
+    public void setMktCampaignNameEdit(String mktCampaignNameEdit) {
+        this.mktCampaignNameEdit = mktCampaignNameEdit;
     }
 
     public String getSkipDisturbed() {

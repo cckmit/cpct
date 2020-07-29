@@ -71,6 +71,13 @@ redisConfig_Prd:
    database: 0
    password: CRM_CPCP_001_USER#Bsscpc!z3
 
+#集团ES定制的redis配置prod环境
+redisConfig_ES:
+   ip: 134.108.0.42,134.108.0.43
+   port: 9051
+   database: 0
+   password: CRM_CPCP_003_USER#Bsscpc!1n
+
 # cpct_pst_topic 下二個分組 producerGroupName  producerGroupName2
 # cpct_push_end_topic 1個分組 pushGroupName : cpct_push_end_consumer
 ctg:

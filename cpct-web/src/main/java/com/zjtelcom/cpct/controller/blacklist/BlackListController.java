@@ -153,10 +153,10 @@ public class BlackListController extends BaseController {
     /*根据业务号码删除黑名单*/
     @PostMapping("/deleteBlackList")
     @CrossOrigin
-    public  Map<String,Object> deleteBlackListByAssetPhone(@RequestBody  List<String> phoneNumsDeleted){
+    public  Map<String,Object> deleteBlackListByAssetPhone(@RequestBody  Map<String,Object> nums){
         Map<String,Object> result = new HashMap<>();
         try{
-
+            List<String> phoneNumsDeleted = (List<String>)nums.get("phoneNumsDeleted");
             result = blackListCpctService.deleteBlackList(phoneNumsDeleted);
         }catch (Exception e){
             logger.error("根据业务号码删除黑名单失败",e);

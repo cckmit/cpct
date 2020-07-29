@@ -14,8 +14,8 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.campaign.MktCampaignDetailVO;
 import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.enums.StatusCode;
-import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
@@ -65,9 +65,6 @@ public class CampaignController extends BaseController {
     private CatalogService catalogService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
-
-    @Autowired
-    private MqService mqService;
 
     @RequestMapping(value = "openCampaignScheForDay", method = RequestMethod.POST)
     @CrossOrigin
@@ -748,6 +745,28 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         try {
             result = mktCampaignService.getByC3AndAuto(params);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
+
+    /*批量活动活动派单过扰，c3级校验是否超过5个*/
+    @PostMapping(value = "/isOpenDisturb")
+    @CrossOrigin
+    public Map<String, Object> isOpenDisturb(@RequestBody MktCampaignDO mktCampaignDO) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean isOverFive = mktCampaignService.isOpenDisturb(mktCampaignDO);
+            if(isOverFive == false){
+                result.put("info", "当前地市过扰活动达到阈值，禁止开启过扰");
+            }
+            result.put("isOverFive",isOverFive);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "成功");
         }catch (Exception e) {

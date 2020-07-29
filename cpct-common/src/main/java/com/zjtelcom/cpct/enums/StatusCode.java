@@ -59,9 +59,11 @@ public enum StatusCode {
     MIXTURE_CAMPAIGN("混合营销活动", "3000"),
 
     /*活动类型*/
-    FRAMEWORK_CAMPAIGN("框架活动", "1000"),
-    ENFORCEMENT_CAMPAIGN("强制活动", "2000"),
-    AUTONOMICK_CAMPAIGN("自主活动", "3000"),
+    FRAMEWORK_CAMPAIGN("框架活动", "6100"),
+    ENFORCEMENT_CAMPAIGN("强制活动", "6200"),
+    AUTONOMICK_CAMPAIGN("自主活动", "6300"),
+    JITUAN_FRAMEWORK_CAMPAIGN("集团框架活动", "5100"),
+    JITUAN_ENFORCEMENT_CAMPAIGN("集团强制活动", "5200"),
 
     /*服务类型*/
     CUST_TYPE("客账户类", "1000"),
