@@ -86,6 +86,6 @@ public interface MktCampaignService {
 
     Map<String,Object> saveMktCamDesc();
 
-    Map<String, Object> getByC3AndAuto(Long c3);
+    Map<String, Object> getByC3AndAuto(Map<String, Object> params);
 
 }
