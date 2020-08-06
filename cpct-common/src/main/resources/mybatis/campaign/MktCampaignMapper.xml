@@ -1380,6 +1380,9 @@
         <if test="lanId!=null">
             and t.LAN_ID = #{lanId,jdbcType=BIGINT}
         </if>
+        <if test="mktCampaignName!=null and mktCampaignName!=''">
+            and t.MKT_CAMPAIGN_NAME LIKE concat ('%', #{mktCampaignName}, '%')
+        </if>
         Order BY UPDATE_DATE DESC
     </select>
 

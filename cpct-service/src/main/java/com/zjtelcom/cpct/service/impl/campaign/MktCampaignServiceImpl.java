@@ -1359,6 +1359,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO MktCampaignPar = new MktCampaignDO();
             MktCampaignPar.setMktCampaignName(mktCampaignName);
             MktCampaignPar.setMktCampaignType(mktCampaignType);
+            MktCampaignPar.setStatusCd("(2002, 2008)");
             List<Long> relationCamList = new ArrayList<>();
             if (eventId != null) {
                 List<MktCamEvtRel> camEvtRelList = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
@@ -3957,13 +3958,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         if(params.get("c3")!=null && !"".equals(params.get("c3"))){
             c3 = Long.valueOf(params.get("c3").toString());
         }
+        String mktCampaignName = (String) params.get("mktCampaignName");
         Integer page = (Integer) params.get("page");
         Integer pageSize = (Integer) params.get("pageSize");
         List<MktCampaignDO> mktCampaignList = null;
         Map<String, Object> resultMap = new HashMap<>();
         try {
             PageHelper.startPage(page, pageSize);
-            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3);
+            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3, mktCampaignName);
             resultMap.put("mktCampaignList", mktCampaignList);
             resultMap.put("pageInfo", new Page(new PageInfo(mktCampaignList)));
             resultMap.put("resultCode", CODE_SUCCESS);
