@@ -716,7 +716,7 @@
         from mkt_campaign
         <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
-            AND MKT_CAMPAIGN_ID = #{mktCampaignId}
+            AND  INIT_ID = #{mktCampaignId}
         </if>
         <choose>
             <when test="statusCd != null and statusCd!='' and statusCd!='all'">

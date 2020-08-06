@@ -450,7 +450,8 @@
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
         REMARK = #{remark,jdbcType=VARCHAR},
         TOP_CAMPAIGN_NUM = #{topCampaignNum,jdbcType=BIGINT},
-        EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
+        EVENT_ID = #{contactEvtId,jdbcType=BIGINT},
+        EVENT_MANAGE_TYPE = #{eventManageType,jdbcType=VARCHAR}
         where EVENT_ID = #{contactEvtId,jdbcType=BIGINT}
     </update>
 
