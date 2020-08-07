@@ -4063,16 +4063,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     /**
      * 提供接口入参C3 返回配置了自动派单（auotTrail=1）得已发布活动（2002,2008）
-     * @param c3
+     * @param params
      * @return
      */
     @Override
-    public Map<String, Object> getByC3AndAuto(Long c3){
+    public Map<String, Object> getByC3AndAuto(Map<String, Object> params){
+        Long c3 = null;
+        if(params.get("c3")!=null && !"".equals(params.get("c3"))){
+            c3 = Long.valueOf(params.get("c3").toString());
+        }
+        String mktCampaignName = (String) params.get("mktCampaignName");
+        Integer page = (Integer) params.get("page");
+        Integer pageSize = (Integer) params.get("pageSize");
         List<MktCampaignDO> mktCampaignList = null;
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3);
+            PageHelper.startPage(page, pageSize);
+            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3, mktCampaignName);
             resultMap.put("mktCampaignList", mktCampaignList);
+            resultMap.put("pageInfo", new Page(new PageInfo(mktCampaignList)));
             resultMap.put("resultCode", CODE_SUCCESS);
             resultMap.put("resultMsg", "查询成功");
         } catch (Exception e) {
@@ -4082,8 +4091,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             resultMap.put("resultCode", CODE_FAIL);
             resultMap.put("resultMsg", "查询失败");
         }
-
-
         return resultMap;
     }
 

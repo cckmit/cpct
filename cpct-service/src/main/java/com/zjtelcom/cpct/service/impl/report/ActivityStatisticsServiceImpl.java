@@ -973,20 +973,25 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
 //                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
 //                        resultMap.put("mktCloseRuleName", CloseRuleName);
                             //所属地市
-                            Long lanId = mktCampaignDO.getLanId();
-                            SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
-                            if (StringUtils.isNotBlank(mktCampaignDO.getRegionFlg())) {
-                                if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
-                                    if (mktCampaignDO.getLanIdFour() != null && mktCampaignDO.getLanIdFour().toString().length() < 6) {
-                                        SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
-                                        resultMap.put("area", sysArea.getName() + "-" + sysAreaFour.getName());
-                                    } else {
-                                        resultMap.put("area", sysArea.getName());
-                                    }
-                                } else {
-                                    resultMap.put("area", sysArea.getName());
-                                }
-                            } else {
+//                            Long lanId = mktCampaignDO.getLanId();
+//                            SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(lanId.toString()));
+//                            if (StringUtils.isNotBlank(mktCampaignDO.getRegionFlg())) {
+//                                if (mktCampaignDO.getRegionFlg().equals("C4") || mktCampaignDO.getRegionFlg().equals("C5")) {
+//                                    if (mktCampaignDO.getLanIdFour() != null && mktCampaignDO.getLanIdFour().toString().length() < 6) {
+//                                        SysArea sysAreaFour = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(mktCampaignDO.getLanIdFour().toString()));
+//                                        resultMap.put("area", sysArea.getName() + "-" + sysAreaFour.getName());
+//                                    } else {
+//                                        resultMap.put("area", sysArea.getName());
+//                                    }
+//                                } else {
+//                                    resultMap.put("area", sysArea.getName());
+//                                }
+//                            } else {
+//                                resultMap.put("area", "空");
+//                            }
+                            if (map.get("orgName")!=null ){
+                                resultMap.put("area", map.get("orgName").toString());
+                            }else {
                                 resultMap.put("area", "空");
                             }
                             //渠道编码

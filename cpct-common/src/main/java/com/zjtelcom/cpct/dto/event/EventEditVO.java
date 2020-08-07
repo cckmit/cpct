@@ -20,7 +20,15 @@ public class EventEditVO implements Serializable {
     private String locationSwitch;//位置切换开关
     private Long topCampaignNum;// 事件允许关联最大活动数
     private String remark;
+    private String eventManageType;// 事件区分营销活动还是服务活动
 
+    public String getEventManageType() {
+        return eventManageType;
+    }
+
+    public void setEventManageType(String eventManageType) {
+        this.eventManageType = eventManageType;
+    }
 
     public Long getInterfaceCfgId() {
         return interfaceCfgId;

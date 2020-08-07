@@ -143,11 +143,35 @@ public class MD5Util {
     public static void setDefaultSalt(String defaultSalt) {
         MD5Util.defaultSalt = defaultSalt;
     }
-    
 
-    
-    
-    
-   
-    
+
+    private static MessageDigest digest = null;
+
+    public static final String encodeHex(byte[] bytes) {
+        StringBuffer buf = new StringBuffer(bytes.length * 2);
+        for(int i = 0; i < bytes.length; ++i) {
+            if((bytes[i] & 255) < 16) {
+                buf.append("0");
+            }
+            buf.append(Long.toString((long)(bytes[i] & 255), 16));
+        }
+        return buf.toString();
+    }
+    public static final String encryByMD5(String data) {
+        if(data == null) {
+            data = "";
+        }
+        if(digest == null) {
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException var2) {
+                System.err.println("Failed to load the MD5 MessageDigest. System will be unable to function normally.");
+                var2.printStackTrace();
+            }
+        }
+        digest.update(data.getBytes());
+        return encodeHex(digest.digest());
+    }
+
+
 }

@@ -321,4 +321,26 @@ public class ChannelController extends BaseController {
         return result;
     }
 
+
+    /**
+     * 通过UAM获取服务密码
+     */
+    @PostMapping("getUamServicePswd")
+    @CrossOrigin
+    public Map<String,Object> getUamServicePswd(@RequestBody Map<String,Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            String accountID = (String)param.get("accountID");
+            String areaCode = (String)param.get("areaCode");
+            String custID = (String)param.get("custID");
+
+            result = channelService.getUamServicePswd(accountID,areaCode,custID);
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getUamServicePswd",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg", "通过uam获取服务密码失败");
+            return result;
+        }
+        return result;
+    }
 }

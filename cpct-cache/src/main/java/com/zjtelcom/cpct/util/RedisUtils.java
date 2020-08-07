@@ -41,6 +41,7 @@ public class RedisUtils {
         }
     }*/
 
+
     public Object hget(final String key, String filed) {
         Object result = null;
         try {
@@ -167,7 +168,7 @@ public class RedisUtils {
 
 
     /**
-     * 更换集团redis方法
+     * 失效时间秒
      *
      * @param key
      * @param value
@@ -195,6 +196,8 @@ public class RedisUtils {
         }
         return result;
     }
+
+
 
     /**
      * 更换集团redis方法
@@ -439,6 +442,37 @@ public class RedisUtils {
         }
         return result;
     }
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hsetUnit(final String key, String field, Object value,int seconds) {
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                jedis.expire(key,seconds);
+                result = true;
+            } catch (Exception e) {
+                System.out.println("REDIShset*********" + key);
+                e.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIShset2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
 
 

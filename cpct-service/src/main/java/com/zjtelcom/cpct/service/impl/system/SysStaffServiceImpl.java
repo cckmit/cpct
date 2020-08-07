@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
+import com.zjtelcom.cpct.dao.channel.StaffOrgRelMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffMapper;
 import com.zjtelcom.cpct.dao.system.SysStaffRoleMapper;
 import com.zjtelcom.cpct.domain.system.SysStaff;
@@ -39,6 +40,9 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
     @Autowired
     private SynSysStaffService synSysStaffService;
+
+    @Autowired
+    private StaffOrgRelMapper staffOrgRelMapper;
 
 
 
@@ -300,6 +304,22 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         Map<String,Object> result = new HashMap<>();
         sysStaffMapper.lastLogin(staffCode);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getStaffByCode(String staffCode) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Long> orgIdList = staffOrgRelMapper.getStaffByCode(staffCode);
+            if (orgIdList != null && orgIdList.size() > 0) {
+                result.put("orgId", orgIdList.get(0));
+            }
+
+            result.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+        }
         return result;
     }
 }

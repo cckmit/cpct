@@ -738,6 +738,24 @@ public class CampaignController extends BaseController {
         return result;
     }
 
+
+    @PostMapping(value = "/getByC3AndAuto")
+    @CrossOrigin
+    public Map<String, Object> getByC3AndAuto(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = mktCampaignService.getByC3AndAuto(params);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
+
     /*批量活动活动派单过扰，c3级校验是否超过5个*/
     @PostMapping(value = "/isOpenDisturb")
     @CrossOrigin

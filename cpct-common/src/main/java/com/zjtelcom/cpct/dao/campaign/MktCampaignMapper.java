@@ -130,7 +130,7 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> listDisturbedCampaignForlanId(@Param("lanId") Long lanId, @Param("tiggerType") String tiggerType);
 
-    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId);
+    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId, @Param("mktCampaignName") String mktCampaignName);
 
 
 }

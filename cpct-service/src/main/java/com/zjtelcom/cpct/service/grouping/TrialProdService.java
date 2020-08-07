@@ -7,4 +7,8 @@ public interface TrialProdService  {
 
 
     Map<String,Object> yzservTest(Map<String,Object> param);
+
+    Map<String, Object> issueTrialResultOut(Map<String, Object> param);
+
+    Map<String, Object> orgListCached(Map<String, Object> param);
 }

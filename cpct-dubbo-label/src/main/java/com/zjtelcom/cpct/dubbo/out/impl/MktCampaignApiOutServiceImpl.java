@@ -104,33 +104,33 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
     @Override
     public Map<String, Object> issueTrialResultOut(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
-        try {
-            Long initId = MapUtil.getLongNum(param.get("initId"));
-            Long areaId = MapUtil.getLongNum(param.get("areaId"));
-
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(initId);
-            if (campaignDO==null){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "未查询到有效活动");
-                return result;
-            }
-            List<Long> orgIdList = new ArrayList<>();
-            orgIdList.add(areaId);
-            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
-            ruleDOList.forEach(ruleDO -> {
-                ruleService.test(ruleDO.getMktStrategyConfRuleId(),orgIdList);
-            });
-            List<Integer> campaignIdList = new ArrayList<>();
-            Map<String, Object> campaignMap = new HashMap<>();
-            campaignIdList.add(Integer.valueOf(initId.toString()));
-            campaignMap.put("idList", campaignIdList);
-            campaignMap.put("perCampaign", "PER_CAMPAIGN");
-            result = trialProdService.campaignIndexTask(campaignMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "自动派发失败");
-        }
+//        try {
+//            Long initId = MapUtil.getLongNum(param.get("initId"));
+//            Long areaId = MapUtil.getLongNum(param.get("areaId"));
+//
+//            MktCampaignDO campaignDO = mktCampaignMapper.selectByInitId(initId);
+//            if (campaignDO==null){
+//                result.put("resultCode", CODE_FAIL);
+//                result.put("resultMsg", "未查询到有效活动");
+//                return result;
+//            }
+//            List<Long> orgIdList = new ArrayList<>();
+//            orgIdList.add(areaId);
+//            List<MktStrategyConfRuleDO> ruleDOList = mktStrategyConfRuleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
+//            ruleDOList.forEach(ruleDO -> {
+//                ruleService.test(ruleDO.getMktStrategyConfRuleId(),orgIdList);
+//            });
+//            List<Integer> campaignIdList = new ArrayList<>();
+//            Map<String, Object> campaignMap = new HashMap<>();
+//            campaignIdList.add(Integer.valueOf(initId.toString()));
+//            campaignMap.put("idList", campaignIdList);
+//            campaignMap.put("perCampaign", "PER_CAMPAIGN");
+//            result = trialProdService.campaignIndexTask(campaignMap);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            result.put("resultCode", CODE_FAIL);
+//            result.put("resultMsg", "自动派发失败");
+//        }
         return result;
     }
 
@@ -188,8 +188,8 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
     }
 
     @Override
-    public Map<String, Object> getByC3(Long C3) {
-        return mktCampaignService.getByC3AndAuto(C3);
+    public Map<String, Object> getByC3(Map<String, Object> params) {
+        return mktCampaignService.getByC3AndAuto(params);
     }
 
     /**

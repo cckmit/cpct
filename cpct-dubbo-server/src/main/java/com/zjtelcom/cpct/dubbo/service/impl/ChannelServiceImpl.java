@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.zjpii.biz.service.uam.SyncService;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
@@ -15,13 +16,14 @@ import com.zjtelcom.cpct.dto.user.UserList;
 import com.zjtelcom.cpct.dubbo.model.*;
 import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.MD5Util;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 
@@ -37,6 +39,8 @@ public class ChannelServiceImpl implements ChannelService {
     private UserListMapper userListMapper;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
+    @Autowired
+    private SyncService syncService;
 
     @Override
     public RetChannel getChannelDetail(String channelCode) {
@@ -113,5 +117,53 @@ public class ChannelServiceImpl implements ChannelService {
         ret.setResultCode("0");
         ret.setResultMsg("导入成功");
         return ret;
+    }
+
+    @Override
+    public  Map<String,Object> getUamServicePswd(String accountType, String accountID, String areaCode, String custID) {
+        //header
+        Map<String, Object> headMap = new HashMap();
+        String miyao = "cUSpwGW0JCMJr2Wu";
+        String tokn = miyao + "uop2_xc" + DateUtil.date2String(new Date());
+        tokn = MD5Util.encryByMD5(tokn).toUpperCase();
+        headMap.put("channel", "uop2_xc");
+        headMap.put("channel_token", tokn);
+        headMap.put("bis_module", "dubbo-server");
+        headMap.put("bis_detail", "dubbo-server");
+        headMap.put("version", "v1.0");
+        //body
+        Date date = new Date();
+        String strDateFormat = "YYYYMMDDHHMMSS";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(strDateFormat);
+        String serviceCode = "CAP08000";
+        String  version = "20200728ZJUAM120";
+        String actionCode = "0";
+        String transactionID = "";
+        String srcSysID = "12110";
+        String digitalSign = "12110";
+        String dstSysID = "12110";
+        String reqTime = simpleDateFormat.format(date);
+        String sendSMS = "00";
+        String receSMService = "";
+
+
+        Map<String,String> bodyMap = new HashMap<>();
+        bodyMap.put("serviceCode",serviceCode);
+        bodyMap.put("version",version);
+        bodyMap.put("actionCode",actionCode);
+        bodyMap.put("transactionID",transactionID);
+        bodyMap.put("srcSysID",srcSysID);
+        bodyMap.put("digitalSign",digitalSign);
+        bodyMap.put("dstSysID",dstSysID);
+        bodyMap.put("reqTime",reqTime);
+        bodyMap.put("sendSMS",sendSMS);
+        bodyMap.put("receSMService",receSMService);
+
+        Map<String,Object> extMap = new HashMap<>();
+
+        Map<String,Object> result = syncService.queryPassword(headMap,bodyMap,extMap);
+
+
+        return result;
     }
 }

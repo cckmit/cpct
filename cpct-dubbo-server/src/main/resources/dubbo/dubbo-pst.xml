@@ -185,4 +185,10 @@
         <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
     </dubbo:service>
 
+
+    <!-- 统一平台获取服务密码 -->
+    <dubbo:reference registry="esb3" interface="com.zjpii.biz.service.uam.SyncService" id="SyncService" version="1.0" check="false">
+        <dubbo:method name="queryPassword" servicecode="33.1016.queryPassword"/>
+    </dubbo:reference>
+
 </beans>

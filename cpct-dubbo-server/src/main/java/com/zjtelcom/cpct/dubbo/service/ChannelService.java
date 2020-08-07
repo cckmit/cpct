@@ -1,9 +1,8 @@
 package com.zjtelcom.cpct.dubbo.service;
 
-import com.zjtelcom.cpct.dubbo.model.FilterRuleInputReq;
-import com.zjtelcom.cpct.dubbo.model.Ret;
-import com.zjtelcom.cpct.dubbo.model.RetChannel;
-import com.zjtelcom.cpct.dubbo.model.RetEvent;
+import com.zjtelcom.cpct.dubbo.model.*;
+
+import java.util.Map;
 
 public interface ChannelService {
 
@@ -13,8 +12,7 @@ public interface ChannelService {
 
     Ret importRuleUserList(FilterRuleInputReq req);
 
-
-
+    Map<String,Object> getUamServicePswd(String accountType, String accountID, String areaCode, String custID);
 
 
 }

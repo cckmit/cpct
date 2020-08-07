@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.blacklist.BlackListLogDO;
 import com.zjtelcom.cpct.dubbo.out.BlackListService;
 import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,9 @@ public class BlackListServiceImpl implements BlackListService {
     ResponseVO responseVO;
     @Autowired
     BlackListLogMapper blackListLogMapper;
+    @Autowired
+    private RedisUtils redisUtils;
+
     private static final String SUCCESS_CODE = "0";
     private static final String FAIL_CODE = "1";
 
@@ -53,6 +57,7 @@ public class BlackListServiceImpl implements BlackListService {
                     //添加黑名单
                     blackListDO.setCreateDate(new Date());
                     blackListMapper.addBlackList(blackListDO);
+                    redisUtils.hset("BLACK_LIST", phone, blackListDO);
                     //添加操作日志
                     BlackListLogDO blackListLogDO = new BlackListLogDO();
                     blackListLogDO.setMethod("add");
@@ -64,10 +69,13 @@ public class BlackListServiceImpl implements BlackListService {
                     blackListLogDO.setStaffId((String)map.get("staffId"));
                     blackListLogDO.setOperType((String)map.get("operType"));
                     blackListLogMapper.addBlacklistlog(blackListLogDO);
+
+
                 }else{
                     //更新黑名单
                     blackListDO.setUpdateDate(new Date());
                     blackListMapper.updateBlackList(blackListDO);
+                    redisUtils.hset("BLACK_LIST", phone, blackListDO);
                     //添加操作日志
                     BlackListLogDO blackListLogDO = new BlackListLogDO();
                     blackListLogDO.setMethod("update");
@@ -93,7 +101,7 @@ public class BlackListServiceImpl implements BlackListService {
     public Map<String, Object> deleteBlackList(List<String> phoneNumsDeleted) {
         try {
             blackListMapper.deleteBlackListById(phoneNumsDeleted);
-
+            redisUtils.del("BLACK_LIST");
             //添加操作日志
             for(String phone: phoneNumsDeleted){
                 BlackListLogDO blackListLogDO = new BlackListLogDO();
