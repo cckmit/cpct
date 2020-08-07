@@ -150,7 +150,13 @@ public class EventRedisServiceImpl implements EventRedisService {
         if (!id.toString().equals("0")) {
             key = key + id;
         }
-        Object o = redisUtils.get(key);
+        Object o = null;
+        try {
+            o = redisUtils.get(key);
+        } catch (Exception e) {
+            redisUtils.del(key);
+            e.printStackTrace();
+        }
         if (o != null ) {
             resutlt.put(key, o);
         } else {
@@ -405,18 +411,6 @@ public class EventRedisServiceImpl implements EventRedisService {
             Channel channelMessage = contactChannelMapper.selectByCode(eventCode);
             redisUtils.set(key + eventCode, channelMessage);
             resutlt.put(key + eventCode, channelMessage);
-        }else if ("BLACK_LIST_MARKET".equals(key)) {  //营销类全局黑名单
-            BlackListDO blackListDO = new BlackListDO();
-            blackListDO.setMaketingCate("1");
-            List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
-            redisUtils.setRedisUnit(key , assetPhoneList,86400);
-            resutlt.put(key , assetPhoneList);
-        }else if ("BLACK_LIST_SERVICE".equals(key)) {  //服务类全局黑名单
-            BlackListDO blackListDO = new BlackListDO();
-            blackListDO.setServiceCate("1");
-            List<String> assetPhoneList = blackListMapper.selectByBlackList(blackListDO);
-            redisUtils.setRedisUnit(key , assetPhoneList,86400);
-            resutlt.put(key , assetPhoneList);
         }
         return resutlt;
     }

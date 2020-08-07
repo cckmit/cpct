@@ -37,7 +37,6 @@ public class TrialOperation extends BaseEntity {
     private String subNum;
     private String specifiedNum;
 
-
     public String getSpecifiedNum() {
         return specifiedNum;
     }

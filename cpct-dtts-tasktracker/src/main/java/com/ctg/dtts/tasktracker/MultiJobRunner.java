@@ -15,6 +15,7 @@ import com.zjtelcom.cpct.domain.channel.LabelSaturation;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dubbo.out.CampaignService;
+import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -35,24 +36,26 @@ public class MultiJobRunner {
     @Autowired
     TestSpringBean springBean;
 
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignMapper mktCampaignMapper;
-    @Autowired
+    @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;
     @Autowired(required = false)
     private TrialStatusUpService trialStatusUpService;
-    @Autowired
+    @Autowired(required = false)
     private CampaignService campaignService;
     @Autowired(required = false)
     private TargetGroupService targetGroupService;
     @Autowired(required = false)
     private QuerySaturationService querySaturationService;
-    @Autowired
+    @Autowired(required = false)
     private LabelSaturationMapper labelSaturationMapper;
-    @Autowired
+    @Autowired(required = false)
     private TrialOperationMapper trialOperationMapper;
-    @Autowired
+    @Autowired(required = false)
     private UCCPSendService uccpSendService;
+    @Autowired(required = false)
+    private OpenApiScheService openApiScheService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -668,6 +671,46 @@ public class MultiJobRunner {
         }
     }
 
+    //3点执行周期性活动定时任务添加校验接口若未执行的 二次执行
+    public void playAgainForSpecialCampaign(){
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 01:00:00");
+        String startTime = sdf.format(d);
+        System.out.println("格式化后的日期：" + startTime);
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 03:00:00");
+        String endTime = sdf2.format(d);
+        System.out.println("格式化后的日期：" + endTime);
+        System.out.println("【活动管控类型】"+StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());
+        List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
+        System.out.println("【查询返回符合条件得试算列表】：" + JSON.toJSONString(trialOperationList));
+        List<Integer> stringArraylist = new ArrayList<>();
+        if (trialOperationList!=null){
+            for (TrialOperation operation : trialOperationList){
+                String statusCd = operation.getStatusCd();
+                //3点得二次确认执行"29、"活动
+                MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(operation.getCampaignId());
+                if (campaignDO!=null && "10361".equals(campaignDO.getInitId().toString())){
+                    //判断状态
+                    if (statusCd.equals("4000")){
+                        stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
+                    }
+                }
+            }
+            System.out.println("【查询返回符合条件得试算列表ARRAYLIST】：" + JSON.toJSONString(stringArraylist));
+            //运行周期性任务下发失败或者全量失败
+            if (!stringArraylist.isEmpty()){
+                //再次执行
+                try {
+                    Map<String,Object> param =new HashMap<>();
+                    param.put("idList",stringArraylist); //活动id集合
+                    param.put("perCampaign","PER_CAMPAIGN");//周期性活动标识
+                    trialStatusUpService.campaignIndexTask(param);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     //3-31 11:07 x
     //周期性活动定时任务添加校验接口若未执行的 二次执行
@@ -680,13 +723,18 @@ public class MultiJobRunner {
         String endTime = sdf2.format(d);
         System.out.println("格式化后的日期：" + endTime);
         List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
-        ArrayList<String> stringArraylist = new ArrayList<String>();
+        List<Integer> stringArraylist = new ArrayList<>();
         if (trialOperationList!=null){
             for (TrialOperation operation : trialOperationList){
                 String statusCd = operation.getStatusCd();
+                //5点得二次确认不执行"29、"活动
+                MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(operation.getCampaignId());
+                if (campaignDO!=null && "10361".equals(campaignDO.getInitId().toString())){
+                    continue;
+                }
                 //判断状态
-                if (!statusCd.equals("7300") || statusCd.equals("8100")){
-                    stringArraylist.add(operation.getId().toString());
+                if (!statusCd.equals("7300") && !statusCd.equals("8100")){
+                    stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
                 }
             }
             //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
@@ -712,9 +760,15 @@ public class MultiJobRunner {
                 }
             }
         }
-
-
     }
+
+    //3-31 11:07 x
+    //集团活动每天增量上传文件
+    public void openCampaignScheForDay(){
+        Map<String, Object> stringObjectMap = openApiScheService.openCampaignScheForDay();
+        System.out.println("集团活动每天增量上传文件:"+JSON.toJSONString(stringObjectMap));
+    }
+
 
 
     //下发短信
