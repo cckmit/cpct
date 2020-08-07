@@ -2273,6 +2273,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                         changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
                     }
                 }
+                if (StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
+                    // 过期活动
+                    updateProjectStateTime(mktCampaignDO.getInitId());
+                }
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 删除下线活动与事件的关系
                     mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignId);
@@ -3185,6 +3189,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                    updateProjectStateTime(mktCampaignDO.getInitId());
                 }
             }
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -4105,6 +4110,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return false;
         }else {
             return true;
+        }
+    }
+
+    private Map<String, Object> updateProjectStateTime(Long initId){
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 根据initId查询所有的活动
+            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectCampaignByInitId(initId);
+            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                List<TrialOperation> trialOperationList = trialOperationMapper.listOperationByCamIdAndStatusCd2(mktCampaignDO.getMktCampaignId(), "(7300, 8100)");
+                for (TrialOperation trialOperation : trialOperationList) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("id", trialOperation.getId());  // 试运算Id
+                    params.put("effectDate", new Date());  // 生效时间
+                    params.put("invalidDate", new Date()); // 失效时间
+                    projectManageService.updateProjectStateTime(params);
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            return resultMap;
         }
     }
 

@@ -50,7 +50,7 @@ public interface MktCampaignMapper {
 
     List<MktCamDisplayColumnRel> selectAllGroupByCamId();
 
-    MktCampaignDO selectCampaignByInitId(@Param("initId")Long initId);
+    List<MktCampaignDO> selectCampaignByInitId(@Param("initId")Long initId);
 
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 

@@ -41,6 +41,8 @@ public interface TrialOperationMapper {
 
     List<TrialOperation> listOperationByCamIdAndStatusCd(@Param("campaignId")Long campaignId, @Param("statusCd")String statusCd);
 
+    List<TrialOperation> listOperationByCamIdAndStatusCd2(@Param("campaignId")Long campaignId, @Param("statusCd")String statusCd);
+
     List<TrialOperation> queryIssuedSuccess();
 
     List<TrialOperation> findOperationListByStrategyIdLsit(List<String> strategyIdList);
