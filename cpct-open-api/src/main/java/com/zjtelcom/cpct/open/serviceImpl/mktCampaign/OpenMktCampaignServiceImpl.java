@@ -339,7 +339,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
     }
 
     @Override
-    public Map<String,Object> getMktCampaignList(String mktActivityNbr, String accNum) {
+    public Map<String,Object> getMktCampaignList(String mktActivityNbr, String accNum, String contactChlCode) {
         logger.info("活动列表查询");
         logger.info("活动编码：" + mktActivityNbr);
         logger.info("用户号码：" + accNum);
@@ -350,6 +350,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             try {
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("accNum", accNum);
+                paramMap.put("contactChlCode", contactChlCode);
                 //通过协同接口查活动id
                 Map<String, Object> map = iReportService.queryCampaignByNum(paramMap);
                 logger.info("用户号码协同查询结果：" + JSON.toJSONString(map));

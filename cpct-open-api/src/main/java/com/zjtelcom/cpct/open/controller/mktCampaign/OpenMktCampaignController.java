@@ -35,9 +35,11 @@ public class OpenMktCampaignController extends BaseController {
     @CrossOrigin
     @RequestMapping(value = "/campaign/mktCampaign", method = RequestMethod.POST)
     public String getMktCampaignList(@RequestParam(required = false) String mktActivityNbr,
-                                     @RequestParam(required = false) String accNum, HttpServletResponse response) {
+                                     @RequestParam(required = false) String accNum,
+                                     @RequestParam(required = false) String contactChlCode,
+                                     HttpServletResponse response) {
         try {
-            Map<String, Object> map = openMktCampaignService.getMktCampaignList(mktActivityNbr, accNum);
+            Map<String, Object> map = openMktCampaignService.getMktCampaignList(mktActivityNbr, accNum, contactChlCode);
             return JSON.toJSONString(map.get("params"), SerializerFeature.WriteMapNullValue);
         } catch (SystemException e) {
             e.printStackTrace();
