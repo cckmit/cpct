@@ -23,4 +23,5 @@ public interface SysStaffService {
 
     Map<String, Object> queryUserByName(String userName);
 
+    Map<String, Object> getStaffByCode(String staffCode);
 }

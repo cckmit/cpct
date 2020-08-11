@@ -1376,8 +1376,14 @@
         select t.*
         from mkt_campaign t
         where (STATUS_CD = 2002 OR STATUS_CD = 2008)
-        and t.LAN_ID = #{lanId,jdbcType=BIGINT}
         and t.AUTO_TRIAL = 1
+        <if test="lanId!=null">
+            and t.LAN_ID = #{lanId,jdbcType=BIGINT}
+        </if>
+        <if test="mktCampaignName!=null and mktCampaignName!=''">
+            and t.MKT_CAMPAIGN_NAME LIKE concat ('%', #{mktCampaignName}, '%')
+        </if>
+        Order BY UPDATE_DATE DESC
     </select>
 
 

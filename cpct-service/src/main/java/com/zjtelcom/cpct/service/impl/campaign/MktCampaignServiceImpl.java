@@ -26,7 +26,6 @@ import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
-import com.zjtelcom.cpct.dao.report.MktCamTopicMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyFilterRuleRelMapper;
@@ -1475,6 +1474,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO MktCampaignPar = new MktCampaignDO();
             MktCampaignPar.setMktCampaignName(mktCampaignName);
             MktCampaignPar.setMktCampaignType(mktCampaignType);
+            MktCampaignPar.setStatusCd("(2002, 2008)");
             List<Long> relationCamList = new ArrayList<>();
             if (eventId != null) {
                 List<MktCamEvtRel> camEvtRelList = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
@@ -2272,6 +2272,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     if (mktCampaignDOAdjust!=null){
                         changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
                     }
+                }
+                if (StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
+                    // 过期活动
+                    updateProjectStateTime(mktCampaignDO.getInitId());
                 }
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 删除下线活动与事件的关系
@@ -3185,6 +3189,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                    updateProjectStateTime(mktCampaignDO.getInitId());
                 }
             }
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -4064,16 +4069,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
     /**
      * 提供接口入参C3 返回配置了自动派单（auotTrail=1）得已发布活动（2002,2008）
-     * @param c3
+     * @param params
      * @return
      */
     @Override
-    public Map<String, Object> getByC3AndAuto(Long c3){
+    public Map<String, Object> getByC3AndAuto(Map<String, Object> params){
+        Long c3 = null;
+        if(params.get("c3")!=null && !"".equals(params.get("c3"))){
+            c3 = Long.valueOf(params.get("c3").toString());
+        }
+        String mktCampaignName = (String) params.get("mktCampaignName");
+        Integer page = (Integer) params.get("page");
+        Integer pageSize = (Integer) params.get("pageSize");
         List<MktCampaignDO> mktCampaignList = null;
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3);
+            PageHelper.startPage(page, pageSize);
+            mktCampaignList = mktCampaignMapper.getByC3AndAuto(c3, mktCampaignName);
             resultMap.put("mktCampaignList", mktCampaignList);
+            resultMap.put("pageInfo", new Page(new PageInfo(mktCampaignList)));
             resultMap.put("resultCode", CODE_SUCCESS);
             resultMap.put("resultMsg", "查询成功");
         } catch (Exception e) {
@@ -4083,8 +4097,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             resultMap.put("resultCode", CODE_FAIL);
             resultMap.put("resultMsg", "查询失败");
         }
-
-
         return resultMap;
     }
 
@@ -4098,6 +4110,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return false;
         }else {
             return true;
+        }
+    }
+
+    private Map<String, Object> updateProjectStateTime(Long initId){
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 根据initId查询所有的活动
+            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectCampaignByInitId(initId);
+            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                List<TrialOperation> trialOperationList = trialOperationMapper.listOperationByCamIdAndStatusCd2(mktCampaignDO.getMktCampaignId(), "(7300, 8100)");
+                for (TrialOperation trialOperation : trialOperationList) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("id", trialOperation.getId());  // 试运算Id
+                    params.put("effectDate", new Date());  // 生效时间
+                    params.put("invalidDate", new Date()); // 失效时间
+                    projectManageService.updateProjectStateTime(params);
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            return resultMap;
         }
     }
 

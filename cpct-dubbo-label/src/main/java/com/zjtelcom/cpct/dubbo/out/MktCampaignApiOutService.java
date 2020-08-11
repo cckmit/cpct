@@ -16,7 +16,7 @@ public interface MktCampaignApiOutService {
 
     RetCamResp qryMktCampaignDetail(Long mktCampaignId) throws Exception;
 
-    Map<String, Object> getByC3(Long C3);
+    Map<String, Object> getByC3(Map<String, Object> params);
 
     Map<String, Object> issueTrialResultOut(Map<String,Object> param);
 }

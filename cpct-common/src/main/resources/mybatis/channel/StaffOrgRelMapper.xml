@@ -80,4 +80,23 @@
     SELECT STAFF_ID,STAFF_CODE,ORG_ID,STAFF_NAME,SALESSTAFF_CODE FROM staff WHERE
       STATUS_CD =1000  AND STAFF_ID = #{staffId ,jdbcType=BIGINT}
   </select>
+
+  <select id="getStaffByCode" parameterType="java.lang.String" resultType="java.lang.Long">
+    SELECT
+      p2.ORG_ID
+    FROM
+      staff p1
+      LEFT JOIN staff_org_rel p2 ON ( p1.STAFF_ID = p2.STAFF_ID
+        AND p2.REL_TYPE = 1900
+        AND p2.STATUS_CD = 1000
+      )
+    <where>1!=2
+      <if test="staffCode!=null and staffCode!=''">
+        and p1.STAFF_CODE = #{staffCode}
+      </if>
+    </where>
+  </select>
+
+
+
 </mapper>

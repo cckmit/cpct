@@ -50,7 +50,7 @@ public interface MktCampaignMapper {
 
     List<MktCamDisplayColumnRel> selectAllGroupByCamId();
 
-    MktCampaignDO selectCampaignByInitId(@Param("initId")Long initId);
+    List<MktCampaignDO> selectCampaignByInitId(@Param("initId")Long initId);
 
     MktCampaignDO selectByInitId(@Param("initId")Long initId);
 
@@ -130,7 +130,7 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> listDisturbedCampaignForlanId(@Param("lanId") Long lanId, @Param("tiggerType") String tiggerType);
 
-    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId);
+    List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId, @Param("mktCampaignName") String mktCampaignName);
 
 
 }

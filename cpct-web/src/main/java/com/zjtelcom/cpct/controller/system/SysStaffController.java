@@ -307,4 +307,26 @@ public class SysStaffController extends BaseController {
         return JSON.toJSON(result).toString();
     }
 
+
+    /**
+     * getStaffByCode
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "getStaffByCode", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getStaffByCode(@RequestBody Map<String,String> params) {
+        Map result = new HashMap();
+        String staffCode = (String) params.get("staffCode");
+        try {
+            result = sysStaffService.getStaffByCode(staffCode);
+        } catch (Exception e) {
+            logger.error("[op:SysStaffController] fail to getStaffByCode Exception: ", e);
+            return initFailRespInfo(ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorMsg(), ErrorCode.SEARCH_EVENT_LIST_FAILURE.getErrorCode());
+        }
+
+        return JSON.toJSON(result).toString();
+    }
+
 }

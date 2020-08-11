@@ -10,5 +10,5 @@ public interface OpenMktCampaignService extends BaseDao {
 
     Map<String,Object> getMktCampaignDetail(String mktActivityNbr);
 
-    Map<String,Object> getMktCampaignList(String mktActivityNbr, String accNum);
+    Map<String,Object> getMktCampaignList(String mktActivityNbr, String accNum, String contactChlCode);
 }
