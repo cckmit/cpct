@@ -199,11 +199,11 @@ public class EventRedisServiceImpl implements EventRedisService {
             resutlt.put(key, mktStrategyConfDOS);
         } else if (key.startsWith("RULE_LIST_")) {   // 规则
             List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktStrategyConfRuleMapper.selectByMktStrategyConfId(id);
-            redisUtils.setRedis(key, mktStrategyConfRuleList);
+            redisUtils.set(key, mktStrategyConfRuleList);
             resutlt.put(key, mktStrategyConfRuleList);
         } else if (key.startsWith("EVENT_ITEM_")) {  // 事件采集项
             List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(id);
-            redisUtils.setRedis(key, contactEvtItems);
+            redisUtils.set(key, contactEvtItems);
             resutlt.put(key, contactEvtItems);
         } else if (key.startsWith("EVT_ALL_LABEL_")) {  // 事件下所有标签
             Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id);  //查询事件下使用的所有标签
