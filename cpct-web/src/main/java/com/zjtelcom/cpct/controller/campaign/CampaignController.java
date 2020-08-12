@@ -778,4 +778,22 @@ public class CampaignController extends BaseController {
         return result;
     }
 
+    @PostMapping(value = "/redisTest")
+    @CrossOrigin
+    public Map<String, Object> redisTest(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String key = (String) params.get("key");
+            Long id = ((Integer) params.get("id")).longValue();
+            mktCampaignService.redisTest(key, id);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "成功");
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
 }

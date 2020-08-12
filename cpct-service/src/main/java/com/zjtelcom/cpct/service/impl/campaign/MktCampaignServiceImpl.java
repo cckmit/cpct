@@ -4137,4 +4137,13 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
     }
 
+    @Override
+    public void redisTest(String key, Long id) {
+        //MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(9L);
+        //redisUtils.set("test", mktCampaignDO);
+        // logger.info("存入缓存");
+        Map<String, Object> redis = eventRedisService.getRedis(key, id);
+        System.out.println("result ->" + JSON.toJSONString(redis));
+    }
+
 }
