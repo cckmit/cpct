@@ -90,4 +90,6 @@ public interface MktCampaignService {
 
     boolean isOpenDisturb(MktCampaignDO mktCampaignDO);
 
+    void redisTest(String key, Long id);
+
 }

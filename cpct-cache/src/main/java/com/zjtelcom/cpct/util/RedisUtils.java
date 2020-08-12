@@ -1,9 +1,11 @@
 package com.zjtelcom.cpct.util;
 
+import com.alibaba.fastjson.JSON;
 import com.ctg.itrdc.cache.pool.CtgJedisPool;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolConfig;
 import com.ctg.itrdc.cache.pool.CtgJedisPoolException;
 import com.ctg.itrdc.cache.pool.ProxyJedis;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class RedisUtils {
 
     @Autowired
     private SysParamsMapper sysParamsMapper;
+
+    @Autowired(required = false)
+    Cache<String, Object> caffeineCache;
 
 
     /*public void setRedisExpiry() {
@@ -150,7 +155,9 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            // 改造后方法
+            // 存入本地方法
+            caffeineCache.put(key, value);
+            // 存入redis缓存
             result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -161,6 +168,9 @@ public class RedisUtils {
 
     public boolean del(final  String key){
         boolean result = false;
+        // 删除本地缓存
+        caffeineCache.asMap().remove(key);
+        // 删除redis缓存
         result = delRedis(key);
         return result;
     }
@@ -376,8 +386,16 @@ public class RedisUtils {
      */
     public Object get(final String key) {
         Object result = null;
-        // 改造后方法
+        caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
+        result = caffeineCache.asMap().get(String.valueOf(key));
+        System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
+        if(result!=null){
+            return result;
+        }
+        // 从redis缓存取数据
         result = getRedis(key);
+        // 本地缓存中无值则再存一次本地缓存
+        caffeineCache.put(key, result);
         return result;
     }
 
