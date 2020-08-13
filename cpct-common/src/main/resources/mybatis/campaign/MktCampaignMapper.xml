@@ -531,7 +531,9 @@
         update mkt_campaign
         set STATUS_CD = #{statusCd,jdbcType=VARCHAR},
         STATUS_DATE = #{updateDate,jdbcType=TIMESTAMP},
-        UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        <if test= "updateStaff!=null and updateStaff != 1">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
         UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
         where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
     </update>
@@ -714,7 +716,7 @@
         from mkt_campaign
         <where>1!=2
         <if test="mktCampaignId != null and mktCampaignId != ''">
-            AND MKT_CAMPAIGN_ID = #{mktCampaignId}
+            AND  INIT_ID = #{mktCampaignId}
         </if>
         <choose>
             <when test="statusCd != null and statusCd!='' and statusCd!='all'">
@@ -1199,8 +1201,8 @@
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
         </if>
-        <if test="value != null and value != '' ">
-            AND THE_ME = #{value}
+        <if test="value != null ">
+            AND DIRECTORY_ID = #{value}
         </if>
         <if test="lanId != null and lanId != ''">
             AND LAN_ID = #{lanId}
@@ -1223,8 +1225,8 @@
         <if test="type != null and type != ''">
             AND MKT_CAMPAIGN_TYPE = #{type}
         </if>
-        <if test="value != null and value != '' ">
-            AND THE_ME = #{value}
+        <if test="value != null ">
+            AND DIRECTORY_ID = #{value}
         </if>
         <if test="lanId != null and lanId != ''">
             AND LAN_ID = #{lanId}

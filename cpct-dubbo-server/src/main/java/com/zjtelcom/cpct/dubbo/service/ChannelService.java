@@ -12,7 +12,7 @@ public interface ChannelService {
 
     Ret importRuleUserList(FilterRuleInputReq req);
 
-    Map<String,Object> getUamServicePswd(String accountType, String accountID, String areaCode, String custID);
+   Map<String,Object> getUamServicePswd( String accountID, String areaCode, String custID);
 
 
 }

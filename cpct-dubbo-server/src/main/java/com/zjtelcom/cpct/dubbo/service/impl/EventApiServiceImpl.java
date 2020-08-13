@@ -2837,13 +2837,6 @@ public class EventApiServiceImpl implements EventApiService {
                     //添加到上下文
                     contextNew.put(entry.getKey(), entry.getValue());
                 }
-            } else {
-                log.info("查询资产标签失败");
-                esJson.put("hit", "false");
-                esJson.put("msg", "查询资产标签失败");
-                //esHitService.save(esJson, IndexList.ACTIVITY_MODULE,params.get("reqId") + activityId + params.get("accNbr"));
-                esHitService.save(esJson, IndexList.EVENT_MODULE, params.get("reqId"));
-                return null;
             }
         }
         contextNew.putAll(labelItems);   //添加事件采集项中作为标签使用的实例

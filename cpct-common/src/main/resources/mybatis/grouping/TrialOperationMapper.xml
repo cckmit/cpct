@@ -200,6 +200,22 @@
   </select>
 
 
+  <select id="listOperationByCamIdAndStatusCd2" resultMap="BaseResultMap">
+    SELECT
+    ID, CAMPAIGN_ID, CAMPAIGN_NAME, STRATEGY_ID, STRATEGY_NAME, BATCH_NUM, STATUS_CD,
+    CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+    FROM trial_operation
+    <where>1!=2
+      <if test="campaignId != null">
+        AND CAMPAIGN_ID = #{campaignId}
+      </if>
+      <if test="statusCd != null">
+        AND STATUS_CD IN #{statusCd}
+      </if>
+    </where>
+  </select>
+
+
   <select id="queryIssuedSuccess" resultMap="BaseResultMap">
     SELECT ID, CAMPAIGN_ID, CAMPAIGN_NAME, BATCH_NUM, CREATE_DATE
     FROM (

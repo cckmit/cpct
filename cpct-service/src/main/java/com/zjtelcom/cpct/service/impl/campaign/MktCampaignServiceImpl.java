@@ -626,11 +626,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             String newCampaignName = mktCampaignDO.getMktCampaignNameEdit().replace("_","-");
             if ("C1".equals(mktCampaignDO.getRegionFlg()) || "C2".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" +  newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr() + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" +  newCampaignName + "_" +  datestr);
             }else if ("C3".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" + newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr()  + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" + newCampaignName  + "_" +  datestr);
             }else if ("C4".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr()  + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + newCampaignName  + "_" +  datestr);
             }
 
             mktCampaignDO.setInitId(mktCampaignId);
@@ -877,7 +877,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             logger.info( "初始名称" + campaignNameArray.toString());
             //会走老活动
-            if(campaignNameArray.length < 5){
+            if(campaignNameArray.length < 4){
                 logger.info( "名称走老活动" + mktCampaignDO1.getMktCampaignName());
 //             保存活动活动名称默认拼上地市信息
                 String c3Name = "";
@@ -1475,6 +1475,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             MktCampaignDO MktCampaignPar = new MktCampaignDO();
             MktCampaignPar.setMktCampaignName(mktCampaignName);
             MktCampaignPar.setMktCampaignType(mktCampaignType);
+            MktCampaignPar.setStatusCd("(2002, 2008)");
             List<Long> relationCamList = new ArrayList<>();
             if (eventId != null) {
                 List<MktCamEvtRel> camEvtRelList = mktCamEvtRelMapper.qryBycontactEvtId(eventId);
@@ -1989,7 +1990,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignVO.setPreMktCampaignId(mktCampaignCountDO.getPreMktCampaignId());
                     MktCampaignDO mktCampaignDOPre = mktCampaignMapper.selectByPrimaryKey(mktCampaignCountDO.getPreMktCampaignId());
                     if (mktCampaignDOPre != null) {
-
+ String msgByCode = StatusCode.getMsgByCode(mktCampaignDOPre.getMktCampaignCategory());
+                        mktCampaignVO.setPreMktCampaignType(msgByCode==null ? "" : msgByCode);
                     }
                     // 集团活动补丁逻辑（现去除）
                     /*List<MktCampaignComplete> mktCampaignCompletes = mktCampaignCompleteMapper.selectByCampaignId(mktCampaignCountDO.getInitId());
@@ -2239,9 +2241,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long initId = mktCampaignDO.getInitId();
             // 记录活动操作
             mktOperatorLogService.addMktOperatorLog(mktCampaignDO.getMktCampaignName(), mktCampaignId, mktCampaignDO.getMktActivityNbr(), mktCampaignDO.getStatusCd(), statusCd, UserUtil.loginId(), statusCd);
-            mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(),null);
+            mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(),UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
-            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
+            if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)|| StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
                 try {
                     eventRedisService.deleteByCampaign(mktCampaignId);
                     logger.info("【活动缓存清理成功】：" + mktCampaignDO.getMktCampaignName());
@@ -2271,6 +2273,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     if (mktCampaignDOAdjust!=null){
                         changeMktCampaignStatus(mktCampaignDOAdjust.getMktCampaignId(), StatusCode.STATUS_CODE_ROLL.getStatusCode());
                     }
+                }
+                if (StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
+                    // 过期活动
+                    updateProjectStateTime(mktCampaignDO.getInitId());
                 }
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 删除下线活动与事件的关系
@@ -3184,6 +3190,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                    updateProjectStateTime(mktCampaignDO.getInitId());
                 }
             }
             result.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -4104,6 +4111,30 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return false;
         }else {
             return true;
+        }
+    }
+
+    private Map<String, Object> updateProjectStateTime(Long initId){
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 根据initId查询所有的活动
+            List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.selectCampaignByInitId(initId);
+            for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
+                List<TrialOperation> trialOperationList = trialOperationMapper.listOperationByCamIdAndStatusCd2(mktCampaignDO.getMktCampaignId(), "(7300, 8100)");
+                for (TrialOperation trialOperation : trialOperationList) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("id", trialOperation.getId());  // 试运算Id
+                    params.put("effectDate", new Date());  // 生效时间
+                    params.put("invalidDate", new Date()); // 失效时间
+                    projectManageService.updateProjectStateTime(params);
+                }
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            return resultMap;
         }
     }
 

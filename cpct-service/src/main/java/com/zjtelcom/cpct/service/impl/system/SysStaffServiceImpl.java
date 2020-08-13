@@ -310,6 +310,11 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Override
     public Map<String, Object> getStaffByCode(String staffCode) {
         Map<String, Object> result = new HashMap<>();
+        if(staffCode==null || "".equals(staffCode)){
+            result.put("resultMsg", "编码为空");
+            result.put("resultCode", CommonConstant.CODE_FAIL);
+            return result;
+        }
         try {
             List<Long> orgIdList = staffOrgRelMapper.getStaffByCode(staffCode);
             if (orgIdList != null && orgIdList.size() > 0) {

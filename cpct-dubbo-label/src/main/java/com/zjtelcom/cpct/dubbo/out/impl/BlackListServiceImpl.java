@@ -50,10 +50,12 @@ public class BlackListServiceImpl implements BlackListService {
                 blackListDO.setOperType((String)map.get("operType"));
 
                 String phone = (String)map.get("assetPhone");
-                List<String> phoneList = new ArrayList<>();
-                phoneList.add(phone);
-                List<BlackListDO> blackListDOS = blackListMapper.getBlackListById(phoneList);
-                if (blackListDOS.size() == 0){
+//                List<String> phoneList = new ArrayList<>();
+//                phoneList.add(phone);
+//                List<BlackListDO> blackListDOS = blackListMapper.getBlackListById(phoneList);
+                BlackListDO blackListDOExisted = blackListMapper.getBlackListByAssetPhone(phone);
+
+                if (blackListDOExisted == null){
                     //添加黑名单
                     blackListDO.setCreateDate(new Date());
                     blackListMapper.addBlackList(blackListDO);
@@ -69,8 +71,6 @@ public class BlackListServiceImpl implements BlackListService {
                     blackListLogDO.setStaffId((String)map.get("staffId"));
                     blackListLogDO.setOperType((String)map.get("operType"));
                     blackListLogMapper.addBlacklistlog(blackListLogDO);
-
-
                 }else{
                     //更新黑名单
                     blackListDO.setUpdateDate(new Date());
@@ -101,7 +101,10 @@ public class BlackListServiceImpl implements BlackListService {
     public Map<String, Object> deleteBlackList(List<String> phoneNumsDeleted) {
         try {
             blackListMapper.deleteBlackListById(phoneNumsDeleted);
-            redisUtils.del("BLACK_LIST");
+            for(String phone: phoneNumsDeleted){
+                redisUtils.hdelRedis("BLACK_LIST", phone);
+            }
+
             //添加操作日志
             for(String phone: phoneNumsDeleted){
                 BlackListLogDO blackListLogDO = new BlackListLogDO();

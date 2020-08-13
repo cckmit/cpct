@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zjpii.biz.service.uam.SyncService;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
@@ -120,25 +122,30 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public  Map<String,Object> getUamServicePswd(String accountType, String accountID, String areaCode, String custID) {
+    public  Map<String,Object> getUamServicePswd( String accountID, String areaCode, String custID) {
         //header
         Map<String, Object> headMap = new HashMap();
-        String miyao = "cUSpwGW0JCMJr2Wu";
-        String tokn = miyao + "uop2_xc" + DateUtil.date2String(new Date());
+        String miyao = "ZZ2hhmTCbnBAl3XS";
+        String tokn = miyao + "CLZX" + DateUtil.date2String(new Date());
         tokn = MD5Util.encryByMD5(tokn).toUpperCase();
-        headMap.put("channel", "uop2_xc");
+        headMap.put("channel", "CLZX");
         headMap.put("channel_token", tokn);
-        headMap.put("bis_module", "dubbo-server");
-        headMap.put("bis_detail", "dubbo-server");
+        headMap.put("bis_module", "策略中心");
+        headMap.put("bis_detail", "策略中心获取服务密码");
         headMap.put("version", "v1.0");
+
         //body
         Date date = new Date();
-        String strDateFormat = "YYYYMMDDHHMMSS";
+        String accountType = "2000004";
+        String strDateFormat = "yyyyMMddHHmmss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(strDateFormat);
+        String strDateFormat2 = "yyyyMMdd";
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(strDateFormat2);
+        int nums = (int) ((Math.random() * 9 + 1) * Math.pow(10,  10));//10位随机数
         String serviceCode = "CAP08000";
         String  version = "20200728ZJUAM120";
         String actionCode = "0";
-        String transactionID = "";
+        String transactionID = simpleDateFormat2.format(date) + nums;
         String srcSysID = "12110";
         String digitalSign = "12110";
         String dstSysID = "12110";
@@ -146,8 +153,9 @@ public class ChannelServiceImpl implements ChannelService {
         String sendSMS = "00";
         String receSMService = "";
 
-
         Map<String,String> bodyMap = new HashMap<>();
+        bodyMap.put("accountID",accountID);
+        bodyMap.put("accountType",accountType);
         bodyMap.put("serviceCode",serviceCode);
         bodyMap.put("version",version);
         bodyMap.put("actionCode",actionCode);
@@ -158,12 +166,15 @@ public class ChannelServiceImpl implements ChannelService {
         bodyMap.put("reqTime",reqTime);
         bodyMap.put("sendSMS",sendSMS);
         bodyMap.put("receSMService",receSMService);
+        bodyMap.put("areaCode",areaCode);
+        bodyMap.put("custID",custID);
 
         Map<String,Object> extMap = new HashMap<>();
-
         Map<String,Object> result = syncService.queryPassword(headMap,bodyMap,extMap);
 
-
+        JSONObject content = JSON.parseObject((String)result.get("msgbody"));
+        String password  = content.getJSONObject("DATA").getString("password");
+        result.put("password",password);
         return result;
     }
 }

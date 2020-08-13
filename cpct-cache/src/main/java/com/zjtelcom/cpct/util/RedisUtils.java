@@ -278,6 +278,30 @@ public class RedisUtils {
         return result;
     }
 
+
+    public boolean hdelRedis(final String key, String field ) {
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if(jedis.exists(key)) {
+                    jedis.hdel(key,field);
+                    result = true;
+                }
+            } catch (Throwable je) {
+                System.out.println("REDIS_EDL*********" + key + field);
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIS_EDL2*********" + key + field);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 批量删除对应的value
      *

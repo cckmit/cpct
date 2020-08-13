@@ -12,7 +12,9 @@ import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.blacklist.BlackListLogDO;
 import com.zjtelcom.cpct.service.blacklist.BlackListCpctService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.SftpUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -65,7 +67,8 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
     BlackListLogMapper blackListLogMapper;
     private static final String SUCCESS_CODE = "0";
     private static final String FAIL_CODE = "1";
-
+    @Autowired
+    private RedisUtils redisUtils;
     /**
      * 从数据库导出黑名单上传ftp服务器
      *
@@ -465,8 +468,35 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
             blackListDO.setStaffId(staffId);
             //添加黑名单
             blackListDO.setCreateDate(new Date());
-            blackListMapper.addBlackList(blackListDO);
 
+            String phone = blackListDO.getAssetPhone();
+            BlackListDO blackListDOExisted = blackListMapper.getBlackListByAssetPhone(phone);
+
+            if (blackListDOExisted == null){
+                //添加黑名单
+                log.info("添加黑名单");
+                blackListDO.setCreateDate(new Date());
+                blackListMapper.addBlackList(blackListDO);
+                redisUtils.hset("BLACK_LIST", phone, blackListDO);
+                //添加操作日志
+                BlackListLogDO blackListLogDO = new BlackListLogDO();
+                BeanUtil.copy(blackListDO,blackListLogDO);
+                blackListLogDO.setMethod("add");
+                blackListLogMapper.addBlacklistlog(blackListLogDO);
+            }else{
+                //更新黑名单
+                log.info("更新黑名单");
+                blackListDO.setUpdateDate(new Date());
+                blackListMapper.updateBlackList(blackListDO);
+                log.info("更新黑名单完成");
+                redisUtils.hset("BLACK_LIST", phone, blackListDO);
+                //添加操作日志
+                BlackListLogDO blackListLogDO = new BlackListLogDO();
+                blackListLogDO.setMethod("update");
+                BeanUtil.copy(blackListDO,blackListLogDO);
+                blackListLogMapper.addBlacklistlog(blackListLogDO);
+                log.info("更新黑名单日志完成");
+            }
         }
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", "导入文件成功");
@@ -644,13 +674,16 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
                 blackListDO.setOperType((String)map.get("operType"));
 
                 String phone = (String)map.get("assetPhone");
-                List<String> phoneList = new ArrayList<>();
-                phoneList.add(phone);
-                List<BlackListDO> blackListDOS = blackListMapper.getBlackListById(phoneList);
-                if (blackListDOS.size() == 0){
+//                List<String> phoneList = new ArrayList<>();
+//                phoneList.add(phone);
+//                List<BlackListDO> blackListDOS = blackListMapper.getBlackListById(phoneList);
+                BlackListDO blackListDOExisted = blackListMapper.getBlackListByAssetPhone(phone);
+
+                if (blackListDOExisted == null){
                     //添加黑名单
                     blackListDO.setCreateDate(new Date());
                     blackListMapper.addBlackList(blackListDO);
+//                    redisUtils.hset("BLACK_LIST", phone, blackListDO);
                     //添加操作日志
                     BlackListLogDO blackListLogDO = new BlackListLogDO();
                     blackListLogDO.setMethod("add");
@@ -666,6 +699,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
                     //更新黑名单
                     blackListDO.setUpdateDate(new Date());
                     blackListMapper.updateBlackList(blackListDO);
+//                    redisUtils.hset("BLACK_LIST", phone, blackListDO);
                     //添加操作日志
                     BlackListLogDO blackListLogDO = new BlackListLogDO();
                     blackListLogDO.setMethod("update");
@@ -687,5 +721,58 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         }
     }
 
+    public Map<String,Object> cleanRepeat(Integer begin,Integer end){
+        Map<String,Object> parentResultMap = new HashMap<>();
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        List<String> distinctAssetPhoneList = blackListMapper.getDistinctPhone(begin,end);
+        int count = 0;
+        for(String phone : distinctAssetPhoneList){
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("phone",phone);
+            List<Integer> deletedBlackIdList = new ArrayList<>();
+            List<String> updatedBlackIdList = new ArrayList<>();
+            List<BlackListDO> blackListDOList = blackListMapper.getBlackListByPhone(phone);
+            String serviceCate = "0";
+            String maketingCate = "0";
+            String publicBenefitCate = "0";
+            for(int i = 0; i < blackListDOList.size(); i++){
+                BlackListDO blackListDO = blackListDOList.get(i);
+
+                if("1".equals(blackListDO.getServiceCate())){
+                    serviceCate = "1";
+                }
+                if("1".equals(blackListDO.getMaketingCate())){
+                    maketingCate = "1";
+                }
+                if("1".equals(blackListDO.getPublicBenefitCate())){
+                    publicBenefitCate = "1";
+                }
+                if(i != (blackListDOList.size() - 1)){
+                    blackListMapper.deleteByBlackId(blackListDO.getBlackId());
+                    deletedBlackIdList.add(blackListDO.getBlackId());
+                    log.info("删除记录 id: " + blackListDO.getBlackId()  + "号码：" + blackListDO.getAssetPhone());
+                }
+                if(i == (blackListDOList.size() - 1)){
+                    blackListDO.setServiceCate(serviceCate);
+                    blackListDO.setMaketingCate(maketingCate);
+                    blackListDO.setPublicBenefitCate(publicBenefitCate);
+                    blackListMapper.updateByBlackId(blackListDO);
+                    count++;
+                    //组织返回结果
+                    updatedBlackIdList.add(String.valueOf(blackListDO.getBlackId()));
+                    updatedBlackIdList.add(serviceCate);
+                    updatedBlackIdList.add(maketingCate);
+                    updatedBlackIdList.add(publicBenefitCate);
+                    log.info("更新记录 id: " + blackListDO.getBlackId()  + "号码：" + blackListDO.getAssetPhone());
+                }
+            }
+            resultMap.put("deletedBlackIdList",deletedBlackIdList);
+            resultMap.put("updatedBlackIdList",updatedBlackIdList);
+            resultList.add(resultMap);
+        }
+        parentResultMap.put("result",resultList);
+        parentResultMap.put("count",count);
+        return  parentResultMap;
+    }
 
 }

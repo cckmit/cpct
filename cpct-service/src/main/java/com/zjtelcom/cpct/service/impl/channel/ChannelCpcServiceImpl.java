@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjpii.biz.service.uam.SyncService;
@@ -32,7 +34,7 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     @Autowired
     private SynChannelService synChannelService;
 
-    @Autowired
+    @Autowired(required = false)
     private SyncService syncService;
 
 
@@ -530,6 +532,9 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
 
         Map<String,Object> extMap = new HashMap<>();
         Map<String,Object> result = syncService.queryPassword(headMap,bodyMap,extMap);
+        JSONObject content = JSON.parseObject((String)result.get("msgbody"));
+        String password  = content.getJSONObject("DATA").getString("password");
+        result.put("password",password);
         return result;
     }
 

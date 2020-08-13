@@ -172,7 +172,7 @@ public class TrialProdServiceImpl implements TrialProdService {
     public Map<String, Object> orgListCached(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
         Long initId = MapUtil.getLongNum(param.get("initId"));
-        List<Integer> areaId = (List<Integer>)param.get("orgList");
+        List<String> areaId = (List<String>)param.get("orgList");
         MktCampaignDO campaignDO = campaignMapper.selectByInitId(initId);
         if (campaignDO==null){
             result.put("resultCode", CODE_FAIL);
@@ -185,8 +185,8 @@ public class TrialProdServiceImpl implements TrialProdService {
                ruleIdList.add(ruleDO.getMktStrategyConfRuleId());
             });
         List<Long> orgIdList = new ArrayList<>();
-        for (Integer integer : areaId) {
-            orgIdList.add(Long.valueOf(integer.toString()));
+        for (String integer : areaId) {
+            orgIdList.add(Long.valueOf(integer));
         }
         area2RedisThread(ruleIdList,orgIdList);
         result.put("resultCode", CODE_SUCCESS);
@@ -200,11 +200,16 @@ public class TrialProdServiceImpl implements TrialProdService {
         //过滤 选择level 大于3 的
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
         if (orgs == null || orgs.isEmpty()){
-            redisUtils.setRedisUnit("ORG_CHECK_"+ruleId.toString(),"true",3600);
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
+            }
         }else {
             //添加所有选择的节点信息到缓存
-            redisUtils.setRedisUnit("ORG_ID_"+ruleId.toString(),orgs,3600);
-            redisUtils.remove("AREA_RULE_ISSURE_"+ruleId);
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"false",3600);
+                redisUtils.setRedisUnit("ORG_ID_"+aLong.toString(),orgs,3600);
+                redisUtils.remove("AREA_RULE_ISSURE_"+aLong);
+            }
             new Thread(){
                 public void run(){
                     areaList2Redis(ruleId,orgs);
@@ -225,7 +230,9 @@ public class TrialProdServiceImpl implements TrialProdService {
             for (Future<Map<String,Object>> future : futureList){
                 future.get();
             }
-            redisUtils.setRedisUnit("ORG_CHECK_"+ruleId.toString(),"true",3600);
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -284,13 +291,14 @@ public class TrialProdServiceImpl implements TrialProdService {
             }
             List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
             for (MktStrategyConfRuleDO rule : ruleDOList){
-                String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null ? null :redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
+                String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null
+                        ? null : redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
                 if (orgCheck==null){
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "请先选则派单组织区域");
                     return result;
                 }
-                if (orgCheck!=null && orgCheck.equals("false")) {
+                if (orgCheck.equals("false")) {
                     result.put("resultCode", CODE_FAIL);
                     result.put("resultMsg", "规则：" + rule.getMktStrategyConfRuleName() + "营销组织树配置正在努力加载请稍后再试");
                     return result;
