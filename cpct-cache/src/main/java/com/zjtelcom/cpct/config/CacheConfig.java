@@ -26,11 +26,11 @@ public class CacheConfig {
     public Cache<String, Object> caffeineCache() {
         return Caffeine.newBuilder()
                 // 设置最后一次写入或访问后经过固定时间过期
-                .expireAfterWrite(6000, TimeUnit.SECONDS)
+                .expireAfterWrite(300, TimeUnit.SECONDS)
                 // 初始的缓存空间大小
-                .initialCapacity(100)
+                .initialCapacity(300)
                 // 缓存的最大条数
-                .maximumSize(1000)
+                .maximumSize(3000)
                 .build();
     }
 }
