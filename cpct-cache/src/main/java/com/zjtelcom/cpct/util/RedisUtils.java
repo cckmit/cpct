@@ -155,8 +155,10 @@ public class RedisUtils {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            // 存入本地方法
-            caffeineCache.put(key, value);
+            // 存入本地缓存
+            if (value != null) {
+                caffeineCache.put(key, value);
+            }
             // 存入redis缓存
             result = setRedis(key, value);
         } catch (Exception e) {
@@ -395,7 +397,9 @@ public class RedisUtils {
         // 从redis缓存取数据
         result = getRedis(key);
         // 本地缓存中无值则再存一次本地缓存
-        caffeineCache.put(key, result);
+        if (result != null) {
+            caffeineCache.put(key, result);
+        }
         return result;
     }
 
