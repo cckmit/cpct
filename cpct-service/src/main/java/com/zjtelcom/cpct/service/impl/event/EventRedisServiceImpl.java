@@ -224,16 +224,16 @@ public class EventRedisServiceImpl implements EventRedisService {
             // redisUtils.set(key, filterRuleIds);
             redisUtils.setCache(key, filterRuleIds);
             resutlt.put(key, filterRuleIds);
-        } else if (key.startsWith("FILTER_RULE_DISTURB_")) {  // 过滤规则信息查询失败
-            List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(id);
-            //redisUtils.set(key, labels);
-            redisUtils.setCache(key, labels);
-            resutlt.put(key, labels);
         } else if (key.startsWith("FILTER_RULE_")) { // 过滤规则
             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
             // redisUtils.set(key, filterRule);
             redisUtils.setCache(key, filterRule);
             resutlt.put(key, filterRule);
+        } else if (key.startsWith("FILTER_RULE_DISTURB_")) {  // 过滤规则信息查询失败
+            List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(id);
+            //redisUtils.set(key, labels);
+            redisUtils.setCache(key, labels);
+            resutlt.put(key, labels);
         } else if (key.startsWith("MKT_ISALE_LABEL_")) {
             List<Map<String, Object>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(id);
             // redisUtils.set(key, iSaleDisplay);
