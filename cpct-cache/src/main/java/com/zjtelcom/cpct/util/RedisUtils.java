@@ -152,7 +152,7 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value) {
+    public boolean setCache(final String key, Object value) {
         boolean result = false;
         try {
             // 存入本地缓存
@@ -167,6 +167,47 @@ public class RedisUtils {
         return result;
     }
 
+    /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean set(final String key, Object value) {
+        boolean result = false;
+        try {
+            // 存入redis缓存
+            result = setRedis(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    /**
+     * 读取缓存
+     *
+     * @param key
+     * @return
+     */
+    public Object get(final String key) {
+        Object result = null;
+        caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
+        result = caffeineCache.asMap().get(String.valueOf(key));
+        System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
+        if (result != null) {
+            return result;
+        }
+        // 从redis缓存取数据
+        result = getRedis(key);
+        // 本地缓存中无值则再存一次本地缓存
+        if (result != null) {
+            caffeineCache.put(key, result);
+        }
+        return result;
+    }
 
     public boolean del(final  String key){
         boolean result = false;
@@ -378,29 +419,6 @@ public class RedisUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * 读取缓存
-     *
-     * @param key
-     * @return
-     */
-    public Object get(final String key) {
-        Object result = null;
-/*        caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
-        result = caffeineCache.asMap().get(String.valueOf(key));
-        System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
-        if(result!=null){
-            return result;
-        }*/
-        // 从redis缓存取数据
-        result = getRedis(key);
-        // 本地缓存中无值则再存一次本地缓存
-        if (result != null) {
-            caffeineCache.put(key, result);
-        }
-        return result;
     }
 
 
