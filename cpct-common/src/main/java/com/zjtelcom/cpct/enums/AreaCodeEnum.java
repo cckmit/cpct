@@ -5,6 +5,7 @@ package com.zjtelcom.cpct.enums;
  * @Author lincaho
  * @Date 2018/12/06 10:15
  */
+
 public enum AreaCodeEnum {
 
     ZHEJIAGN(1L, 8330000L, 0L),
@@ -78,6 +79,14 @@ public enum AreaCodeEnum {
         return null;
     }
 
+    public  static String getAreaNameByLanId(Long lanId){
+        for(AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()){
+            if(lanId.equals(areaCodeEnum.lanId)){
+                return areaCodeEnum.toString();
+            }
+        }
+        return null;
+    }
     public enum sysAreaCode{
         CHAOGUAN("cpcp0001","C1","集团"),
         SHENGJI("cpcpch0001","C2","省级"),

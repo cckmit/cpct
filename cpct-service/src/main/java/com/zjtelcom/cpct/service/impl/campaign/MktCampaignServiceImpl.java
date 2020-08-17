@@ -625,11 +625,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktActivityNbr("MKT" + String.format("%06d", mktCampaignId));
             String newCampaignName = mktCampaignDO.getMktCampaignNameEdit().replace("_","-");
             if ("C1".equals(mktCampaignDO.getRegionFlg()) || "C2".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" +  newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr() + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" +  newCampaignName + "_" +  datestr);
             }else if ("C3".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" + newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr()  + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" + newCampaignName  + "_" +  datestr);
             }else if ("C4".equals(mktCampaignDO.getRegionFlg())){
-                mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + newCampaignName  +"_"+ mktCampaignDO.getMktActivityNbr()  + "_" +  datestr);
+                mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + newCampaignName  + "_" +  datestr);
             }
 
             mktCampaignDO.setInitId(mktCampaignId);
@@ -876,7 +876,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
             logger.info( "初始名称" + campaignNameArray.toString());
             //会走老活动
-            if(campaignNameArray.length < 5){
+            if(campaignNameArray.length < 4){
                 logger.info( "名称走老活动" + mktCampaignDO1.getMktCampaignName());
 //             保存活动活动名称默认拼上地市信息
                 String c3Name = "";

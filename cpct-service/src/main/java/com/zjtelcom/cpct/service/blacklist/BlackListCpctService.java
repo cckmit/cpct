@@ -18,6 +18,6 @@ public interface BlackListCpctService {
     void exportBlackListFileManage(HttpServletResponse response) throws IOException;
     Map<String, Object> importBlackListFileManage(MultipartFile multipartFile) throws IOException;
     Map<String,Object> addBlackList(List<Map<String, Object>> blackListContent);
-
+    Map<String,Object> cleanRepeat(Integer begin,Integer end);
 
 }

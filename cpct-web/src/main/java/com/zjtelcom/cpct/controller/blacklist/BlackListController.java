@@ -77,7 +77,7 @@ public class BlackListController extends BaseController {
         response.setContentType("text/html;charset=" + encode);
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
-        String downLoadPath = "下载模板.xlsx";
+        String downLoadPath = "blacklist_template.xlsx";
         try {
             File file = new File(downLoadPath);
             long fileLength = file.length();
@@ -170,12 +170,29 @@ public class BlackListController extends BaseController {
     /*根据业务号码删除黑名单*/
     @PostMapping("/addBlackList")
     @CrossOrigin
-    public  Map<String,Object> addBlackList(@RequestBody  List<Map<String, Object>> blackListContent){
+    public  Map<String,Object> addBlackList(@RequestBody Map<String, Object> blackListMap){
         Map<String,Object> result = new HashMap<>();
         try{
+            List<Map<String, Object>> blackListContent =(List<Map<String, Object>>) blackListMap.get("blackListContent");
             result = blackListCpctService.addBlackList(blackListContent);
         }catch (Exception e){
             logger.error("根据业务号码删除黑名单失败",e);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /*根据业务号码删除黑名单*/
+    @PostMapping("/cleanRepeat")
+    @CrossOrigin
+    public  Map<String,Object> cleanRepeat(@RequestBody Map<String, Integer> paramMap){
+        Map<String,Object> result = new HashMap<>();
+        try{
+            Integer begin = paramMap.get("begin");
+            Integer end = paramMap.get("end");
+            result = blackListCpctService.cleanRepeat(begin,end);
+        }catch (Exception e){
+            logger.error("黑名单去重异常",e);
             e.printStackTrace();
         }
         return result;

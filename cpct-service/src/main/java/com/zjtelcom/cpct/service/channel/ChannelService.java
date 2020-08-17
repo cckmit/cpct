@@ -46,5 +46,6 @@ public interface ChannelService {
 
     Map<String,Object> selectBatchByCode(List<String> contactChlCodeList);
 
+    Map<String,Object> getUamServicePswd(String accountID, String areaCode, String custID);
 
 }

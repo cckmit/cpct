@@ -573,6 +573,17 @@ public class ChannelUtil  {
         }
         return list;
     }
+
+    public static List<Integer> StringToIntegerList(String var1) {
+        String[] array = var1.split(",");
+        List<Integer> list = new ArrayList<Integer>();
+        for (String str : array)
+        {
+            list.add(Integer.valueOf(str));
+        }
+        return list;
+    }
+
     public static List<Long> StringToIdList(String var1) {
         String[] array = var1.split("/");
         List<Long> list = new ArrayList<Long>();

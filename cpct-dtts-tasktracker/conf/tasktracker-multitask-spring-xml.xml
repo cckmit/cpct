@@ -134,6 +134,24 @@
         <property name="shardValue" value="openCampaignScheForDay"/>
     </bean>
 
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="playFromSysCampaign"/>
+        <property name="shardValue" value="playFromSysCampaign"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="exportBlackListFile"/>
+        <property name="shardValue" value="exportBlackListFile"/>
+    </bean>
+
+    <bean class="com.ctg.dtts.spring.tasktracker.MethodInvokingJobRunner">
+        <property name="targetObject" ref="multiJobRunner"/>
+        <property name="targetMethod" value="importBlackListFile"/>
+        <property name="shardValue" value="importBlackListFile"/>
+    </bean>
+
     <!-- 这个 TaskTrackerAnnotationFactoryBean bean 要放在 MethodInvokingJobRunner的后面  -->
     <bean id="taskTracker" class="com.ctg.dtts.spring.TaskTrackerAnnotationFactoryBean" init-method="start">
         <!-- 使用JobRunnerItem注解一定要使用 JobDispatcher -->

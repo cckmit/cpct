@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dao.event;
 
 import com.zjtelcom.cpct.domain.event.CommonRegion;
+import com.zjtelcom.cpct.domain.event.OfferExpenseDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,7 @@ public interface CommonRegionMapper {
     List<CommonRegion> selectAll();
 
     int updateByPrimaryKey(CommonRegion record);
+
+    List<OfferExpenseDO> getExpenseByOfferNbr(String offerNbr);
 
 }

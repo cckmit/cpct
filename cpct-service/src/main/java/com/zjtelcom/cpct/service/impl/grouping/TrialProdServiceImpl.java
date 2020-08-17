@@ -21,10 +21,7 @@ import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
-import com.zjtelcom.cpct.domain.channel.DisplayColumn;
-import com.zjtelcom.cpct.domain.channel.Label;
-import com.zjtelcom.cpct.domain.channel.LabelResult;
-import com.zjtelcom.cpct.domain.channel.MktProductRule;
+import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyCloseRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
@@ -50,6 +47,7 @@ import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
+import com.zjtelcom.cpct.service.impl.strategy.MktStrategyConfRuleServiceImpl;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamChlConfAttrPrdMapper;
@@ -109,7 +107,7 @@ public class TrialProdServiceImpl implements TrialProdService {
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
-    @Autowired
+    @Autowired(required = false)
     private OfferProdMapper offerMapper;
     @Autowired
     private MktCamChlConfMapper chlConfMapper;
@@ -162,6 +160,164 @@ public class TrialProdServiceImpl implements TrialProdService {
 
     @Autowired(required = false)
     private YzServ yzServ; //因子实时查询dubbo服务
+
+    @Autowired
+    private MktStrategyConfRuleService ruleService;
+    @Autowired
+    private OrganizationMapper organizationMapper;
+
+
+
+    @Override
+    public Map<String, Object> orgListCached(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        Long initId = MapUtil.getLongNum(param.get("initId"));
+        List<String> areaId = (List<String>)param.get("orgList");
+        MktCampaignDO campaignDO = campaignMapper.selectByInitId(initId);
+        if (campaignDO==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未查询到有效活动");
+            return result;
+        }
+        List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
+        List<Long> ruleIdList = new ArrayList<>();
+            ruleDOList.forEach(ruleDO -> {
+               ruleIdList.add(ruleDO.getMktStrategyConfRuleId());
+            });
+        List<Long> orgIdList = new ArrayList<>();
+        for (String integer : areaId) {
+            orgIdList.add(Long.valueOf(integer));
+        }
+        area2RedisThread(ruleIdList,orgIdList);
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "营销组织树加载中");
+        return result;
+    }
+
+
+    //添加营销组织树集合
+    private void area2RedisThread(List<Long> ruleId,List<Long> orgIdList) {
+        //过滤 选择level 大于3 的
+        List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
+        if (orgs == null || orgs.isEmpty()){
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
+            }
+        }else {
+            //添加所有选择的节点信息到缓存
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"false",3600);
+                redisUtils.setRedisUnit("ORG_ID_"+aLong.toString(),orgs,3600);
+                redisUtils.remove("AREA_RULE_ISSURE_"+aLong);
+            }
+            new Thread(){
+                public void run(){
+                    areaList2Redis(ruleId,orgs);
+                }
+            }.start();
+        }
+    }
+
+    public void areaList2Redis(List<Long> ruleId,List<Long> areaIdList){
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(areaIdList.size());
+        List<Organization> sysAreaList = new ArrayList<>();
+        List<Future<Map<String,Object>>> futureList = new ArrayList<>();
+        try {
+            for (Long id : areaIdList){
+                Future<Map<String,Object>> future = fixedThreadPool.submit(new areaTask(ruleId,id,sysAreaList));
+                futureList.add(future);
+            }
+            for (Future<Map<String,Object>> future : futureList){
+                future.get();
+            }
+            for (Long aLong : ruleId) {
+                redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    class areaTask implements Callable<Map<String,Object>>{
+        private List<Long> ruleId;
+        private Long id;
+        private  List<Organization> sysAreaList;
+        public areaTask(List<Long> ruleId,Long id, List<Organization> sysAreaList){
+            this.ruleId = ruleId;
+            this.id = id;
+            this.sysAreaList = sysAreaList;
+        }
+
+        @Override
+        public Map<String, Object> call() throws Exception {
+            Map<String,Object> result = new HashMap<>();
+            Organization org = organizationMapper.selectByPrimaryKey(id);
+            if (org!=null){
+                List<String> resultList = new ArrayList<>();
+                resultList.add(org.getOrgId4a().toString());
+                areaList(id,resultList,sysAreaList);
+                for (Long aLong : ruleId) {
+                    redisUtils.hsetUnit("AREA_RULE_ISSURE_"+aLong,id.toString(),resultList,3600);
+                }
+            }
+            return result;
+        }
+    }
+
+    public List<String> areaList(Long parentId,List<String> resultList,List<Organization> areas){
+        List<Organization> sysAreaList = organizationMapper.selectByParentId(parentId);
+        if (sysAreaList.isEmpty()){
+            return resultList;
+        }
+        for (Organization area : sysAreaList){
+            resultList.add(area.getOrgId4a().toString());
+            areas.add(area);
+            areaList(area.getOrgId(),resultList,areas);
+        }
+        return resultList;
+    }
+
+    @Override
+    public Map<String, Object> issueTrialResultOut(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            Long initId = MapUtil.getLongNum(param.get("initId"));
+
+            MktCampaignDO campaignDO = campaignMapper.selectByInitId(initId);
+            if (campaignDO==null){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "未查询到有效活动");
+                return result;
+            }
+            List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
+            for (MktStrategyConfRuleDO rule : ruleDOList){
+                String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null
+                        ? null : redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
+                if (orgCheck==null){
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "请先选则派单组织区域");
+                    return result;
+                }
+                if (orgCheck.equals("false")) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "规则：" + rule.getMktStrategyConfRuleName() + "营销组织树配置正在努力加载请稍后再试");
+                    return result;
+                }
+            }
+            List<Integer> campaignIdList = new ArrayList<>();
+            Map<String, Object> campaignMap = new HashMap<>();
+            campaignIdList.add(Integer.valueOf(initId.toString()));
+            campaignMap.put("idList", campaignIdList);
+            campaignMap.put("perCampaign", "PER_CAMPAIGN");
+            result = campaignIndexTask(campaignMap);
+            mktDttsLogService.saveMktDttsLog("2222", "自动派发成功", new Date(), new Date(), "自动派发成功", JSON.toJSONString(param));
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "自动派发失败");
+        }
+        return result;
+    }
 
     @Override
     public Map<String, Object> yzservTest(Map<String, Object> param) {

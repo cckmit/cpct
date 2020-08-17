@@ -44,6 +44,9 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Autowired
     private StaffOrgRelMapper staffOrgRelMapper;
 
+    @Autowired
+    private StaffOrgRelMapper staffOrgRelMapper;
+
 
 
 
