@@ -150,7 +150,13 @@ public class EventRedisServiceImpl implements EventRedisService {
         if (!id.toString().equals("0")) {
             key = key + id;
         }
-        Object o = redisUtils.get(key);
+        Object o = null;
+        try {
+            o = redisUtils.get(key);
+        } catch (Exception e) {
+            redisUtils.del(key);
+            e.printStackTrace();
+        }
         if (o != null ) {
             resutlt.put(key, o);
         } else {
@@ -193,11 +199,11 @@ public class EventRedisServiceImpl implements EventRedisService {
             resutlt.put(key, mktStrategyConfDOS);
         } else if (key.startsWith("RULE_LIST_")) {   // 规则
             List<MktStrategyConfRuleDO> mktStrategyConfRuleList = (List<MktStrategyConfRuleDO>) mktStrategyConfRuleMapper.selectByMktStrategyConfId(id);
-            redisUtils.setRedis(key, mktStrategyConfRuleList);
+            redisUtils.set(key, mktStrategyConfRuleList);
             resutlt.put(key, mktStrategyConfRuleList);
         } else if (key.startsWith("EVENT_ITEM_")) {  // 事件采集项
             List<EventItem> contactEvtItems = contactEvtItemMapper.listEventItem(id);
-            redisUtils.setRedis(key, contactEvtItems);
+            redisUtils.set(key, contactEvtItems);
             resutlt.put(key, contactEvtItems);
         } else if (key.startsWith("EVT_ALL_LABEL_")) {  // 事件下所有标签
             Map<String, String> mktAllLabels = searchLabelService.labelListByEventId(id);  //查询事件下使用的所有标签
@@ -215,7 +221,8 @@ public class EventRedisServiceImpl implements EventRedisService {
             resutlt.put(key, filterRuleList);
         } else if (key.startsWith("MKT_FILTER_RULE_IDS_")) { // 过滤规则Id
             List<Long> filterRuleIds = mktStrategyFilterRuleRelMapper.selectByStrategyId(id);
-            redisUtils.set(key, filterRuleIds);
+            // redisUtils.set(key, filterRuleIds);
+            redisUtils.setCache(key, filterRuleIds);
             resutlt.put(key, filterRuleIds);
         } else if (key.startsWith("FILTER_RULE_DISTURB_")) {  // 过滤规则信息查询失败
             List<String> labels = mktVerbalConditionMapper.getLabelListByConditionId(id);
@@ -223,15 +230,18 @@ public class EventRedisServiceImpl implements EventRedisService {
             resutlt.put(key, labels);
         } else if (key.startsWith("FILTER_RULE_")) { // 过滤规则
             FilterRule filterRule = filterRuleMapper.selectByPrimaryKey(id);
-            redisUtils.set(key, filterRule);
+            // redisUtils.set(key, filterRule);
+            redisUtils.setCache(key, filterRule);
             resutlt.put(key, filterRule);
         } else if (key.startsWith("MKT_ISALE_LABEL_")) {
             List<Map<String, Object>> iSaleDisplay = injectionLabelMapper.listLabelByDisplayId(id);
-            redisUtils.set(key, iSaleDisplay);
+            // redisUtils.set(key, iSaleDisplay);
+            redisUtils.setCache(key, iSaleDisplay);
             resutlt.put(key, iSaleDisplay);
         } else if (key.startsWith("RULE_ALL_LABEL_")) {
             List<Map<String, String>> labelMapList = tarGrpConditionMapper.selectAllLabelByTarId(id);
-            redisUtils.set(key, labelMapList);
+            // redisUtils.set(key, labelMapList);
+            redisUtils.setCache(key, labelMapList);
             resutlt.put(key, labelMapList);
         } else if (key.startsWith("MKT_CAM_ITEM_LIST_")) {
             List<MktCamItem> mktCamItemList = new ArrayList<>();
@@ -242,7 +252,8 @@ public class EventRedisServiceImpl implements EventRedisService {
                 MktCamItem mktCamItem = mktCamItemMapper.selectByPrimaryKey(Long.valueOf(str));
                 mktCamItemList.add(mktCamItem);
             }
-            redisUtils.set(key, mktCamItemList);
+            // redisUtils.set(key, mktCamItemList);
+            redisUtils.setCache(key, mktCamItemList);
             resutlt.put(key, mktCamItemList);
         } else if (key.startsWith("MKT_CAMCHL_CONF_LIST_")) {
             List<MktCamChlConfDO> mktCamChlConfDOS = new ArrayList<>();
@@ -252,16 +263,19 @@ public class EventRedisServiceImpl implements EventRedisService {
                     MktCamChlConfDO mktCamChlConfDO = mktCamChlConfMapper.selectByPrimaryKey(Long.valueOf(str));
                     mktCamChlConfDOS.add(mktCamChlConfDO);
                 }
-                redisUtils.set(key, mktCamChlConfDOS);
+                // redisUtils.set(key, mktCamChlConfDOS);
+                redisUtils.setCache(key, mktCamChlConfDOS);
                 resutlt.put(key, mktCamChlConfDOS);
             }
         } else if (key.startsWith("MKT_STRATEGY_")) {
             MktStrategyConfDO mktStrategyConfDO = mktStrategyConfMapper.selectByPrimaryKey(id);
-            redisUtils.set(key, mktStrategyConfDO);
+            // redisUtils.set(key, mktStrategyConfDO);
+            redisUtils.setCache(key, mktStrategyConfDO);
             resutlt.put(key, mktStrategyConfDO);
         } else if (key.startsWith("MKT_RULE_")) {
             MktStrategyConfRuleDO mktStrategyConfRuleDO = mktStrategyConfRuleMapper.selectByPrimaryKey(id);
-            redisUtils.set(key, mktStrategyConfRuleDO);
+            // redisUtils.set(key, mktStrategyConfRuleDO);
+            redisUtils.setCache(key, mktStrategyConfRuleDO);
             resutlt.put(key, mktStrategyConfRuleDO);
         } else if (key.startsWith("CHL_CONF_DETAIL_")) {   // 下发渠道基本信息 + 属性
             // 从数据库中获取并拼成mktCamChlConfDetail对象存入redis
@@ -277,12 +291,14 @@ public class EventRedisServiceImpl implements EventRedisService {
             //渠道信息
             Channel channelMessage = contactChannelMapper.selectByPrimaryKey(mktCamChlConfDetail.getContactChlId());
             mktCamChlConfDetail.setContactChlCode(channelMessage.getContactChlCode());
-            redisUtils.set(key, mktCamChlConfDetail);
+            // redisUtils.set(key, mktCamChlConfDetail);
+            redisUtils.setCache(key, mktCamChlConfDetail);
             resutlt.put(key, mktCamChlConfDetail);
         } else if (key.startsWith("MKT_CAM_SCRIPT_")) {  // 下发渠道脚本
             // 数据库中获取脚本存入redis
             CamScript camScript = mktCamScriptMapper.selectByConfId(id);
-            redisUtils.set(key, camScript);
+            // redisUtils.set(key, camScript);
+            redisUtils.setCache(key, camScript);
             resutlt.put(key, camScript);
         } else if (key.startsWith("MKT_VERBAL_")) {  // 下发渠道话术
             List<MktVerbal> mktVerbals = mktVerbalMapper.findVerbalListByConfId(id);
@@ -291,7 +307,8 @@ public class EventRedisServiceImpl implements EventRedisService {
                 VerbalVO verbalVO = BeanUtil.create(mktVerbal, new VerbalVO());
                 verbalVOList.add(verbalVO);
             }
-            redisUtils.set(key, verbalVOList);
+            // redisUtils.set(key, verbalVOList);
+            redisUtils.setCache(key, verbalVOList);
             resutlt.put(key, verbalVOList);
         }
         return resutlt;
@@ -325,7 +342,8 @@ public class EventRedisServiceImpl implements EventRedisService {
             List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("REAL_PROD_FILTER");
             if (sysParamsList != null && sysParamsList.size() > 0) {
                 String realProdFilter = sysParamsList.get(0).getParamValue();
-                redisUtils.set(key, realProdFilter);
+                // redisUtils.set(key, realProdFilter);
+                redisUtils.setCache(key, realProdFilter);
                 resutlt.put(key, realProdFilter);
             }
         } else if ("DATETYPE_TARGOUID_LIST".equals(key)) { // 自定义时间类型标签值
@@ -336,28 +354,33 @@ public class EventRedisServiceImpl implements EventRedisService {
                     Long tarGrpId = tarGrpCondition.getTarGrpId();
                     sb.append(tarGrpId + ",");
                 }
-                redisUtils.set(key, sb.toString());
+                // redisUtils.set(key, sb.toString());
+                redisUtils.setCache(key, sb.toString());
                 resutlt.put(key, sb.toString());
             }
         } else if ("LABEL_CODE_LIST".equals(key)) {
             List<String> labelCodeList = injectionLabelMapper.selectLabelCodeByType("1100"); // 1100 代表为时间类型的标签
-            redisUtils.set(key, labelCodeList);
+            // redisUtils.set(key, labelCodeList);
+            redisUtils.setCache(key, labelCodeList);
             resutlt.put(key, labelCodeList);
         } else if ("COOL_LOGIN_ID_KEY".equals(key)) {
             List<Map<String, String>> sysParam = sysParamsMapper.listParamsByKey("COOL_LOGIN_ID");
-            redisUtils.set(key, sysParam);
+            // redisUtils.set(key, sysParam);
+            redisUtils.setCache(key, sysParam);
             resutlt.put(key, sysParam);
         } else if ("CHANNEL_FILTER_CODE".equals(key)) {  // 渠道话术拦截开关
             List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CHANNEL_FILTER_CODE");
             if (sysParamsList != null && sysParamsList.size() > 0) {
                 String channelFilterCode = sysParamsList.get(0).getParamValue();
-                redisUtils.set(key, channelFilterCode);
+                // redisUtils.set(key, channelFilterCode);
+                redisUtils.setCache(key, channelFilterCode);
                 resutlt.put(key, channelFilterCode);
             }
         } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             List<SysParams> systemParamList = sysParamsMapper.findParamKeyIn("CHECK_LABEL");
             if (systemParamList.size() > 0) {
-                redisUtils.set(key, systemParamList.get(0));
+                // redisUtils.set(key, systemParamList.get(0));
+                redisUtils.setCache(key, systemParamList.get(0));
                 resutlt.put(key, systemParamList.get(0));
             }
         } else if ("SATISFACTION_SURVEY".equals(key)){  // 满意度调查事件(用,分隔)

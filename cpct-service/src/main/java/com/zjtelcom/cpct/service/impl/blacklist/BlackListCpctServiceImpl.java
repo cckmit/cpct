@@ -721,6 +721,7 @@ public class BlackListCpctServiceImpl implements BlackListCpctService {
         }
     }
 
+
     public Map<String,Object> cleanRepeat(Integer begin,Integer end){
         Map<String,Object> parentResultMap = new HashMap<>();
         List<Map<String,Object>> resultList = new ArrayList<>();

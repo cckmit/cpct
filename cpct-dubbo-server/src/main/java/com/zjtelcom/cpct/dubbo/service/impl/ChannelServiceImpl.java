@@ -41,7 +41,7 @@ public class ChannelServiceImpl implements ChannelService {
     private UserListMapper userListMapper;
     @Autowired
     private FilterRuleMapper filterRuleMapper;
-    @Autowired
+    @Autowired(required = false)
     private SyncService syncService;
 
     @Override

@@ -97,6 +97,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
+
     @Override
     public Map<String, Object> saveMktCamChlConf(MktCamChlConfDetail mktCamChlConfDetail) {
         MktCamChlConfDO mktCamChlConfDO = new MktCamChlConfDO();
@@ -316,7 +317,7 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     if (organization != null) {
                         mktCamChlConfAttr.setAttrValName(organization.getOrgName());
                     }
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_CUSTOMER.getArrId()) || mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_AREA.getArrId())){
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_CUSTOMER.getArrId()) || mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_AREA.getArrId()) ||  mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ACCOUNT.getArrId()) ){
                     Map<String, Object> map = injectionLabelMapper.selectDistributeLabelByCode(mktCamChlConfAttr.getAttrValue());
                     if (map != null) {
                         mktCamChlConfAttr.setAttrValName((String) map.get("labelName"));
