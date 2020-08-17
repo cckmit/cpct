@@ -152,7 +152,7 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value) {
+    public boolean setCache(final String key, Object value) {
         boolean result = false;
         try {
             // 存入本地缓存
@@ -163,6 +163,54 @@ public class RedisUtils {
             result = setRedis(key, value);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 写入缓存
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public boolean set(final String key, Object value) {
+        boolean result = false;
+        try {
+            // 存入redis缓存
+            result = setRedis(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    /**
+     * 读取缓存
+     *
+     * @param key
+     * @return
+     */
+    public Object get(final String key) {
+        boolean getByLocalCatch = isGetByLocalCatch(key);
+        Object result = null;
+        if(getByLocalCatch){
+            caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
+            result = caffeineCache.asMap().get(String.valueOf(key));
+            System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
+            if (result != null) {
+                return result;
+            }
+            // 从redis缓存取数据
+            result = getRedis(key);
+            // 本地缓存中无值则再存一次本地缓存
+            if (result != null) {
+                caffeineCache.put(key, result);
+            }
+        } else {
+            // 从redis缓存取数据
+            result = getRedis(key);
         }
         return result;
     }
@@ -378,29 +426,6 @@ public class RedisUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * 读取缓存
-     *
-     * @param key
-     * @return
-     */
-    public Object get(final String key) {
-        Object result = null;
-/*        caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
-        result = caffeineCache.asMap().get(String.valueOf(key));
-        System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
-        if(result!=null){
-            return result;
-        }*/
-        // 从redis缓存取数据
-        result = getRedis(key);
-        // 本地缓存中无值则再存一次本地缓存
-        if (result != null) {
-            caffeineCache.put(key, result);
-        }
-        return result;
     }
 
 
@@ -727,6 +752,48 @@ public class RedisUtils {
     public boolean getSwitch(String key) {
         String redisOrSysParams = getRedisOrSysParams(key);
         if ("1".equals(redisOrSysParams)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private boolean isGetByLocalCatch(String key){
+        if (key.startsWith("MKT_FILTER_RULE_IDS_")) { // 过滤规则Id
+            return true;
+        } else if (key.startsWith("FILTER_RULE_")) { // 过滤规则
+            return true;
+        } else if (key.startsWith("FILTER_RULE_DISTURB_")) {  // 过滤规则信息查询失败
+            return true;
+        } else if (key.startsWith("MKT_ISALE_LABEL_")) {
+            return true;
+        } else if (key.startsWith("RULE_ALL_LABEL_")) {
+            return true;
+        } else if (key.startsWith("MKT_CAM_ITEM_LIST_")) {
+            return true;
+        } else if (key.startsWith("MKT_CAMCHL_CONF_LIST_")) {
+            return true;
+        } else if (key.startsWith("MKT_STRATEGY_")) {
+            return true;
+        } else if (key.startsWith("MKT_RULE_")) {
+            return true;
+        } else if (key.startsWith("CHL_CONF_DETAIL_")) {   // 下发渠道基本信息 + 属性
+            return true;
+        } else if (key.startsWith("MKT_CAM_SCRIPT_")) {  // 下发渠道脚本
+            return true;
+        } else if (key.startsWith("MKT_VERBAL_")) {  // 下发渠道话术
+            return true;
+        }else if ("REAL_PROD_FILTER".equals(key)) { // 实时销售品过滤开关
+            return true;
+        } else if ("DATETYPE_TARGOUID_LIST".equals(key)) { // 自定义时间类型标签值
+            return true;
+        } else if ("LABEL_CODE_LIST".equals(key)) {
+            return true;
+        } else if ("COOL_LOGIN_ID_KEY".equals(key)) {
+            return true;
+        } else if ("CHANNEL_FILTER_CODE".equals(key)) {  // 渠道话术拦截开关
+            return true;
+        } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             return true;
         }
         return false;
