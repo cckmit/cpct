@@ -381,6 +381,11 @@ public class TestController extends BaseController {
         return camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(params, params.get("eventCode").toString(),params.get("lanId").toString());
     }
 
+@Test
+public void  ssf (){
+    String s = "【省】ZJX-isee资产测试-0630";
+    System.out.println(s.substring(3,s.length()));
+}
 
     @Test
     public void SSSSSSS() {

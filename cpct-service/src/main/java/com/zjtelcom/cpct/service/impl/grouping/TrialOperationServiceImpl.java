@@ -865,6 +865,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未找到有效的活动策略或规则");
             return result;
         }
+        if (confRule.getEvtContactConfId()==null || confRule.getEvtContactConfId().equals("")){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未查找到有效的渠道配置");
+            return result;
+        }
         campaign.setBatchType("1000");
         campaignMapper.updateByPrimaryKey(campaign);
         TrialOperation op = null;

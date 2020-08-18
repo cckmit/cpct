@@ -186,35 +186,6 @@ public class RedisUtils {
     }
 
 
-    /**
-     * 读取缓存
-     *
-     * @param key
-     * @return
-     */
-    public Object get(final String key) {
-        boolean getByLocalCatch = isGetByLocalCatch(key);
-        Object result = null;
-        if(getByLocalCatch){
-            caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
-            result = caffeineCache.asMap().get(String.valueOf(key));
-            System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
-            if (result != null) {
-                return result;
-            }
-            // 从redis缓存取数据
-            result = getRedis(key);
-            // 本地缓存中无值则再存一次本地缓存
-            if (result != null) {
-                caffeineCache.put(key, result);
-            }
-        } else {
-            // 从redis缓存取数据
-            result = getRedis(key);
-        }
-        return result;
-    }
-
 
     public boolean del(final  String key){
         boolean result = false;
@@ -335,6 +306,30 @@ public class RedisUtils {
         return result;
     }
 
+
+    public boolean hdelRedis(final String key, String field ) {
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                if(jedis.exists(key)) {
+                    jedis.hdel(key,field);
+                    result = true;
+                }
+            } catch (Throwable je) {
+                System.out.println("REDIS_EDL*********" + key + field);
+                je.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIS_EDL2*********" + key + field);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 批量删除对应的value
      *
@@ -428,6 +423,36 @@ public class RedisUtils {
         }
     }
 
+    /**
+     * 读取缓存
+     *
+     * @param key
+     * @return
+     */
+    public Object get(final String key) {
+        boolean getByLocalCatch = isGetByLocalCatch(key);
+        Object result = null;
+        if(getByLocalCatch){
+            caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
+            result = caffeineCache.asMap().get(String.valueOf(key));
+            System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
+            if (result != null) {
+                return result;
+            }
+            // 从redis缓存取数据
+            result = getRedis(key);
+            System.out.println("从redis获取缓存数据--->>>" + JSON.toJSONString(result));
+            // 本地缓存中无值则再存一次本地缓存
+            if (result != null) {
+                caffeineCache.put(key, result);
+            }
+        } else {
+            // 从redis缓存取数据
+            result = getRedis(key);
+        }
+        return result;
+    }
+
 
     /**
      * 更换集团redis方法
@@ -486,6 +511,37 @@ public class RedisUtils {
         }
         return result;
     }
+
+    /**
+     * hash存储Redis
+     * @param key
+     * @param field
+     * @param value
+     * @return
+     */
+    public boolean hsetUnit(final String key, String field, Object value,int seconds) {
+        boolean result = false;
+        try {
+            ProxyJedis jedis = new ProxyJedis();
+            try {
+                jedis = ctgJedisPool.getResource();
+                jedis.hset(key, field, serialize(value));
+                jedis.expire(key,seconds);
+                result = true;
+            } catch (Exception e) {
+                System.out.println("REDIShset*********" + key);
+                e.printStackTrace();
+            } finally {
+                jedis.close();
+            }
+        } catch (Exception e) {
+            System.out.println("REDIShset2*********" + key);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
 
 
@@ -756,7 +812,6 @@ public class RedisUtils {
         }
         return false;
     }
-
 
     private boolean isGetByLocalCatch(String key){
         if (key.startsWith("MKT_FILTER_RULE_IDS_")) { // 过滤规则Id

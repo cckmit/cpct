@@ -2243,13 +2243,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignMapper.changeMktCampaignStatus(mktCampaignId, statusCd, new Date(),UserUtil.loginId());
             // 判断是否是发布活动, 是该状态生效
             if (STATUS_CODE_PUBLISHED.getStatusCode().equals(statusCd) || StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)|| StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
-                try {
-                    eventRedisService.deleteByCampaign(mktCampaignId);
-                    logger.info("【活动缓存清理成功】：" + mktCampaignDO.getMktCampaignName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("【活动缓存清理失败】：" + mktCampaignDO.getMktCampaignName());
-                }
                 // 删除准生产的redis缓存
                 synchronizeCampaignService.deleteCampaignRedisPre(mktCampaignId);
                 List<MktCamResultRelDO> mktCamResultRelDOS = mktCamResultRelMapper.selectResultByMktCampaignId(mktCampaignId);
@@ -2297,6 +2290,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     logger.error("[op:MktCampaignServiceImpl] 缓存添加失败 by mktCampaignId = {}, Expection = ", mktCampaignId, e);
                 }
                 syncCamData2Synergy(mktCampaignDO);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(3000);
+                            eventRedisService.deleteByCampaign(mktCampaignId);
+                            logger.info("【活动缓存清理成功】：" + mktCampaignDO.getMktCampaignName());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            logger.error("【活动缓存清理失败】：" + mktCampaignDO.getMktCampaignName());
+                        }
+                    }
+                }.start();
+
                 // 对象转换
                 if (SystemParamsUtil.isCampaignSync()) {
                     // 发布活动异步同步活动到生产环境
