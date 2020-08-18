@@ -859,7 +859,14 @@ public class EventApiServiceImpl implements EventApiService {
                     String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
                     String isBind = (String) reultMap.get(followFlgType);
                     // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
+                    String contactNumberStr = (String) evtParams.get("CPCP_ORDER_PHONE");
+                    String contactNumber = "";
+                    log.info("contactNumberStr_1120 --->>>" + contactNumberStr);
+                    if (contactNumberStr != null) {
+                        String[] split = contactNumberStr.split(",");
+                        contactNumber = split[0];
+                        log.info("contactNumber_1120 --->>>" + contactNumber);
+                    }
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
@@ -932,7 +939,14 @@ public class EventApiServiceImpl implements EventApiService {
                     String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
                     String isBind = (String) reultMap.get(followFlgType);
                     // 联系号码-事件采集项
-                    String contactNumber = (String) evtParams.get("CPCP_ORDER_PHONE");
+                    String contactNumberStr = (String) evtParams.get("CPCP_ORDER_PHONE");
+                    String contactNumber = "";
+                    log.info("contactNumberStr_1121 --->>>" + contactNumberStr);
+                    if (contactNumberStr != null) {
+                        String[] split = contactNumberStr.split(",");
+                        contactNumber = split[0];
+                        log.info("contactNumber_1121 --->>>" + contactNumber);
+                    }
                     // 1为绑定公众号，0 为不绑定公众号
                     log.info("111---isBind --->" + isBind);
                     if ("1".equals(isBind)) {
