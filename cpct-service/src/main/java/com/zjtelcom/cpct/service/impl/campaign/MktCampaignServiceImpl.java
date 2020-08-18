@@ -4123,7 +4123,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 List<TrialOperation> trialOperationList = trialOperationMapper.listOperationByCamIdAndStatusCd2(mktCampaignDO.getMktCampaignId(), "(7300, 8100)");
                 for (TrialOperation trialOperation : trialOperationList) {
                     Map<String, Object> params = new HashMap<>();
-                    params.put("id", trialOperation.getId());  // 试运算Id
+                    params.put("id", trialOperation.getId()==null?0:trialOperation.getId().intValue());  // 试运算Id
                     params.put("effectDate", new Date());  // 生效时间
                     params.put("invalidDate", new Date()); // 失效时间
                     projectManageService.updateProjectStateTime(params);

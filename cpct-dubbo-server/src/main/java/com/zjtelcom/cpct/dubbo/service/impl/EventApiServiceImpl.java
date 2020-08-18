@@ -1132,6 +1132,7 @@ public class EventApiServiceImpl implements EventApiService {
                 //套餐生效套餐变更事件，畅享套餐变更生效事件
                 if("EVTS000001138".equals(eventCode) || "EVTS000001139".equals(eventCode) || "EVTS000001140".equals(eventCode) || "EVTS000001142".equals(eventCode) || "EVTS000001143".equals(eventCode)){
                     log.info("接入事件： "+ eventCode);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
                     log.info("销售品编码"+ offerNbr);
                     List<OfferExpenseDO> offerExpenseDO = commonRegionMapper.getExpenseByOfferNbr(offerNbr);
@@ -1141,28 +1142,28 @@ public class EventApiServiceImpl implements EventApiService {
                     Long CPCP_TOTAL_TIME = 0L; //总时长（分钟）
                     for(OfferExpenseDO offerExpe: offerExpenseDO){
                         if(offerExpe.getTemplateInstName().contains("语音")){
-                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
+                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
                         }
                         if(offerExpe.getTemplateInstName().contains("流量")){
-                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
+                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
                         }
                        offerName = offerExpe.getTemplateInstName();
                         amount = offerExpe.getAmount();
                     }
-                    log.info("offerName: "+ offerName);
-                    log.info("amount: "+ amount);
-                    log.info("CPCP_TOTAL_FLOW: "+ CPCP_TOTAL_FLOW);
-                    log.info("CPCP_TOTAL_TIME: "+ CPCP_TOTAL_TIME);
 
-                    evtContent.put("CPCP_VIR_SUB_NAME", offerName);
-                    evtContent.put("CPCP_EXPENSES", amount);
-                    evtContent.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW);
-                    evtContent.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME);
+                    reultMap.put("CPCP_VIR_SUB_NAME", offerName);
+                    reultMap.put("CPCP_EXPENSES", amount.toString());
+                    reultMap.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW.toString());
+                    reultMap.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME.toString());
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+                    log.info("resultMapList" + resultMapList);
 
                 }
 
                 //5G套餐办理变更事件
                 if("EVTS000001141".equals(eventCode)){
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
                     log.info("接入事件： "+ eventCode);
                     List<OfferExpenseDO> offerExpenseDO = commonRegionMapper.getExpenseByOfferNbr(offerNbr);
@@ -1173,29 +1174,27 @@ public class EventApiServiceImpl implements EventApiService {
                     Long CPCP_TOTAL_TIME = 0L; //总时长（分钟）
                     for(OfferExpenseDO offerExpe: offerExpenseDO){
                         if(offerExpe.getTemplateInstName().contains("语音")){
-                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
+                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
                         }
                         if(offerExpe.getTemplateInstName().contains("流量")){
-                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
+                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
                         }
                         offerName = offerExpe.getTemplateInstName();
                         amount = offerExpe.getAmount();
                     }
-                    evtContent.put("CPCP_VIR_SUB_NAME", offerName);
-                    evtContent.put("CPCP_EXPENSES", amount);
-                    evtContent.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW);
-                    evtContent.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME);
+                    reultMap.put("CPCP_VIR_SUB_NAME", offerName);
+                    reultMap.put("CPCP_EXPENSES", amount.toString());
+                    reultMap.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW.toString());
+                    reultMap.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME.toString());
                     String phone = map.get("accNbr");
                     String areaId = AreaCodeEnum.getAreaNameByLanId(Long.parseLong(map.get("lanId")));
                     Map<String,Object> paswMap = channelService.getUamServicePswd(phone,areaId,custId);
                     String pasw =(String)paswMap.get("password");
-                    evtContent.put("CPCP_SERVICE_PSWD", pasw);
+                    reultMap.put("CPCP_SERVICE_PSWD", pasw);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
 
-                    log.info("offerName: "+ offerName);
-                    log.info("amount: "+ amount);
-                    log.info("CPCP_TOTAL_FLOW: "+ CPCP_TOTAL_FLOW);
-                    log.info("CPCP_TOTAL_TIME: "+ CPCP_TOTAL_TIME);
-                    log.info("CPCP_SERVICE_PSWD: "+ pasw);
+                    log.info("resultMapList" + resultMapList);
 
                 }
 
