@@ -210,7 +210,7 @@
         AND CAMPAIGN_ID = #{campaignId}
       </if>
       <if test="statusCd != null">
-        AND STATUS_CD IN #{statusCd}
+        AND STATUS_CD IN ${statusCd}
       </if>
     </where>
   </select>
