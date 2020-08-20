@@ -1037,6 +1037,19 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                             resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                             resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+                            // 查询主题
+                            resultMap.put("theMeValue", "");
+                            TopicLabelValue topicLabelValue = labelValueMapper.selectByValue(mktCampaignDO.getTheMe());
+                            if (topicLabelValue != null) {
+                                resultMap.put("theMeValue", topicLabelValue.getValueName());
+                            }
+
+                            // 查询目录
+                            resultMap.put("catalogItemName", "");
+                            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                            if (catalogItem != null) {
+                                resultMap.put("catalogItemName", catalogItem.getCatalogItemName());
+                            }
 
                             //关单规则名称
 //                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
