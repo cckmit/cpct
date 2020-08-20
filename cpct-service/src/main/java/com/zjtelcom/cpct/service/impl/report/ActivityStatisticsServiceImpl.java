@@ -691,7 +691,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             if (catalogItem != null) {
                                 resultMap.put("catalogItemName", catalogItem.getCatalogItemName());
                             }
-
+                            Date parentStartTime = null;
+                            Date parentEndTime = null;
                             // 查询父活动
                             List<MktCampaignRelDO> mktCampaignRelDOS = mktCampaignRelMapper.selectByZmktCampaignId(mktCampaignDO.getMktCampaignId(), "1000");
                             if (mktCampaignRelDOS != null && mktCampaignRelDOS.size() > 0 && mktCampaignRelDOS.get(0)!=null) {
@@ -699,7 +700,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                 if (mktCampaign != null) {
                                     resultMap.put("parentActivityNbr", mktCampaign.getMktActivityNbr()==null?"":mktCampaign.getMktActivityNbr());
                                     resultMap.put("parentStartTime", mktCampaign.getPlanBeginTime()==null?"":mktCampaign.getPlanBeginTime());
+                                    parentStartTime = mktCampaign.getPlanBeginTime();
                                     resultMap.put("parentEndTime", mktCampaign.getPlanEndTime()==null?"":mktCampaign.getPlanBeginTime());
+                                    parentEndTime = mktCampaign.getPlanEndTime();
+                                } else {
+                                    resultMap.put("parentActivityNbr", "");
                                 }
                             }
 
@@ -810,14 +815,28 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         msgMap.put("nub", "是");
                                         statisicts.add(msgMap);
                                         HashMap<String, Object> parentActivityNbrMap = new HashMap<>();
-                                        parentActivityNbrMap.put("name", "对应框架母活动编码");
-                                        parentActivityNbrMap.put("nub", resultMap.get("parentActivityNbr"));
-                                        statisicts.add(parentActivityNbrMap);
+                                        if (resultMap.get("parentActivityNbr") != null) {
+                                            parentActivityNbrMap.put("name", "对应框架母活动编码");
+                                            parentActivityNbrMap.put("nub", resultMap.get("parentActivityNbr"));
+                                            statisicts.add(parentActivityNbrMap);
+                                        } else {
+                                            parentActivityNbrMap.put("name", "对应框架母活动编码");
+                                            parentActivityNbrMap.put("nub", "");
+                                            statisicts.add(parentActivityNbrMap);
+                                        }
 
-                                        HashMap<String, Object> startEndTimeMap = new HashMap<>();
-                                        startEndTimeMap.put("name", "对应母框架活动生效时间");
-                                        startEndTimeMap.put("nub", fmt.format(resultMap.get("parentStartTime")) + "-" + fmt.format(resultMap.get("parentEndTime")));
-                                        statisicts.add(startEndTimeMap);
+                                        if(parentStartTime!=null && parentEndTime!=null){
+                                            HashMap<String, Object> startEndTimeMap = new HashMap<>();
+                                            startEndTimeMap.put("name", "对应母框架活动生效时间");
+                                            startEndTimeMap.put("nub", fmt.format(parentStartTime) + "-" + fmt.format(parentEndTime));
+                                            statisicts.add(startEndTimeMap);
+                                        } else {
+                                            HashMap<String, Object> startEndTimeMap = new HashMap<>();
+                                            startEndTimeMap.put("name", "对应母框架活动生效时间");
+                                            startEndTimeMap.put("nub", "");
+                                            statisicts.add(startEndTimeMap);
+                                        }
+
 
                                     } else {
                                         msgMap.put("name", "是否框架子活动");
@@ -1018,6 +1037,19 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                             resultMap.put("beginTime", fmt.format(mktCampaignDO.getPlanBeginTime()));
                             resultMap.put("endTime", fmt.format(mktCampaignDO.getPlanEndTime()));
                             resultMap.put("mktActivityBnr", mktCampaignDO.getMktActivityNbr());
+                            // 查询主题
+                            resultMap.put("theMeValue", "");
+                            TopicLabelValue topicLabelValue = labelValueMapper.selectByValue(mktCampaignDO.getTheMe());
+                            if (topicLabelValue != null) {
+                                resultMap.put("theMeValue", topicLabelValue.getValueName());
+                            }
+
+                            // 查询目录
+                            resultMap.put("catalogItemName", "");
+                            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                            if (catalogItem != null) {
+                                resultMap.put("catalogItemName", catalogItem.getCatalogItemName());
+                            }
 
                             //关单规则名称
 //                        String CloseRuleName = mktCampaignMapper.getCloseRuleNameFromMktCamId(mktCampaignDO.getMktCampaignId());
