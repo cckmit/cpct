@@ -720,7 +720,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
             detail.setTarGrpConditions(allCondition);
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            redisUtils.del("TAR_GRP_"+tarGrp.getTarGrpId());
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "修改成功！");

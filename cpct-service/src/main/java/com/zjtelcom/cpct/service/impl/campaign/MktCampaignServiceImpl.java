@@ -975,11 +975,11 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 String mktActivityNbr = mktCampaignDO1.getMktActivityNbr();
 
                 if ("C1".equals(mktCampaignDO1.getRegionFlg()) || "C2".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" + campaignNameLast  +"_"+ mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【省】" + "_" + catalogName +"_" + campaignNameLast + "_" +  datestr);
                 }else if ("C3".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" +campaignNameLast +"_"+  mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【市】" + c3Name +"_" + catalogName +"_" +campaignNameLast  + "_" +  datestr);
                 }else if ("C4".equals(mktCampaignDO1.getRegionFlg())){
-                    mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + campaignNameLast +"_"+  mktActivityNbr + "_" +  datestr);
+                    mktCampaignDO.setMktCampaignName("【区】" + c3Name + c4Name +"_"+ catalogName +"_" + campaignNameLast + "_" +  datestr);
                 }
 
                 if(isFrame && regionName != ""){
