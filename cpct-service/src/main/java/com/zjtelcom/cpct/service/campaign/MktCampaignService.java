@@ -92,4 +92,6 @@ public interface MktCampaignService {
 
     void redisTest(String key, Long id);
 
+    Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params);
+
 }

@@ -36,4 +36,6 @@ public interface SysParamsMapper {
     int delectConsumerlogByDate(@Param("createDate")String s);
 
     SysParams selectByParamKey(@Param("paramKey")String paramKey);
+
+    List<String> listValueByKey(String key,String withoutList);
 }

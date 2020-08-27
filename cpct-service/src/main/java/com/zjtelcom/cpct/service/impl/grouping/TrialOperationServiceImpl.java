@@ -1754,6 +1754,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add("CCUST_ROW_ID");
         }if (!codeList.contains("ASSET_NUMBER")){
             codeList.add("ASSET_NUMBER");
+        }if (!codeList.contains("COMM_LVL3_ID")){
+            codeList.add("COMM_LVL3_ID");
+        }if (!codeList.contains("COMM_LVL4_ID")){
+            codeList.add("COMM_LVL4_ID");
         }
         //策略下所有分群条件加入
         if (ruleCodeList!=null){

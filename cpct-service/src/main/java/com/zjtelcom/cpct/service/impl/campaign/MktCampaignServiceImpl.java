@@ -74,6 +74,7 @@ import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
 import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import javafx.scene.input.DataFormat;
+import lombok.experimental.var;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,91 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
+    @Override
+    public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
+        Map<String,Object> result = new HashMap<>();
+        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+        RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
+        if (requestInfo==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未查询到有效的需求函信息");
+            result.put("flg","false");
+            return result;
+        }
+        String level = UserUtil.getSysUserLevel();
+        String key = requestInfo.getActivitiKey();
+        Map<String,Object> data = new HashMap<>();
+        String campaignType = "";
+        String chufaType = "";
+        String periodType = "";
+
+        if ("C1".equals(level) || "C2".equals(level)){
+            addParam(requestInfo, key,campaignType,chufaType,data);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "");
+            result.put("flg","true");
+            result.put("data",data);
+            return result;
+        }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
+            result.put("flg","false");
+            return result;
+        }
+        if ("C3".equals(level)){
+            addParam(requestInfo, key,campaignType,chufaType,data);
+                result.put("resultCode", CODE_SUCCESS);
+                result.put("resultMsg", "");
+                result.put("flg","true");
+                result.put("data",data);
+                return result;
+        }
+        if ("C4".equals(level) ){
+            if (!requestInfo.getBusinessType().equals("1000")){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
+                result.put("flg","false");
+                return result;
+            }
+            addParam(requestInfo, key,campaignType,chufaType,data);
+            result.put("resultCode", CODE_SUCCESS);
+            result.put("resultMsg", "");
+            result.put("flg","true");
+            result.put("data",data);
+            return result;
+        }
+        if ("C5".equals(level) ){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "无法创建活动");
+            result.put("flg","false");
+            return result;
+        }
+        return result;
+    }
+
+    private void addParam(RequestInfo requestInfo, String key, String campaignType,String chufaType, Map<String,Object> data) {
+        switch (key){
+            case "mkt_province_ser_process"://服务（随销）活动
+                campaignType = "5000";
+                ;
+            case "mkt_free_city_process"://地市自主活动
+                campaignType = "1000";
+                ;
+            case "mkt_free_province_process"://省自主活动
+                campaignType = "1000";
+                ;
+            case "mkt_force_province"://框架活动
+                campaignType = "1000";
+                ;
+                if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
+                    chufaType = "1000";
+                }else {
+                    chufaType = "2000";
+                }
+        }
+        data.put("campaignType",campaignType);
+        data.put("chufaType",chufaType);
+    }
 
     // 集团活动承接接口
     @Override

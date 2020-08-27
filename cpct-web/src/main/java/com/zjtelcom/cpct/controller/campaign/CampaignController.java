@@ -67,6 +67,25 @@ public class CampaignController extends BaseController {
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
 
+    /**
+     * 需求函类型限制活动类型校验
+     * @param param
+     * @return
+     */
+    @PostMapping(value = "/checkCampaignByRequestInfo")
+    @CrossOrigin
+    public Map<String, Object> checkCampaignByRequestInfo(@RequestBody  Map<String,Object> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result =  mktCampaignService.checkCampaignByRequestInfo(param);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
+
     @RequestMapping(value = "openCampaignScheForDay", method = RequestMethod.POST)
     @CrossOrigin
     public String openCampaignScheForDay() {
