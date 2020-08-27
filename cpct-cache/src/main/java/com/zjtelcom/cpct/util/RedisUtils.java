@@ -431,6 +431,16 @@ public class RedisUtils {
      */
     public Object get(final String key) {
         boolean getByLocalCatch = isGetByLocalCatch(key);
+        String prodFilter = "0";
+        List<Map<String, String>> sysFilList = sysParamsMapper.listParamsByKey(key);
+        if (sysFilList != null && !sysFilList.isEmpty()) {
+            prodFilter = sysFilList.get(0).get("value");
+            if("0".equals(prodFilter)){
+                getByLocalCatch = false;
+                System.out.println("本地缓存开关 --->关闭, getByLocalCatch" + getByLocalCatch);
+            }
+        }
+
         Object result = null;
         if(getByLocalCatch){
             caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null

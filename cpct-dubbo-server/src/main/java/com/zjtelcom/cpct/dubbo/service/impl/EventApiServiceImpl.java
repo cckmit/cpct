@@ -1188,7 +1188,12 @@ public class EventApiServiceImpl implements EventApiService {
                     reultMap.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME.toString());
                     String phone = map.get("accNbr");
                     String areaId = AreaCodeEnum.getAreaNameByLanId(Long.parseLong(map.get("lanId")));
-                    Map<String,Object> paswMap = channelService.getUamServicePswd(phone,areaId,custId);
+                    Map<String,Object> paswMap = new HashMap<>();
+                    try {
+                        paswMap =channelService.getUamServicePswd(phone,areaId,custId);
+                    }catch ( Exception e){
+                        e.printStackTrace();
+                    }
                     String pasw =(String)paswMap.get("password");
                     reultMap.put("CPCP_SERVICE_PSWD", pasw);
                     resultMapList.clear();

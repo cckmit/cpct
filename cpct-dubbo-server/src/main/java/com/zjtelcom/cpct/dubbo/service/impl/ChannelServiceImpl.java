@@ -21,6 +21,8 @@ import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MD5Util;
 import com.zjtelcom.cpct.util.UserUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,7 @@ public class ChannelServiceImpl implements ChannelService {
     private FilterRuleMapper filterRuleMapper;
     @Autowired(required = false)
     private SyncService syncService;
-
+    private static final Logger log = LoggerFactory.getLogger(EventApiServiceImpl.class);
     @Override
     public RetChannel getChannelDetail(String channelCode) {
         RetChannel ret = new RetChannel();
@@ -171,10 +173,17 @@ public class ChannelServiceImpl implements ChannelService {
 
         Map<String,Object> extMap = new HashMap<>();
         Map<String,Object> result = syncService.queryPassword(headMap,bodyMap,extMap);
+        log.info("统一平台服务密码获取结果：" + result);
+        Map<String,String> msghead =(Map) result.get("msghead");
 
-        JSONObject content = JSON.parseObject((String)result.get("msgbody"));
-        String password  = content.getJSONObject("DATA").getString("password");
-        result.put("password",password);
+        if("1".equals(msghead.get("result_code"))){
+            JSONObject content = JSON.parseObject((String)result.get("msgbody"));
+            String password  = content.getJSONObject("DATA").getString("password");
+            result.put("password",password);
+        }else {
+            result.put("password","服务密码获取失败");
+            log.info("统一平台服务密码获取失败：" + (String)result.get("result_msg"));
+        }
         return result;
     }
 }

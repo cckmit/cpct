@@ -420,9 +420,6 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
                         maps.put("resultMsg", "请选择下拉框运算类型");
                         return maps;
                     }
-//                    if (tarGrpCondition.getAreaIdList()!=null){
-//                        area2RedisThread(tarGrp, tarGrpCondition);
-//                    }
                     tarGrpCondition.setConditionId(null);
                     tarGrpCondition.setRootFlag(0L);
                     tarGrpCondition.setRemark(tarGrpCondition.getRemark()==null ? "2000" : tarGrpCondition.getRemark());
@@ -720,7 +717,7 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
             }
             TarGrpDetail detail = BeanUtil.create(tarGrp,new TarGrpDetail());
             detail.setTarGrpConditions(allCondition);
-            redisUtils.set("TAR_GRP_"+tarGrp.getTarGrpId(),detail);
+            redisUtils.del("TAR_GRP_"+tarGrp.getTarGrpId());
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("resultMsg", "修改成功！");

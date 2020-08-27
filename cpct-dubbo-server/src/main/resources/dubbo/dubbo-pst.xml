@@ -185,10 +185,14 @@
         <dubbo:method name="getEventListByOffer" servicecode="00.1083.getEventListByOffer" timeout="10000" />
     </dubbo:service>
 
-
     <!-- 统一平台获取服务密码 -->
     <dubbo:reference registry="esb3" interface="com.zjpii.biz.service.uam.SyncService" id="SyncService" version="1.0" check="false">
-        <dubbo:method name="queryPassword" servicecode="33.1016.queryPassword" timeout="10000" />
+        <dubbo:method name="queryPassword" servicecode="33.1016.queryPassword" timeout="3000" />
     </dubbo:reference>
 
+    <!--黑名单删除接口，受理拆机调用-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.BlackListService" ref="blackListServiceImpl"
+                   version="1.0">
+        <dubbo:method name="deleteBlackList" servicecode="00.1083.deleteBlackList" timeout="10000"/>
+    </dubbo:service>
 </beans>
