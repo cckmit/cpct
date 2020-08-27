@@ -4146,4 +4146,39 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         System.out.println("result ->" + JSON.toJSONString(redis));
     }
 
+    @Override
+    public Map<String, Object> updateStaffById(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 修改活动信息
+            MktCampaignDO mktCampaignDO = new MktCampaignDO();
+            Long mktCampaignId = Long.valueOf(params.get("mktCampaignId").toString());
+            mktCampaignDO.setMktCampaignId(mktCampaignId);
+            mktCampaignDO.setCreateStaff(Long.valueOf(params.get("sysUserId").toString()));
+            String contName = (String) params.get("name");
+            String department = (String) params.get("department");
+            Long staffId = Long.valueOf(params.get("staffId").toString());
+            logger.info("mktCampaignDO --->>>" + JSON.toJSONString(mktCampaignDO));
+            mktCampaignMapper.updateStaffById(mktCampaignDO);
+            // 修改需求函
+            List<RequestInstRel> requestInstRelList = requestInstRelMapper.selectByCampaignId(mktCampaignId, "mkt");
+            for (RequestInstRel requestInstRel : requestInstRelList) {
+                RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInstRel.getRequestInfoId());
+                requestInfo.setContName(contName);
+                requestInfo.setDeptCode(department);
+                requestInfo.setCreateStaff(staffId);
+                logger.info("requestInfo --->>>" + JSON.toJSONString(requestInfo));
+                requestInfoMapper.updateByPrimaryKey(requestInfo);
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "成功");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "失败");
+            return resultMap;
+        }
+    }
+
 }

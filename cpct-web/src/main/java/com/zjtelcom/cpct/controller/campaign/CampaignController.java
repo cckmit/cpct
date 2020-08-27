@@ -796,4 +796,17 @@ public class CampaignController extends BaseController {
         return result;
     }
 
+    @PostMapping(value = "/updateStaffById")
+    @CrossOrigin
+    public Map<String, Object> updateStaffById(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            return mktCampaignService.updateStaffById(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return result;
+    }
+
 }

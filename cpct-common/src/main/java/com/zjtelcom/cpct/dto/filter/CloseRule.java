@@ -40,7 +40,15 @@ public class CloseRule extends BaseEntity implements Serializable{
     private String noteThree;
     private String noteFour;
     private String noteFive;
+    private String regionFlg;
 
+    public String getRegionFlg() {
+        return regionFlg;
+    }
+
+    public void setRegionFlg(String regionFlg) {
+        this.regionFlg = regionFlg;
+    }
 
     public Long getConditionId() {
         return conditionId;
