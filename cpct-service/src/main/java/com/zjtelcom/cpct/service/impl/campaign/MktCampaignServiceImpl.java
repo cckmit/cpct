@@ -4155,7 +4155,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             Long mktCampaignId = Long.valueOf(params.get("mktCampaignId").toString());
             mktCampaignDO.setMktCampaignId(mktCampaignId);
             mktCampaignDO.setCreateStaff(Long.valueOf(params.get("sysUserId").toString()));
+            mktCampaignDO.setUpdateDate(new Date());
             String contName = (String) params.get("name");
+            String tel = (String) params.get("tel");
             String department = (String) params.get("department");
             Long staffId = Long.valueOf(params.get("staffId").toString());
             logger.info("mktCampaignDO --->>>" + JSON.toJSONString(mktCampaignDO));
@@ -4165,8 +4167,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             for (RequestInstRel requestInstRel : requestInstRelList) {
                 RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInstRel.getRequestInfoId());
                 requestInfo.setContName(contName);
+                requestInfo.setContTele(tel);
                 requestInfo.setDeptCode(department);
                 requestInfo.setCreateStaff(staffId);
+                requestInfo.setUpdateDate(new Date());
                 logger.info("requestInfo --->>>" + JSON.toJSONString(requestInfo));
                 requestInfoMapper.updateByPrimaryKey(requestInfo);
             }
