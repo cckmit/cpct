@@ -311,13 +311,13 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     if (questionnaire != null) {
                         mktCamChlConfAttr.setAttrValName(questionnaire.getNaireName());
                     }
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_AREA.getArrId())){
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_AREA.getArrId()) && !mktCamChlConfAttr.getAttrValue().equals("")){
                     // 获取营销组织树的名称
                     Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                     if (organization != null) {
                         mktCamChlConfAttr.setAttrValName(organization.getOrgName());
                     }
-                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_CUSTOMER.getArrId()) || mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_AREA.getArrId()) ||  mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ACCOUNT.getArrId()) ){
+                } else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_CUSTOMER.getArrId()) || mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ISEE_LABEL_AREA.getArrId())  ){
                     Map<String, Object> map = injectionLabelMapper.selectDistributeLabelByCode(mktCamChlConfAttr.getAttrValue());
                     if (map != null) {
                         mktCamChlConfAttr.setAttrValName((String) map.get("labelName"));
@@ -328,6 +328,11 @@ public class MktCamChlConfServiceImpl extends BaseService implements MktCamChlCo
                     if (mktCamChlConfAttr.getAttrValue() != null) {
                         ServicePackage servicePackage = servicePackageMapper.selectByPrimaryKey(Long.valueOf(mktCamChlConfAttr.getAttrValue()));
                         mktCamChlConfAttr.setAttrValName(servicePackage.getServicePackageName());
+                    }
+                }else if(mktCamChlConfAttr.getAttrId().equals(ConfAttrEnum.ACCOUNT.getArrId())){
+                    if (mktCamChlConfAttr.getAttrValue() != null && !mktCamChlConfAttr.getAttrValue().equals("")) {
+                        SysParams paramsByValue = sysParamsMapper.findParamsByValue("CAM-C-0100", mktCamChlConfAttr.getAttrValue());
+                        mktCamChlConfAttr.setAttrValName(paramsByValue==null ? "" : paramsByValue.getParamName());
                     }
                 }
                 mktCamChlConfAttrList.add(mktCamChlConfAttr);

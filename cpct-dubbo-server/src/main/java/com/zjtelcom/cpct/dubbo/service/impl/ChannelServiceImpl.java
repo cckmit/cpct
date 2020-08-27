@@ -127,7 +127,7 @@ public class ChannelServiceImpl implements ChannelService {
     public  Map<String,Object> getUamServicePswd( String accountID, String areaCode, String custID) {
         //header
         Map<String, Object> headMap = new HashMap();
-        String miyao = "ZZ2hhmTCbnBAl3XS";
+        String miyao = "rAx5T2pIvvw5W9vQ";
         String tokn = miyao + "CLZX" + DateUtil.date2String(new Date());
         tokn = MD5Util.encryByMD5(tokn).toUpperCase();
         headMap.put("channel", "CLZX");

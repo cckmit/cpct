@@ -121,4 +121,13 @@
         where PARAM_KEY = #{paramKey};
     </select>
 
+    <select id="listValueByKey" resultType="java.lang.String">
+        select PARAM_VALUE
+        from sys_params
+        where PARAM_KEY = #{paramKey,jdbcType=VARCHAR}
+        and PARAM_VALUE not in ${withoutList}
+    </select>
+
+
+
 </mapper>

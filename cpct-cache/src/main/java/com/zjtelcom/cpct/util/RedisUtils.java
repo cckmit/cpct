@@ -445,13 +445,13 @@ public class RedisUtils {
         if(getByLocalCatch){
             caffeineCache.getIfPresent(key); // 缓存中存在相应数据，则返回；不存在返回null
             result = caffeineCache.asMap().get(String.valueOf(key));
-            System.out.println("从本地获取缓存数据--->>>" + JSON.toJSONString(result));
+//            System.out.println("从本地获取缓存数据--->>>"+key + JSON.toJSONString(result));
             if (result != null) {
                 return result;
             }
             // 从redis缓存取数据
             result = getRedis(key);
-            System.out.println("从redis获取缓存数据--->>>" + JSON.toJSONString(result));
+//            System.out.println("从redis获取缓存数据--->>>"+key + JSON.toJSONString(result));
             // 本地缓存中无值则再存一次本地缓存
             if (result != null) {
                 caffeineCache.put(key, result);

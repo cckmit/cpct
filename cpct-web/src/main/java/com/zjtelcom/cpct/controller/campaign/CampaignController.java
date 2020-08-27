@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dto.pojo.Result;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.MqService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
@@ -65,6 +66,25 @@ public class CampaignController extends BaseController {
     private CatalogService catalogService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
+
+    /**
+     * 需求函类型限制活动类型校验
+     * @param param
+     * @return
+     */
+    @PostMapping(value = "/checkCampaignByRequestInfo")
+    @CrossOrigin
+    public Map<String, Object> checkCampaignByRequestInfo(@RequestBody  Map<String,Object> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result =  mktCampaignService.checkCampaignByRequestInfo(param);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+        }
+        return result;
+    }
 
     @RequestMapping(value = "openCampaignScheForDay", method = RequestMethod.POST)
     @CrossOrigin

@@ -346,7 +346,10 @@ public class TrialProdServiceImpl implements TrialProdService {
         //清单方案活动标记
         String userListCam =  MapUtil.getString(param.get("userListCam"));
         List<Integer> idList = ( List<Integer>)param.get("idList");
-
+        List<String>  strategyList = new ArrayList<>();
+        if (param.get("strategyList")!=null ){
+            strategyList = (List<String>)param.get("strategyList");
+        }
         List<String> mktCamCodeList = (List<String>) redisUtils.get("MKT_CAM_API_CODE_KEY");
         if (mktCamCodeList == null) {
             List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("MKT_CAM_API_CODE");
@@ -386,6 +389,9 @@ public class TrialProdServiceImpl implements TrialProdService {
 //            }
             List<MktStrategyConfDO> strategyConfDOList = strategyConfPrdMapper.selectByCampaignId(campaignDO.getMktCampaignId());
             for (MktStrategyConfDO strategy : strategyConfDOList){
+                if (!strategyList.isEmpty() && !strategyList.contains(strategy.getMktStrategyConfId().toString())){
+                    continue;
+                }
                 //生成批次号
                 String batchNumSt = DateUtil.date2St4Trial(new Date()) + ChannelUtil.getRandomStr(4);
                 TrialOperation operation = new TrialOperation();

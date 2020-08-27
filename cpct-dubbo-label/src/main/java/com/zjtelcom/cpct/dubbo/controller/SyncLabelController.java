@@ -78,6 +78,7 @@ public class SyncLabelController {
     @Autowired
     private TarGrpCheckApiService tarGrpCheckApiService;
 
+
     private String gaotao = "2200,1400,1100,3299,3656,1900,9932,8946";
     private String sishengwu = "1600,8444";
     private String huoyue = "1500,2793,2827";
@@ -93,6 +94,7 @@ public class SyncLabelController {
         System.out.println(JSON.toJSONString(positionzj));
     }
 
+
     //查看所有主题
     @PostMapping("/cpcTarGrpCheck")
     @CrossOrigin
@@ -100,7 +102,25 @@ public class SyncLabelController {
 
         Map<String,Object> result = new HashMap<>();
         try {
-            result = tarGrpCheckApiService.cpcTarGrpCheck(param);
+            List<MktCampaignDO> campaignDOS = mktCampaignMapper.selectAll();
+            List<List<MktCampaignDO>> lists = ChannelUtil.averageAssign(campaignDOS, 10);
+            for (List<MktCampaignDO> list : lists) {
+                new Thread(){
+                    public void run(){
+                        list.forEach(campaignDO -> {
+                            if (campaignDO.getMktCampaignNameEdit()==null){
+                                String mktCampaignName = campaignDO.getMktCampaignName()==null ? "": campaignDO.getMktCampaignName() ;
+                                if (mktCampaignName.startsWith("【省】") || mktCampaignName.startsWith("【市】") ||  mktCampaignName.startsWith("【县】")){
+                                    mktCampaignName = mktCampaignName.substring(3,mktCampaignName.length());
+                                }
+                                campaignDO.setMktCampaignNameEdit(mktCampaignName.length()>30 ? mktCampaignName.substring(0,30) : mktCampaignName);
+                                campaignMapper.updateByPrimaryKey(campaignDO);
+                            }
+                        });
+
+                    }
+                }.start();
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

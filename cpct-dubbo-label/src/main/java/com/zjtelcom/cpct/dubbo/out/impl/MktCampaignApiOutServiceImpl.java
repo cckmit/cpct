@@ -191,7 +191,6 @@ public class MktCampaignApiOutServiceImpl implements MktCampaignApiOutService {
     public Map<String, Object> getByC3(Map<String, Object> params) {
         return mktCampaignService.getByC3AndAuto(params);
     }
-
     /**
      * 查询配置配置信息
      *
