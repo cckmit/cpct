@@ -286,7 +286,7 @@
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
-        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE,REGION_FLG
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
         from close_rule
         <where>1!=2
         <if test="closeName != null and closeName != ''">
@@ -301,9 +301,6 @@
         <if test="staffId != null and staffId != ''">
             AND CREATE_STAFF = #{staffId}
         </if>
-        <if test="regionFlg != null and regionFlg != ''">
-            AND REGION_FLG =  #{regionFlg}
-        </if>
         </where>
         ORDER BY RULE_ID DESC
     </select>
@@ -314,11 +311,14 @@
         FAILURE_DATE,LABEL_CODE,CHOOSE_PRODUCT, EXPRESSION,DAY_START,DAY_END,STATUS_CD, CREATE_STAFF,
         UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
         UPDATE_DATE, REMARK, USER_LIST, CONDITION_ID,
-        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE
+        DAYS, TIMES, OFFER_INFO,CLOSE_CODE,NOTE_ONE,NOTE_TWO,NOTE_THREE,REGION_FLG
         from close_rule
         <where>1!=2
         <if test="closeName != null and closeName != ''">
             AND CLOSE_NAME like concat('%',concat(#{closeName},'%'))
+        </if>
+        <if test="regionFlg != null and regionFlg != ''">
+            AND REGION_FLG IN ${regionFlg}
         </if>
         <choose>
             <when test="closeType != null and closeType!=''">

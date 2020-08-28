@@ -699,7 +699,17 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             return maps;
         }
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRuleReq.getCloseRule());
+        CloseRule closeRule = closeRuleReq.getCloseRule();
+        if("C1".equals(closeRule.getRegionFlg()) || "C2".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C1', 'C2')");
+        } else if("C3".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C3')");
+        } else if("C4".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C4')");
+        } else if("C5".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C5')");
+        }
+        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRule);
         Page page = new Page(new PageInfo(closeRules));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
