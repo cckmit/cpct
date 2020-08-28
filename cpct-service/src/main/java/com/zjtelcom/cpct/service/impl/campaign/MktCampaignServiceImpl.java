@@ -122,7 +122,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         String periodType = "";
 
         if ("C1".equals(level) || "C2".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,data);
+            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "");
             result.put("flg","true");
@@ -135,7 +135,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return result;
         }
         if ("C3".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,data);
+            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
                 result.put("resultCode", CODE_SUCCESS);
                 result.put("resultMsg", "");
                 result.put("flg","true");
@@ -149,7 +149,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 result.put("flg","false");
                 return result;
             }
-            addParam(requestInfo, key,campaignType,chufaType,data);
+            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "");
             result.put("flg","true");
@@ -165,19 +165,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         return result;
     }
 
-    private void addParam(RequestInfo requestInfo, String key, String campaignType,String chufaType, Map<String,Object> data) {
+    private void addParam(RequestInfo requestInfo, String key, String campaignType,String chufaType,String periodType, Map<String,Object> data) {
         switch (key){
             case "mkt_province_ser_process"://服务（随销）活动
                 campaignType = "5000";
+                periodType = "6300"
                 ;
             case "mkt_free_city_process"://地市自主活动
                 campaignType = "1000";
+                periodType = "6300"
                 ;
             case "mkt_free_province_process"://省自主活动
                 campaignType = "1000";
+                periodType = "6300"
                 ;
             case "mkt_force_province"://框架活动
                 campaignType = "1000";
+                periodType = "6100"
                 ;
                 if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
                     chufaType = "1000";
@@ -187,6 +191,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         data.put("campaignType",campaignType);
         data.put("chufaType",chufaType);
+        data.put("periodType",periodType);
     }
 
     // 集团活动承接接口
