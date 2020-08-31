@@ -921,12 +921,14 @@ public class EventApiServiceImpl implements EventApiService {
 
                 /*
                 * 满意度调查事件（装维）
+                * EVTS000001147	9666政企测评
+                * EVTS000001148	家庭内网检测测评
                 * 1、先判断测评业务号码是否绑定“浙江电信”微信公众号，绑定则推送微厅，推送账号为业务号码
                 * 2、非绑定用户再根据联系电话判断是否有绑定，有则推联系号码，
                 * 3、没有则通过联系电话推送到IVR
                 *
                 * */
-                if ("EVTS000001121".equals(eventCode)) {
+                if ("EVTS000001121".equals(eventCode) || "EVTS000001147".equals(eventCode) || "EVTS000001148".equals(eventCode)) {
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     // 判断是否添加是否为微厅的标签
                     Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
@@ -965,6 +967,28 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
+                /**
+                 * 电渠线上测评, 判断是否有业务号码，如果有则推送业务号码，如果没有，则推送联系号码
+                 */
+                if ("EVTS000001146".equals(eventCode)) {
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    if (map.get("accNbr") != null) {
+                        reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
+                    } else {
+                        // 联系号码-事件采集项
+                        String contactNumberStr = (String) evtParams.get("CPCP_ORDER_PHONE");
+                        String contactNumber = "";
+                        log.info("contactNumberStr_1122 --->>>" + contactNumberStr);
+                        if (contactNumberStr != null) {
+                            String[] split = contactNumberStr.split(",");
+                            contactNumber = split[0];
+                            log.info("contactNumber_1122 --->>>" + contactNumber);
+                        }
+                        reultMap.put("CPCP_ACCS_NBR", contactNumber);
+                    }
+                }
+
+
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
                     // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
