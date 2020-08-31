@@ -78,8 +78,10 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
             param.put("batchNum",batchNum);
             if (!remark.equals("") && status.equals(TrialStatus.ISEE_ANALYZE_FAIL.getValue())){
                 param.put("data",remark);
+                param.put("remark",remark);
             }else {
                 param.put("data",TrialStatus.getNameByCode(status).getName());
+                param.put("remark",remark);
             }
             esService.addLogByBatchNum(param);
         }catch (Exception e){

@@ -109,7 +109,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
         RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
         if (requestInfo==null){
-            result.put("resultCode", CODE_FAIL);
+            result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "未查询到有效的需求函信息");
             result.put("flg","false");
             return result;
@@ -129,7 +129,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             result.put("data",data);
             return result;
         }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
-            result.put("resultCode", CODE_FAIL);
+            result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
             result.put("flg","false");
             return result;
@@ -144,7 +144,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         }
         if ("C4".equals(level) ){
             if (!requestInfo.getBusinessType().equals("1000")){
-                result.put("resultCode", CODE_FAIL);
+                result.put("resultCode", CODE_SUCCESS);
                 result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
                 result.put("flg","false");
                 return result;
@@ -157,7 +157,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return result;
         }
         if ("C5".equals(level) ){
-            result.put("resultCode", CODE_FAIL);
+            result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "无法创建活动");
             result.put("flg","false");
             return result;
@@ -169,25 +169,25 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         switch (key){
             case "mkt_province_ser_process"://服务（随销）活动
                 campaignType = "5000";
-                periodType = "6300"
-                ;
+                periodType = "6300";
+                break;
             case "mkt_free_city_process"://地市自主活动
                 campaignType = "1000";
-                periodType = "6300"
-                ;
+                periodType = "6300";
+                break;
             case "mkt_free_province_process"://省自主活动
                 campaignType = "1000";
-                periodType = "6300"
-                ;
+                periodType = "6300";
+                break;
             case "mkt_force_province"://框架活动
                 campaignType = "1000";
-                periodType = "6100"
-                ;
-                if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
-                    chufaType = "1000";
-                }else {
-                    chufaType = "2000";
-                }
+                periodType = "6100";
+                break;
+        }
+        if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
+            chufaType = "1000";
+        }else {
+            chufaType = "2000";
         }
         data.put("campaignType",campaignType);
         data.put("chufaType",chufaType);
@@ -1876,6 +1876,16 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Override
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
+        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+        if (requestInfoId!=null){
+            Map<String, Object> map = checkCampaignByRequestInfo(params);
+            if (map.get("resultCode").equals(CODE_SUCCESS)){
+                Map<String,Object> data = (Map<String, Object>) map.get("data");
+                params.put("tiggerType",data.get("chufaType"));
+                params.put("mktCampaignCategory",data.get("periodType"));
+                params.put("mktCampaignType",data.get("campaignType"));
+            }
+        }
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
