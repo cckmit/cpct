@@ -953,8 +953,6 @@ public class MultiJobRunner {
                     }
 
                 }
-
-
                 //下发短信
                 String sendMsg = "周期性活动下发或试算失败，活动id为："+JSON.toJSONString(stringArraylist);
                 List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");

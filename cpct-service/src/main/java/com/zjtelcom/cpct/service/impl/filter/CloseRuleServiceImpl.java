@@ -3,6 +3,7 @@ package com.zjtelcom.cpct.service.impl.filter;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -24,6 +25,8 @@ import com.zjtelcom.cpct.dto.filter.CloseRuleVO;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
+import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
@@ -187,12 +190,41 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             maps.put("resultMsg", "关单规则名称重复！");
             return maps;
         }
+
+        //添加所属地市
+        String createChannel = PostEnum.ADMIN.getPostCode();
+        if (UserUtil.getUser() != null) {
+            // 获取当前用户的岗位编码包含“cpcpch”
+            SystemUserDto userDetail = UserUtil.getRoleCode();
+            for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
+                // 判断是否为超级管理员
+                if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
+                    createChannel = role.getSysPostCode();
+                    break;
+                } else if (role.getSysPostCode().contains("cpcpch")) {
+                    createChannel = role.getSysPostCode();
+                    continue;
+                }
+            }
+        }
+        String sysPostCode =  AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        if (createChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        }
+        closeRule.setRegionFlg(sysPostCode);
         closeRule.setCreateDate(DateUtil.getCurrentTime());
         closeRule.setUpdateDate(DateUtil.getCurrentTime());
         closeRule.setStatusDate(DateUtil.getCurrentTime());
         closeRule.setUpdateStaff(UserUtil.loginId());
         closeRule.setCreateStaff(UserUtil.loginId());
         closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
+        System.out.println("closeRule --->>>" + JSON.toJSONString(closeRule));
         List<String> codeList = new ArrayList<>();
 
         if (StringUtils.isNotBlank(addVO.getCloseType()) && addVO.getCloseType().equals("2000")){
@@ -565,29 +597,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRule.setStatusDate(DateUtil.getCurrentTime());
             closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             closeRuleMapper.createFilterRule(closeRule);
-            System.out.println("关单规则插入主键的id："+closeRule.getRuleId());
-            CloseRule closeRule2 = new CloseRule();
-            //导入销售品 关单编码为空？
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("1000")){
-                closeRule2.setExpression("CR001");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("3000")){
-                closeRule2.setExpression("CR003");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("4000")){
-                closeRule2.setExpression("CR004");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("2000")){
-                closeRule2.setExpression("CR002");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("5000")){
-                closeRule2.setExpression("CR005");
-            }
-            System.out.println("关单规则前缀："+closeRule2.getExpression());
-            //自动步枪6位数 前面补零
-            String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
-            System.out.println("最后插入的关单编码："+closeRule2.getExpression()+expression);
-            closeRuleMapper.updateExpression(String.valueOf(closeRule.getRuleId()),closeRule2.getExpression()+expression);
         }else {
             Integer count = closeRuleMapper.getCloseNameCount(closeName);
             if (count>1){
@@ -664,7 +673,17 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             return maps;
         }
         PageHelper.startPage(pageInfo.getPage(), pageInfo.getPageSize());
-        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRuleReq.getCloseRule());
+        CloseRule closeRule = closeRuleReq.getCloseRule();
+        if("C1".equals(closeRule.getRegionFlg()) || "C2".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C1', 'C2')");
+        } else if("C3".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C3')");
+        } else if("C4".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C4')");
+        } else if("C5".equals(closeRule.getRegionFlg())){
+            closeRule.setRegionFlg("('C5')");
+        }
+        List<CloseRule> closeRules = closeRuleMapper.getCloseRuleOut(closeRule);
         Page page = new Page(new PageInfo(closeRules));
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);

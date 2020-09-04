@@ -74,7 +74,7 @@ ctg:
   sendMsgTimeout: 30000
   compressMsgBodyOverHowmuch: 4098
   clusterName: pst_crm_mq
-  tenantID: 2
+  tenantID: 2900002
   cpctTopic: cpct_topic_import
   clientWorkerThreads: 4
 

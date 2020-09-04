@@ -34,6 +34,8 @@ public interface MktCampaignMapper {
 
     List<MktCampaignCountDO> qryMktCampaignListPage(MktCampaignDO mktCampaignDO);
 
+    List<MktCampaignCountDO> qryMktCampaignList4Moudle(MktCampaignDO mktCampaignDO);
+
     List<MktCampaignCountDO> qryMktCampaignListPageForNoPublish(MktCampaignDO mktCampaignDO);
 
     List<MktCampaignCountDO> qryMktCampaignListPageForPublish(MktCampaignDO mktCampaignDO);
@@ -132,5 +134,5 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId, @Param("mktCampaignName") String mktCampaignName);
 
-
+    int updateStaffById(MktCampaignDO mktCampaignDO);
 }

@@ -87,7 +87,7 @@
     </dubbo:reference>
 
     <!-- 营销活动发布接口 注册 2.0 -->
-    <dubbo:service registry="esb2" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
+    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MktCampaignSyncApiService" ref="mktCampaignSyncApiServiceImpl" version="1.0" >
         <dubbo:method name="publishMktCampaign" servicecode="00.1083.publishMktCampaign" timeout="10000"/>
     </dubbo:service>
 
