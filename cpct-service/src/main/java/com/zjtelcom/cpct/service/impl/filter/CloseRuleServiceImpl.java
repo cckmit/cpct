@@ -3,8 +3,10 @@ package com.zjtelcom.cpct.service.impl.filter;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
@@ -32,6 +34,7 @@ import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -55,6 +58,7 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 @EnableCaching(proxyTargetClass = true)
 @Service
 @Transactional
+@Slf4j
 public class CloseRuleServiceImpl implements CloseRuleService {
 
     @Autowired
@@ -81,6 +85,8 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private InjectionLabelMapper injectionLabelMapper;
     @Autowired
     private ProductMapper productMapper;
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
     /**
      * 根据关单规则id集合查询过滤规则集合
@@ -715,6 +721,46 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("closeRules", closeRules);
         maps.put("pageInfo",page);
+        return maps;
+    }
+
+    @Override
+    public Map<String,Object> addRegionFlg() {
+        Map<String, Object> maps = new HashMap<>();
+        List<CloseRule> closeRuleList = closeRuleMapper.qryFilterRule(new CloseRule());
+        for (CloseRule closeRule : closeRuleList) {
+            List<String> arrayList = new ArrayList<>();
+            SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(closeRule.getCreateStaff(), new ArrayList<Long>());
+            log.info("systemUserDtoSysmgrResultObject --->>>" + JSON.toJSONString(systemUserDtoSysmgrResultObject) );
+            if (systemUserDtoSysmgrResultObject != null) {
+                if (systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                    List<SystemPostDto> systemPostDtoList = systemUserDtoSysmgrResultObject.getResultObject().getSystemPostDtoList();
+                    if (systemPostDtoList.size() > 0 && systemPostDtoList != null) {
+                        for (SystemPostDto systemPostDto : systemPostDtoList) {
+                            arrayList.add(systemPostDto.getSysPostCode());
+                        }
+                    }
+                    String sysPostCode = "";
+                    if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())) {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+                    } else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())) {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+                    } else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())) {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+                    } else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())) {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+                    } else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())) {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+                    } else {
+                        sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+                    }
+                    log.info("RuleId = " + closeRule.getRuleId() + ",   sysPostCode = " + sysPostCode );
+                    closeRuleMapper.updateRegionFlg(closeRule.getRuleId(), sysPostCode);
+                }
+            }
+        }
+        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+        maps.put("resultMsg", "成功");
         return maps;
     }
 }

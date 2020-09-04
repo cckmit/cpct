@@ -971,7 +971,7 @@ public class EventApiServiceImpl implements EventApiService {
                  * 电渠线上测评, 判断是否有业务号码，如果有则推送业务号码，如果没有，则推送联系号码
                  */
                 if ("EVTS000001146".equals(eventCode)) {
-                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+/*                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     if (map.get("accNbr") != null) {
                         reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                     } else {
@@ -985,7 +985,7 @@ public class EventApiServiceImpl implements EventApiService {
                             log.info("contactNumber_1122 --->>>" + contactNumber);
                         }
                         reultMap.put("CPCP_ACCS_NBR", contactNumber);
-                    }
+                    }*/
                 }
 
 
