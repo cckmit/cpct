@@ -338,7 +338,7 @@ public class ChannelController extends BaseController {
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getUamServicePswd",e);
             result.put("resultCode",CODE_FAIL);
-            result.put("resultMsg", "通过uam获取服务密码失败");
+            result.put("resultMsg", "通过uam获取服务密码失败" + e);
             return result;
         }
         return result;

@@ -11,7 +11,7 @@ public class ResponseVO<T> {
     private String resultMessage;
     private T data;
 
-    public Map<String,Object> response(String resultCode, String resultMessage){
+    public static Map<String,Object> response(String resultCode, String resultMessage){
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("resultCode",resultCode);
         resultMap.put("resultMessage",resultMessage);

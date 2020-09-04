@@ -115,12 +115,61 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return result;
         }
         String level = UserUtil.getSysUserLevel();
+//        String level = MapUtil.getString(params.get("level"));
         String key = requestInfo.getActivitiKey();
         Map<String,Object> data = new HashMap<>();
         String campaignType = "";
         String chufaType = "";
         String periodType = "";
-
+        Long campaignId = MapUtil.getLongNum(params.get("campaignId"));
+        if (!"0".equals(campaignId.toString())){
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+            if (campaignDO!=null ){
+                if (campaignDO.getSrcId()!=null){
+                    periodType = campaignDO.getMktCampaignCategory();
+                }
+                addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+                if (campaignType.equals("1000") && !campaignDO.getMktCampaignType().equals("1000")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（营销活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (campaignType.equals("5000") && campaignDO.getMktCampaignType().equals("1000")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（服务类活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (chufaType.equals("1000") && !campaignDO.getTiggerType().equals("1000")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（批量活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (chufaType.equals("2000") && !campaignDO.getTiggerType().equals("2000")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（实时活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (periodType.equals("6100") && !campaignDO.getMktCampaignCategory().equals("6100")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（自主活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (periodType.equals("6300") && !campaignDO.getMktCampaignCategory().equals("6300")){
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（框架活动）");
+                    result.put("flg","false");
+                    return result;
+                }
+                if (periodType.equals("6300") || periodType.equals("6100") ){
+                    periodType = "";
+                }
+            }
+        }
         if ("C1".equals(level) || "C2".equals(level)){
             addParam(requestInfo, key,campaignType,chufaType,periodType,data);
             result.put("resultCode", CODE_SUCCESS);
@@ -169,19 +218,19 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         switch (key){
             case "mkt_province_ser_process"://服务（随销）活动
                 campaignType = "5000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_free_city_process"://地市自主活动
                 campaignType = "1000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_free_province_process"://省自主活动
                 campaignType = "1000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_force_province"://框架活动
                 campaignType = "1000";
-                periodType = "6100";
+                periodType = periodType.equals("") ? "6100" : periodType;
                 break;
         }
         if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
@@ -193,7 +242,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         data.put("chufaType",chufaType);
         data.put("periodType",periodType);
     }
-
     // 集团活动承接接口
     @Override
     public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
@@ -1877,12 +1925,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
         Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
-        if (requestInfoId!=null){
+        if (!"0".equals(requestInfoId.toString())){
             Map<String, Object> map = checkCampaignByRequestInfo(params);
             if (map.get("resultCode").equals(CODE_SUCCESS)){
                 Map<String,Object> data = (Map<String, Object>) map.get("data");
                 params.put("tiggerType",data.get("chufaType"));
                 params.put("mktCampaignCategory",data.get("periodType"));
+                if (data.get("campaignType")!=null && data.get("campaignType").toString().equals("5000")){
+                    data.put("campaignType","5000,6000,7000");
+                }
                 params.put("mktCampaignType",data.get("campaignType"));
             }
         }
@@ -1892,7 +1943,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setStatusCd("(2002, 2010)");                 // 活动状态发布
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
             mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
-            mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
+            mktCampaignDO.setMktCampaignType("("+params.get("mktCampaignType").toString() + ")");   // 活动类别 - 服务，营销，服务+营销
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
@@ -1907,7 +1958,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignDO.setCreateChannel(params.get("createChannel").toString());       // 创建渠道
             PageHelper.startPage(Integer.parseInt(params.get("page").toString()), Integer.parseInt(params.get("pageSize").toString())); // 分页
-            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
+            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignList4Moudle(mktCampaignDO);
 
             // 获取所有的sysParam
             Map<String, String> paramMap = new HashMap<>();
@@ -4252,6 +4303,45 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // logger.info("存入缓存");
         Map<String, Object> redis = eventRedisService.getRedis(key, id);
         System.out.println("result ->" + JSON.toJSONString(redis));
+    }
+
+    @Override
+    public Map<String, Object> updateStaffById(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 修改活动信息
+            MktCampaignDO mktCampaignDO = new MktCampaignDO();
+            Long mktCampaignId = Long.valueOf(params.get("mktCampaignId").toString());
+            mktCampaignDO.setMktCampaignId(mktCampaignId);
+            mktCampaignDO.setCreateStaff(Long.valueOf(params.get("sysUserId").toString()));
+            mktCampaignDO.setUpdateDate(new Date());
+            String contName = (String) params.get("name");
+            String tel = (String) params.get("tel");
+            String department = (String) params.get("department");
+            Long staffId = Long.valueOf(params.get("staffId").toString());
+            logger.info("mktCampaignDO --->>>" + JSON.toJSONString(mktCampaignDO));
+            mktCampaignMapper.updateStaffById(mktCampaignDO);
+            // 修改需求函
+            List<RequestInstRel> requestInstRelList = requestInstRelMapper.selectByCampaignId(mktCampaignId, "mkt");
+            for (RequestInstRel requestInstRel : requestInstRelList) {
+                RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInstRel.getRequestInfoId());
+                requestInfo.setContName(contName);
+                requestInfo.setContTele(tel);
+                requestInfo.setDeptCode(department);
+                requestInfo.setCreateStaff(staffId);
+                requestInfo.setUpdateDate(new Date());
+                logger.info("requestInfo --->>>" + JSON.toJSONString(requestInfo));
+                requestInfoMapper.updateByPrimaryKey(requestInfo);
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "成功");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "失败");
+            return resultMap;
+        }
     }
 
 }

@@ -5,6 +5,9 @@ import com.ctg.dtts.core.logger.Logger;
 import com.ctg.dtts.core.logger.LoggerFactory;
 import com.ctg.dtts.tasktracker.logger.BizLogger;
 import com.ctg.dtts.tasktracker.runner.DttsLoggerFactory;
+import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
+import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
 import com.zjhcsoft.eagle.main.dubbo.service.QuerySaturationService;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.LabelSaturationMapper;
@@ -15,6 +18,7 @@ import com.zjtelcom.cpct.domain.channel.LabelSaturation;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dubbo.out.*;
+import com.zjtelcom.cpct.enums.DttsMsgEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
@@ -56,6 +60,8 @@ public class MultiJobRunner {
     private OpenApiScheService openApiScheService;
     @Autowired(required = false)
     private BlackListService blackListService;
+    @Autowired(required = false)
+    private ISystemUserDtoDubboService iSystemUserDtoDubboService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -837,7 +843,7 @@ public class MultiJobRunner {
     }
 
     //3-31 11:07 x
-    //周期性活动定时任务添加校验接口若未执行的 二次执行
+    //凌晨5点那个-周期性活动定时任务添加校验接口若未执行的 二次执行
     public void playAgainPeriodicity(){
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 01:00:00");
@@ -848,6 +854,7 @@ public class MultiJobRunner {
         System.out.println("格式化后的日期：" + endTime);
         List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
         List<Integer> stringArraylist = new ArrayList<>();
+        List<String> strategyList = new ArrayList<>();
         if (trialOperationList!=null){
             for (TrialOperation operation : trialOperationList){
                 String statusCd = operation.getStatusCd();
@@ -860,6 +867,7 @@ public class MultiJobRunner {
                 if (!statusCd.equals("7300") && !statusCd.equals("8100")
                         && !stringArraylist.contains(Integer.valueOf(campaignDO.getMktCampaignId().toString()))){
                     stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
+                    strategyList.add(operation.getStrategyId().toString());
                 }
             }
             //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
@@ -869,6 +877,7 @@ public class MultiJobRunner {
                     Map<String,Object> param =new HashMap<>();
                     param.put("idList",stringArraylist); //活动id集合
                     param.put("perCampaign","PER_CAMPAIGN");//周期性活动标识
+                    param.put("strategyList",strategyList);//周期性活动标识
                     trialStatusUpService.campaignIndexTask(param);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -886,6 +895,78 @@ public class MultiJobRunner {
             }
         }
     }
+
+
+
+    //3-31 11:07 x
+    //周期性活动定时任务添加校验接口若未执行的 二次执行 验证
+    public void playAgainPeriodicityCheck() throws Exception{
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 05:00:00");
+        String startTime = sdf.format(d);
+        System.out.println("格式化后的日期：" + startTime);
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 07:00:00");
+        String endTime = sdf2.format(d);
+        System.out.println("格式化后的日期：" + endTime);
+        List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
+        List<Integer> stringArraylist = new ArrayList<>();
+        List<MktCampaignDO> mktCampaignDOList = new ArrayList<>();
+        if (trialOperationList!=null){
+            for (TrialOperation operation : trialOperationList){
+                String statusCd = operation.getStatusCd();
+                //5点得二次确认不执行"29、"活动
+                MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(operation.getCampaignId());
+                if (campaignDO==null || "10361".equals(campaignDO.getInitId().toString())){
+                    continue;
+                }
+                //判断状态
+                if (!statusCd.equals("7300") && !statusCd.equals("8100")
+                        && !stringArraylist.contains(Integer.valueOf(campaignDO.getMktCampaignId().toString()))){
+                    stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
+                    mktCampaignDOList.add(campaignDO);
+                }
+            }
+            //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
+            if (!stringArraylist.isEmpty()){
+                int i = 0;
+                List<Map> sendFailList = new ArrayList();
+                // 给活动创建人发送短信
+                for (MktCampaignDO mktCampaignDO:mktCampaignDOList) {
+                    Long staff = mktCampaignDO.getCreateStaff();
+                    SysmgrResultObject<SystemUserDto> systemUserDtoSysmgrResultObject = iSystemUserDtoDubboService.qrySystemUserDto(staff, new ArrayList<Long>());
+                    if (systemUserDtoSysmgrResultObject != null && systemUserDtoSysmgrResultObject.getResultObject() != null) {
+                        String sysUserCode = systemUserDtoSysmgrResultObject.getResultObject().getSysUserCode();
+                        Long lanId = mktCampaignDO.getLanId();
+                        // TODO  调用发送短信接口
+                        String sendContent = "您好，您创建的活动（" + mktCampaignDO.getMktCampaignName() + "）即将到期，且活动不可再延期，到期后即失效。如需继续活动内容，请新建活动！";
+                        System.out.println(sendContent);
+                        if (lanId != null && lanId != 1) {
+                            String resultMsg = sendShortMessage(sysUserCode, sendContent, lanId.toString());
+                            if (!resultMsg.isEmpty()) {
+                                Map map = new HashMap();
+                                map.put("campaignId", mktCampaignDO.getMktCampaignId());
+                                map.put("resuleMsg", resultMsg);
+                                sendFailList.add(map);
+                            }
+                            i++;
+                        }
+                    }
+
+                }
+                //下发短信
+                String sendMsg = "周期性活动下发或试算失败，活动id为："+JSON.toJSONString(stringArraylist);
+                List<SysParams> send_msg = sysParamsMapper.listParamsByKeyForCampaign("SEND_MSG");
+                for (SysParams sysParams : send_msg) {
+                    try {
+                        sendShortMessage(sysParams.getParamValue(),sendMsg,"571");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
 
     //3-31 11:07 x
     //集团活动每天增量上传文件
