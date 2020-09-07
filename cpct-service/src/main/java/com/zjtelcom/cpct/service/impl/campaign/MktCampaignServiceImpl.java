@@ -103,6 +103,12 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
+
+    /**
+     * 需求函控制活动类型（废弃）
+     * @param params
+     * @return
+     */
     @Override
     public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
@@ -1924,32 +1930,38 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Override
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
-        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
-        if (!"0".equals(requestInfoId.toString())){
-            Map<String, Object> map = checkCampaignByRequestInfo(params);
-            if (map.get("resultCode").equals(CODE_SUCCESS)){
-                Map<String,Object> data = (Map<String, Object>) map.get("data");
-                params.put("tiggerType",data.get("chufaType"));
-                params.put("mktCampaignCategory",data.get("periodType"));
-                if (data.get("campaignType")!=null && data.get("campaignType").toString().equals("5000")){
-                    data.put("campaignType","5000,6000,7000");
-                }
-                params.put("mktCampaignType",data.get("campaignType"));
-            }
-        }
+        //需求函类型控制列表查询
+//        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+//        if (!"0".equals(requestInfoId.toString())){
+//            Map<String, Object> map = checkCampaignByRequestInfo(params);
+//            if (map.get("resultCode").equals(CODE_SUCCESS)){
+//                Map<String,Object> data = (Map<String, Object>) map.get("data");
+//                params.put("tiggerType",data.get("chufaType"));
+//                params.put("mktCampaignCategory",data.get("periodType"));
+//                if (data.get("campaignType")!=null && data.get("campaignType").toString().equals("5000")){
+//                    data.put("campaignType","5000,6000,7000");
+//                }
+//                params.put("mktCampaignType",data.get("campaignType"));
+//            }
+//        }
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
             mktCampaignDO.setStatusCd("(2002, 2010)");                 // 活动状态发布
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
-            mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
-            mktCampaignDO.setMktCampaignType("("+params.get("mktCampaignType").toString() + ")");   // 活动类别 - 服务，营销，服务+营销
-            if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
+            mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());// 活动分类 - 框架，强制，自主
+            if (params.get("mktCampaignType")!=null && !params.get("mktCampaignType").toString().equals("")){
+                mktCampaignDO.setMktCampaignType("("+params.get("mktCampaignType").toString() + ")");   // 活动类别 - 服务，营销，服务+营销
+            }
+            if (params.get("createStaff")!= null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
                 mktCampaignDO.setMktCampaignType("1000");
+            }
+            if ("C4".equals(userLevl)){
+                mktCampaignDO.setTiggerType("1000");
             }
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
