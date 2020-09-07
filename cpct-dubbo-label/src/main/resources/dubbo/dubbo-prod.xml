@@ -125,11 +125,17 @@
         <dubbo:method name="openCampaignScheForMonth" servicecode="33.1083.openCampaignScheForMonth" timeout="10000"/>
     </dubbo:service>
 
+
     <!--分群规则校验接口-->
     <dubbo:service interface="com.zjtelcom.cpct.dubbo.out.TarGrpCheckApiService" ref="tarGrpCheckApiServiceImpl"
                    version="1.0">
         <dubbo:method name="cpcTarGrpCheck" servicecode="33.1083.cpcTarGrpCheck" timeout="10000"/>
     </dubbo:service>
+
+    <!--批次生效时间修改-->
+    <dubbo:reference  interface="com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService" id="cpcAPIServiceImpl" version="1.0" check="false">
+        <dubbo:method name="updateProjectStateTime" servicecode="00.1079.updateProjectStateTime" timeout="120000"/>
+    </dubbo:reference>
 
 
 

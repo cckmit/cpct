@@ -94,4 +94,6 @@ public interface MktCampaignService {
 
     Map<String, Object> updateStaffById(Map<String, Object> params);
 
+    Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params);
+
 }

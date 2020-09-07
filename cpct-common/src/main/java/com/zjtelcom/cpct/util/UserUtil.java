@@ -4,9 +4,11 @@ import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
 import com.ctzj.smt.bss.sysmgr.model.dataobject.SystemRoles;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemPostDto;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,4 +65,44 @@ public class UserUtil {
         }
         return userDetail;
     }
+
+
+    /**
+     * 获取用户权限名称
+     * @return
+     */
+    public static String getSysUserLevel() {
+        String sysPostCode = "";
+        try {
+            SystemUserDto userDetail = BssSessionHelp.getCpctSystemUserDto();
+            ArrayList<String> arrayList = new ArrayList<>();
+            List<SystemPostDto> systemPostDtoList = userDetail.getSystemPostDtoList();
+            //岗位信息查看最大权限作为岗位信息
+            if (systemPostDtoList.size()>0 && systemPostDtoList!=null){
+                for (SystemPostDto systemPostDto : systemPostDtoList) {
+                    arrayList.add(systemPostDto.getSysPostCode());
+                }
+            }
+            if (arrayList.contains(AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+            }else if (arrayList.contains(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())){
+                sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+            }else {
+                sysPostCode = AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return sysPostCode;
+        }
+        return sysPostCode;
+    }
+
+
+
 }

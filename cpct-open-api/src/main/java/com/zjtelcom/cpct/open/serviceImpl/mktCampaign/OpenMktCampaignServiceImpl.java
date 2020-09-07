@@ -533,6 +533,8 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
             //规则
             MktStrategyConfRuleDO mktStrategyConfRuleDO = new MktStrategyConfRuleDO();
             List<MktStrategyConfRuleDO> mktStrategyConfRuleDOList = new ArrayList<>();
+            List<TarGrp> tarGrpIdList = new ArrayList<>();
+
             int ruleNumber = 1;
             String productList = "";
             String channelList = "";
@@ -557,7 +559,7 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                         tarGrp.setRemark("0");
                         tarGrpMapper.createTarGrp(tarGrp);
                         mktCamGrpRul.setTarGrpId(tarGrp.getTarGrpId());
-                        mktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
+                        tarGrpIdList.add(tarGrp);
                         //新增目标分群条件
                         List<OpenTarGrpConditionEntity> openTarGrpConditionList = openTarGrpEntity.getTarGrpConditions();
                         if (openTarGrpConditionList != null && openTarGrpConditionList.size() > 0) {
@@ -574,6 +576,10 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
                                                 break;
                                             }
                                         }
+                                    }else {
+                                        //集团标签编码不存在 用省内提示标签替换
+                                        tarGrpCondition.setConditionText( tarGrpCondition.getConditionText() + "【"+openTarGrpConditionEntity.getLeftParam()+"】");
+                                        tarGrpCondition.setLeftParam("802628");
                                     }
                                 }
                                 tarGrpCondition.setRemark("2000");
@@ -793,20 +799,28 @@ public class OpenMktCampaignServiceImpl extends BaseService implements OpenMktCa
 
             //新增规则
             for(int i=1; i<=ruleNumber; i++) {
-                mktStrategyConfRuleDO.setMktStrategyConfRuleId(null);
-                mktStrategyConfRuleDO.setMktStrategyConfRuleName("规则" + i);
-                mktStrategyConfRuleDO.setProductId(productList);
-                mktStrategyConfRuleDO.setEvtContactConfId(channelList);
-                mktStrategyConfRuleDO.setCreateDate(mktCampaignDO.getCreateDate());
-                mktStrategyConfRuleDO.setUpdateDate(mktCampaignDO.getUpdateDate());
-                mktStrategyConfRuleMapper.insert(mktStrategyConfRuleDO);
-                mktStrategyConfRuleDO.setInitId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
-                mktStrategyConfRuleMapper.updateByPrimaryKey(mktStrategyConfRuleDO);
-                mktStrategyConfRuleDOList.add(mktStrategyConfRuleDO);
+                MktStrategyConfRuleDO ruleDO = BeanUtil.create(mktStrategyConfRuleDO, new MktStrategyConfRuleDO());
+                ruleDO.setMktStrategyConfRuleId(null);
+                ruleDO.setMktStrategyConfRuleName("规则" + i);
+                ruleDO.setProductId(productList);
+                ruleDO.setEvtContactConfId(channelList);
+                ruleDO.setCreateDate(mktCampaignDO.getCreateDate());
+                ruleDO.setUpdateDate(mktCampaignDO.getUpdateDate());
+                if (tarGrpIdList.size() == ruleNumber){
+                    ruleDO.setTarGrpId(tarGrpIdList.get(i-1).getTarGrpId());
+                    ruleDO.setMktStrategyConfRuleName(tarGrpIdList.get(i-1).getTarGrpName());
+                }else if (!tarGrpIdList.isEmpty()){
+                    ruleDO.setTarGrpId(tarGrpIdList.get(0).getTarGrpId());
+                    ruleDO.setMktStrategyConfRuleName(tarGrpIdList.get(0).getTarGrpName());
+                }
+                mktStrategyConfRuleMapper.insert(ruleDO);
+                ruleDO.setInitId(ruleDO.getMktStrategyConfRuleId());
+                mktStrategyConfRuleMapper.updateByPrimaryKey(ruleDO);
+                mktStrategyConfRuleDOList.add(ruleDO);
                 //新增策略与规则的关联
                 MktStrategyConfRuleRelDO mktStrategyConfRuleRelDO = new MktStrategyConfRuleRelDO();
                 mktStrategyConfRuleRelDO.setMktStrategyConfId(mktStrategyConfDO.getMktStrategyConfId());
-                mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
+                mktStrategyConfRuleRelDO.setMktStrategyConfRuleId(ruleDO.getMktStrategyConfRuleId());
                 mktStrategyConfRuleRelDO.setCreateDate(mktCampaignDO.getCreateDate());
                 mktStrategyConfRuleRelDO.setUpdateDate(mktCampaignDO.getUpdateDate());
                 mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);

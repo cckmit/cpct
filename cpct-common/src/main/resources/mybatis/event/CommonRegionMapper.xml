@@ -85,5 +85,48 @@
         from common_region
     </select>
 
+    <!--根据销售品编码获取销售品详情-->
+    <select id="getExpenseByOfferNbr"  parameterType="java.lang.String"  resultMap="offerResultMap">
+        SELECT
+        a.OFFER_ID,
+        a.OFFER_NBR,
+        a.offer_name,
+        c1.TEMPLATE_NAME,
+        c.TEMPLATE_INST_NAME,
+        d2.PARAMETER_NAME,
+        d.PARAM_VALUE,
+        a1.AMOUNT
+        FROM
+        offer a
+        JOIN offer_prod_rel b ON a.OFFER_ID = b.OFFER_ID
+        JOIN offer_ext a1 ON a.OFFER_ID = a1.OFFER_ID
+        JOIN tariff_template_inst c ON b.OFFER_ID = c.OFFER_ID
+        JOIN tariff_template c1 ON c.TARIFF_TEMPLATE_ID = c1.TARIFF_TEMPLATE_ID
+        JOIN template_param_inst d ON c.TARIFF_TEMPLATE_INST_ID = d.TARIFF_TEMPLATE_INST_ID
+        JOIN template_parameter_rel d1 ON d.TEMPLATE_PARAMETER_REL_ID = d1.TEMPLATE_PARAMETER_REL_ID
+        JOIN template_parameter d2 ON d1.TEMPLATE_PARAM_ID = d2.TEMPLATE_PARAM_ID
+        AND d2.PARAMETER_NAME IN (
+        '业务量'
+        )
+        WHERE
+        a.offer_type = '11'
+        AND b.ROLE_ID = '10100002'
+        AND a.STATUS_CD = '1000'
+        AND b.PROD_ID = '1429695'
+        AND c.TARIFF_TEMPLATE_ID IN ('35000010', '35000006')
+        AND a.OFFER_NBR = #{offerNbr}
+    </select>
+
+    <resultMap id="offerResultMap" type="com.zjtelcom.cpct.domain.event.OfferExpenseDO">
+        <id column="OFFER_ID" jdbcType="BIGINT"  property="offerId" />
+        <result column="OFFER_NBR" jdbcType="VARCHAR"  property="offerNbr" />
+        <result column="offer_name" jdbcType="VARCHAR"  property="offerName" />
+        <result column="TEMPLATE_NAME  " jdbcType="VARCHAR"  property="templateName" />
+        <result column="TEMPLATE_INST_NAME" jdbcType="VARCHAR"  property="templateInstName" />
+        <result column="PARAMETER_NAME" jdbcType="VARCHAR"  property="parameterName" />
+        <result column="PARAM_VALUE" jdbcType="BIGINT"  property="paramValue" />
+        <result column="AMOUNT" jdbcType="BIGINT"  property="amount" />
+
+    </resultMap>
 
 </mapper>

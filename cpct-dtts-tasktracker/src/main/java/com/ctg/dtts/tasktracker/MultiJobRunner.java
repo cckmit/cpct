@@ -14,11 +14,9 @@ import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.LabelSaturation;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dubbo.out.CampaignService;
-import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
-import com.zjtelcom.cpct.dubbo.out.TargetGroupService;
-import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
+import com.zjtelcom.cpct.dubbo.out.*;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import com.ztesoft.uccp.dubbo.interfaces.UCCPSendService;
@@ -56,6 +54,8 @@ public class MultiJobRunner {
     private UCCPSendService uccpSendService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
+    @Autowired(required = false)
+    private BlackListService blackListService;
 
 
     private static final String userAcct = "CPCPYX";
@@ -72,13 +72,32 @@ public class MultiJobRunner {
             LOGGER.info(msg);
             BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
             bizLogger.info(msg);
+            List<SysParams> flg = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_FLG");
+            if (!flg.isEmpty() && flg.get(0).getParamValue().equals("0")){
+                return;
+            }
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+            if (!sysParamsList.isEmpty()){
+                SysParams sysParams1 = sysParamsList.get(0);
+                sysParams1.setParamValue("1");
+                sysParamsMapper.updateByPrimaryKey(sysParams1);
+            }
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
             //筛选出周期为"天"的营销活动
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
@@ -101,13 +120,26 @@ public class MultiJobRunner {
             LOGGER.info(msg);
             BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
             bizLogger.info(msg);
+            List<SysParams> flg = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_FLG");
+            if (!flg.isEmpty() && flg.get(0).getParamValue().equals("0")){
+                return;
+            }
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"天"的服务活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
@@ -130,13 +162,26 @@ public class MultiJobRunner {
             LOGGER.info(msg);
             BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
             bizLogger.info(msg);
+            List<SysParams> flg = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_FLG");
+            if (!flg.isEmpty() && flg.get(0).getParamValue().equals("0")){
+                return;
+            }
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"天"的服务随销活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("1000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
@@ -203,10 +248,19 @@ public class MultiJobRunner {
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
             //筛选出周期为"月"的营销活动
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
@@ -232,10 +286,19 @@ public class MultiJobRunner {
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
             //筛选出周期为"月"的服务活动
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
@@ -260,11 +323,20 @@ public class MultiJobRunner {
             bizLogger.info(msg);
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"月"的服务随销活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("2000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
@@ -339,11 +411,20 @@ public class MultiJobRunner {
             bizLogger.info(msg);
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"周"的营销活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("1000")) {
@@ -368,11 +449,20 @@ public class MultiJobRunner {
             bizLogger.info(msg);
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"周"的服务活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("5000")) {
@@ -397,11 +487,20 @@ public class MultiJobRunner {
             bizLogger.info(msg);
             //筛选出周期性、已发布的活动
             List<MktCampaignDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListByTypeAndStatus("2000", "2002");
+            List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+            List<String> list = new ArrayList<>();
+            if (!sysParams.isEmpty()){
+                String paramValue = sysParams.get(0).getParamValue();
+                list = ChannelUtil.StringToList(paramValue);
+            }
             //筛选出周期为"周"的服务随销活动
             List<MktCampaignDO> mktCampaignDOs = new ArrayList<>();
             for (MktCampaignDO mktCampaignDO : mktCampaignDOList) {
                 String[] execInvl = mktCampaignDO.getExecInvl().split("-");
                 if (execInvl.length < 2) {
+                    continue;
+                }
+                if (list.contains(mktCampaignDO.getMktCampaignId().toString())){
                     continue;
                 }
                 if (execInvl[1].equals("3000") && mktCampaignDO.getMktCampaignCategory().equals(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode()) && mktCampaignDO.getMktCampaignType().equals("6000")) {
@@ -671,29 +770,54 @@ public class MultiJobRunner {
         }
     }
 
-    //3点执行周期性活动定时任务添加校验接口若未执行的 二次执行
+    //21点执行参数表中的周期性活动
+    public void playFromSysCampaign(){
+        List<SysParams> sysParams = sysParamsMapper.listParamsByKeyForCampaign("SCHE_CAMPAIGN_LIST_DAY");
+        List<Integer> list = new ArrayList<>();
+        if (!sysParams.isEmpty()){
+            String paramValue = sysParams.get(0).getParamValue();
+            list = ChannelUtil.StringToIntegerList(paramValue);
+        }
+        List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("CUST_PROD_FILTER");
+        if (!sysParamsList.isEmpty()){
+            SysParams sysParams1 = sysParamsList.get(0);
+            sysParams1.setParamValue("0");
+            sysParamsMapper.updateByPrimaryKey(sysParams1);
+        }
+        System.out.println("【参数表周期性活动列表】"+JSON.toJSONString(sysParams));
+
+        if (!list.isEmpty()) {
+            //再次执行
+            try {
+                Map<String, Object> param = new HashMap<>();
+                param.put("idList", list); //活动id集合
+                param.put("perCampaign", "PER_CAMPAIGN");//周期性活动标识
+                trialStatusUpService.campaignIndexTask(param);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //23点执行周期性活动定时任务添加校验接口若未执行的 二次执行
     public void playAgainForSpecialCampaign(){
         Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 01:00:00");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 21:00:00");
         String startTime = sdf.format(d);
         System.out.println("格式化后的日期：" + startTime);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 03:00:00");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 23:30:00");
         String endTime = sdf2.format(d);
         System.out.println("格式化后的日期：" + endTime);
-        System.out.println("【活动管控类型】"+StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());
         List<TrialOperation> trialOperationList = trialOperationMapper.getDataStartToEnd(startTime, endTime);
         System.out.println("【查询返回符合条件得试算列表】：" + JSON.toJSONString(trialOperationList));
         List<Integer> stringArraylist = new ArrayList<>();
-        if (trialOperationList!=null){
-            for (TrialOperation operation : trialOperationList){
+        if (trialOperationList!=null) {
+            for (TrialOperation operation : trialOperationList) {
                 String statusCd = operation.getStatusCd();
                 //3点得二次确认执行"29、"活动
-                MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(operation.getCampaignId());
-                if (campaignDO!=null && "10361".equals(campaignDO.getInitId().toString())){
-                    //判断状态
-                    if (statusCd.equals("4000")){
-                        stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
-                    }
+                //判断状态
+                if (statusCd.equals("4000") && !stringArraylist.contains(Integer.valueOf(operation.getCampaignId().toString()))) {
+                    stringArraylist.add(Integer.parseInt(operation.getCampaignId().toString()));
                 }
             }
             System.out.println("【查询返回符合条件得试算列表ARRAYLIST】：" + JSON.toJSONString(stringArraylist));
@@ -729,16 +853,17 @@ public class MultiJobRunner {
                 String statusCd = operation.getStatusCd();
                 //5点得二次确认不执行"29、"活动
                 MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(operation.getCampaignId());
-                if (campaignDO!=null && "10361".equals(campaignDO.getInitId().toString())){
+                if (campaignDO==null || "10361".equals(campaignDO.getInitId().toString())){
                     continue;
                 }
                 //判断状态
-                if (!statusCd.equals("7300") && !statusCd.equals("8100")){
+                if (!statusCd.equals("7300") && !statusCd.equals("8100")
+                        && !stringArraylist.contains(Integer.valueOf(campaignDO.getMktCampaignId().toString()))){
                     stringArraylist.add(Integer.parseInt(campaignDO.getMktCampaignId().toString()));
                 }
             }
             //运行周期性任务下发失败或者全量失败的任务再次执行 并下发短信
-            if (stringArraylist!=null){
+            if (!stringArraylist.isEmpty()){
                 //再次执行
                 try {
                     Map<String,Object> param =new HashMap<>();
@@ -828,4 +953,43 @@ public class MultiJobRunner {
 //            e.printStackTrace();
 //        }
 //    }
+
+
+    /**
+     * 黑名单导出
+     */
+    public void exportBlackListFile() throws Throwable {
+        try {
+            LOGGER.info("黑名单导出exportBlackListFile执行");
+            springBean.hello();
+            String msg = "exportBlackListFile执行任务";
+            LOGGER.info(msg);
+            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
+            bizLogger.info(msg);
+            //黑名单导出
+            blackListService.exportBlackListFile();
+        } catch (Exception e) {
+            LOGGER.info("Run exportBlackListFile failed!", e);
+        }
+    }
+
+
+    /**
+     * 黑名单导入
+     */
+    public void importBlackListFile() throws Throwable {
+        try {
+            LOGGER.info("黑名单导入importBlackListFile执行");
+            springBean.hello();
+            String msg = "importBlackListFile执行任务";
+            LOGGER.info(msg);
+            BizLogger bizLogger = DttsLoggerFactory.getBizLogger();
+            bizLogger.info(msg);
+            //黑名单导入
+            blackListService.importBlackListFile();
+        } catch (Exception e) {
+            LOGGER.info("Run importBlackListFile failed!", e);
+        }
+    }
+
 }

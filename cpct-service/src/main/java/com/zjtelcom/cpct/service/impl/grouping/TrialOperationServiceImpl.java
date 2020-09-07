@@ -865,6 +865,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             result.put("resultMsg", "未找到有效的活动策略或规则");
             return result;
         }
+        if (confRule.getEvtContactConfId()==null || confRule.getEvtContactConfId().equals("")){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "未查找到有效的渠道配置");
+            return result;
+        }
         campaign.setBatchType("1000");
         campaignMapper.updateByPrimaryKey(campaign);
         TrialOperation op = null;
@@ -1749,6 +1754,10 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             codeList.add("CCUST_ROW_ID");
         }if (!codeList.contains("ASSET_NUMBER")){
             codeList.add("ASSET_NUMBER");
+        }if (!codeList.contains("COMM_LVL3_ID")){
+            codeList.add("COMM_LVL3_ID");
+        }if (!codeList.contains("COMM_LVL4_ID")){
+            codeList.add("COMM_LVL4_ID");
         }
         //策略下所有分群条件加入
         if (ruleCodeList!=null){

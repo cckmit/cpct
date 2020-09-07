@@ -6,7 +6,7 @@
         <property name="locations">
             <list>
                 <value>file:./conf/application.properties</value>
-                <value>file:./conf/application-pst.properties</value>
+                <value>file:./conf/application-prod.properties</value>
             </list>
         </property>
     </bean>

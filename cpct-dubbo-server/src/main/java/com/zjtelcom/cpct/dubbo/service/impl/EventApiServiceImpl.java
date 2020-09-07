@@ -24,6 +24,7 @@ import com.ql.util.express.Operator;
 import com.ql.util.express.rule.RuleResult;
 import com.telin.dubbo.service.QueryBindByAccCardService;
 import com.zjpii.biz.serv.YzServ;
+import com.zjpii.biz.service.uam.SyncService;
 import com.zjtelcom.cpct.dao.blacklist.BlackListMapper;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -38,6 +39,7 @@ import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.CommonRegion;
+import com.zjtelcom.cpct.domain.event.OfferExpenseDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -49,8 +51,10 @@ import com.zjtelcom.cpct.dto.event.EventMatchRulCondition;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.CamApiSerService;
 import com.zjtelcom.cpct.dubbo.service.CamApiService;
+import com.zjtelcom.cpct.dubbo.service.ChannelService;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.elastic.config.IndexList;
+import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.AreaNameEnum;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
@@ -210,6 +214,9 @@ public class EventApiServiceImpl implements EventApiService {
     private OrgGridRelMapper orgGridRelMapper;
     @Autowired
     private CommonRegionMapper commonRegionMapper;
+
+    @Autowired
+    private ChannelService channelService;
     /*@Autowired(required = false)
     private CamCpcService camCpcService;*/
 
@@ -375,7 +382,6 @@ public class EventApiServiceImpl implements EventApiService {
         params.put("evtContent", evtContent); //事件采集项
         params.put("accNbr", accNbr); //资产号码
         params.put("integrationId", integrationId); //资产集成编码
-
         esJson.put("reqId", reqId);
         esJson.put("eventCode", eventCode);
         esJson.put("integrationId", integrationId);
@@ -1161,6 +1167,76 @@ public class EventApiServiceImpl implements EventApiService {
                         log.info("reultMap的值为：" + JSON.toJSONString(reultMap));
                     }
                 }
+                //套餐生效套餐变更事件，畅享套餐变更生效事件
+                if("EVTS000001138".equals(eventCode) || "EVTS000001139".equals(eventCode) || "EVTS000001140".equals(eventCode) || "EVTS000001142".equals(eventCode) || "EVTS000001143".equals(eventCode)){
+                    log.info("接入事件： "+ eventCode);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
+                    log.info("销售品编码"+ offerNbr);
+                    List<OfferExpenseDO> offerExpenseDO = commonRegionMapper.getExpenseByOfferNbr(offerNbr);
+                    String offerName = ""; //套餐名称
+                    Long amount = 0L; //套餐费用
+                    Long CPCP_TOTAL_FLOW = 0L; //套内流量
+                    Long CPCP_TOTAL_TIME = 0L; //总时长（分钟）
+                    for(OfferExpenseDO offerExpe: offerExpenseDO){
+                        if(offerExpe.getTemplateInstName().contains("语音")){
+                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
+                        }
+                        if(offerExpe.getTemplateInstName().contains("流量")){
+                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
+                        }
+                       offerName = offerExpe.getTemplateInstName();
+                        amount = offerExpe.getAmount();
+                    }
+
+                    reultMap.put("CPCP_VIR_SUB_NAME", offerName);
+                    reultMap.put("CPCP_EXPENSES", amount.toString());
+                    reultMap.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW.toString());
+                    reultMap.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME.toString());
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+                    log.info("resultMapList" + resultMapList);
+
+                }
+
+                //5G套餐办理变更事件
+                if("EVTS000001141".equals(eventCode)){
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
+                    log.info("接入事件： "+ eventCode);
+                    List<OfferExpenseDO> offerExpenseDO = commonRegionMapper.getExpenseByOfferNbr(offerNbr);
+                    log.info("销售品编码"+ offerNbr);
+                    String offerName = ""; //套餐名称
+                    Long amount = 0L; //套餐费用
+                    Long CPCP_TOTAL_FLOW = 0L; //套内流量
+                    Long CPCP_TOTAL_TIME = 0L; //总时长（分钟）
+                    for(OfferExpenseDO offerExpe: offerExpenseDO){
+                        if(offerExpe.getTemplateInstName().contains("语音")){
+                            CPCP_TOTAL_TIME = offerExpe.getParamValue();
+                        }
+                        if(offerExpe.getTemplateInstName().contains("流量")){
+                            CPCP_TOTAL_FLOW = offerExpe.getParamValue();
+                        }
+                        offerName = offerExpe.getTemplateInstName();
+                        amount = offerExpe.getAmount();
+                    }
+                    reultMap.put("CPCP_VIR_SUB_NAME", offerName);
+                    reultMap.put("CPCP_EXPENSES", amount.toString());
+                    reultMap.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW.toString());
+                    reultMap.put("CPCP_TOTAL_TIME", CPCP_TOTAL_TIME.toString());
+                    String phone = map.get("accNbr");
+                    String areaId = AreaCodeEnum.getAreaNameByLanId(Long.parseLong(map.get("lanId")));
+                    Map<String,Object> paswMap = channelService.getUamServicePswd(phone,areaId,custId);
+                    String pasw =(String)paswMap.get("password");
+                    reultMap.put("CPCP_SERVICE_PSWD", pasw);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+
+                    log.info("resultMapList" + resultMapList);
+
+                }
+
+
                 //重新赋值一遍
                 map.put("evtContent",JSON.toJSONString(evtContent));
 
@@ -3370,7 +3446,9 @@ public class EventApiServiceImpl implements EventApiService {
                 //        log.info("333333------prodInstCacheEntity --->" + JSON.toJSONString(prodInstCacheEntity));
                 if (prodInstCacheEntity != null && prodInstCacheEntity.getResultObject() != null && "1000".equals(prodInstCacheEntity.getResultObject().getProdUseType())) {
                     mainOfferInstId = prodInstCacheEntity.getResultObject().getMainOfferInstId();
-                    break;
+                    if(mainOfferInstId!=null){
+                        break;
+                    }
                 }
             }
             // 根据offerInstId和statusCd查询offerProdInstRelId

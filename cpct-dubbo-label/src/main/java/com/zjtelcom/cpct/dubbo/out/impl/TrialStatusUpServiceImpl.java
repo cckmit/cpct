@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
 import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
+import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -34,6 +35,8 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
 
     @Autowired
     private MktCampaignApiService mktCampaignApiService;
+    @Autowired
+    private ProjectManageService projectManageService;
 
 
     @Override
@@ -78,10 +81,19 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
             param.put("batchNum",batchNum);
             if (!remark.equals("") && status.equals(TrialStatus.ISEE_ANALYZE_FAIL.getValue())){
                 param.put("data",remark);
+                param.put("remark",remark);
             }else {
                 param.put("data",TrialStatus.getNameByCode(status).getName());
+                param.put("remark",remark);
             }
             esService.addLogByBatchNum(param);
+            if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", operation.getId().intValue());  // 试运算Id
+                map.put("effectDate", new Date());  // 生效时间
+                map.put("invalidDate", new Date()); // 失效时间
+                projectManageService.updateProjectStateTime(params);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
