@@ -186,7 +186,7 @@ public class ActivityStatisticsController extends BaseController {
                 String sheetName = "随销报表";
                 String[] title = {"活动名称", "活动状态", "活动类型", "活动编码", "活动主题",	"活动目录", "活动渠道", "活动生效时间", "活动失效时间",
                         "关单规则名称", "所属地市","客户接触数", "商机推荐数","商机成功数","客触转化率","商机转化率",
-                        "收入低迁数","收入低迁率", "门店有销率","是否框架子活动"};
+                        "收入低迁数","收入低迁率", "门店有销率","是否框架子活动","人员Y编码","人员姓名"};
                 String fileName = "随销报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -227,6 +227,12 @@ public class ActivityStatisticsController extends BaseController {
                                 }else if (name.equals("是否框架子活动")){
                                     //是否框架子活动 yesOrNo
                                     content[i][19] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("人员Y编码")){
+                                    //是否框架子活动 yesOrNo
+                                    content[i][20] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("人员姓名")){
+                                    //是否框架子活动 yesOrNo
+                                    content[i][21] = String.valueOf(map3.get("nub"));
                                 }
                             }
                         }
