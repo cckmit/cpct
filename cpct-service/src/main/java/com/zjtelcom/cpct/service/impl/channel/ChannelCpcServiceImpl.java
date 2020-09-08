@@ -105,6 +105,11 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
     private void listParent(List<ChannelDetail> parentDetailList, List<Channel> parentList,String channelName, String triggerType) {
+        String level = UserUtil.getSysUserLevel();
+        boolean uccpFilter = true;
+        if ("C1".equals(level) || "C2".equals(level)){
+            uccpFilter = false;
+        }
         Iterator it = parentList.iterator();
         while(it.hasNext()){
             Channel parent = (Channel)it.next();
@@ -116,6 +121,9 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
             }else {
                 for (Channel child : childList) {
                     if (channelName != null && !channelName.equals("") && !child.getContactChlName().contains(channelName)) {
+                        continue;
+                    }
+                    if (uccpFilter && "QD00034".equals(child.getContactChlCode())){
                         continue;
                     }
                     ChannelDetail childDetail = new ChannelDetail();

@@ -277,6 +277,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 campaignType = "1000";
                 periodType = periodType.equals("") ? "6100" : periodType;
                 break;
+            case "mkt_force_province_city"://框架活动子活动
+                campaignType = "1000";
+                periodType = "6300";
+                break;
         }
         if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
             chufaType = "1000";
