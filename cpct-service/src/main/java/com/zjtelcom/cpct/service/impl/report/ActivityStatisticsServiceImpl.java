@@ -802,17 +802,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
                                 }
-                                /*if (key.equals("revenueReduceNum")) {
-                                    msgMap.put("name", "收入低迁数");
+                                if (key.equals("resultNum")) {
+                                    msgMap.put("name", "回单数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("revenueReduceRate")) {
-                                    msgMap.put("name", "收入低迁率");
+                                if (key.equals("resultRate")) {
+                                    msgMap.put("name", "回单率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
-                                }*/
+                                }
                                 if (key.equals("orgChannelRate")) {
                                     msgMap.put("name", "门店有销率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
