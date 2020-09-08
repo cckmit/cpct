@@ -339,4 +339,9 @@
     <select id="getNameByCloseNumber" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT CLOSE_NAME from close_rule WHERE EXPRESSION = #{s}
     </select>
+
+    <update id="updateRegionFlg">
+        UPDATE close_rule set REGION_FLG = #{regionFlg,jdbcType=VARCHAR}
+        where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    </update>
 </mapper>

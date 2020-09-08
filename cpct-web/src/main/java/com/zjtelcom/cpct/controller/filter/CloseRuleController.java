@@ -214,6 +214,24 @@ public class CloseRuleController extends BaseController {
     }
 
 
+    /**
+     * 刷close_rule表的REGION_FLG数据
+     * @return
+     */
+    @PostMapping("/addRegionFlg")
+    @CrossOrigin
+    public String addRegionFlg() {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            maps = closeRuleService.addRegionFlg();
+        } catch (Exception e) {
+            logger.error("[op:addCloseRuleDate] fail to addCloseRuleDate {}! Exception: ", e);
+            return JSON.toJSONString(maps);
+        }
+        return JSON.toJSONString(maps);
+    }
+
+
 
    /* @Autowired
     private EsHitsService esHitService;

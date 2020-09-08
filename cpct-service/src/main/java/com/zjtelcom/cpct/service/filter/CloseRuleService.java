@@ -30,4 +30,6 @@ public interface CloseRuleService {
 
     Map<String,Object> getCloseRuleOut(CloseRuleReq closeRuleReq);
 
+    Map<String,Object> addRegionFlg();
+
 }
