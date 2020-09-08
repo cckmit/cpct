@@ -132,5 +132,5 @@ public interface MktCampaignMapper {
 
     List<MktCampaignDO> getByC3AndAuto(@Param("lanId") Long lanId, @Param("mktCampaignName") String mktCampaignName);
 
-
+    int updateStaffById(MktCampaignDO mktCampaignDO);
 }

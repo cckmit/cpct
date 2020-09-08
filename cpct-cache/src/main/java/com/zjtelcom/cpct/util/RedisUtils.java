@@ -851,6 +851,25 @@ public class RedisUtils {
         } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             return true;
         }
+
+
+        else if (key.startsWith("CAM_IDS_EVT_REL_")) {
+            return true;
+        } else if (key.startsWith("FILTER_RULE_STR_")) { // 过滤规则
+            return true;
+        } else if (key.startsWith("MKT_CAMPAIGN_")) {  // 活动基本信息
+            return true;
+        } else if (key.startsWith("MKT_CAM_STRATEGY_")) {    //  通过活动查询相关联的策略
+            return true;
+        } else if (key.startsWith("RULE_LIST_")) {   // 规则
+            return true;
+        } else if (key.startsWith("EVENT_ITEM_")) {  // 事件采集项
+            return true;
+        } else if (key.startsWith("EVT_ALL_LABEL_")) {  // 事件下所有标签
+            return true;
+        } else if (key.startsWith("CAM_EVT_REL_")) {   // 活动事件关系
+            return true;
+        }
         return false;
     }
 

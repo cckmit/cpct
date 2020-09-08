@@ -1386,6 +1386,19 @@
         Order BY UPDATE_DATE DESC
     </select>
 
-
+    <update id="updateStaffById" parameterType="com.zjtelcom.cpct.domain.campaign.MktCampaignDO">
+        update mkt_campaign
+        set
+        <if test= "createStaff!=null">CREATE_STAFF = #{createStaff,jdbcType=BIGINT},</if>
+        <if test= "updateStaff!=null and updateStaff != 1">UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},</if>
+        <if test= "createChannel!=null">CREATE_CHANNEL = #{createChannel,jdbcType=VARCHAR},</if>
+        <if test= "lanId!=null">LAN_ID = #{lanId,jdbcType=BIGINT},</if>
+        <if test= "regionId!=null">REGION_ID = #{regionId,jdbcType=BIGINT},</if>
+        <if test= "lanIdFour!=null">LAN_ID_FOUR = #{lanIdFour,jdbcType=BIGINT},</if>
+        <if test= "lanIdFive!=null">LAN_ID_FIVE = #{lanIdFive,jdbcType=BIGINT},</if>
+        <if test= "regionFlg!=null">REGION_FLG = #{regionFlg,jdbcType=VARCHAR},</if>
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+        where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    </update>
 
 </mapper>

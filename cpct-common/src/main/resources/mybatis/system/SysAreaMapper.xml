@@ -42,7 +42,7 @@
     where area_level = #{areaLevel,jdbcType=INTEGER}
   </select>
   <select id="selectByParnetArea"  parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select area_id, parent_area, name, area_level,ORG_ID
+    select area_id, parent_area, name, area_level,ORG_ID,CITY_THREE,CITY_FOUR
     from sys_area
     where parent_area = #{parentArea,jdbcType=INTEGER}
   </select>

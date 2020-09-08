@@ -92,6 +92,8 @@ public interface MktCampaignService {
 
     void redisTest(String key, Long id);
 
+    Map<String, Object> updateStaffById(Map<String, Object> params);
+
     Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params);
 
 }

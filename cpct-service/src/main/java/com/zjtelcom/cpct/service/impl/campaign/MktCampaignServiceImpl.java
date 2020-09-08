@@ -1891,7 +1891,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
             mktCampaignDO.setStatusCd("(2002, 2010)");                 // 活动状态发布
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
-            mktCampaignDO.setMktCampaignCategory(params.get("mktCampaignCategory").toString());  // 活动分类 - 框架，强制，自主
+            mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());  // 活动分类 - 框架，强制，自主
             mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
             if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
@@ -4252,6 +4252,45 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         // logger.info("存入缓存");
         Map<String, Object> redis = eventRedisService.getRedis(key, id);
         System.out.println("result ->" + JSON.toJSONString(redis));
+    }
+
+    @Override
+    public Map<String, Object> updateStaffById(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            // 修改活动信息
+            MktCampaignDO mktCampaignDO = new MktCampaignDO();
+            Long mktCampaignId = Long.valueOf(params.get("mktCampaignId").toString());
+            mktCampaignDO.setMktCampaignId(mktCampaignId);
+            mktCampaignDO.setCreateStaff(Long.valueOf(params.get("sysUserId").toString()));
+            mktCampaignDO.setUpdateDate(new Date());
+            String contName = (String) params.get("name");
+            String tel = (String) params.get("tel");
+            String department = (String) params.get("department");
+            Long staffId = Long.valueOf(params.get("staffId").toString());
+            logger.info("mktCampaignDO --->>>" + JSON.toJSONString(mktCampaignDO));
+            mktCampaignMapper.updateStaffById(mktCampaignDO);
+            // 修改需求函
+            List<RequestInstRel> requestInstRelList = requestInstRelMapper.selectByCampaignId(mktCampaignId, "mkt");
+            for (RequestInstRel requestInstRel : requestInstRelList) {
+                RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInstRel.getRequestInfoId());
+                requestInfo.setContName(contName);
+                requestInfo.setContTele(tel);
+                requestInfo.setDeptCode(department);
+                requestInfo.setCreateStaff(staffId);
+                requestInfo.setUpdateDate(new Date());
+                logger.info("requestInfo --->>>" + JSON.toJSONString(requestInfo));
+                requestInfoMapper.updateByPrimaryKey(requestInfo);
+            }
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "成功");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "失败");
+            return resultMap;
+        }
     }
 
 }

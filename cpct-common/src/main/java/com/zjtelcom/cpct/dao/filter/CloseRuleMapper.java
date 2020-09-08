@@ -50,4 +50,6 @@ public interface CloseRuleMapper {
     Integer getCloseNameCount(@Param("closeName")String closeName);
 
     String getNameByCloseNumber(String s);
+
+    int updateRegionFlg (@Param("ruleId")Long ruleId, @Param("regionFlg")String regionFlg);
 }
