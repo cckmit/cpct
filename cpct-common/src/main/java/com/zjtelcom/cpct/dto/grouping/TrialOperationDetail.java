@@ -10,6 +10,7 @@ public class TrialOperationDetail extends TrialOperation implements Serializable
     private String ruleName;
     private String flg;
 
+
     public String getFlg() {
         return flg;
     }

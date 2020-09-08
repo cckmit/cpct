@@ -103,65 +103,159 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
+
+//    @Override
+//    public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
+//        Map<String,Object> result = new HashMap<>();
+//        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+//        RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
+//        if (requestInfo==null){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "未查询到有效的需求函信息");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        String level = UserUtil.getSysUserLevel();
+////        String level = MapUtil.getString(params.get("level"));
+//        String key = requestInfo.getActivitiKey();
+//        Map<String,Object> data = new HashMap<>();
+//        String campaignType = "";
+//        String chufaType = "";
+//        String periodType = "";
+//        Long campaignId = MapUtil.getLongNum(params.get("campaignId"));
+//        if (!"0".equals(campaignId.toString())){
+//            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+//            if (campaignDO!=null ){
+//                if (campaignDO.getSrcId()!=null){
+//                    periodType = campaignDO.getMktCampaignCategory();
+//                }
+//                addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//                if (campaignType.equals("1000") && !campaignDO.getMktCampaignType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（营销活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (campaignType.equals("5000") && campaignDO.getMktCampaignType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（服务类活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (chufaType.equals("1000") && !campaignDO.getTiggerType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（批量活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (chufaType.equals("2000") && !campaignDO.getTiggerType().equals("2000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（实时活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6100") && !campaignDO.getMktCampaignCategory().equals("6100")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（自主活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6300") && !campaignDO.getMktCampaignCategory().equals("6300")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（框架活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6300") || periodType.equals("6100") ){
+//                    periodType = "";
+//                }
+//            }
+//        }
+//        if ("C1".equals(level) || "C2".equals(level)){
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        if ("C3".equals(level)){
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }
+//        if ("C4".equals(level) ){
+//            if (!requestInfo.getBusinessType().equals("1000")){
+//                result.put("resultCode", CODE_SUCCESS);
+//                result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
+//                result.put("flg","false");
+//                return result;
+//            }
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }
+//        if ("C5".equals(level) ){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "无法创建活动");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        return result;
+//    }
+
     @Override
     public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
-        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
-        RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
-        if (requestInfo==null){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "未查询到有效的需求函信息");
-            result.put("flg","false");
-            return result;
-        }
+        Long campaignId = MapUtil.getLongNum(params.get("campaignId"));
         String level = UserUtil.getSysUserLevel();
-        String key = requestInfo.getActivitiKey();
         Map<String,Object> data = new HashMap<>();
-        String campaignType = "";
-        String chufaType = "";
-        String periodType = "";
-
         if ("C1".equals(level) || "C2".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "");
             result.put("flg","true");
-            result.put("data",data);
-            return result;
-        }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
-            result.put("flg","false");
-            return result;
-        }
-        if ("C3".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
-                result.put("resultCode", CODE_SUCCESS);
-                result.put("resultMsg", "");
-                result.put("flg","true");
-                result.put("data",data);
-                return result;
-        }
-        if ("C4".equals(level) ){
-            if (!requestInfo.getBusinessType().equals("1000")){
-                result.put("resultCode", CODE_SUCCESS);
-                result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
-                result.put("flg","false");
-                return result;
-            }
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "");
-            result.put("flg","true");
-            result.put("data",data);
             return result;
         }
         if ("C5".equals(level) ){
             result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "无法创建活动");
+            result.put("resultMsg", "无法修改活动");
             result.put("flg","false");
             return result;
         }
+        if (!"0".equals(campaignId.toString())){
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+            if (campaignDO!=null ) {
+                if ("C3".equals(level) && !"1000".equals(campaignDO.getMktCampaignType())) {
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg", "非营销类活动，无权限调整");
+                    result.put("flg", "false");
+                    return result;
+                }
+                if ("C4".equals(level)) {
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"2000".equals(campaignDO.getTiggerType())
+                            || !"1000".equals(campaignDO.getExecType())) {
+                        result.put("resultCode", CODE_SUCCESS);
+                        result.put("resultMsg", "您没有权限调整该活动，请重新选择");
+                        result.put("flg", "false");
+                        return result;
+                    }
+                }
+            }
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "");
+        result.put("flg","true");
         return result;
     }
 
@@ -169,19 +263,23 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         switch (key){
             case "mkt_province_ser_process"://服务（随销）活动
                 campaignType = "5000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_free_city_process"://地市自主活动
                 campaignType = "1000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_free_province_process"://省自主活动
                 campaignType = "1000";
-                periodType = "6300";
+                periodType = periodType.equals("") ? "6300" : periodType;
                 break;
             case "mkt_force_province"://框架活动
                 campaignType = "1000";
-                periodType = "6100";
+                periodType = periodType.equals("") ? "6100" : periodType;
+                break;
+            case "mkt_force_province_city"://框架活动子活动
+                campaignType = "1000";
+                periodType = "6300";
                 break;
         }
         if (requestInfo.getBusinessType().equals("1000")){//2000 ： 实时    1000：批量
@@ -193,7 +291,6 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         data.put("chufaType",chufaType);
         data.put("periodType",periodType);
     }
-
     // 集团活动承接接口
     @Override
     public void acceptGroupCampaign(MktCampaignDO mktCampaignDO) {
@@ -1876,29 +1973,38 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Override
     public Map<String, Object> qryMktCampaignListPage(Map<String, Object> params) {
         Map<String, Object> maps = new HashMap<>();
-        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
-        if (requestInfoId!=null){
-            Map<String, Object> map = checkCampaignByRequestInfo(params);
-            if (map.get("resultCode").equals(CODE_SUCCESS)){
-                Map<String,Object> data = (Map<String, Object>) map.get("data");
-                params.put("tiggerType",data.get("chufaType"));
-                params.put("mktCampaignCategory",data.get("periodType"));
-                params.put("mktCampaignType",data.get("campaignType"));
-            }
-        }
+        //需求函类型控制列表查询
+//        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+//        if (!"0".equals(requestInfoId.toString())){
+//            Map<String, Object> map = checkCampaignByRequestInfo(params);
+//            if (map.get("resultCode").equals(CODE_SUCCESS)){
+//                Map<String,Object> data = (Map<String, Object>) map.get("data");
+//                params.put("tiggerType",data.get("chufaType"));
+//                params.put("mktCampaignCategory",data.get("periodType"));
+//                if (data.get("campaignType")!=null && data.get("campaignType").toString().equals("5000")){
+//                    data.put("campaignType","5000,6000,7000");
+//                }
+//                params.put("mktCampaignType",data.get("campaignType"));
+//            }
+//        }
         try {
             MktCampaignDO mktCampaignDO = new MktCampaignDO();
             mktCampaignDO.setMktCampaignName(params.get("mktCampaignName").toString());  // 活动名称
             mktCampaignDO.setStatusCd("(2002, 2010)");                 // 活动状态发布
             mktCampaignDO.setTiggerType(params.get("tiggerType").toString());             // 活动触发类型 - 实时，批量
-            mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());  // 活动分类 - 框架，强制，自主
-            mktCampaignDO.setMktCampaignType(params.get("mktCampaignType").toString());   // 活动类别 - 服务，营销，服务+营销
-            if (params.get("createStaff").toString() != null && !"".equals(params.get("createStaff").toString())) {
+            mktCampaignDO.setMktCampaignCategory(StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());// 活动分类 - 框架，强制，自主
+            if (params.get("mktCampaignType")!=null && !params.get("mktCampaignType").toString().equals("")){
+                mktCampaignDO.setMktCampaignType("("+params.get("mktCampaignType").toString() + ")");   // 活动类别 - 服务，营销，服务+营销
+            }
+            if (params.get("createStaff")!= null && !"".equals(params.get("createStaff").toString())) {
                 mktCampaignDO.setCreateStaff(Long.valueOf(params.get("createStaff").toString()));  // 创建人
             }
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
                 mktCampaignDO.setMktCampaignType("1000");
+            }
+            if ("C4".equals(userLevl)){
+                mktCampaignDO.setTiggerType("1000");
             }
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
@@ -1907,7 +2013,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             mktCampaignDO.setCreateChannel(params.get("createChannel").toString());       // 创建渠道
             PageHelper.startPage(Integer.parseInt(params.get("page").toString()), Integer.parseInt(params.get("pageSize").toString())); // 分页
-            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignListPage(mktCampaignDO);
+            List<MktCampaignCountDO> mktCampaignDOList = mktCampaignMapper.qryMktCampaignList4Moudle(mktCampaignDO);
 
             // 获取所有的sysParam
             Map<String, String> paramMap = new HashMap<>();

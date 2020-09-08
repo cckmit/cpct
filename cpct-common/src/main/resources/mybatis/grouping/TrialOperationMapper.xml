@@ -243,4 +243,10 @@
     from trial_operation
     WHERE  CREATE_DATE > #{startTime} AND #{endTime} > CREATE_DATE AND CREATE_STAFF = 2000
   </select>
+
+  <select id="getlist" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="selectColumn"/>
+    from trial_operation
+    WHERE  CREATE_DATE > #{startTime} AND #{endTime} > CREATE_DATE
+  </select>
 </mapper>

@@ -603,29 +603,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
             closeRule.setStatusDate(DateUtil.getCurrentTime());
             closeRule.setStatusCd(CommonConstant.STATUSCD_EFFECTIVE);
             closeRuleMapper.createFilterRule(closeRule);
-            System.out.println("关单规则插入主键的id："+closeRule.getRuleId());
-            CloseRule closeRule2 = new CloseRule();
-            //导入销售品 关单编码为空？
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("1000")){
-                closeRule2.setExpression("CR001");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("3000")){
-                closeRule2.setExpression("CR003");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("4000")){
-                closeRule2.setExpression("CR004");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("2000")){
-                closeRule2.setExpression("CR002");
-            }
-            if (StringUtils.isNotBlank(closeType) && closeType.equals("5000")){
-                closeRule2.setExpression("CR005");
-            }
-            System.out.println("关单规则前缀："+closeRule2.getExpression());
-            //自动步枪6位数 前面补零
-            String expression = CpcUtil.addZeroForNum(String.valueOf(closeRule.getRuleId()), 6);
-            System.out.println("最后插入的关单编码："+closeRule2.getExpression()+expression);
-            closeRuleMapper.updateExpression(String.valueOf(closeRule.getRuleId()),closeRule2.getExpression()+expression);
         }else {
             Integer count = closeRuleMapper.getCloseNameCount(closeName);
             if (count>1){

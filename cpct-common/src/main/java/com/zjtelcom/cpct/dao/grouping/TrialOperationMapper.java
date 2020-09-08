@@ -47,5 +47,5 @@ public interface TrialOperationMapper {
 
     List<TrialOperation> findOperationListByStrategyIdLsit(List<String> strategyIdList);
 
-    List<TrialOperation> getDataStartToEnd (String startTime,String endTime);
+    List<TrialOperation> getDataStartToEnd (@Param("campaignId")Long campaignId,@Param("startTime")String startTime,@Param("endTime")String endTime);
 }
