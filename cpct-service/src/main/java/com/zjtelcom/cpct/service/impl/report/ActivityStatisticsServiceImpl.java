@@ -768,11 +768,11 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("acceptOrderNum")) {
+                                /*if (key.equals("acceptOrderNum")) {
                                     msgMap.put("name", "接单数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
-                                }
+                                }*/
                                 if (key.equals("outBoundNum")) {
                                     msgMap.put("name", "外呼数");
                                     msgMap.put("nub", o);
@@ -783,13 +783,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("acceptOrderRate")) {
+                                /*if (key.equals("acceptOrderRate")) {
                                     //转换成百分比 保留二位小数位
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("name", "接单率");
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
-                                }
+                                }*/
                                 if (key.equals("outBoundRate")) {
                                     msgMap.put("name", "外呼率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
@@ -802,7 +802,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("revenueReduceNum")) {
+                                /*if (key.equals("revenueReduceNum")) {
                                     msgMap.put("name", "收入低迁数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
@@ -812,7 +812,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
-                                }
+                                }*/
                                 if (key.equals("orgChannelRate")) {
                                     msgMap.put("name", "门店有销率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
