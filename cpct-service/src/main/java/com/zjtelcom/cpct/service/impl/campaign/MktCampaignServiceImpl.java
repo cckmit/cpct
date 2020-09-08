@@ -104,119 +104,158 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
 
 
-    /**
-     * 需求函控制活动类型（废弃）
-     * @param params
-     * @return
-     */
+//    @Override
+//    public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
+//        Map<String,Object> result = new HashMap<>();
+//        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
+//        RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
+//        if (requestInfo==null){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "未查询到有效的需求函信息");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        String level = UserUtil.getSysUserLevel();
+////        String level = MapUtil.getString(params.get("level"));
+//        String key = requestInfo.getActivitiKey();
+//        Map<String,Object> data = new HashMap<>();
+//        String campaignType = "";
+//        String chufaType = "";
+//        String periodType = "";
+//        Long campaignId = MapUtil.getLongNum(params.get("campaignId"));
+//        if (!"0".equals(campaignId.toString())){
+//            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+//            if (campaignDO!=null ){
+//                if (campaignDO.getSrcId()!=null){
+//                    periodType = campaignDO.getMktCampaignCategory();
+//                }
+//                addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//                if (campaignType.equals("1000") && !campaignDO.getMktCampaignType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（营销活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (campaignType.equals("5000") && campaignDO.getMktCampaignType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（服务类活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (chufaType.equals("1000") && !campaignDO.getTiggerType().equals("1000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（批量活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (chufaType.equals("2000") && !campaignDO.getTiggerType().equals("2000")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（实时活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6100") && !campaignDO.getMktCampaignCategory().equals("6100")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（自主活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6300") && !campaignDO.getMktCampaignCategory().equals("6300")){
+//                    result.put("resultCode", CODE_SUCCESS);
+//                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（框架活动）");
+//                    result.put("flg","false");
+//                    return result;
+//                }
+//                if (periodType.equals("6300") || periodType.equals("6100") ){
+//                    periodType = "";
+//                }
+//            }
+//        }
+//        if ("C1".equals(level) || "C2".equals(level)){
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        if ("C3".equals(level)){
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }
+//        if ("C4".equals(level) ){
+//            if (!requestInfo.getBusinessType().equals("1000")){
+//                result.put("resultCode", CODE_SUCCESS);
+//                result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
+//                result.put("flg","false");
+//                return result;
+//            }
+//            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "");
+//            result.put("flg","true");
+//            result.put("data",data);
+//            return result;
+//        }
+//        if ("C5".equals(level) ){
+//            result.put("resultCode", CODE_SUCCESS);
+//            result.put("resultMsg", "无法创建活动");
+//            result.put("flg","false");
+//            return result;
+//        }
+//        return result;
+//    }
+
     @Override
     public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
         Map<String,Object> result = new HashMap<>();
-        Long requestInfoId = MapUtil.getLongNum(params.get("requestInfoId"));
-        RequestInfo requestInfo = requestInfoMapper.selectByPrimaryKey(requestInfoId);
-        if (requestInfo==null){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "未查询到有效的需求函信息");
-            result.put("flg","false");
-            return result;
-        }
-        String level = UserUtil.getSysUserLevel();
-//        String level = MapUtil.getString(params.get("level"));
-        String key = requestInfo.getActivitiKey();
-        Map<String,Object> data = new HashMap<>();
-        String campaignType = "";
-        String chufaType = "";
-        String periodType = "";
         Long campaignId = MapUtil.getLongNum(params.get("campaignId"));
-        if (!"0".equals(campaignId.toString())){
-            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
-            if (campaignDO!=null ){
-                if (campaignDO.getSrcId()!=null){
-                    periodType = campaignDO.getMktCampaignCategory();
-                }
-                addParam(requestInfo, key,campaignType,chufaType,periodType,data);
-                if (campaignType.equals("1000") && !campaignDO.getMktCampaignType().equals("1000")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（营销活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (campaignType.equals("5000") && campaignDO.getMktCampaignType().equals("1000")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（服务类活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (chufaType.equals("1000") && !campaignDO.getTiggerType().equals("1000")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（批量活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (chufaType.equals("2000") && !campaignDO.getTiggerType().equals("2000")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（实时活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (periodType.equals("6100") && !campaignDO.getMktCampaignCategory().equals("6100")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（自主活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (periodType.equals("6300") && !campaignDO.getMktCampaignCategory().equals("6300")){
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg","需求函类型与活动类型不匹配，请重新选择。（框架活动）");
-                    result.put("flg","false");
-                    return result;
-                }
-                if (periodType.equals("6300") || periodType.equals("6100") ){
-                    periodType = "";
-                }
-            }
-        }
+        String level = UserUtil.getSysUserLevel();
+        Map<String,Object> data = new HashMap<>();
         if ("C1".equals(level) || "C2".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "");
             result.put("flg","true");
-            result.put("data",data);
-            return result;
-        }else if (!"mkt_free_city_process".equals(key) && !"mkt_free_province_process".equals(key)){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "地市工号只能创建自主营销活动，请重新选择需求函类型");
-            result.put("flg","false");
-            return result;
-        }
-        if ("C3".equals(level)){
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
-                result.put("resultCode", CODE_SUCCESS);
-                result.put("resultMsg", "");
-                result.put("flg","true");
-                result.put("data",data);
-                return result;
-        }
-        if ("C4".equals(level) ){
-            if (!requestInfo.getBusinessType().equals("1000")){
-                result.put("resultCode", CODE_SUCCESS);
-                result.put("resultMsg", "地市工号只能创建批量活动，请重新选择需求函类型");
-                result.put("flg","false");
-                return result;
-            }
-            addParam(requestInfo, key,campaignType,chufaType,periodType,data);
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "");
-            result.put("flg","true");
-            result.put("data",data);
             return result;
         }
         if ("C5".equals(level) ){
             result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "无法创建活动");
+            result.put("resultMsg", "无法修改活动");
             result.put("flg","false");
             return result;
         }
+        if (!"0".equals(campaignId.toString())){
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
+            if (campaignDO!=null ) {
+                if ("C3".equals(level) && !"1000".equals(campaignDO.getMktCampaignType())) {
+                    result.put("resultCode", CODE_SUCCESS);
+                    result.put("resultMsg", "非营销类活动，无权限调整");
+                    result.put("flg", "false");
+                    return result;
+                }
+                if ("C4".equals(level)) {
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"2000".equals(campaignDO.getTiggerType())
+                            || !"1000".equals(campaignDO.getExecType())) {
+                        result.put("resultCode", CODE_SUCCESS);
+                        result.put("resultMsg", "您没有权限调整该活动，请重新选择");
+                        result.put("flg", "false");
+                        return result;
+                    }
+                }
+            }
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "");
+        result.put("flg","true");
         return result;
     }
 
