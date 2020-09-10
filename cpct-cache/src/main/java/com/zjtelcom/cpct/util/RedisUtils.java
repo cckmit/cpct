@@ -851,8 +851,6 @@ public class RedisUtils {
         } else if ("CHECK_LABEL_KEY".equals(key)) {   // 事件实时接入标签验证开关
             return true;
         }
-
-
         else if (key.startsWith("CAM_IDS_EVT_REL_")) {
             return true;
         } else if (key.startsWith("FILTER_RULE_STR_")) { // 过滤规则
@@ -868,6 +866,12 @@ public class RedisUtils {
         } else if (key.startsWith("EVT_ALL_LABEL_")) {  // 事件下所有标签
             return true;
         } else if (key.startsWith("CAM_EVT_REL_")) {   // 活动事件关系
+            return true;
+        }
+        else if (key.startsWith("CAM_CLOSE_RULE_LIST_")) {   // 活动跟关单规则关系数据
+            return true;
+        }
+        else if (key.startsWith("CLOSE_RULE_")) {   // 关单规则规格
             return true;
         }
         return false;

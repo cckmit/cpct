@@ -236,14 +236,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         if (!"0".equals(campaignId.toString())){
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
             if (campaignDO!=null ) {
-                if ("C3".equals(level) && !"1000".equals(campaignDO.getMktCampaignType())) {
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg", "非营销类活动，无权限调整");
-                    result.put("flg", "false");
-                    return result;
+                if ("C3".equals(level) ) {
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(campaignDO.getMktCampaignCategory()) ){
+                        result.put("resultCode", CODE_SUCCESS);
+                        result.put("resultMsg", "您没有权限调整该活动，请重新选择");
+                        result.put("flg", "false");
+                        return result;
+                    }
+
                 }
                 if ("C4".equals(level)) {
-                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"2000".equals(campaignDO.getTiggerType())
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"1000".equals(campaignDO.getTiggerType())
                             || !"1000".equals(campaignDO.getExecType())) {
                         result.put("resultCode", CODE_SUCCESS);
                         result.put("resultMsg", "您没有权限调整该活动，请重新选择");
@@ -2001,7 +2004,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
-                mktCampaignDO.setMktCampaignType("1000");
+                mktCampaignDO.setMktCampaignType("(1000)");
             }
             if ("C4".equals(userLevl)){
                 mktCampaignDO.setTiggerType("1000");

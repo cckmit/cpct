@@ -977,23 +977,41 @@ public class EventApiServiceImpl implements EventApiService {
                  * 电渠线上测评, 判断是否有业务号码，如果有则推送业务号码，如果没有，则推送联系号码
                  */
                 if ("EVTS000001146".equals(eventCode)) {
-/*                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    if (map.get("accNbr") != null) {
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    // 判断是否添加是否为微厅的标签
+                    Map<String, Object> followFlgRedis = eventRedisService.getRedis("FOLLOW_FLG");
+                    String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
+                    String isBind = (String) reultMap.get(followFlgType);
+                    // 联系号码-事件采集项
+                    String contactNumberStr = (String) evtParams.get("CPCP_ORDER_PHONE");
+                    String contactNumber = "";
+                    log.info("contactNumberStr_1121 --->>>" + contactNumberStr);
+                    if (contactNumberStr != null) {
+                        String[] split = contactNumberStr.split(",");
+                        contactNumber = split[0];
+                        log.info("contactNumber_1121 --->>>" + contactNumber);
+                    }
+                    // 1为绑定公众号，0 为不绑定公众号
+                    log.info("111---isBind --->" + isBind);
+                    if ("1".equals(isBind)) {
+                        reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅
                         reultMap.put("CPCP_ACCS_NBR", map.get("accNbr"));
                     } else {
-                        // 联系号码-事件采集项
-                        String contactNumberStr = (String) evtParams.get("CPCP_ORDER_PHONE");
-                        String contactNumber = "";
-                        log.info("contactNumberStr_1122 --->>>" + contactNumberStr);
-                        if (contactNumberStr != null) {
-                            String[] split = contactNumberStr.split(",");
-                            contactNumber = split[0];
-                            log.info("contactNumber_1122 --->>>" + contactNumber);
+                        // 若资产号码为绑定微厅，查看联系号码是否绑定微厅
+                        Map<String, Object> telMap = new HashMap<>();
+                        telMap.put("tel", contactNumber);
+                        log.info("esServiceInfo.getAssetByTelFourYN入参 = " + JSON.toJSONString(telMap));
+                        Map<String, Object> assetByTelFourYN = esServiceInfo.getAssetByTelFourYN(telMap);
+                        log.info("结果assetByTelFourYN = " + JSON.toJSONString(assetByTelFourYN));
+                        if (assetByTelFourYN != null && "200".equals(assetByTelFourYN.get("resultCode")) && "true".equals(assetByTelFourYN.get("msg"))) {
+                            reultMap.put("CPCP_PUSH_CHANNEL", "1"); // 1-微厅
+                            reultMap.put("CPCP_ACCS_NBR", contactNumber);
                         }
-                        reultMap.put("CPCP_ACCS_NBR", contactNumber);
-                    }*/
+                    }
+                    log.info("222---reultMap --->" + reultMap);
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
                 }
-
 
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {

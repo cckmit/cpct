@@ -289,6 +289,11 @@ public class TrialProdServiceImpl implements TrialProdService {
                 result.put("resultMsg", "未查询到有效活动");
                 return result;
             }
+            List<TrialOperation> operationList = trialOperationMapper.listOperationByCamIdAndStatusCd(campaignDO.getMktCampaignId(), TrialStatus.ALL_SAMPEL_GOING.getValue());
+            if (!operationList.isEmpty()){
+                operationList.forEach(trialOperation ->{
+                });
+            }
             List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
             for (MktStrategyConfRuleDO rule : ruleDOList){
                 String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null
@@ -462,7 +467,8 @@ public class TrialProdServiceImpl implements TrialProdService {
             label.put("labelDataType", "1200");
             labelList.add(label);
         }
-        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId())) {
+        if (attrList.contains(ISEE_AREA.getArrId()) || attrList.contains(ISEE_LABEL_AREA.getArrId())
+                || attrList.contains(ISEE_LABEL_AREA_CUSTOMER.getArrId())) {
             Map<String, Object> label = new HashMap<>();
             label.put("code", "AREA");
             label.put("name", "派单区域");
