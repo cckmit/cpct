@@ -216,11 +216,6 @@ public class EventApiServiceImpl implements EventApiService {
 
     @Autowired
     private ChannelService channelService;
-    /*@Autowired(required = false)
-    private CamCpcService camCpcService;*/
-
-    /*@Autowired
-    private TarGrpConditionMapper tarGrpConditionMapper;*/
 
     private final static String USED_FLOW = "used_flow";
 
@@ -474,7 +469,6 @@ public class EventApiServiceImpl implements EventApiService {
 
 
             try {
-                // List<String> list = contactEvtMapper.selectChannelListByEvtCode(map.get("eventCode"));
                 List<String> list = new ArrayList<>();
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("eventCode", map.get("eventCode"));
@@ -1904,19 +1898,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 }
                                 taskChlMap.put("taskChlAttrList", taskChlAttrList);
 
-                                // 营销服务话术脚本
-//                                CamScript camScript = mktCamScriptMapper.selectByConfId(mktCamChlConfDO.getEvtContactConfId());
-//                                if (camScript != null) {
-//                                    taskChlMap.put("contactScript", camScript.getScriptDesc());
-//                                }
-//
-//                                // 痛痒点话术
-//                                List<MktVerbal> verbalList = mktVerbalMapper.findVerbalListByConfId(mktCamChlConfDO.getEvtContactConfId());
-//                                if (verbalList != null && verbalList.size() > 0) {
-//                                    taskChlMap.put("reason", verbalList.get(0).getScriptDesc()); // 痛痒点话术有多个
-//                                }
-
-
                                 //查询推荐指引
                                 List<String> scriptLabelList = new ArrayList<>();
                                 String contactScript = null;
@@ -1935,10 +1916,7 @@ public class EventApiServiceImpl implements EventApiService {
                                 if (verbalList != null && verbalList.size() > 0) {
                                     taskChlMap.put("reason", verbalList.get(0).getScriptDesc()); // 痛痒点话术有多个
                                     for (MktVerbal mktVerbal : verbalList) {
-                                        //查询痛痒点规则 todo
-//                        List<MktVerbalCondition> channelConditionList = mktVerbalConditionMapper.findChannelConditionListByVerbalId(mktVerbal.getVerbalId());
-
-                                        mktVerbalStr = verbalList.get(0).getScriptDesc();
+                                     mktVerbalStr = verbalList.get(0).getScriptDesc();
                                         if (mktVerbalStr != null) {
                                             scriptLabelList.addAll(subScript(mktVerbalStr));
                                         }
