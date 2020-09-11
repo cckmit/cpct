@@ -379,6 +379,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         if (theMe != "" && theMe != null) {
             paramMap.put("theMe", theMe);
         }
+
+        //staffCode (非必填,ALL表示所有,多个用逗号隔开, ""或者null表示传该字段)
+        Object staffCode = params.get("staffCode");
+        if (staffCode != null && !"".equals(staffCode)) {
+            if ("all".equals(staffCode)) {
+                paramMap.put("staffCode", "all");
+            } else {
+                paramMap.put("staffCode", staffCode);
+            }
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
         List<MktCampaignDO> mktCampaignList = mktCampaignMapper.queryRptBatchOrderForMktCampaign(paramMap);
         //todo 修改为 init_id 原 getMktCampaignId
@@ -757,28 +768,28 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("acceptOrderNum")) {
+                                /*if (key.equals("acceptOrderNum")) {
                                     msgMap.put("name", "接单数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
-                                }
+                                }*/
                                 if (key.equals("outBoundNum")) {
                                     msgMap.put("name", "外呼数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("orderSuccessNum")) {
+                                if (key.equals("orderSuccessNum2")) {
                                     msgMap.put("name", "成功数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("acceptOrderRate")) {
+                                /*if (key.equals("acceptOrderRate")) {
                                     //转换成百分比 保留二位小数位
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("name", "接单率");
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
-                                }
+                                }*/
                                 if (key.equals("outBoundRate")) {
                                     msgMap.put("name", "外呼率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
@@ -791,13 +802,13 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("revenueReduceNum")) {
-                                    msgMap.put("name", "收入低迁数");
+                                if (key.equals("resultNum")) {
+                                    msgMap.put("name", "回单数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("revenueReduceRate")) {
-                                    msgMap.put("name", "收入低迁率");
+                                if (key.equals("resultRate")) {
+                                    msgMap.put("name", "回单率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
@@ -844,17 +855,12 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         statisicts.add(msgMap);
                                     }
                                 }
-                                if (key.equals("orderSuccessNum2")) {
-                                    msgMap.put("name", "批次成功数");
-                                    msgMap.put("nub", o);
-                                    statisicts.add(msgMap);
-                                }
                                 if (key.equals("disturbNum")) {
                                     msgMap.put("name", "过扰关单数");
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
-                                if (key.equals("orderSuccessNum2")) {
+                                if (key.equals("disturbRate")) {
                                     msgMap.put("name", "过扰关单率");
                                     String percentFormat = getPercentFormat(Double.valueOf(o.toString()), 3, 2);
                                     msgMap.put("nub", percentFormat);
@@ -916,6 +922,7 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     statisicts.add(msgMap);
                                 }
 
+
                                 // todo 新加关单编码 2020 1/2 x
                                 if (key.equals("batchNbr")) {
                                     resultMap.put("batchNum", o.toString());
@@ -948,6 +955,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", percentFormat);
                                     statisicts.add(msgMap);
                                 }
+
+
                             }
 
                             // 获取批次号
@@ -1161,6 +1170,17 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         statisicts.add(msgMap);
                                     }
                                 }
+                                if (key.equals("salesstaffCode")) {
+                                    msgMap.put("name", "人员Y编码");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("staffName")) {
+                                    msgMap.put("name", "人员姓名");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+
                                 if (key.equals("closeNumber")) {
                                     logger.info("查看closeNumber的值：" + o.toString());
                                     if (!o.toString().equals("0")) {
@@ -1170,6 +1190,8 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                         resultMap.put("mktCloseRuleName", "空");
                                     }
                                 }
+
+
                             }
                             resultMap.put("statistics", statisicts);
                             hashMaps.add(resultMap);

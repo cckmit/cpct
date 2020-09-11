@@ -263,6 +263,7 @@
       s.STAFF_ID = r.STAFF_ID
     AND	r.REL_TYPE = 1900
     AND r.STATUS_CD = 1000
+    AND s.STATUS_CD = 1000
     AND r.ORG_ID = #{orgId,jdbcType=BIGINT}
   </select>
 

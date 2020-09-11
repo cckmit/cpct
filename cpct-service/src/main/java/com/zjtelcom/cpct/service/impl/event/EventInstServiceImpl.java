@@ -3,12 +3,15 @@ package com.zjtelcom.cpct.service.impl.event;
 
 import com.alibaba.fastjson.JSON;
 import com.ctzj.smt.bss.cooperate.service.dubbo.ICpcAPIService;
+import com.zjtelcom.cpct.dao.event.ContactEvtMapper;
+import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.service.event.EventInstService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
@@ -26,6 +29,8 @@ public class EventInstServiceImpl implements EventInstService {
 
     @Autowired(required = false)
     private ICpcAPIService iCpcAPIService;
+    @Autowired
+    private ContactEvtMapper contactEvtMapper;
 
     @Override
     public Map<String, Object> queryEventInst(Map<String, String> paramsMap) {
@@ -34,6 +39,12 @@ public class EventInstServiceImpl implements EventInstService {
         // 调用协同中心的queryEventInst接口
         Map<String, Object>  resultMap = iCpcAPIService.queryEventInst(paramsMap);
         System.out.println("queryEventInst接口出参：" + JSON.toJSONString(resultMap));
+        List<Map<String,String>> eventInstList = (List<Map<String,String>>) resultMap.get("eventInstList");
+        for (Map<String, String> eventInstMap : eventInstList) {
+            String eventCode = eventInstMap.get("eventCode");
+            ContactEvt contactEvt = contactEvtMapper.getEventByEventNbr(eventCode);
+            eventInstMap.put("eventName", contactEvt.getContactEvtName());
+        }
         if("1".equals(resultMap.get("resultCode"))){
             resultMap.put("resultCode", CODE_SUCCESS);
         } else {
