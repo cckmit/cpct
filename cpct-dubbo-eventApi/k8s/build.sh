@@ -1,6 +1,6 @@
 #! /bin/bash
 version=$1
-project=bss-cpct-dubbo-eventApi
+project=crm-cpct-dubbo-eventApi
 if [[ -n "$6" ]]; then
 	project=$6
 fi
