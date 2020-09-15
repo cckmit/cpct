@@ -88,8 +88,12 @@ public class ProductServiceImpl implements ProductService {
                         if (mktCampaignRedis != null) {
                                 mktCampaignDO = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + mktStrategyCloseRuleRelDO.getStrategyId());
                         }
-                        if (mktCampaignDO==null || !"2002".equals(mktCampaignDO.getStatusCd())){
+                        if (mktCampaignDO==null || (!"2002".equals(mktCampaignDO.getStatusCd())
+                                && !"2008".equals(mktCampaignDO.getStatusCd()))){
                             mktStrategyCloseRuleRelMapper.deleteByPrimaryKey(mktStrategyCloseRuleRelDO.getMktStrategyFilterRuleRelId());
+                            continue;
+                        }
+                        if ("2001".equals(mktCampaignDO.getStatusCd())){
                             continue;
                         }
                         Object o = redisUtils.get("CLOSE_RULE_" + filterRule1.getRuleId());

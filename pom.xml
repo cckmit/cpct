@@ -22,7 +22,7 @@
         <module>cpct-count</module>
         <module>cpct-eslog</module>
         <module>cpct-dubbo-log</module>
-        <module>cpct-dtts-tasktracker</module>
+        <!--<module>cpct-dtts-tasktracker</module>-->
         <!--<module>cpct-label-statistic</module>-->
     </modules>
 
@@ -481,32 +481,32 @@
                 <artifactId>bss-centralized-authenticate</artifactId>
                 <version>${bss-centralized.verson}</version>
             </dependency>
-            <dependency>
-                <groupId>com.zjhcsoft.session</groupId>
-                <artifactId>spring-session</artifactId>
-                <version>${spring-session.verson}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zjhcsoft.session</groupId>
-                <artifactId>spring-session-api</artifactId>
-                <version>${spring-session.verson}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
-                <version>${security.verson}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session-data-redis</artifactId>
-                <version>${session-data-redis.verson}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework.session</groupId>
-                        <artifactId>spring-session</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session</artifactId>-->
+                <!--<version>${spring-session.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.zjhcsoft.session</groupId>-->
+                <!--<artifactId>spring-session-api</artifactId>-->
+                <!--<version>${spring-session.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-starter-security</artifactId>-->
+                <!--<version>${security.verson}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.springframework.session</groupId>-->
+                <!--<artifactId>spring-session-data-redis</artifactId>-->
+                <!--<version>${session-data-redis.verson}</version>-->
+                <!--<exclusions>-->
+                    <!--<exclusion>-->
+                        <!--<groupId>org.springframework.session</groupId>-->
+                        <!--<artifactId>spring-session</artifactId>-->
+                    <!--</exclusion>-->
+                <!--</exclusions>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
