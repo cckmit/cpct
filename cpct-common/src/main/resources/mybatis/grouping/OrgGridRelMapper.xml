@@ -80,4 +80,21 @@
     and a.status_cd = 1000
     and b.org_id = a.org_id
   </select>
+
+  <select id="getStaffByC3orC4" resultType="java.util.Map">
+    SELECT p2.STAFF_CODE
+    FROM
+	staff_attr p1
+    LEFT JOIN staff p2 ON p1.STAFF_ID = p2.STAFF_ID
+    LEFT JOIN staff_org_rel p3 ON p3.STAFF_ID = p2.STAFF_ID
+    WHERE p1.ATTR_ID = '30001032'
+    AND p1.ATTR_VALUE = 10
+    AND p1.STATUS_CD = 1000
+    AND p2.STATUS_CD = 1000
+    AND p3.REL_TYPE = 1900
+    AND p3.ORG_ID = #{orgId}
+  </select>
+
+
+
 </mapper>

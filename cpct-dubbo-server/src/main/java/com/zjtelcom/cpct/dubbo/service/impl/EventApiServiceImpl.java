@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.event.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
+import com.zjtelcom.cpct.dao.org.StaffGisRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleRelMapper;
@@ -1013,9 +1014,9 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.add(reultMap);
                 }
 
+
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
-                    // HashMap evtParamsMap = JSON.toJavaObject(evtParams, HashMap.class);
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
@@ -1031,7 +1032,32 @@ public class EventApiServiceImpl implements EventApiService {
                             evtContent.put("400600000041", c4Str);
                         }
                     }
-                    reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel"));
+                    String staffCode = "";
+                    Object flg = evtContent.get("400600000052");
+                    if (flg!=null && "1".equals(flg.toString())){
+                        if (onlineMap.get("wgbm")==null){
+                            staffCode = "GIS网格编码查询为空";
+                        }
+                        String wgbm = (String) onlineMap.get("wgbm");
+                        Map<String, Object> mapRes = orgGridRelMapper.getC3AndC4(wgbm);
+                        if (mapRes!=null && mapRes.get("c4")!=null){
+                            List<String> list = orgGridRelMapper.getStaffByC3orC4(mapRes.get("c4").toString());
+                            if (!list.isEmpty()){
+                                staffCode = list.get(0);
+                            }
+                        }
+                        if ("".equals(staffCode)&& mapRes.get("c3")!=null){
+                            List<String> list = orgGridRelMapper.getStaffByC3orC4(mapRes.get("c3").toString());
+                            if (!list.isEmpty()){
+                                staffCode = list.get(0);
+                            }else {
+                                staffCode = "未查询到有效的接单人信息";
+                            }
+                        }
+                    }else {
+                        staffCode = onlineMap.get("tel").toString();
+                    }
+                    reultMap.put("CPCP_ACCS_NBR", staffCode);
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
