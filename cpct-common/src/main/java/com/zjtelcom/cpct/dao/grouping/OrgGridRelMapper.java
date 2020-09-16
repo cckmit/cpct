@@ -29,5 +29,8 @@ public interface OrgGridRelMapper {
 
     List<String>  getStaffByC3orC4(@Param("orgId")String orgId);
 
+    List<String>  getStaffByOrgPath(@Param("orgPath")String orgPath);
+
+    String  getOrgPathByOrgId(@Param("orgId")String orgId);
 
 }
