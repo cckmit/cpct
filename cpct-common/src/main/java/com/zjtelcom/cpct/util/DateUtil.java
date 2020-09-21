@@ -909,6 +909,14 @@ public class DateUtil {
     }
 
 
+    public static Date Cal_Days(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + days);
+        return calendar.getTime();
+    }
+
+
     /**
      * 计算两个日期之间相差的天数
      * @param targetDate
