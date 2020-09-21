@@ -48,4 +48,9 @@ public interface TrialOperationMapper {
     List<TrialOperation> findOperationListByStrategyIdLsit(List<String> strategyIdList);
 
     List<TrialOperation> getDataStartToEnd (@Param("campaignId")Long campaignId,@Param("startTime")String startTime,@Param("endTime")String endTime);
+
+    String selectOrgpathPathByWgbm(@Param("wgbm") String wgbm);
+    String selectOrgNameByOrgId(@Param("orgId") String orgId);
+    String selectStaffByOrgpath(@Param("list") String [] list);
+
 }

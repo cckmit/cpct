@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
 import com.ctg.mq.api.bean.MQSendStatus;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
@@ -54,6 +55,7 @@ import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.impl.MqServiceImpl;
+import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.thread.MyThread;
@@ -89,18 +91,15 @@ import java.util.regex.Pattern;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 import static com.zjtelcom.cpct.enums.ConfAttrEnum.*;
+import static com.zjtelcom.cpct.enums.ConfAttrEnum.ISEE_LABEL_AREA_CUSTOMER;
 
 @Service
 public class TrialOperationServiceImpl extends BaseService implements TrialOperationService {
 
-
-
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-
     @Autowired
     private InjectionLabelMapper injectionLabelMapper;
-
     @Autowired
     private TrialOperationMapper trialOperationMapper;
     @Autowired
@@ -149,7 +148,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private MktCamDisplayColumnRelMapper mktCamDisplayColumnRelMapper;
     @Autowired
     private ServicePackageMapper servicePackageMapper;
-
+    @Autowired
+    private CamCpcSpecialLogic camCpcSpecialLogic;
     @Value("${ctg.cpctTopic}")
     private String importTopic;
 
@@ -201,7 +201,8 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
     private OrganizationMapper organizationMapper;
     @Autowired
     private SysAreaMapper sysAreaMapper;
-
+    @Autowired(required = false)
+    private ISaleService iSaleService;
     //抽样展示全量试算记录
     @Override
     public Map<String, Object> showCalculationLog(Long id) {
@@ -849,7 +850,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
      */
     @Transactional(readOnly = false)
     @Override
-    public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId) throws IOException {
+    public Map<String, Object> importUserList(MultipartFile multipartFile, TrialOperationVO operation, Long ruleId,boolean isBusinessMkt) throws IOException {
         // 接单人标签索引
         int index = 0;
         Map<String, Object> result = new HashMap<>();
@@ -1133,6 +1134,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     check = false;
                                     break;
                                 }
+
                                 customers.put(codeList[x], value);
                             }
                             if (!check || customers.isEmpty()) {
@@ -1140,6 +1142,37 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             }
                             customerList.add(customers);
                         }
+
+                        //蓝海流程
+                        if(isBusinessMkt == true){
+                            logger.info("customerList数量：" +customerList.size());
+                            customerList.forEach(customMap -> {
+                                String c4 =(String)customMap.get("CPCP_COMPANY_CITY") + "市";
+                                Long lanId = AreaNameEnum.getLanIdByName(c4);
+                                String addr = (String)customMap.get("CPCP_COMPANY_ADDRESS");
+                                logger.info("c4: " + c4);
+                                logger.info("lanId: " + lanId);
+                                logger.info("addr: " + addr);
+                                String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
+                                logger.info("wgbm: " + wgbm);
+                                if(wgbm == null || wgbm.equals("")){
+                                    String ccust_name =(String)customMap.get("CCUST_NAME");
+                                    addLog2Es(ccust_name, "gis网格编码为空");
+                                    return;
+                                }
+                                String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
+                                logger.info("orgpath: " + orgpath);
+                                String [] orgpathToUse = orgpath.split("-");
+                                String orgName = trialOperationMapper.selectOrgNameByOrgId(orgpathToUse[orgpathToUse.length-1]);
+                                String staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
+                                logger.info("orgName: " + orgName + "staffid: " + staffid);
+                                if(orgName != null || staffid != null){
+                                    customMap.put("MANAGER_ID ",staffid);
+                                    customMap.put("CLUSTER_NAME",orgName);
+                                }
+                            });
+                        }
+
                         if (customerList.size() > 0) {
                             importListMQ2EsService(request, customerList, productFilter, batchNumSt, ruleId.toString(), trialOp);
                         }
@@ -1162,7 +1195,34 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         result.put("resultMsg", "导入成功,请稍后查看结果");
         return result;
     }
-
+private String getWgbmByLanId(String lanId,String c4,String addr){
+    // 本地网标识
+    String respXml = "";
+    try {
+        String resCoverId = iSaleService.queryCoverIdByAddr(lanId, c4, addr);
+        logger.info("onlineScanCodeOrCallPhone4Home-->resCoverId:" + resCoverId);
+        String resCoverIdXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<WebService FuncName=\"QueryResCoverInfoService\" City=\"WT\">\n" +
+                "\t<Root>\n" +
+                "\t\t<AreaBm>" + lanId + "</AreaBm>\n" +
+                "\t\t<Method>QueryResCoverInfo</Method>\n" +
+                "\t\t<Query>\n" +
+                "\t\t\t<ResCoverId>" + resCoverId + "</ResCoverId>\n" +
+                "\t\t</Query>\n" +
+                "\t</Root>\n" +
+                "</WebService>";
+        respXml = iSaleService.queryResCoverInfoService(resCoverIdXml);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    logger.info("onlineScanCodeOrCallPhone4Home-->respXml:" + respXml);
+    List<Map<String, Object>> maps = camCpcSpecialLogic.parseData(respXml);
+    logger.info("onlineScanCodeOrCallPhone4Home-->maps:" + maps);
+    Map<String, Object> map = maps.get(0);
+    // 获取GIS网格编码
+    String wgbm = camCpcSpecialLogic.getValue4CycleMap(map, "Wgbm");
+    return wgbm;
+}
     @Transactional(readOnly = false)
     public Map<String, Object> importExcelUserList(MultipartFile multipartFile) throws IOException {
         // 接单人标签索引
@@ -1911,6 +1971,11 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             redisUtils_es.set( "SPECIFIEDNUM_" + batchNum, specifiedNum);
         }
 
+        //分批下发数量存到redis  SPECIFIED_File_NUM
+        String specifiedFileNum = trialOperation.getSpecifiedFileNum();
+        if (!specifiedFileNum.equals("") && !specifiedFileNum.equals("all")){
+            redisUtils_es.set( "SPECIFIED_File_NUM_" + batchNum, specifiedFileNum);
+        }
 
         BeanUtil.copy(operation,trialOperation);
         // 通过活动id获取关联的标签字段数组
@@ -1997,7 +2062,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                     logger.info("默认展示列displayLabel.get(\"contactChlCode\").toString()" + displayLabel.get("contactChlCode").toString());
                     if(contactChlCode.equals(displayLabel.get("contactChlCode").toString())){
                         logger.info("默认展示列displayLabel4:" + displayLabel);
-                        labelList.add(displayLabel);
+                        for(Map<String,Object> map : labelList){
+                            if(!map.get("code").toString().equals(displayLabel.get("code").toString())){
+                                labelList.add(displayLabel);
+                            }
+                        }
+
                     }
                 }
             }
@@ -2168,7 +2238,15 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 }
             }
             operationDetailList.add(detail);
+            //如果是分批下发并且状态是全量试算成功给前端一个标记
+            Object p = redisUtils_es.get("SPECIFIED_File_NUM_" + trialOperation.getBatchNum());
+            if (trialOperation.getStatusCd().equals("5000")){
+                if ( p != null && !"".equals(p.toString())){
+                    detail.setBatchFlg("true");
+                }
+            }
         }
+
         return operationDetailList;
     }
 

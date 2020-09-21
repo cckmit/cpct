@@ -5,6 +5,7 @@ import com.zjtelcom.cpct.dao.event.ContactEvtItemMapper;
 import com.zjtelcom.cpct.dao.event.MktOfferEventMapper;
 import com.zjtelcom.cpct.domain.event.MktOfferEventDO;
 import com.zjtelcom.cpct.dubbo.service.MktOfferEventService;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,8 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
     private MktOfferEventMapper mktOfferEventMapper;
     @Autowired
     private ContactEvtItemMapper contactEvtItemMapper;
+    @Autowired
+    private RedisUtils redisUtils;
     @Override
     public Map<String, Object> getEventListByOffer(Map<String, Object> paramMap) {
         List<String> offerCodeList = (List<String>) paramMap.get("offerCodeList");
@@ -37,9 +40,20 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
         List<Map<String,Object>> data = new ArrayList<>();
         try{
             for(String offerCode :offerCodeList){
+                HashMap<String,Object> dataMap = new HashMap<String,Object>();
+                //先取缓存
+                if(redisUtils.get("OFFER_EVENT_LIST" + offerCode) != null){
+                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                    dataMap.put("offerCode", offerCode);
+                    dataMap.put("eventList",eventList);
+                    data.add(dataMap);
+                    log.info("销售品获取关联事件数据走缓存：" + offerCode);
+                    continue;
+                };
+                //否则查数据库
                 List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
                 log.info(" 数据库返回：mktOfferEventDOList" + mktOfferEventDOList);
-                HashMap<String,Object> dataMap = new HashMap<String,Object>();
+
                 if(mktOfferEventDOList.size() == 0){
                     List<String> eventList = new ArrayList<>();
                     dataMap.put("offerCode", offerCode);
@@ -65,6 +79,7 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
                     }
                     dataMap.put("eventList",eventList);
                     data.add(dataMap);
+                    redisUtils.setRedisUnit("OFFER_EVENT_LIST" + offerCode, eventList, 86400);
                 }
 
             }

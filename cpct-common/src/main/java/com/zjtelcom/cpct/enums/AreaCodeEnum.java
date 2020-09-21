@@ -61,6 +61,14 @@ public enum AreaCodeEnum {
         return null;
     }
 
+    public static Long getLanIdBylatnId(Long latnId){
+        for (AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()) {
+            if(latnId.equals(areaCodeEnum.latnId)){
+                return areaCodeEnum.lanId;
+            }
+        }
+        return null;
+    }
     public static Long getLandIdByRegionId(Long RegionId){
         for (AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()) {
             if(RegionId.equals(areaCodeEnum.regionId)){
@@ -78,6 +86,8 @@ public enum AreaCodeEnum {
         }
         return null;
     }
+
+
 
     public  static String getAreaNameByLanId(Long lanId){
         for(AreaCodeEnum areaCodeEnum : AreaCodeEnum.values()){

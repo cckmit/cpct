@@ -11,6 +11,7 @@ import com.zjtelcom.cpct.dto.event.ContactEvt;
 import com.zjtelcom.cpct.service.channel.EventRelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,8 @@ public class EventRelServiceImpl implements EventRelService {
     private ContactEvtMapper contactEvtMapper;
     @Autowired
     private ContactEvtItemMapper contactEvtItemMapper;
-
+    @Autowired
+    private RedisUtils redisUtils;
     /*
     ** 获取未被当前事件关联的事件
     ** aEvtId-被关联的事件 zEvtId-进行关联操作的事件
@@ -127,9 +129,21 @@ public class EventRelServiceImpl implements EventRelService {
         List<Map<String,Object>> data = new ArrayList<>();
         try{
             for(String offerCode :offerCodeList){
+                HashMap<String,Object> dataMap = new HashMap<String,Object>();
+                //先取缓存
+                if(redisUtils.get("OFFER_EVENT_LIST" + offerCode) != null){
+                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                    dataMap.put("offerCode", offerCode);
+                    dataMap.put("eventList",eventList);
+                    data.add(dataMap);
+                    log.info("销售品获取关联事件数据走缓存：" + offerCode);
+                    continue;
+                };
+
+                //否则取数据库
                 List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
                 log.info(" 数据库返回：mktOfferEventDOList" + mktOfferEventDOList);
-                HashMap<String,Object> dataMap = new HashMap<String,Object>();
+
                 if(mktOfferEventDOList.size() == 0){
                     List<String> eventList = new ArrayList<>();
                     dataMap.put("offerCode", offerCode);
@@ -155,6 +169,7 @@ public class EventRelServiceImpl implements EventRelService {
                     }
                     dataMap.put("eventList",eventList);
                     data.add(dataMap);
+                    redisUtils.setRedisUnit("OFFER_EVENT_LIST" + offerCode, eventList, 86400);
                 }
             }
         }catch (Exception e){
