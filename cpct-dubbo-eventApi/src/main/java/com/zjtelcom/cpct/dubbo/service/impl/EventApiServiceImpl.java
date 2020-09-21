@@ -38,7 +38,7 @@ import com.zjtelcom.cpct.domain.blacklist.BlackListDO;
 import com.zjtelcom.cpct.domain.campaign.*;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.event.CommonRegion;
-//import com.zjtelcom.cpct.domain.event.OfferExpenseDO;
+import com.zjtelcom.cpct.domain.event.OfferExpenseDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
@@ -1196,7 +1196,7 @@ public class EventApiServiceImpl implements EventApiService {
 
                 //5G套餐办理变更事件
                 if("EVTS000001141".equals(eventCode)){
-                   /* DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
                     log.info("接入事件： "+ eventCode);
                     List<OfferExpenseDO> offerExpenseDO = commonRegionMapper.getExpenseByOfferNbr(offerNbr);
@@ -1228,7 +1228,6 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.add(reultMap);
 
                     log.info("resultMapList" + resultMapList);
-                    */
 
                 }
 
@@ -2565,7 +2564,6 @@ public class EventApiServiceImpl implements EventApiService {
 //                        redisUtils.del("MKT_CAMPAIGN_"+mktCampaginId);
 //                    }
                 }
-                log.info("mktCampaign -->>" + JSON.toJSONString(mktCampaign));
                 Date now = null;
                 try {
                     now = new Date();
@@ -2608,7 +2606,6 @@ public class EventApiServiceImpl implements EventApiService {
                     esHitService.save(esJson, IndexList.ACTIVITY_MODULE);
                     return Collections.EMPTY_MAP;
                 }
-                log.info("活动类型 -- > " + StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode());
                 // 判断活动类型
                 if (!StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaign.getMktCampaignCategory())
                         && !"3000".equals(mktCampaign.getMktCampaignCategory())) {

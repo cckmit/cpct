@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: crm-cpct-dubbo-eventapi
+  name: crm-cpct-dubbo-eventApi
   labels:
-    name: crm-cpct-dubbo-eventapi
+    name: crm-cpct-dubbo-eventApi
 spec:
   type: NodePort
   ports:
   - port: 30816
     nodePort: 30816
   selector:
-    name: crm-cpct-dubbo-eventapi
+    name: crm-cpct-dubbo-eventApi
