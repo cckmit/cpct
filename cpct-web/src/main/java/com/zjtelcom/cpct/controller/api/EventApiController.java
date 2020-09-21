@@ -8,6 +8,7 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
 import com.zjtelcom.cpct.service.api.TestService;
@@ -70,7 +71,35 @@ public class EventApiController extends BaseController {
     private OpenCampaignScheService openCampaignScheService;
     @Autowired
     private EventRelService mktOfferEventService;
+    @Autowired
+    private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
 
+
+    @PostMapping("mktStrategyCloseRuleRelMapper")
+    public  Map<String,Object> mktStrategyCloseRuleRelMapper(@RequestBody Map<String,String> param) {
+        Map<String,Object> result = new HashMap<>();
+        try {
+            List<String> stringList = ChannelUtil.StringToList(param.get("string"));
+            List<List<String>> list = ChannelUtil.averageAssign(stringList,10);
+            for (List<String> strings : list) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (String string : strings) {
+                                mktStrategyCloseRuleRelMapper.deleteByPrimaryKey(Long.valueOf(string));
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 
     @PostMapping("openCampaignScheForDay")

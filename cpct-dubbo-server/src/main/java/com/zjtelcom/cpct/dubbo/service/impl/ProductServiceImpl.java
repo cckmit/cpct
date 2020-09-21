@@ -11,7 +11,9 @@ import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dubbo.service.ProductService;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.DateUtil;
+import com.zjtelcom.cpct.util.RedisUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,10 @@ public class ProductServiceImpl implements ProductService {
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
     @Autowired(required = false)
     private MktCampaignMapper mktCampaignMapper;
+    @Autowired
+    private EventRedisService eventRedisService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     //销售品关联活动查询
     @Override
@@ -49,9 +55,23 @@ public class ProductServiceImpl implements ProductService {
                 } else if ("2".equals(type)) {
                     type = "3000";
                 }
-                List<CloseRule> filterRuleList = closeRuleMapper.selectByProduct(split[i], type, StatusCode.RECEIVE_CLOSE.getStatusCode());
+                Object list = redisUtils.hget("CLOSE_RULE_LIST_" + split[i],type);
+                List<CloseRule> filterRuleList= new ArrayList<>();
+                if (list!=null){
+                    filterRuleList = (List<CloseRule>) list;
+                }else {
+                    filterRuleList = closeRuleMapper.selectByProduct(split[i], type, StatusCode.RECEIVE_CLOSE.getStatusCode());
+                    redisUtils.hset("CLOSE_RULE_LIST_"+ split[i],type,filterRuleList);
+                }
                 for (CloseRule filterRule1 : filterRuleList) {
-                    List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
+                    Object ruleList = redisUtils.get("CAM_CLOSE_RULE_LIST_" + filterRule1.getRuleId());
+                    List<MktStrategyCloseRuleRelDO> mktStrategyCloseRuleRelDOList = new ArrayList<>();
+                    if (ruleList!=null){
+                        mktStrategyCloseRuleRelDOList = (List<MktStrategyCloseRuleRelDO>) ruleList;
+                    }else {
+                         mktStrategyCloseRuleRelDOList = mktStrategyCloseRuleRelMapper.selectByRuleId(filterRule1.getRuleId());
+                        redisUtils.setRedisUnit("CAM_CLOSE_RULE_LIST_"+filterRule1.getRuleId(),mktStrategyCloseRuleRelDOList,300);
+                    }
                     for (MktStrategyCloseRuleRelDO mktStrategyCloseRuleRelDO : mktStrategyCloseRuleRelDOList) {
                         Map<String, Object> maps = new HashMap<>();
                         if (filterRule1.getOfferInfo() != null) {
@@ -63,8 +83,31 @@ public class ProductServiceImpl implements ProductService {
                                 offerInfo = "2";
                             }
                         }
-                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktStrategyCloseRuleRelDO.getStrategyId());
-                        CloseRule closeRule = closeRuleMapper.selectByPrimaryKey(filterRule1.getRuleId());
+                        Map<String, Object> mktCampaignRedis = eventRedisService.getRedis("MKT_CAMPAIGN_", mktStrategyCloseRuleRelDO.getStrategyId());
+                        MktCampaignDO mktCampaignDO = new MktCampaignDO();
+                        if (mktCampaignRedis != null) {
+                                mktCampaignDO = (MktCampaignDO) mktCampaignRedis.get("MKT_CAMPAIGN_" + mktStrategyCloseRuleRelDO.getStrategyId());
+                        }
+                        try {
+                            if (mktCampaignDO==null || "2007".equals(mktCampaignDO.getStatusCd())){
+                                mktStrategyCloseRuleRelMapper.deleteByPrimaryKey(mktStrategyCloseRuleRelDO.getMktStrategyFilterRuleRelId());
+                                continue;
+                            }
+                            if ( !"2002".equals(mktCampaignDO.getStatusCd())
+                                    && !"2008".equals(mktCampaignDO.getStatusCd())){
+                                continue;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Object o = redisUtils.get("CLOSE_RULE_" + filterRule1.getRuleId());
+                        CloseRule closeRule = new CloseRule();
+                        if (o!=null){
+                            closeRule = (CloseRule) o;
+                        }else {
+                            closeRule  = closeRuleMapper.selectByPrimaryKey(filterRule1.getRuleId());
+                            redisUtils.setRedisUnit("CLOSE_RULE_"+closeRule.getRuleId(),closeRule,300);
+                        }
                         maps.put("closeType", offerInfo);
                         maps.put("activityId", mktCampaignDO.getInitId());
                         maps.put("closeName",filterRule1.getCloseName());

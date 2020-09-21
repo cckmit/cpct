@@ -36,6 +36,15 @@ public class TrialOperation extends BaseEntity {
     private String endNum;
     private String subNum;
     private String specifiedNum;
+    private String specifiedFileNum;
+
+    public String getSpecifiedFileNum() {
+        return specifiedFileNum;
+    }
+
+    public void setSpecifiedFileNum(String specifiedFileNum) {
+        this.specifiedFileNum = specifiedFileNum;
+    }
 
     public String getSpecifiedNum() {
         return specifiedNum;

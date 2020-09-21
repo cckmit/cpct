@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.service.impl.filter;
 
 import com.ctzj.smt.bss.centralized.web.util.BssSessionHelp;
-import com.ctzj.smt.bss.cpc.configure.service.api.offer.IFairValueConfigureService;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

@@ -212,7 +212,7 @@ public class TrialOperationController extends BaseController {
      */
     @PostMapping("importUserList")
     @CrossOrigin
-    public Map<String, Object> importUserList(MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
+    public Map<String, Object> importUserList(boolean isBusinessMkt, MultipartFile file, TrialOperationVO operation,@Param("ruleId") Long ruleId)throws IOException{
         Map<String, Object> result = new HashMap<>();
         try {
             InputStream inputStream = file.getInputStream();
@@ -225,7 +225,7 @@ public class TrialOperationController extends BaseController {
                 result.put("resultMsg", "文件格式不正确");
                 return result;
             }
-            result = operationService.importUserList(file,operation,ruleId);
+            result = operationService.importUserList(file,operation,ruleId,isBusinessMkt);
         } catch (Exception e) {
             logger.error("[op:ScriptController] fail to importUserList", e);
             result.put("resultCode", CODE_FAIL);

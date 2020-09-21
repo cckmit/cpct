@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.BatchSendMapper">
+
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.BatchSendDO">
+        <id column="ID" jdbcType="BIGINT" property="batchId" />
+        <result column="BATCH_NUM" jdbcType="VARCHAR" property="batchNum" />
+        <result column="FILE_NAME" jdbcType="VARCHAR" property="fileName" />
+        <result column="TOTAL" jdbcType="BIGINT" property="total" />
+        <result column="STATE" jdbcType="VARCHAR" property="state" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="LITTLE_BATCH" jdbcType="VARCHAR" property="littleBatch" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zjtelcom.cpct.domain.campaign.BatchSendDO" >
+        insert into mkt_batch_send
+        (BATCH_NUM, FILE_NAME, TOTAL, STATE, create_date, update_date,LITTLE_BATCH)
+        values
+        ( #{batchNum,jdbcType=VARCHAR},
+        #{fileName,jdbcType=VARCHAR},
+        #{state,jdbcType=VARCHAR},
+        #{total,jdbcType=BIGINT},
+        #{createDate,jdbcType=TIMESTAMP},
+        #{updateDate,jdbcType=TIMESTAMP},
+        #{littleBatch,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByBatchNum" resultMap="BaseResultMap">
+        select ID,BATCH_NUM,FILE_NAME,TOTAL,STATE,CREATE_DATE,UPDATE_DATE,LITTLE_BATCH from mkt_batch_send
+        WHERE
+        BATCH_NUM = #{batchNum}
+    </select>
+
+    <update id="updateStateByBatchNum" >
+        update mkt_batch_send
+        set
+            state = #{state,jdbcType=VARCHAR}
+        where BATCH_NUM=#{batchNum}
+    </update>
+
+</mapper>

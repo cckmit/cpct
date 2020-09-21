@@ -11,7 +11,10 @@ import com.zjtelcom.cpct.dao.strategy.MktCamStrategyRelMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
+import com.zjtelcom.cpct.enums.ConfAttrEnum;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.cpct.ProjectManageService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description:
@@ -61,6 +61,9 @@ public class ProjectManageServiceImpl implements ProjectManageService{
         if (id != null) {
             TrialOperation trialOperation = trialOperationMapper.selectByPrimaryKey(id);
             if (trialOperation != null) {
+                trialOperation.setStartTime(DateUtil.string2DateTime(params.get("effectDate").toString()));
+                trialOperation.setEndTime(DateUtil.string2DateTime(params.get("invalidDate").toString()));
+                trialOperationMapper.updateByPrimaryKey(trialOperation);
                 params.put("workFlowId", trialOperation.getBatchNum().toString());
             }
         }

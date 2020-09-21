@@ -236,14 +236,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
         if (!"0".equals(campaignId.toString())){
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(campaignId);
             if (campaignDO!=null ) {
-                if ("C3".equals(level) && !"1000".equals(campaignDO.getMktCampaignType())) {
-                    result.put("resultCode", CODE_SUCCESS);
-                    result.put("resultMsg", "非营销类活动，无权限调整");
-                    result.put("flg", "false");
-                    return result;
+                if ("C3".equals(level) ) {
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(campaignDO.getMktCampaignCategory()) ){
+                        result.put("resultCode", CODE_SUCCESS);
+                        result.put("resultMsg", "您没有权限调整该活动，请重新选择");
+                        result.put("flg", "false");
+                        return result;
+                    }
+
                 }
                 if ("C4".equals(level)) {
-                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"2000".equals(campaignDO.getTiggerType())
+                    if (!"1000".equals(campaignDO.getMktCampaignType()) || !"1000".equals(campaignDO.getTiggerType())
                             || !"1000".equals(campaignDO.getExecType())) {
                         result.put("resultCode", CODE_SUCCESS);
                         result.put("resultMsg", "您没有权限调整该活动，请重新选择");
@@ -2001,7 +2004,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
-                mktCampaignDO.setMktCampaignType("1000");
+                mktCampaignDO.setMktCampaignType("(1000)");
             }
             if ("C4".equals(userLevl)){
                 mktCampaignDO.setTiggerType("1000");
@@ -2476,6 +2479,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
                     // 过期活动
                     updateProjectStateTime(mktCampaignDO.getInitId());
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
                 }
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 删除下线活动与事件的关系
@@ -3403,6 +3407,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
                     updateProjectStateTime(mktCampaignDO.getInitId());
                 }
             }
@@ -4337,8 +4342,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 for (TrialOperation trialOperation : trialOperationList) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("id", trialOperation.getId()==null?0:trialOperation.getId().intValue());  // 试运算Id
-                    params.put("effectDate", new Date());  // 生效时间
-                    params.put("invalidDate", new Date()); // 失效时间
+                    params.put("effectDate",DateUtil.date2StringDate(new Date()));  // 生效时间
+                    params.put("invalidDate",DateUtil.date2StringDate(new Date())); // 失效时间
                     projectManageService.updateProjectStateTime(params);
                 }
             }

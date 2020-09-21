@@ -9,6 +9,15 @@ public class TrialOperationDetail extends TrialOperation implements Serializable
     private Long ruleId;
     private String ruleName;
     private String flg;
+    private String batchFlg;
+    public String getBatchFlg() {
+        return batchFlg;
+    }
+
+    public void setBatchFlg(String batchFlg) {
+        this.batchFlg = batchFlg;
+    }
+
 
 
     public String getFlg() {
