@@ -2479,6 +2479,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 if (StatusCode.STATUS_CODE_PRE_PAUSE.getStatusCode().equals(statusCd)) {
                     // 过期活动
                     updateProjectStateTime(mktCampaignDO.getInitId());
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
                 }
                 if (StatusCode.STATUS_CODE_ROLL.getStatusCode().equals(statusCd)) {
                     // 删除下线活动与事件的关系
@@ -3406,6 +3407,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCampaignDO.setStatusDate(now);
                     mktCampaignDO.setUpdateDate(now);
                     mktCampaignMapper.updateByPrimaryKey(mktCampaignDO);
+                    mktCamEvtRelMapper.deleteByMktCampaignId(mktCampaignDO.getMktCampaignId());
                     updateProjectStateTime(mktCampaignDO.getInitId());
                 }
             }
@@ -4340,8 +4342,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 for (TrialOperation trialOperation : trialOperationList) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("id", trialOperation.getId()==null?0:trialOperation.getId().intValue());  // 试运算Id
-                    params.put("effectDate", new Date());  // 生效时间
-                    params.put("invalidDate", new Date()); // 失效时间
+                    params.put("effectDate",DateUtil.date2StringDate(new Date()));  // 生效时间
+                    params.put("invalidDate",DateUtil.date2StringDate(new Date())); // 失效时间
                     projectManageService.updateProjectStateTime(params);
                 }
             }

@@ -23,4 +23,6 @@ public interface ObjMktCampaignRelMapper {
     int updateByPrimaryKey(ObjMktCampaignRel record);
 
     List<ObjMktCampaignRel> selectByRequestIdAndType(@Param("requestId") Long requestId,@Param("type")String type);
+
+    List<ObjMktCampaignRel> selectByOfferCodeAndType(@Param("offerCode") String offerCode,@Param("type")String type);
 }

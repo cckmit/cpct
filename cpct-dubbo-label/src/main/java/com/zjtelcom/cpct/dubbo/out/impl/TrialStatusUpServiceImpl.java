@@ -9,6 +9,7 @@ import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.cpct.ProjectManageService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
 import com.zjtelcom.cpct.service.grouping.TrialProdService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.es.es.service.EsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,8 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
             if (status.equals(TrialStatus.CHANNEL_PUBLISH_FAIL.getValue())){
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", operation.getId().intValue());  // 试运算Id
-                map.put("effectDate", new Date());  // 生效时间
-                map.put("invalidDate", new Date()); // 失效时间
+                map.put("effectDate", DateUtil.date2StringDate(new Date()));  // 生效时间
+                map.put("invalidDate",DateUtil.date2StringDate(new Date())); // 失效时间
                 projectManageService.updateProjectStateTime(params);
             }
         }catch (Exception e){

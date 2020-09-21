@@ -2053,8 +2053,18 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
         requests.setParamList(paramList);
         final  TrialOperationVOES  issureRequest = requests;
         System.out.println(JSON.toJSONString(requests));
-        operation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
-        trialOperationMapper.updateByPrimaryKey(operation);
+        try {
+            List<String> startList = mktCamChlConfAttrMapper.selectAttrTimeInfoByCampaignId(campaignDO.getMktCampaignId(),
+                    ConfAttrEnum.START_DATE.getArrId() );
+            List<String> endList = mktCamChlConfAttrMapper.selectAttrTimeInfoByCampaignId(campaignDO.getMktCampaignId(),
+                    ConfAttrEnum.END_DATE.getArrId() );
+            operation.setStartTime(new Date(startList.get(0)));
+            operation.setEndTime(new Date(endList.get(0)));
+            operation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
+            trialOperationMapper.updateByPrimaryKey(operation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         try {
             new Thread(){
                 public void run(){

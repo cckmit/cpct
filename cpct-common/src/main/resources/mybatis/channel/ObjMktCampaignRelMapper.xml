@@ -86,5 +86,15 @@
     from obj_mkt_campaign_rel where OBJ_ID = #{requestId} and OBJ_TYPE = #{type}
   </select>
 
+  <select id="selectByOfferCodeAndType" resultMap="BaseResultMap">
+   select OFFER_SCENE_REL_ID, MKT_CAMPAIGN_ID, OBJ_TYPE, OBJ_ID, REL_TYPE, EFF_DATE,
+    EXP_DATE, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE,
+    REMARK
+    FROM
+	obj_mkt_campaign_rel p1 LEFT JOIN offer p2 on p1.OBJ_ID = p2.OFFER_ID
+	WHERE
+	OBJ_ID = #{requestId} and OBJ_TYPE = #{type}
+  </select>
+
 
 </mapper>
