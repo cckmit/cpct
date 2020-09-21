@@ -95,6 +95,32 @@
     AND p3.ORG_ID = #{orgId}
   </select>
 
+  <select id="getStaffByOrgPath" resultType="java.lang.String">
+    SELECT
+	c.salesstaff_code
+    FROM
+	organization a,
+	staff_org_rel b,
+	staff c,
+	staff_attr d
+    WHERE a.org_path like concat('%',concat(#{orgPath},'%'))
+    AND a.status_cd = '1000'
+    AND b.org_id = a.org_id
+    AND b.rel_type = '1900'
+    AND b.status_cd = '1000'
+    AND c.staff_id = b.staff_id
+    AND c.status_cd = '1000'
+    AND d.staff_id = c.staff_id
+    AND d.attr_id = '30001032'
+    AND d.attr_value = '10'
+    AND d.status_cd = '1000'
+  </select>
+
+  <select id="getOrgPathByOrgId" resultType="java.lang.String">
+   select org_path from organization where org_id= #{orgId}
+  </select>
+
+
 
   <select id="getStaffByOrgPath" resultType="java.lang.String">
     SELECT

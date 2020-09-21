@@ -244,9 +244,27 @@
     WHERE  CREATE_DATE > #{startTime} AND #{endTime} > CREATE_DATE AND CREATE_STAFF = 2000
   </select>
 
-  <select id="getlist" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select <include refid="selectColumn"/>
-    from trial_operation
-    WHERE  CREATE_DATE > #{startTime} AND #{endTime} > CREATE_DATE
+  <select id="selectOrgpathPathByWgbm" parameterType="java.lang.String" resultType="java.lang.String">
+    select a.ORG_PATH
+    from organization a , org_grid_rel b where b.X_ATTRIB=#{wgbm} and b.STATUS_CD ='1000' and b.ORG_ID =a.ORG_ID
+  </select>
+  <select id="selectOrgNameByOrgId"  parameterType="java.lang.String" resultType="java.lang.String">
+    select c.STAFF_ID from organization a ,staff_org_rel b,staff c
+    where a.org_id  = #{orgId}
+    and org_area_level='10'
+    and b.org_id=a.org_id and b.rel_type='1910' and b.status_cd='1000'
+    and c.staff_id=b.staff_id  and c.status_cd='1000'
+  </select>
+  <select id="selectStaffByOrgpath"  resultType="java.lang.String">
+    select c.STAFF_ID from organization a ,staff_org_rel b,staff c
+    where a.org_id in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    and org_area_level='10'
+    and b.org_id=a.org_id and b.rel_type='1910' and b.status_cd='1000'
+    and c.staff_id=b.staff_id  and c.status_cd='1000'
   </select>
 </mapper>
+
+
