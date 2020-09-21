@@ -13,7 +13,7 @@
     <dubbo:registry id="esb2" protocol="dubbo" address="134.96.159.11:8033"/>
 
     <!-- 暴露服务 -->
-    <dubbo:protocol name="dubbo" port="30803"/>
+    <dubbo:protocol name="dubbo" port="30816"/>
     <dubbo:monitor protocol="registry" />
 
     <!-- 注册 -->
@@ -105,11 +105,6 @@
     <dubbo:reference registry="esb3" id="ICacheIdMappingEntityQryService" interface="com.ctzj.smt.bss.cache.service.api.CacheEntityApi.ICacheIdMappingEntityQryService" version="1.0" retries="0" check="false">
         <dubbo:method name="getProdInstIdMappingCacheEntity" servicecode="00.1074.getProdInstIdMappingCacheEntity"  timeout="10000"/>
     </dubbo:reference>
-
-    <!-- 关单规则filterType查询关单信息 -->
-    <dubbo:service registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.ProductService" ref="productServiceImpl" version="1.0" >
-        <dubbo:method name="getCloseCampaign" servicecode="00.1083.getCloseCampaign" timeout="10000"/>
-    </dubbo:service>
 
     <!-- eslog -->
     <dubbo:reference registry="esb3" interface="com.zjtelcom.cpct.dubbo.service.MqProducerService" id="mqProducerService" version="1.0" check="false">
