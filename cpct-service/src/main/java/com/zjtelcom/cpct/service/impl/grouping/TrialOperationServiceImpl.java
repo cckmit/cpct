@@ -1162,13 +1162,28 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 }
                                 String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
                                 logger.info("orgpath: " + orgpath);
+                                if(orgpath == null || orgpath.equals("")){
+                                    String ccust_name =(String)customMap.get("CCUST_NAME");
+                                    addLog2Es(ccust_name, "客户组织路径为空");
+                                    return;
+                                }
                                 String [] orgpathToUse = orgpath.split("-");
                                 String orgName = trialOperationMapper.selectOrgNameByOrgId(orgpathToUse[orgpathToUse.length-1]);
                                 String staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
                                 logger.info("orgName: " + orgName + "staffid: " + staffid);
-                                if(orgName != null || staffid != null){
-                                    customMap.put("MANAGER_ID ",staffid);
+
+                                if(orgName == null || orgName.equals("")){
+                                    String ccust_name =(String)customMap.get("CCUST_NAME");
+                                    addLog2Es(ccust_name, "片区地址为空");
+                                }else {
                                     customMap.put("CLUSTER_NAME",orgName);
+                                }
+
+                                if(staffid == null || staffid.equals("")){
+                                    String ccust_name =(String)customMap.get("CCUST_NAME");
+                                    addLog2Es(ccust_name, "客户经理为空");
+                                }else {
+                                    customMap.put("MANAGER_ID ",staffid);
                                 }
                             });
                         }
@@ -2250,7 +2265,9 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
             operationDetailList.add(detail);
             //如果是分批下发并且状态是全量试算成功给前端一个标记
             Object p = redisUtils_es.get("SPECIFIED_File_NUM_" + trialOperation.getBatchNum());
-            if (trialOperation.getStatusCd().equals("5000")){
+            if (!trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING) || !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS) ||
+                    !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_FAIL) || !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_GOING) ||
+                    !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_FAIL)){
                 if ( p != null && !"".equals(p.toString())){
                     detail.setBatchFlg("true");
                 }

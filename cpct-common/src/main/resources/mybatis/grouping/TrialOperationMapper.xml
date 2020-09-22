@@ -263,7 +263,7 @@
     </foreach>
     and org_area_level='10'
     and b.org_id=a.org_id and b.rel_type='1910' and b.status_cd='1000'
-    and c.staff_id=b.staff_id  and c.status_cd='1000'
+    and c.staff_id=b.staff_id  and c.status_cd='1000' limit 1
   </select>
 </mapper>
 
