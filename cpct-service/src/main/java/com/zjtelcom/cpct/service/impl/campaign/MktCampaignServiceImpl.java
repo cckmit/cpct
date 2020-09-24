@@ -4346,6 +4346,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     params.put("invalidDate",DateUtil.date2StringDate(new Date())); // 失效时间
                     projectManageService.updateProjectStateTime(params);
                 }
+                projectManageService.updateProjectPcState(mktCampaignDO.getMktCampaignId());
             }
             resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             return resultMap;
