@@ -29,7 +29,7 @@ public class RedisUtils {
     @Autowired(required = false)
     private CtgJedisPool ctgJedisPool;
 
-    @Autowired
+    @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;
 
     @Autowired(required = false)
