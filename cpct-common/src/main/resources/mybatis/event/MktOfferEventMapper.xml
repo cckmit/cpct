@@ -17,8 +17,21 @@
         LEFT JOIN (SELECT c.MKT_CAMPAIGN_ID, c.EVENT_ID,d.EVENT_NAME,d.EVENT_NBR FROM mkt_cam_evt_rel c,event d WHERE c.EVENT_ID= d.EVENT_ID  AND d.EVT_TYPE_ID= #{eventType,jdbcType = BIGINT}) e
         ON b.MKT_CAMPAIGN_ID = e.MKT_CAMPAIGN_ID
         ORDER BY b.OBJ_ID,b.MKT_CAMPAIGN_ID;
-
     </select>
-
-
+    <!--通过销售品编码获取initId-->
+    <select id="selectInitIdByOfferNbr" parameterType="java.lang.String" resultType="java.lang.Long">
+        select mc.INIT_ID from mkt_campaign mc where mc.MKT_CAMPAIGN_ID = (
+        SELECT omcr.MKT_CAMPAIGN_ID from obj_mkt_campaign_rel omcr where omcr.OBJ_ID =
+        (select offer.OFFER_ID from `offer` WHERE OFFER_NBR = #{offerNbr,jdbcType = VARCHAR})limit 1)
+    </select>
+    <!--initID获取正在生效活动的mktcamId-->
+    <select id="selectMktIdByInitId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select mc.MKT_CAMPAIGN_ID from mkt_campaign mc where mc.INIT_ID = #{initId} and (mc.STATUS_CD = "2002" or mc.STATUS_CD =  "2008")
+    </select>
+    <!--mktCamId与evttype获取关联事件-->
+    <select id="getEventIdByCamId" resultMap="BaseResultMap">
+        select mcer.MKT_CAMPAIGN_ID, e.EVENT_ID, e.EVENT_NAME,e.EVENT_NBR from mkt_cam_evt_rel mcer,`event` e
+        WHERE mcer.EVENT_ID= e.EVENT_ID and mcer.MKT_CAMPAIGN_ID = #{mktCamId} and e.EVT_TYPE_ID=#{eventType,jdbcType = BIGINT}
+    </select>
+    
 </mapper>
