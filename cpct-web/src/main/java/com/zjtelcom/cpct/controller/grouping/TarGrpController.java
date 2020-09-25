@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
+import com.zjtelcom.cpct.domain.grouping.TarGrpRel;
 import com.zjtelcom.cpct.dto.filter.CloseRule;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
@@ -306,4 +307,37 @@ public class TarGrpController extends BaseController {
         }
         return FastJsonUtils.objToJson(maps);
     }
+
+
+
+    @RequestMapping("/getNewTarGrpByTemplate")
+    @CrossOrigin
+    public String getNewTarGrpByTemplate(@RequestBody TarGrpRel tarGrpRel) {
+        Map<String, Object> resultMap = tarGrpService.getNewTarGrpByTemplate(tarGrpRel);
+        return FastJsonUtils.objToJson(resultMap);
+    }
+
+
+    @RequestMapping("/getTarGrpRel")
+    @CrossOrigin
+    public String getTarGrpRel(@RequestBody TarGrpRel tarGrpRel) {
+        Map<String, Object> resultMap = tarGrpService.getTarGrpRel(tarGrpRel.getId());
+        return FastJsonUtils.objToJson(resultMap);
+    }
+
+    @RequestMapping("/deleteTarGrpRel")
+    @CrossOrigin
+    public String deleteTarGrpRel(@RequestBody TarGrpRel tarGrpRel) {
+        Map<String, Object> resultMap = tarGrpService.deleteTarGrpRel(tarGrpRel.getId());
+        return FastJsonUtils.objToJson(resultMap);
+    }
+
+
+    @RequestMapping("/updateTarGrpName")
+    @CrossOrigin
+    public String updateTarGrpName(@RequestBody TarGrp tarGrp) {
+        Map<String, Object> resultMap = tarGrpService.updateTarGrpName(tarGrp);
+        return FastJsonUtils.objToJson(resultMap);
+    }
+
 }

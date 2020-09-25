@@ -135,6 +135,25 @@
         order by UPDATE_DATE desc
     </select>
 
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        select TAR_GRP_ID, TAR_GRP_NAME, TAR_GRP_DESC, TAR_GRP_TYPE, STATUS_CD, CREATE_STAFF,
+        UPDATE_STAFF, CREATE_DATE, STATUS_DATE, UPDATE_DATE, REMARK
+        from tar_grp
+        <where>1!=2
+            <if test="tarGrpTemplateName != null and tarGrpTemplateName != ''">
+                AND TAR_GRP_NAME LIKE CONCAT('%', #{tarGrpTemplateName, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="tarGrpType != null and tarGrpType != ''">
+                AND TAR_GRP_TYPE  = #{tarGrpType, jdbcType=VARCHAR}
+            </if>
+            <if test="lanId != null and lanId != 0">
+                AND LAN_ID  = #{lanId, jdbcType=BIGINT}
+            </if>
+            and REMARK = #{remark}
+        </where>
+        order by UPDATE_DATE desc
+    </select>
+
     <update id="modTarGrpOther" parameterType="com.zjtelcom.cpct.dto.grouping.TarGrp">
         update tar_grp
         set CHANNEL_CODE = #{channelCode}, LABEL_CODE = #{labelCodes}
