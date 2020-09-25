@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.impl.grouping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
-import com.ctg.mq.api.bean.MQSendStatus;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
@@ -36,7 +35,6 @@ import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.campaign.MktCamChlConf;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfAttr;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
@@ -54,14 +52,13 @@ import com.zjtelcom.cpct.service.campaign.MktCamChlConfService;
 import com.zjtelcom.cpct.service.campaign.MktDttsLogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TrialOperationService;
-import com.zjtelcom.cpct.service.impl.MqServiceImpl;
 import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.service.org.OrgTreeService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.service.thread.MyThread;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
+import com.zjtelcom.cpct.dao.offer.MktResourceProdMapper;
+import com.zjtelcom.cpct.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.*;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
 import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
@@ -78,13 +75,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.LockSupport;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1146,46 +1141,41 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         //蓝海流程
                         if(isBusinessMkt == true){
                             logger.info("customerList数量：" +customerList.size());
-                            customerList.forEach(customMap -> {
-                                String c4 =(String)customMap.get("CPCP_COMPANY_CITY") + "市";
-                                Long lanId = AreaNameEnum.getLanIdByName(c4);
-                                String addr = (String)customMap.get("CPCP_COMPANY_ADDRESS");
-                                logger.info("c4: " + c4);
-                                logger.info("lanId: " + lanId);
-                                logger.info("addr: " + addr);
-                                String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
-                                logger.info("wgbm: " + wgbm);
-                                if(wgbm == null || wgbm.equals("")){
-                                    String ccust_name =(String)customMap.get("CCUST_NAME");
-                                    addLog2Es(ccust_name, "gis网格编码为空");
-                                    return;
-                                }
-                                String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
-                                logger.info("orgpath: " + orgpath);
-                                if(orgpath == null || orgpath.equals("")){
-                                    String ccust_name =(String)customMap.get("CCUST_NAME");
-                                    addLog2Es(ccust_name, "客户组织路径为空");
-                                    return;
-                                }
-                                String [] orgpathToUse = orgpath.split("-");
-                                String orgName = trialOperationMapper.selectOrgNameByOrgId(orgpathToUse[orgpathToUse.length-1]);
-                                String staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
-                                logger.info("orgName: " + orgName + "staffid: " + staffid);
-
-                                if(orgName == null || orgName.equals("")){
-                                    String ccust_name =(String)customMap.get("CCUST_NAME");
-                                    addLog2Es(ccust_name, "片区地址为空");
-                                }else {
+                            for (Map<String, Object> customMap : customerList) {
+                                try {
+                                    String staffid = "null";
+                                    String orgName = "null";
+                                    String c4 =(String)customMap.get("CPCP_COMPANY_CITY") + "市";
+                                    Long lanId = AreaNameEnum.getLanIdByName(c4);
+                                    String addr = (String)customMap.get("CPCP_COMPANY_ADDRESS");
+                                    logger.info("c4: " + c4);
+                                    logger.info("lanId: " + lanId);
+                                    logger.info("addr: " + addr);
+                                    String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
+                                    logger.info("wgbm: " + wgbm);
+                                    if(wgbm == null || wgbm.equals("")){
+                                        customMap.put("SALE_EMP_NBR ",staffid);
+                                        customMap.put("CLUSTER_NAME",orgName);
+                                        continue;
+                                    }
+                                    String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
+                                    logger.info("orgpath: " + orgpath);
+                                    if (orgpath!=null){
+                                        String [] orgpathToUse = orgpath.split("-");
+                                        if (orgpathToUse.length>2){
+                                            Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgpathToUse[orgpathToUse.length-1]));
+                                            orgName = organization.getOrgName();
+                                            staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
+                                            logger.info("orgName: " + orgName + "staffid: " + staffid);
+                                        }
+                                    }
+                                    customMap.put("SALE_EMP_NBR",staffid);
                                     customMap.put("CLUSTER_NAME",orgName);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                    logger.info("客户查询失败" + JSON.toJSONString(customMap));
                                 }
-
-                                if(staffid == null || staffid.equals("")){
-                                    String ccust_name =(String)customMap.get("CCUST_NAME");
-                                    addLog2Es(ccust_name, "客户经理为空");
-                                }else {
-                                    customMap.put("MANAGER_ID ",staffid);
-                                }
-                            });
+                            }
                         }
 
                         if (customerList.size() > 0) {
@@ -2143,8 +2133,8 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
                     ConfAttrEnum.START_DATE.getArrId() );
             List<String> endList = mktCamChlConfAttrMapper.selectAttrTimeInfoByCampaignId(campaignDO.getMktCampaignId(),
                     ConfAttrEnum.END_DATE.getArrId() );
-            operation.setStartTime(new Date(startList.get(0)));
-            operation.setEndTime(new Date(endList.get(0)));
+            operation.setStartTime(new Date(Long.valueOf(startList.get(0))));
+            operation.setEndTime(new Date(Long.valueOf(endList.get(0))));
             operation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
             trialOperationMapper.updateByPrimaryKey(operation);
         } catch (Exception e) {
@@ -2265,9 +2255,11 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
             operationDetailList.add(detail);
             //如果是分批下发并且状态是全量试算成功给前端一个标记
             Object p = redisUtils_es.get("SPECIFIED_File_NUM_" + trialOperation.getBatchNum());
-            if (!trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING) || !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS) ||
-                    !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_FAIL) || !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_GOING) ||
-                    !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_FAIL)){
+            if (!trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_FAIL.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_GOING.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_FAIL.getValue())){
                 if ( p != null && !"".equals(p.toString())){
                     detail.setBatchFlg("true");
                 }

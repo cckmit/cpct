@@ -12,7 +12,6 @@ import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.enums.ChannelType;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ChannelService;
-import com.zjtelcom.cpct.service.synchronize.channel.SynChannelService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,7 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     private ContactChannelMapper channelMapper;
     @Autowired
     private RedisUtils redisUtils;
-    @Autowired
-    private SynChannelService synChannelService;
+
 
     @Autowired(required = false)
     private SyncService syncService;
@@ -348,18 +346,6 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synChannelService.synchronizeSingleChannel(channel.getContactChlId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -384,17 +370,6 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synChannelService.synchronizeSingleChannel(channel.getContactChlId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -416,18 +391,6 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
         channelMapper.deleteByPrimaryKey(channelDetail.getChannelId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synChannelService.deleteSingleChannel(channel.getContactChlId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dubbo.out.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.dao.grouping.TrialOperationMapper;
 import com.zjtelcom.cpct.domain.grouping.TrialOperation;
 import com.zjtelcom.cpct.dubbo.out.TrialStatusUpService;
@@ -12,6 +13,8 @@ import com.zjtelcom.cpct.service.grouping.TrialProdService;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.es.es.service.EsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,8 @@ import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 public class TrialStatusUpServiceImpl implements TrialStatusUpService {
+
+    private static final Logger log = LoggerFactory.getLogger(TrialStatusUpServiceImpl.class);
     @Autowired
     private TrialOperationMapper  trialOperationMapper;
     @Autowired(required = false)
@@ -55,6 +60,7 @@ public class TrialStatusUpServiceImpl implements TrialStatusUpService {
      */
     @Override
     public Map<String, Object> updateOperationStatus(Map<String,Object> params) {
+        log.info("【试算记录状态更新】:"+JSON.toJSONString(params));
         Map<String,Object> result = new HashMap<>();
         String batchNum = MapUtil.getString(params.get("batchNum"));
         String status = MapUtil.getString(params.get("status"));

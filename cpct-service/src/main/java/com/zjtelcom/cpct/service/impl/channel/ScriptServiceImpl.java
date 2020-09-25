@@ -14,7 +14,6 @@ import com.zjtelcom.cpct.dto.channel.QryMktScriptReq;
 import com.zjtelcom.cpct.dto.channel.ScriptVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ScriptService;
-import com.zjtelcom.cpct.service.synchronize.script.SynScriptService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
@@ -34,8 +33,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
     private MktScriptMapper scriptMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
-    @Autowired
-    private SynScriptService synScriptService;
     @Autowired
     private SysParamsMapper sysParamsMapper;
 
@@ -70,18 +67,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synScriptService.synchronizeScript(script.getScriptId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -101,18 +86,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synScriptService.synchronizeScript(script.getScriptId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -128,18 +101,6 @@ public class ScriptServiceImpl extends BaseService  implements ScriptService {
         scriptMapper.deleteByPrimaryKey(mktScript.getScriptId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synScriptService.delelteSynchronizeScript(script.getScriptId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

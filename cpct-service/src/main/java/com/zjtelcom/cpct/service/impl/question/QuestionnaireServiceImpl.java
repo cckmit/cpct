@@ -15,7 +15,6 @@ import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
 import com.zjtelcom.cpct.service.question.QuestionnaireService;
-import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +46,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private MktQuestionDetailMapper questionDetailMapper;
     @Autowired
     private SysParamsService sysParamsService;
-    @Autowired
-    private SynQuestionService synQuestionService;
 
 
 
@@ -109,18 +106,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","创建成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.synQuestion("",questionnaire.getNaireId());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -148,17 +133,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.synQuestion("",questionnaire.getNaireId());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -267,18 +241,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questRelMapper.deleteByNaireId(questionnaire.getNaireId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.deleteQuestion("",questionnaire.getNaireId());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

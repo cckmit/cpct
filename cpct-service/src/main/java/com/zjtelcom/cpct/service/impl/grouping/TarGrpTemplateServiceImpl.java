@@ -8,15 +8,12 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
 import com.ctzj.smt.bss.cpc.evn.type.EvnType;
 import com.ctzj.smt.bss.cpc.model.offer.atomic.OfferRestrict;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
-import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IFuncCompDubboService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.gson.JsonObject;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -26,12 +23,8 @@ import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpTemplateMapper;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
-import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpTemplateDO;
-import com.zjtelcom.cpct.domain.grouping.TrialOperation;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
-import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.*;
 import com.zjtelcom.cpct.dto.filter.FilterRule;
 import com.zjtelcom.cpct.dto.grouping.*;
@@ -42,24 +35,17 @@ import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
-import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
-import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
-import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
-import com.zjtelcom.es.es.entity.TrialOperationVOES;
+import com.zjtelcom.cpct.dao.offer.MktResourceProdMapper;
+import com.zjtelcom.cpct.dao.offer.OfferProdMapper;
 import com.zjtelcom.es.es.entity.model.LabelResultES;
-import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
-import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsTarGrpTemplate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -67,7 +53,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -98,8 +83,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private OfferRestrictMapper offerRestrictMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-    @Autowired
-    private SynTarGrpTemplateService synTarGrpTemplateService;
+
     @Autowired
     private TarGrpService tarGrpService;
     @Autowired
@@ -617,17 +601,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
@@ -702,17 +675,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 }
             }
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
@@ -888,18 +851,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         tarGrpMapper.deleteByPrimaryKey(tarGrpTemplateId);
         tarGrpConditionMapper.deleteByTarGrpTemplateId(tarGrpTemplateId);
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.deleteSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;

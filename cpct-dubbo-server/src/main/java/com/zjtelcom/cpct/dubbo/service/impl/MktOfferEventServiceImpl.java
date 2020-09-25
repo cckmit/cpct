@@ -42,8 +42,9 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
             for(String offerCode :offerCodeList){
                 HashMap<String,Object> dataMap = new HashMap<String,Object>();
                 //先取缓存
-                if(redisUtils.get("OFFER_EVENT_LIST" + offerCode) != null){
-                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                Object o = redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                if(o != null){
+                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)o;
                     dataMap.put("offerCode", offerCode);
                     dataMap.put("eventList",eventList);
                     data.add(dataMap);

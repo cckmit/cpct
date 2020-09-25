@@ -9,11 +9,8 @@ import com.zjtelcom.cpct.dao.system.SysRoleMenuMapper;
 import com.zjtelcom.cpct.domain.system.SysRole;
 import com.zjtelcom.cpct.domain.system.SysRoleMenu;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.sys.SynSysRoleService;
 import com.zjtelcom.cpct.service.system.SysRoleService;
-import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +29,6 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
     @Autowired
     private SysRoleMenuMapper sysRoleMenuMapper;
 
-    @Autowired
-    private SynSysRoleService synSysRoleService;
 
 
     @Override
@@ -66,18 +61,6 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysRoleService.synchronizeSingleRole(sysRole.getRoleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -95,18 +78,6 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         sysRoleMapper.updateByPrimaryKey(sysRole);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysRoleService.synchronizeSingleRole(sysRole.getRoleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -134,18 +105,6 @@ public class SysRoleServiceImpl extends BaseService implements SysRoleService {
         sysRoleMapper.deleteByPrimaryKey(id);
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysRoleService.deleteSingleRole(id,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

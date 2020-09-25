@@ -1008,10 +1008,8 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
-
-
                 // 扫码下单、电话到家事件特殊逻辑
-                if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) ) {
+                if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) || "EVT0000000105".equals(eventCode) ) {
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
                     log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
@@ -1029,7 +1027,7 @@ public class EventApiServiceImpl implements EventApiService {
                     }
                     String staffCode = "";
                     Object flg = evtContent.get("400600000052");
-                    if (flg!=null && "1".equals(flg.toString())){
+                    if ("EVT0000000105".equals(eventCode)|| (flg!=null && "1".equals(flg.toString()))){
                         if (onlineMap.get("wgbm")==null){
                             staffCode = "GIS网格编码查询为空";
                         }else {

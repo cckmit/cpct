@@ -18,7 +18,6 @@ import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.domain.question.QuestionDetail;
 import com.zjtelcom.cpct.dto.question.*;
 import com.zjtelcom.cpct.service.question.QuestionService;
-import com.zjtelcom.cpct.service.synchronize.SynQuestionService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,9 +41,6 @@ public class QuestionCpcServiceImpl implements QuestionService {
     private MktQuestionnaireMapper questionnaireMapper;
     @Autowired
     private MktQstQuestRelMapper questRelMapper;
-    @Autowired
-    private SynQuestionService synQuestionService;
-
 
     private String value;
     @Autowired(required = false)
@@ -175,17 +171,6 @@ public class QuestionCpcServiceImpl implements QuestionService {
         result.put("resultMsg","添加成功");
         result.put("questionId",questionId);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.synQuestionBank("",questionId);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -218,17 +203,6 @@ public class QuestionCpcServiceImpl implements QuestionService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.synQuestionBank("",question.getQuestionId());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -284,17 +258,7 @@ public class QuestionCpcServiceImpl implements QuestionService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synQuestionService.deleteQuestionBank("",question.getQuestionId());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }

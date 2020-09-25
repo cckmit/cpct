@@ -91,10 +91,10 @@
     <if test="subNum != null and subNum != ''">
       SUB_NUM = #{subNum,jdbcType=VARCHAR},
     </if>
-    <if test="createDate != null">
+    <if test="startTime != null">
       START_TIME = #{startTime,jdbcType=TIMESTAMP},
     </if>
-    <if test="statusDate != null">
+    <if test="endTime != null">
       END_TIME = #{endTime,jdbcType=TIMESTAMP},
     </if>
     UPDATE_DATE = now(3)
@@ -256,7 +256,7 @@
     and c.staff_id=b.staff_id  and c.status_cd='1000'
   </select>
   <select id="selectStaffByOrgpath"  resultType="java.lang.String">
-    select c.STAFF_ID from organization a ,staff_org_rel b,staff c
+    select c.STAFF_CODE from organization a ,staff_org_rel b,staff c
     where a.org_id in
     <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
       #{item}

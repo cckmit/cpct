@@ -33,5 +33,5 @@
         select mcer.MKT_CAMPAIGN_ID, e.EVENT_ID, e.EVENT_NAME,e.EVENT_NBR from mkt_cam_evt_rel mcer,`event` e
         WHERE mcer.EVENT_ID= e.EVENT_ID and mcer.MKT_CAMPAIGN_ID = #{mktCamId} and e.EVT_TYPE_ID=#{eventType,jdbcType = BIGINT}
     </select>
-    
+
 </mapper>

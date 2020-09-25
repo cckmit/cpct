@@ -119,7 +119,4 @@
   <select id="getOrgPathByOrgId" resultType="java.lang.String">
    select org_path from organization where org_id= #{orgId}
   </select>
-
-
-
 </mapper>
