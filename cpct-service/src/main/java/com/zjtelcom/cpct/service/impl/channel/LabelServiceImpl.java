@@ -16,8 +16,6 @@ import com.zjtelcom.cpct.enums.LabelCondition;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.LabelService;
-import com.zjtelcom.cpct.service.synchronize.label.SynLabelGrpService;
-import com.zjtelcom.cpct.service.synchronize.label.SynLabelService;
 import com.zjtelcom.cpct.util.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -52,10 +50,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-    @Autowired
-    private SynLabelService synLabelService;
-    @Autowired
-    private SynLabelGrpService synLabelGrpService;
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
@@ -385,17 +379,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelService.synchronizeSingleLabel(label.getInjectionLabelId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -446,17 +429,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelService.synchronizeSingleLabel(label.getInjectionLabelId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }
@@ -530,17 +503,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelService.deleteSingleLabel(labelId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }
@@ -602,17 +565,7 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }
@@ -633,17 +586,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -664,17 +606,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", "删除成功");
 
-            if (SystemParamsUtil.isSync()){
-                new Thread(){
-                    public void run(){
-                        try {
-                            synLabelGrpService.deleteSingleLabel(labelGrpId,"");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-            }
         }else{
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "存在关联标签,不能删除");
@@ -765,18 +696,6 @@ public class LabelServiceImpl extends BaseService implements LabelService {
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synLabelGrpService.synchronizeSingleLabel(labelGrp.getGrpId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

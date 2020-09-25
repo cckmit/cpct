@@ -1008,8 +1008,6 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
-
-
                 // 扫码下单、电话到家事件特殊逻辑
                 if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) || "EVT0000000105".equals(eventCode) ) {
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));

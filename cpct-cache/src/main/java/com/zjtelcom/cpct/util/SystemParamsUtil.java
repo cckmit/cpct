@@ -83,31 +83,6 @@ public class SystemParamsUtil {
         return IS_OPEN_SYNC;
     }
 
-    /**
-     * 针对除活动和事件外的同步的判断方法  目前值为  1和2 都可以同步
-     * @return
-     */
-    public synchronized static boolean isSync(){
-        boolean tip=false;
-        if (SystemParamsUtil.getSyncValue().equals("1")||SystemParamsUtil.getSyncValue().equals("2")){
-            tip=true;
-        }
-        return  tip;
-    }
-
-    /**
-     * 针对活动和事件的同步的判断方法     目前只有  值为1才能同步
-     * @return
-     */
-    public synchronized static boolean isCampaignSync(){
-        boolean tip=false;
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            tip=true;
-        }
-        return  tip;
-    }
-
-
 
 
     /**

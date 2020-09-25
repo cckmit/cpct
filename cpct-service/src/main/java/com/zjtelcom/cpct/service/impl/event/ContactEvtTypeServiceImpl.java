@@ -11,11 +11,9 @@ import com.zjtelcom.cpct.dto.event.EventTypeVO;
 import com.zjtelcom.cpct.request.event.QryContactEvtTypeReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtTypeService;
-import com.zjtelcom.cpct.service.synchronize.SynContactEvtTypeService;
 import com.zjtelcom.cpct.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +42,6 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
     private ContactEvtTypeMapper contactEvtTypeMapper;
     @Autowired
     private ContactEvtMapper contactEvtMapper;
-    @Autowired
-    SynContactEvtTypeService synContactEvtTypeService;
 
 
     /**
@@ -149,17 +145,6 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synContactEvtTypeService.synchronizeSingleEventType(contactEvtType.getEvtTypeId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }
@@ -201,18 +186,6 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
         maps.put("contactEvtType", contactEvtType);
         maps.put("ruleEvents", null);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synContactEvtTypeService.synchronizeSingleEventType(contactEvtType.getEvtTypeId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return maps;
     }
 
@@ -243,17 +216,6 @@ public class ContactEvtTypeServiceImpl extends BaseService implements ContactEvt
             maps.put("ruleEvents", null);
         }
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synContactEvtTypeService.deleteSingleEventType(contactEvtType.getEvtTypeId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }

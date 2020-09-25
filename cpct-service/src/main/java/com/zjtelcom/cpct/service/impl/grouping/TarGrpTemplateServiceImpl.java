@@ -42,7 +42,6 @@ import com.zjtelcom.cpct.service.channel.LabelService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.grouping.TarGrpService;
 import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
-import com.zjtelcom.cpct.service.synchronize.template.SynTarGrpTemplateService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct.vo.grouping.TarGrpConditionVO;
 import com.zjtelcom.cpct.vo.grouping.TarGrpVO;
@@ -98,8 +97,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private OfferRestrictMapper offerRestrictMapper;
     @Autowired
     private TarGrpConditionMapper tarGrpConditionMapper;
-    @Autowired
-    private SynTarGrpTemplateService synTarGrpTemplateService;
+
     @Autowired
     private TarGrpService tarGrpService;
     @Autowired
@@ -617,17 +615,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
@@ -702,17 +689,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 }
             }
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.synchronizeSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
@@ -888,18 +865,6 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         tarGrpMapper.deleteByPrimaryKey(tarGrpTemplateId);
         tarGrpConditionMapper.deleteByTarGrpTemplateId(tarGrpTemplateId);
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synTarGrpTemplateService.deleteSingleTarGrp(tarGrpTemplateId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
         tarGrpTemplateMap.put("tarGrpTemplateId", tarGrpTemplateId);
         return tarGrpTemplateMap;
