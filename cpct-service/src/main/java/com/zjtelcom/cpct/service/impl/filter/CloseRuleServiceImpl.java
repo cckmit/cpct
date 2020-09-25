@@ -31,7 +31,6 @@ import com.zjtelcom.cpct.enums.AreaCodeEnum;
 import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
-import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -75,8 +74,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
-    @Autowired
-    private SynFilterRuleService synFilterRuleService;
     @Autowired
     private TarGrpMapper TarGrpMapper;
     @Autowired
@@ -163,17 +160,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.deleteSingleFilterRule(closeRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         return maps;
     }
 
@@ -305,17 +291,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", closeRule);
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         return maps;
     }
 
@@ -388,18 +363,6 @@ public class CloseRuleServiceImpl implements CloseRuleService {
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", closeRule);
-
-        if (SystemParamsUtil.getSyncValue().equals("1")){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.synchronizeSingleFilterRule(closeRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }

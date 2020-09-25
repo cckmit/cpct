@@ -6,10 +6,8 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.system.SysParams;
-import com.zjtelcom.cpct.dto.system.SystemParam;
 import com.zjtelcom.cpct.enums.ParamKeyEnum;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.sys.SynSysParamsService;
 import com.zjtelcom.cpct.service.system.SysParamsService;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
@@ -26,8 +24,7 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
 
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired
-    private SynSysParamsService synSysParamsService;
+
     @Autowired
     private RedisUtils redisUtils;
 
@@ -61,17 +58,6 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         int flag = sysParamsMapper.insert(sysParams);
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysParamsService.synchronizeSingleParam(sysParams.getParamId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -91,19 +77,6 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         //修改静态参数  同时将修改的参数同步到redis
         SystemParamsUtil.initValue(sysParams);
-        //静态参数的同步 如果是同步开关状态千万不能同步到生产环境，生产环境应该一直保持关闭状态,
-        // 为保证生产环境的安全,生产数据库SYS_PARAMS表不能存在  PARAM_KEY为 IS_OPEN_SYNC的记录
-        if (SystemParamsUtil.isSync()&&!SystemParamsUtil.getSyncName().equals(sysParams.getParamKey())){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysParamsService.synchronizeSingleParam(sysParams.getParamId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -131,17 +104,6 @@ public class SysParamsServiceImpl extends BaseService implements SysParamsServic
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysParamsService.deleteSingleParam(id,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

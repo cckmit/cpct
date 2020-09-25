@@ -18,10 +18,8 @@ import com.zjtelcom.cpct.domain.system.SysParams;
 import com.zjtelcom.cpct.dto.event.EventSorce;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.EventSorceService;
-import com.zjtelcom.cpct.service.synchronize.SynEventSorceService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +42,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
 
     @Autowired
     private SysParamsMapper sysParamsMapper;
-    @Autowired
-    private SynEventSorceService synEventSorceService;
+
 
     /**
      * 新增事件源
@@ -71,17 +68,6 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultCode", CommonConstant.CODE_FAIL);
             eventSorceMap.put("resultMsg", "新增事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 新增事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
-        }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synEventSorceService.synchronizeSingleEventSorce(eventSorceDO.getEvtSrcId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
         }
         return eventSorceMap;
     }
@@ -136,17 +122,6 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "更新事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 更新事件源eventSorce = {}失败！Exception: ", JSON.toJSON(eventSorce), e);
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synEventSorceService.synchronizeSingleEventSorce(eventSorceDO.getEvtSrcId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
         return eventSorceMap;
     }
 
@@ -169,17 +144,7 @@ public class EventSorceServiceImpl extends BaseService implements EventSorceServ
             eventSorceMap.put("resultMsg", "查询事件源失败！");
             logger.error("[op:EventSorceServiceImpl] 通过evtSrcId = {} 删除事件源失败！Exception: ", evtSrcId, e);
         }
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synEventSorceService.deleteSingleEventSorce(evtSrcId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
         return eventSorceMap;
     }
 

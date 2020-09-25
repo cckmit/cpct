@@ -8,7 +8,6 @@ import com.zjtelcom.cpct.domain.channel.ServiceEntity;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ServiceService;
-import com.zjtelcom.cpct.service.synchronize.channel.SynServiceService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
@@ -29,8 +28,6 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
 
     @Autowired
     private ServiceMapper serviceMapper;
-    @Autowired
-    private SynServiceService synServiceService;
 
     @Override
     public Map<String, Object> getServiceList(Long userId, Map<String,Object> params) {
@@ -99,17 +96,7 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setStatusDate(new Date());
         serviceMapper.insert(serviceEntity);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synServiceService.synchronizeSingleService(serviceEntity.getServiceId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
@@ -130,17 +117,6 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
         serviceEntity.setUpdateStaff(UserUtil.loginId());
         serviceMapper.updateByPrimaryKey(serviceEntity);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synServiceService.synchronizeSingleService(serviceEntity.getServiceId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","修改成功");
@@ -157,18 +133,6 @@ public class ServiceServiceImpl extends BaseService implements ServiceService {
             return result;
         }
         serviceMapper.deleteByPrimaryKey(delVO.getServiceId());
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synServiceService.deleteSingleService(serviceEntity.getServiceId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");

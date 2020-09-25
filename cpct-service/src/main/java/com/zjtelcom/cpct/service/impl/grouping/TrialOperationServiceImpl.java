@@ -78,6 +78,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -1146,31 +1147,41 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         //蓝海流程
                         if(isBusinessMkt == true){
                             logger.info("customerList数量：" +customerList.size());
-                            customerList.forEach(customMap -> {
-                                String c4 =(String)customMap.get("CPCP_COMPANY_CITY") + "市";
-                                Long lanId = AreaNameEnum.getLanIdByName(c4);
-                                String addr = (String)customMap.get("CPCP_COMPANY_ADDRESS");
-                                logger.info("c4: " + c4);
-                                logger.info("lanId: " + lanId);
-                                logger.info("addr: " + addr);
-                                String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
-                                logger.info("wgbm: " + wgbm);
-                                if(wgbm == null || wgbm.equals("")){
-                                    String ccust_name =(String)customMap.get("CCUST_NAME");
-                                    addLog2Es(ccust_name, "gis网格编码为空");
-                                    return;
-                                }
-                                String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
-                                logger.info("orgpath: " + orgpath);
-                                String [] orgpathToUse = orgpath.split("-");
-                                String orgName = trialOperationMapper.selectOrgNameByOrgId(orgpathToUse[orgpathToUse.length-1]);
-                                String staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
-                                logger.info("orgName: " + orgName + "staffid: " + staffid);
-                                if(orgName != null || staffid != null){
-                                    customMap.put("MANAGER_ID ",staffid);
+                            for (Map<String, Object> customMap : customerList) {
+                                try {
+                                    String staffid = "null";
+                                    String orgName = "null";
+                                    String c4 =(String)customMap.get("CPCP_COMPANY_CITY") + "市";
+                                    Long lanId = AreaNameEnum.getLanIdByName(c4);
+                                    String addr = (String)customMap.get("CPCP_COMPANY_ADDRESS");
+                                    logger.info("c4: " + c4);
+                                    logger.info("lanId: " + lanId);
+                                    logger.info("addr: " + addr);
+                                    String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
+                                    logger.info("wgbm: " + wgbm);
+                                    if(wgbm == null || wgbm.equals("")){
+                                        customMap.put("SALE_EMP_NBR ",staffid);
+                                        customMap.put("CLUSTER_NAME",orgName);
+                                        continue;
+                                    }
+                                    String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
+                                    logger.info("orgpath: " + orgpath);
+                                    if (orgpath!=null){
+                                        String [] orgpathToUse = orgpath.split("-");
+                                        if (orgpathToUse.length>2){
+                                            Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgpathToUse[orgpathToUse.length-1]));
+                                            orgName = organization.getOrgName();
+                                            staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
+                                            logger.info("orgName: " + orgName + "staffid: " + staffid);
+                                        }
+                                    }
+                                    customMap.put("SALE_EMP_NBR",staffid);
                                     customMap.put("CLUSTER_NAME",orgName);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                    logger.info("客户查询失败" + JSON.toJSONString(customMap));
                                 }
-                            });
+                            }
                         }
 
                         if (customerList.size() > 0) {
@@ -2128,8 +2139,8 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
                     ConfAttrEnum.START_DATE.getArrId() );
             List<String> endList = mktCamChlConfAttrMapper.selectAttrTimeInfoByCampaignId(campaignDO.getMktCampaignId(),
                     ConfAttrEnum.END_DATE.getArrId() );
-            operation.setStartTime(new Date(startList.get(0)));
-            operation.setEndTime(new Date(endList.get(0)));
+            operation.setStartTime(new Date(Long.valueOf(startList.get(0))));
+            operation.setEndTime(new Date(Long.valueOf(endList.get(0))));
             operation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
             trialOperationMapper.updateByPrimaryKey(operation);
         } catch (Exception e) {
@@ -2250,7 +2261,11 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
             operationDetailList.add(detail);
             //如果是分批下发并且状态是全量试算成功给前端一个标记
             Object p = redisUtils_es.get("SPECIFIED_File_NUM_" + trialOperation.getBatchNum());
-            if (trialOperation.getStatusCd().equals("5000")){
+            if (!trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_SUCCESS.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_FAIL.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_GOING.getValue())
+                    && !trialOperation.getStatusCd().equals(TrialStatus.ALL_SAMPEL_FAIL.getValue())){
                 if ( p != null && !"".equals(p.toString())){
                     detail.setBatchFlg("true");
                 }

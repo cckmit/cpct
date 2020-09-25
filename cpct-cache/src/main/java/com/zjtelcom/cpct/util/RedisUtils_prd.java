@@ -37,7 +37,7 @@ public class RedisUtils_prd {
     @Value("${redisConfig_Prd.password}")
     private String redisPassword;
 
-    @Autowired
+    @Autowired(required = false)
     private SysParamsMapper sysParamsMapper;
 
 

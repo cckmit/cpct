@@ -13,7 +13,6 @@ import com.zjtelcom.cpct.request.channel.DisplayAllMessageReq;
 import com.zjtelcom.cpct.request.channel.MessageReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
-import com.zjtelcom.cpct.service.synchronize.label.SynMessageLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
@@ -49,8 +48,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
     private DisplayColumnLabelMapper displayColumnLabelMapper;
     @Autowired
     private SysParamsMapper systemParamMapper;
-    @Autowired
-    private SynMessageLabelService synMessageLabelService;
+
 
 
 
@@ -157,17 +155,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synMessageLabelService.deleteSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.run();
-        }
+
 
         return maps;
     }
@@ -187,17 +175,7 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", "删除成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synMessageLabelService.deleteSingleDisplayLabel(displayId, labelId, "");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return maps;
     }
@@ -299,17 +277,6 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         maps.put("resultCode", CODE_SUCCESS);
         maps.put("resultMsg", displayColumn.getDisplayColumnId());
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synMessageLabelService.synchronizeSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }
@@ -378,17 +345,6 @@ public class MessageLabelServiceImpl extends BaseService implements MessageLabel
         displayColumn.setStatusCd("2000");
         displayColumnMapper.updateByPrimaryKey(displayColumn);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synMessageLabelService.synchronizeSingleMessageLabel(displayColumn.getDisplayColumnId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return  queryLabelListByDisplayId(dc);
     }

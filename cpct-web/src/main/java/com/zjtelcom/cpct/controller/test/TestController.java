@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dao.channel.MktVerbalConditionMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.User;
 import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.TrialStatus;
 import com.zjtelcom.cpct.service.EngineTestService;
 import com.zjtelcom.cpct.service.campaign.MktCamChlResultApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
@@ -28,6 +29,7 @@ import com.zjtelcom.cpct.service.grouping.TarGrpTemplateService;
 import com.zjtelcom.cpct.service.impl.dubbo.CamCpcSpecialLogic;
 import com.zjtelcom.cpct.service.scheduled.ScheduledTaskService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import org.junit.Test;
@@ -37,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -383,13 +386,12 @@ public class TestController extends BaseController {
 
     @Test
     public void ssf() {
-        String contactNumberStr = "1234543234";
-        String contactNumber = "";
-        System.out.println("contactNumberStr_1121 --->>>" + contactNumberStr);
-        if (contactNumberStr != null) {
-            String[] split = contactNumberStr.split(",");
-            contactNumber = split[0];
-            System.out.println("contactNumber_1121 --->>>" + contactNumber);
+        try {
+            Date parse = DateFormat.getDateTimeInstance().parse("1600704000");
+
+            DateUtil.date2String( new Date(1600704000));
+        }catch (Exception e){
+
         }
     }
 
