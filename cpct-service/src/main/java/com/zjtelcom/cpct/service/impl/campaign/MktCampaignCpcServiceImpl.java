@@ -37,8 +37,6 @@ import com.zjtelcom.cpct.service.dubbo.UCCPService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCamItemPrdMapper;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,11 +117,10 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
     @Autowired(required = false)
     private UCCPService uccpService;
 
-    @Autowired(required = false)
-    private MktCamItemPrdMapper mktCamItemPrdMapper;
-
     @Autowired
     private MktDttsLogService mktDttsLogService;
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
 
     @Override
     public Map<String, Object> qryMktCampaignDetail(Long mktCampaignId) throws Exception {
@@ -174,10 +171,8 @@ public class MktCampaignCpcServiceImpl implements MktCampaignApiService {
         Date preDate = DateUtil.string2DateTime4Day(preDay);
         String dateFormatStr = DateUtil.getDateFormatStr(date);
         List<Offer> offerList = offerMapper.selectOfferByOver(preDate,date);
-//        offerList.get(0).setOfferId(290508);
-//        offerList.get(1).setOfferId(290936);
         if (!offerList.isEmpty()){
-            List<MktCamItem> mktCamItems = mktCamItemPrdMapper.getMktCampaignById(offerList);
+            List<MktCamItem> mktCamItems = mktCamItemMapper.getMktCampaignById(offerList);
             if (!mktCamItems.isEmpty()){
                 for (MktCamItem mktCamItem : mktCamItems) {
                     MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamItem.getMktCampaignId());

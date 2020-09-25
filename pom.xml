@@ -12,7 +12,6 @@
         <module>cpct-web</module>
         <module>cpct-common</module>
         <module>cpct-service</module>
-        <module>cpct-shiro</module>
         <module>cpct-dubbo-server</module>
         <module>cpct-dubbo-eventApi</module>
         <module>cpct-dubbo-cpc</module>
@@ -69,7 +68,7 @@
         <service-batch.version>1.1.2</service-batch.version>
         <ctg-mq.version>2.4.0</ctg-mq.version>
         <cpct-trial.version>1.0.8</cpct-trial.version>
-        <smt-bss-cpc.version>1.0.2</smt-bss-cpc.version>
+        <smt-bss-cpc.version>1.0-SNAPSHOT</smt-bss-cpc.version>
         <smt-bss-cpc-model.version>1.0.2</smt-bss-cpc-model.version>
         <cooperate-service-api.version>1.1</cooperate-service-api.version>
         <cpct-dubbo-log.version>1.0.0</cpct-dubbo-log.version>

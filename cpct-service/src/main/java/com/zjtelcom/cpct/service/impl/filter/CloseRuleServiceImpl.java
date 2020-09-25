@@ -32,7 +32,7 @@ import com.zjtelcom.cpct.enums.PostEnum;
 import com.zjtelcom.cpct.request.filter.CloseRuleReq;
 import com.zjtelcom.cpct.service.filter.CloseRuleService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prod.dao.offer.ProductMapper;
+import com.zjtelcom.cpct.dao.offer.ProductMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;

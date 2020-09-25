@@ -6,7 +6,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.domain.channel.MktResource;
 import com.zjtelcom.cpct.service.channel.ResourceService;
 import com.zjtelcom.cpct.util.MapUtil;
-import com.zjtelcom.cpct_prod.dao.offer.MktResourceProdMapper;
+import com.zjtelcom.cpct.dao.offer.MktResourceProdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
