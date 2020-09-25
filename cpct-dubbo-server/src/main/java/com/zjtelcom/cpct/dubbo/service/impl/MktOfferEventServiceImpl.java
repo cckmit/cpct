@@ -42,16 +42,21 @@ public class MktOfferEventServiceImpl implements MktOfferEventService {
             for(String offerCode :offerCodeList){
                 HashMap<String,Object> dataMap = new HashMap<String,Object>();
                 //先取缓存
-                if(redisUtils.get("OFFER_EVENT_LIST" + offerCode) != null){
-                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                Object o = redisUtils.get("OFFER_EVENT_LIST" + offerCode);
+                if(o != null){
+                    List<Map<String,Object>> eventList = (List<Map<String,Object>>)o;
                     dataMap.put("offerCode", offerCode);
                     dataMap.put("eventList",eventList);
                     data.add(dataMap);
-                    log.info("销售品获取关联事件数据走缓存：" + offerCode);
+                    log.info("c：" + offerCode);
                     continue;
                 };
                 //否则查数据库
-                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
+
+                //List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
+                Long initId = mktOfferEventMapper.selectInitIdByOfferNbr(offerCode);
+                Long mktCamId = mktOfferEventMapper.selectMktIdByInitId(initId);
+                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByCamId(mktCamId,Integer.parseInt(eventType));
                 log.info(" 数据库返回：mktOfferEventDOList" + mktOfferEventDOList);
 
                 if(mktOfferEventDOList.size() == 0){

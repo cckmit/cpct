@@ -25,7 +25,6 @@ import com.zjtelcom.cpct.enums.FilterRuleType;
 import com.zjtelcom.cpct.request.filter.FilterRuleReq;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.filter.FilterRuleService;
-import com.zjtelcom.cpct.service.synchronize.filter.SynFilterRuleService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
 import org.apache.commons.lang.StringUtils;
@@ -75,8 +74,7 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
     private MktVerbalConditionMapper verbalConditionMapper;
     @Autowired
     private InjectionLabelMapper labelMapper;
-    @Autowired
-    private SynFilterRuleService synFilterRuleService;
+
 
 
 
@@ -257,17 +255,6 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.deleteSingleFilterRule(filterRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }
@@ -371,18 +358,6 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return maps;
     }
 
@@ -447,17 +422,6 @@ public class FilterRuleServiceImpl extends BaseService implements FilterRuleServ
         maps.put("resultMsg", StringUtils.EMPTY);
         maps.put("filterRule", filterRule);
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synFilterRuleService.synchronizeSingleFilterRule(filterRule.getRuleId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return maps;
     }

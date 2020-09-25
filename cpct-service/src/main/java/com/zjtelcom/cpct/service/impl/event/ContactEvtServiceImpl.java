@@ -28,7 +28,6 @@ import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
-import com.zjtelcom.cpct.service.synchronize.SynContactEvtService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.channel.ContactChannelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.event.InterfaceCfgPrdMapper;
@@ -82,8 +81,6 @@ public class ContactEvtServiceImpl extends BaseService implements ContactEvtServ
     private EventMatchRulConditionMapper eventMatchRulConditionMapper;
     @Autowired
     private EventMatchRulService eventMatchRulService;
-    @Autowired
-    private SynContactEvtService synContactEvtService;
     @Autowired
     private ContactChannelMapper channelMapper;
 

@@ -14,7 +14,6 @@ import com.zjtelcom.cpct.dubbo.model.RecordModel;
 import com.zjtelcom.cpct.dubbo.service.SyncLabelService;
 import com.zjtelcom.cpct.enums.SynchronizeType;
 import com.zjtelcom.cpct.exception.SystemException;
-import com.zjtelcom.cpct.service.synchronize.SynchronizeRecordService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelPrdMapper;
 import com.zjtelcom.cpct_prd.dao.label.InjectionLabelValuePrdMapper;
@@ -53,47 +52,11 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
     @Autowired(required = false)
     private InjectionLabelPrdMapper injectionLabelPrdMapper;
     @Autowired
-    private SynchronizeRecordService synchronizeRecordService;
-    @Autowired
     private InjectionLabelValueMapper injectionLabelValueMapper;
     @Autowired(required = false)
     private InjectionLabelValuePrdMapper injectionLabelValuePrdMapper;
     //同步表名
     private static final String tableName="injection_label";
-
-    /**
-     * 单个标签信息同步
-     * @param labelId
-     * @param roleName
-     * @return
-     */
-    public Map<String, Object> synchronizeSingleLabel(Long labelId, String roleName) {
-        Map<String,Object> maps = new HashMap<>();
-        Label label = injectionLabelMapper.selectByPrimaryKey(labelId);
-        if(null==label){
-            throw new SystemException("对应标签信息不存在!");
-        }
-        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(label.getInjectionLabelId());
-
-        Label label1 = injectionLabelPrdMapper.selectByPrimaryKey(labelId);
-        if(null==label1){
-            injectionLabelPrdMapper.insert(label);
-            if(!labelValues.isEmpty()){
-                injectionLabelValuePrdMapper.insertBatch(labelValues);
-//                for (LabelValue labelValue:labelValues){
-//                    injectionLabelValuePrdMapper.insert(labelValue);
-//                }
-            }
-            synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.add.getType());
-        }else{
-            injectionLabelPrdMapper.updateByPrimaryKey(label);
-            diffLabelValue(labelValues,label1);
-            synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.update.getType());
-        }
-        maps.put("resultCode", CommonConstant.CODE_SUCCESS);
-        maps.put("resultMsg", StringUtils.EMPTY);
-        return maps;
-    }
 
     /**
      * 比较标签对应的标签值是否对应
@@ -131,12 +94,6 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
         Map<String,Object> maps = new HashMap<>();
         injectionLabelPrdMapper.deleteByPrimaryKey(labelId);
         injectionLabelValuePrdMapper.deleteByLabelId(labelId);
-        //相关的标签值
-//        List<LabelValue> labelValues = injectionLabelValueMapper.selectByLabelId(labelId);
-//        for (LabelValue labelValue:labelValues){
-//            injectionLabelValueMapper.deleteByPrimaryKey(labelValue.getLabelValueId());
-//        }
-        synchronizeRecordService.addRecord(roleName,tableName,labelId, SynchronizeType.delete.getType());
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", org.apache.commons.lang.StringUtils.EMPTY);
         return maps;
@@ -164,31 +121,9 @@ public class SyncLabelServiceImpl  implements SyncLabelService {
             switch (recordModel.getLabState()){
                 case "3":
                     result = addLabel(recordModel);
-//                    if (result.get("resultCode").equals(CODE_SUCCESS)){
-//                        new Thread(){
-//                            public void run(){
-//                                try {
-//                                    synchronizeSingleLabel(record.getLabel().getLabRowId(),"");
-//                                }catch (Exception e){
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        }.start();
-//                    }
                     break;
                 case "5":
                     result = deleteLabel(recordModel);
-//                    if (result.get("resultCode").equals(CODE_SUCCESS)){
-//                        new Thread(){
-//                            public void run(){
-//                                try {
-//                                    deleteSingleLabel(record.getLabel().getLabRowId(),"");
-//                                }catch (Exception e){
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        }.start();
-//                    }
                     break;
             }
 

@@ -13,10 +13,8 @@ import com.zjtelcom.cpct.domain.event.InterfaceCfg;
 import com.zjtelcom.cpct.dto.event.InterfaceCfgVO;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.event.InterfaceCfgService;
-import com.zjtelcom.cpct.service.synchronize.SynInterfaceCfgService;
 import com.zjtelcom.cpct.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,8 +31,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
     private EventSorceMapper eventSorceMapper;
     @Autowired
     private ContactChannelMapper channelMapper;
-    @Autowired
-    private SynInterfaceCfgService synInterfaceCfgService;
 
 
 
@@ -64,17 +60,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","添加成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synInterfaceCfgService.synchronizeSingleEventInterface(ic.getInterfaceCfgId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -95,17 +80,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","编辑成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synInterfaceCfgService.synchronizeSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }
@@ -122,18 +96,6 @@ public class InterfaceCfgServiceImpl extends BaseService implements InterfaceCfg
         interfaceCfgMapper.deleteByPrimaryKey(ic.getInterfaceCfgId());
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","删除成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synInterfaceCfgService.deleteSingleEventInterface(interfaceCfg.getInterfaceCfgId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

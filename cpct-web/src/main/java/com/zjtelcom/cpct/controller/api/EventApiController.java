@@ -16,7 +16,6 @@ import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.EventRelService;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventInstService;
-import com.zjtelcom.cpct.service.synchronize.campaign.SynchronizeCampaignService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.RedisUtils_prd;
@@ -55,8 +54,6 @@ public class EventApiController extends BaseController {
     private RedisUtils redisUtils;
     @Autowired
     private RedisUtils_prd redisUtils_prd;
-    @Autowired(required = false)
-    private SynchronizeCampaignService synchronizeCampaignService;
     @Autowired
     private MktCampaignMapper campaignMapper;
     @Autowired
@@ -139,34 +136,6 @@ public class EventApiController extends BaseController {
                 if (null != mktAllLabels) {
                     redisUtils.set("EVT_ALL_LABEL_" + id, mktAllLabels);
                     result.put("EVENT_"+id,JSON.toJSONString(redisUtils.get("EVT_ALL_LABEL_"+id)));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    @PostMapping("syncCampaign")
-    public  Map<String,String> syncCampaign(@RequestBody HashMap<String,String> key) {
-        Map<String,String> result = new HashMap<>();
-        List<MktCampaignDO> campaigns = new ArrayList<>();
-        try {
-            List<MktCampaignDO> campaignDOS = campaignMapper.qryMktCampaignListByTypeAndStatus(null,"2002");
-            for (MktCampaignDO campaignDO : campaignDOS){
-                if (campaignPrdMapper.selectByPrimaryKey(campaignDO.getMktCampaignId())==null){
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                String roleName = "admin";
-                                synchronizeCampaignService.synchronizeCampaign(campaignDO.getMktCampaignId(), roleName);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                logger.error("[op:MktCampaignServiceImpl] 活动同步失败 by mktCampaignId = {}, Expection = ",campaignDO.getMktCampaignId(), e);
-                            }
-                        }
-                    }.start();
                 }
             }
         } catch (Exception e) {

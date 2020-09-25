@@ -12,7 +12,6 @@ import com.zjtelcom.cpct.domain.system.SysStaff;
 import com.zjtelcom.cpct.domain.system.SysStaffRole;
 import com.zjtelcom.cpct.dto.system.SysStaffDTO;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.sys.SynSysStaffService;
 import com.zjtelcom.cpct.service.system.SysStaffService;
 import com.zjtelcom.cpct.util.CopyPropertiesUtil;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
@@ -38,9 +37,6 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
     @Autowired
     private SysStaffRoleMapper sysStaffRoleMapper;
 
-    @Autowired
-    private SynSysStaffService synSysStaffService;
-    
     @Autowired(required = false)
     private StaffOrgRelMapper staffOrgRelMapper;
 
@@ -168,18 +164,6 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysStaffService.synchronizeSingleStaff(sysStaff.getStaffId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -216,18 +200,6 @@ public class SysStaffServiceImpl extends BaseService implements SysStaffService 
 
         result.put("resultCode",CommonConstant.CODE_SUCCESS);
         result.put("resultMsg","保存成功");
-
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysStaffService.synchronizeSingleStaff(sysStaff.getStaffId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
 
         return result;
     }

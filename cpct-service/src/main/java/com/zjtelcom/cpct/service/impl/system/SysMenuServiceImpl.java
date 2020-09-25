@@ -6,7 +6,6 @@ import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.system.SysMenuMapper;
 import com.zjtelcom.cpct.domain.system.SysMenu;
 import com.zjtelcom.cpct.service.BaseService;
-import com.zjtelcom.cpct.service.synchronize.sys.SynSysMenuService;
 import com.zjtelcom.cpct.service.system.SysMenuService;
 import com.zjtelcom.cpct.util.SystemParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
 
     @Autowired
     private SysMenuMapper sysMenuMapper;  //菜单mapper
-    @Autowired
-    private SynSysMenuService synSysMenuService;
+
 
 
 
@@ -110,17 +108,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysMenuService.synchronizeSingleMenu(menu.getMenuId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }
@@ -152,18 +140,6 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "保存成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysMenuService.synchronizeSingleMenu(menu.getMenuId(),"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
-
         return result;
     }
 
@@ -177,17 +153,7 @@ public class SysMenuServiceImpl extends BaseService implements SysMenuService {
         result.put("resultCode", CommonConstant.CODE_SUCCESS);
         result.put("resultMsg", "删除成功");
 
-        if (SystemParamsUtil.isSync()){
-            new Thread(){
-                public void run(){
-                    try {
-                        synSysMenuService.deleteSingleMenu(menuId,"");
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-        }
+
 
         return result;
     }

@@ -141,7 +141,11 @@ public class EventRelServiceImpl implements EventRelService {
                 };
 
                 //否则取数据库
-                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
+                //List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByOfferNbr(offerCode,Integer.parseInt(eventType));
+                Long initId = mktOfferEventMapper.selectInitIdByOfferNbr(offerCode);
+                Long mktCamId = mktOfferEventMapper.selectMktIdByInitId(initId);
+                List<MktOfferEventDO> mktOfferEventDOList = mktOfferEventMapper.getEventIdByCamId(mktCamId,Integer.parseInt(eventType));
+
                 log.info(" 数据库返回：mktOfferEventDOList" + mktOfferEventDOList);
 
                 if(mktOfferEventDOList.size() == 0){
