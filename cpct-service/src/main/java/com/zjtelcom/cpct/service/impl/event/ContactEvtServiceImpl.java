@@ -29,12 +29,8 @@ import com.zjtelcom.cpct.service.event.ContactEvtItemService;
 import com.zjtelcom.cpct.service.event.ContactEvtService;
 import com.zjtelcom.cpct.service.event.EventMatchRulService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prd.dao.channel.ContactChannelPrdMapper;
-import com.zjtelcom.cpct_prd.dao.event.InterfaceCfgPrdMapper;
-import com.zjtelcom.cpct_prd.dao.strategy.MktStrategyConfPrdMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

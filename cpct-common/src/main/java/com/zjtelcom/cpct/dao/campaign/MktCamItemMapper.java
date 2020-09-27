@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.dao.campaign;
 
 
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
+import com.zjtelcom.cpct.domain.channel.Offer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Param;
@@ -34,4 +35,9 @@ public interface MktCamItemMapper {
     List<Long> selectCamItemIdByCampaignId (Long campaignId);
 
     List<MktCamItem> selectByCampaignIdAndItemIdAndType(@Param("itemId")Long itemId,@Param("mktCampaignId")Long campaignId,@Param("itemType")String itemType);
+
+
+    List<MktCamItem> getMktCampaignById(@Param("list")List<Offer> idList);
+
+
 }

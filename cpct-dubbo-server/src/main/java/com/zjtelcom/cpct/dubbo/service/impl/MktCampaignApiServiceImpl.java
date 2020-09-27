@@ -26,13 +26,6 @@ import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.util.*;
-import com.zjtelcom.cpct_prd.dao.campaign.*;
-import com.zjtelcom.cpct_prd.dao.channel.MktCamScriptPrdMapper;
-import com.zjtelcom.cpct_prd.dao.channel.MktVerbalConditionPrdMapper;
-import com.zjtelcom.cpct_prd.dao.channel.MktVerbalPrdMapper;
-import com.zjtelcom.cpct_prd.dao.grouping.TarGrpConditionPrdMapper;
-import com.zjtelcom.cpct_prd.dao.grouping.TarGrpPrdMapper;
-import com.zjtelcom.cpct_prd.dao.strategy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,82 +88,6 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
     private MktCamChlResultMapper mktCamChlResultMapper;
     @Autowired
     private MktCamChlResultConfRelMapper mktCamChlResultConfRelMapper;
-    @Autowired
-    private MktVerbalConditionMapper mktVerbalConditionMapper;
-    @Autowired
-    private InjectionLabelMapper injectionLabelMapper;
-    @Autowired
-    private MktCampaignRelMapper mktCampaignRelMapper;
-    @Autowired
-    private MktCamEvtRelMapper mktCamEvtRelMapper;
-    @Autowired
-    private MktCamCityRelMapper mktCamCityRelMapper;
-    @Autowired
-    private MktStrategyConfRuleRelMapper mktStrategyConfRuleRelMapper;
-    @Autowired
-    private MktCampaignPrdMapper mktCampaignPrdMapper;
-    @Autowired
-    private MktCamCityRelPrdMapper mktCamCityRelPrdMapper;
-    @Autowired
-    private MktCamEvtRelPrdMapper mktCamEvtRelPrdMapper;
-    @Autowired
-    private MktCamStrategyConfRelPrdMapper mktCamStrategyConfRelPrdMapper;
-    @Autowired
-    private MktStrategyConfPrdMapper mktStrategyConfPrdMapper;
-    @Autowired
-    private MktStrategyConfRulePrdMapper mktStrategyConfRulePrdMapper;
-    @Autowired
-    private MktStrategyConfRuleRelPrdMapper mktStrategyConfRuleRelPrdMapper;
-    @Autowired
-    private MktStrategyConfRegionRelPrdMapper mktStrategyConfRegionRelPrdMapper;
-    @Autowired
-    private MktStrategyFilterRuleRelMapper mktStrategyFilterRuleRelMapper;
-    @Autowired
-    private MktStrategyFilterRuleRelPrdMapper mktStrategyFilterRuleRelPrdMapper;
-    @Autowired
-    private TarGrpMapper tarGrpMapper;
-    @Autowired
-    private TarGrpPrdMapper tarGrpPrdMapper;
-    @Autowired
-    private TarGrpConditionMapper tarGrpConditionMapper;
-    @Autowired
-    private TarGrpConditionPrdMapper tarGrpConditionPrdMapper;
-    @Autowired
-    private MktCamItemMapper mktCamItemMapper;
-    @Autowired
-    private MktCamItemPrdMapper mktCamItemPrdMapper;
-    @Autowired
-    private MktCamChlConfPrdMapper mktCamChlConfPrdMapper;
-    @Autowired
-    private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
-    @Autowired
-    private MktCamChlConfAttrPrdMapper mktCamChlConfAttrPrdMapper;
-    @Autowired
-    private MktCamChlResultPrdMapper mktCamChlResultPrdMapper;
-    @Autowired
-    private MktCamChlResultConfRelPrdMapper mktCamChlResultConfRelPrdMapper;
-    @Autowired
-    private MktVerbalPrdMapper mktVerbalPrdMapper;
-    @Autowired
-    private MktVerbalConditionPrdMapper mktVerbalConditionPrdMapper;
-    @Autowired
-    private MktCamScriptPrdMapper mktCamScriptPrdMapper;
-    @Autowired
-    private RedisUtils redisUtils;
-    @Autowired
-    private OrgTreeMapper orgTreeMapper;
-    @Autowired
-    private MktCamItemMapper camItemMapper;
-    @Autowired
-    private MktVerbalMapper verbalMapper;
-    @Autowired
-    private MktVerbalConditionMapper verbalConditionMapper;
-    @Autowired
-    private MktCamScriptMapper camScriptMapper;
-    @Autowired
-    private SynchronizeRecordMapper synchronizeRecordMapper;
-    @Autowired
-    private RedisUtils_prd redisUtils_prd;
 
     @Autowired
     private MktCampaignService mktCampaignService;
