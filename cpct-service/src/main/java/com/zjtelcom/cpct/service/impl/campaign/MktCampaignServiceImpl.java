@@ -69,10 +69,7 @@ import com.zjtelcom.cpct.service.system.SysAreaService;
 import com.zjtelcom.cpct.util.*;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInfoMapper;
 import com.zjtelcom.cpct_offer.dao.inst.RequestInstRelMapper;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
-import javafx.scene.input.DataFormat;
-import lombok.experimental.var;
+import com.zjtelcom.cpct.dao.offer.OfferProdMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -482,8 +479,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private MktCamDisplayColumnRelService mktCamDisplayColumnRelService;
 
-    @Autowired
-    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
+
 
     @Autowired
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;

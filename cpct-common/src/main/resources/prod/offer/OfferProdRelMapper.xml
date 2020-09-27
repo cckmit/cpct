@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.OfferProdRelMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.offer.OfferProdRelMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.OfferProdRel">
     <id column="OFFER_PROD_REL_ID" jdbcType="BIGINT" property="offerProdRelId" />
     <result column="PAR_OFFER_PROD_REL_ID" jdbcType="BIGINT" property="parOfferProdRelId" />

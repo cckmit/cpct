@@ -15,8 +15,8 @@ import com.zjtelcom.cpct.dto.event.Catalog;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.util.BeanUtil;
-import com.zjtelcom.cpct_prod.dao.offer.CatalogItemProdMapper;
-import com.zjtelcom.cpct_prod.dao.offer.OfferProdMapper;
+import com.zjtelcom.cpct.dao.offer.CatalogItemProdMapper;
+import com.zjtelcom.cpct.dao.offer.OfferProdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

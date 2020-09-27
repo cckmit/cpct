@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjtelcom.cpct_prod.dao.offer.OfferCatalogLocationProdMapper">
+<mapper namespace="com.zjtelcom.cpct.dao.offer.OfferCatalogLocationProdMapper">
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.OfferCatalogLocation">
     <id column="OFFER_CAT_LOC_ID" jdbcType="DECIMAL" property="offerCatLocId" />
     <result column="OFFER_ID" jdbcType="DECIMAL" property="offerId" />

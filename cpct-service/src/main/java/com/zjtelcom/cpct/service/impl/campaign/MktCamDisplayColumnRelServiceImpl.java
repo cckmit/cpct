@@ -19,7 +19,6 @@ import com.zjtelcom.cpct.service.campaign.MktCamDisplayColumnRelService;
 import com.zjtelcom.cpct.service.channel.MessageLabelService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.UserUtil;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCamDisplayColumnRelPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +47,6 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
     private MktCampaignMapper mktCampaignMapper;
     @Autowired
     private DisplayColumnLabelMapper displayColumnLabelMapper;
-    @Autowired(required = false)
-    private MktCamDisplayColumnRelPrdMapper mktCamDisplayColumnRelPrdMapper;
 
 
     /**
@@ -131,25 +128,6 @@ public class MktCamDisplayColumnRelServiceImpl implements MktCamDisplayColumnRel
         return result;
     }
 
-    @Override
-    public Map<String, Object> syncMktCamDisplayColumnRel(Long mktCampaignId) {
-        Map<String,Object> result = new HashMap<>();
-        List<MktCamDisplayColumnRel> relList = mktCamDisplayColumnRelMapper.selectDisplayLabelByCamId(mktCampaignId);
-        if(relList.isEmpty() || relList.size() == 0){
-            result.put("resultCode", CODE_SUCCESS);
-            result.put("resultMsg", "MktCamDisplayColumnRelList为空");
-            return result;
-        }
-        for (MktCamDisplayColumnRel rel : relList) {
-            rel.setCreateStaff(UserUtil.loginId());
-            rel.setCreateDate(new Date());
-            rel.setStatusCd("1000");
-            mktCamDisplayColumnRelPrdMapper.insert(rel);
-        }
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", "同步完成");
-        return result;
-    }
 
     @Override
     public Map<String, Object> importOldCamDisplay(){

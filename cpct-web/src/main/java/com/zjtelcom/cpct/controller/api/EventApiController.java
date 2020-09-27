@@ -19,7 +19,6 @@ import com.zjtelcom.cpct.service.event.EventInstService;
 import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import com.zjtelcom.cpct.util.RedisUtils_prd;
-import com.zjtelcom.cpct_prd.dao.campaign.MktCampaignPrdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,8 +55,7 @@ public class EventApiController extends BaseController {
     private RedisUtils_prd redisUtils_prd;
     @Autowired
     private MktCampaignMapper campaignMapper;
-    @Autowired
-    private MktCampaignPrdMapper campaignPrdMapper;
+
 
     @Autowired(required = false)
     private TestService testService;
