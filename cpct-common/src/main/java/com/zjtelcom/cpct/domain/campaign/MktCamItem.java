@@ -36,7 +36,7 @@ public class MktCamItem extends BaseEntity{
     /**
      * 推荐条目类型
      */
-    private String itemType;//1000	销售品;2000	礼包	;3000	营销资源	;4000	服务
+    private String itemType;//1000	销售品;2000	礼包	;3000 营销资源; 4000 服务 ;5000 依赖销售品； 6000 依赖产品
 
     /**
      * 推荐条目标识

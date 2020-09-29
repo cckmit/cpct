@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.channel.MktProductAttrMapper">
+  <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktProductAttr">
+    <id column="MKT_PRODUCT_ATTR_ID" jdbcType="BIGINT" property="mktProductAttrId" />
+    <result column="PRODUCT_ID" jdbcType="BIGINT" property="productId" />
+    <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
+    <result column="ATTR_ID" jdbcType="BIGINT" property="attrId" />
+    <result column="ATTR_NAME" jdbcType="VARCHAR" property="attrName" />
+    <result column="ATTR_VALUE" jdbcType="VARCHAR" property="attrValue" />
+    <result column="EDIT_FLG" jdbcType="VARCHAR" property="editFlg" />
+    <result column="FRAME_FLG" jdbcType="VARCHAR" property="frameFlg" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from mkt_product_attr
+    where MKT_PRODUCT_ATTR_ID = #{mktProductAttrId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductAttr">
+    insert into mkt_product_attr (MKT_PRODUCT_ATTR_ID, PRODUCT_ID, RULE_ID, 
+      ATTR_ID, ATTR_NAME, ATTR_VALUE, 
+      EDIT_FLG, FRAME_FLG, STATUS_CD, 
+      CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, 
+      UPDATE_DATE, REMARK)
+    values (#{mktProductAttrId,jdbcType=BIGINT}, #{productId,jdbcType=BIGINT}, #{ruleId,jdbcType=BIGINT}, 
+      #{attrId,jdbcType=BIGINT}, #{attrName,jdbcType=VARCHAR}, #{attrValue,jdbcType=VARCHAR}, 
+      #{editFlg,jdbcType=VARCHAR}, #{frameFlg,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, 
+      #{createStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktProductAttr">
+    update mkt_product_attr
+    set PRODUCT_ID = #{productId,jdbcType=BIGINT},
+      RULE_ID = #{ruleId,jdbcType=BIGINT},
+      ATTR_ID = #{attrId,jdbcType=BIGINT},
+      ATTR_NAME = #{attrName,jdbcType=VARCHAR},
+      ATTR_VALUE = #{attrValue,jdbcType=VARCHAR},
+      EDIT_FLG = #{editFlg,jdbcType=VARCHAR},
+      FRAME_FLG = #{frameFlg,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where MKT_PRODUCT_ATTR_ID = #{mktProductAttrId,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_PRODUCT_ATTR_ID, PRODUCT_ID, RULE_ID, ATTR_ID, ATTR_NAME, ATTR_VALUE, 
+    EDIT_FLG, FRAME_FLG, STATUS_CD, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+    REMARK
+    from mkt_product_attr
+    where MKT_PRODUCT_ATTR_ID = #{mktProductAttrId,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MKT_PRODUCT_ATTR_ID, PRODUCT_ID, RULE_ID, ATTR_ID, ATTR_NAME, ATTR_VALUE, 
+    EDIT_FLG, FRAME_FLG, STATUS_CD, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, 
+    REMARK
+    from mkt_product_attr
+  </select>
+</mapper>

@@ -16,6 +16,7 @@ import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.enums.ManageGradeEnum;
 import com.zjtelcom.cpct.enums.ProdCompTypeEnum;
+import com.zjtelcom.cpct.enums.CamItemType;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
@@ -53,8 +54,6 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
     private ProductMapper productProdMapper;
-    @Autowired
-    private ProductNewMapper productNewMapper;
 
 
     @Override
@@ -258,7 +257,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         List<MktCamItem> mktCamItems = new ArrayList<>();
 
         //销售品
-        if (param.getItemType().equals("1000") || param.getItemType().equals("2000")){
+        if (param.getItemType().equals("1000") || param.getItemType().equals("2000")
+                || param.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
             for (Long productId : param.getIdList()){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
@@ -296,18 +296,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
                 item.setOfferCode(resource.getMktResNbr());
                 item.setOfferName(resource.getMktResName());
-                item.setItemId(resourceId);
-                item.setItemType(param.getItemType());
-                item.setCreateDate(new Date());
-                item.setCreateDate(DateUtil.getCurrentTime());
-                item.setUpdateDate(DateUtil.getCurrentTime());
-                item.setStatusDate(DateUtil.getCurrentTime());
-                item.setUpdateStaff(UserUtil.loginId());
-                item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
-                mktCamItems.add(item);
-                //redis添加推荐条目数据
-                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+                itemBuild(param, mktCamItems, resourceId, item);
             }
         }else if ("4000".equals(param.getItemType())){
             for (Long serviceId : param.getIdList()){
@@ -321,18 +310,21 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
                 item.setOfferCode(serviceEntity.getServiceNbr());
                 item.setOfferName(serviceEntity.getServiceName());
-                item.setItemId(serviceId);
-                item.setItemType(param.getItemType());
-                item.setCreateDate(new Date());
-                item.setCreateDate(DateUtil.getCurrentTime());
-                item.setUpdateDate(DateUtil.getCurrentTime());
-                item.setStatusDate(DateUtil.getCurrentTime());
-                item.setUpdateStaff(UserUtil.loginId());
-                item.setCreateStaff(UserUtil.loginId());
-                item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
-                mktCamItems.add(item);
-                //redis添加推荐条目数据
-                redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
+                itemBuild(param, mktCamItems, serviceId, item);
+            }
+        }else if (CamItemType.DEPEND_PRODUCT.getValue().equals(param.getItemType())){
+            for (Long productId : param.getIdList()){
+                Product product = productProdMapper.selectByPrimaryKey(productId);
+                if (product==null){
+                    result.put("resultCode",CODE_FAIL);
+                    result.put("resultMsg","依赖产品不存在");
+                    return result;
+                }
+                MktCamItem item = new MktCamItem();
+                item.setMktCampaignId(param.getCampaignId()==null ? -1L : param.getCampaignId());
+                item.setOfferCode(product.getProdNbr());
+                item.setOfferName(product.getProdName());
+                itemBuild(param, mktCamItems, productId, item);
             }
         }
         if (!mktCamItems.isEmpty()){
@@ -344,6 +336,21 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleIdList);
         return result;
+    }
+
+    private void itemBuild(ProductParam param, List<MktCamItem> mktCamItems, Long productId, MktCamItem item) {
+        item.setItemId(productId);
+        item.setItemType(param.getItemType());
+        item.setCreateDate(new Date());
+        item.setCreateDate(DateUtil.getCurrentTime());
+        item.setUpdateDate(DateUtil.getCurrentTime());
+        item.setStatusDate(DateUtil.getCurrentTime());
+        item.setUpdateStaff(UserUtil.loginId());
+        item.setCreateStaff(UserUtil.loginId());
+        item.setStatusCd(param.getStatusCd()==null? STATUSCD_EFFECTIVE : param.getStatusCd());
+        mktCamItems.add(item);
+        //redis添加推荐条目数据
+        redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
     }
 
     @Override
@@ -544,31 +551,6 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             Page pageInfo = new Page(new PageInfo(mapList));
             resultMap.put("data", mapList);
             resultMap.put("page", pageInfo);
-            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
-            resultMap.put("resultMsg", "查询成功！");
-            return resultMap;
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("getProjectList失败= {}", e);
-            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
-            resultMap.put("resultMsg", "查询失败！");
-            return resultMap;
-        }
-    }
-
-    @Override
-    public Map<String, Object> getProjectDetail(Map<String, Object> params) {
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-
-            Long prodId = (Long) params.get("prodId");
-
-            List<Product> productList = productNewMapper.selectByProdName(prodName);
-            for (Product product : productList) {
-                product.setManageGradeValue(ManageGradeEnum.getValuedById(product.getManageGrade()));
-                product.setProdCompTypeValue(ProdCompTypeEnum.getValuedById(product.getProdCompType()));
-            }
-            resultMap.put("data", productList);
             resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             resultMap.put("resultMsg", "查询成功！");
             return resultMap;
