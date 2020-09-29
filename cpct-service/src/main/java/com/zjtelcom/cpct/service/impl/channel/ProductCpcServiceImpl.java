@@ -3,15 +3,19 @@ package com.zjtelcom.cpct.service.impl.channel;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
+import com.zjtelcom.cpct.dao.product.ProductNewMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
+import com.zjtelcom.cpct.enums.ManageGradeEnum;
+import com.zjtelcom.cpct.enums.ProdCompTypeEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
@@ -49,6 +53,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
     private ProductMapper productProdMapper;
+    @Autowired
+    private ProductNewMapper productNewMapper;
 
 
     @Override
@@ -481,4 +487,98 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,nameList);
         }
     }
+
+
+    @Override
+    public Map<String, Object> getProjectListPage(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            //获取分页参数
+            Integer page = Integer.parseInt(params.get("page").toString());
+            Integer pageSize = Integer.parseInt(params.get("pageSize").toString());
+            String prodName = (String) params.get("prodName");
+            //分页
+            PageHelper.startPage(page, pageSize);
+            List<Product> productList = productNewMapper.selectByProdName(prodName);
+            for (Product product : productList) {
+                product.setManageGradeValue(ManageGradeEnum.getValuedById(product.getManageGrade()));
+                product.setProdCompTypeValue(ProdCompTypeEnum.getValuedById(product.getProdCompType()));
+            }
+            Page pageInfo = new Page(new PageInfo(productList));
+            resultMap.put("data", productList);
+            resultMap.put("page", pageInfo);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getAttrSpecListPage(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            //获取分页参数
+            Long prodId = Long.valueOf(params.get("prodId").toString());
+            Integer page = Integer.parseInt(params.get("page").toString());
+            Integer pageSize = Integer.parseInt(params.get("pageSize").toString());
+            String attrName = (String) params.get("attrName");
+            //分页
+            PageHelper.startPage(page, pageSize);
+            List<Map<String, Object>> mapList = productNewMapper.selectAttrSpec(prodId, attrName);
+            for (Map<String, Object> map : mapList) {
+                Long prodAttrId = (Long) map.get("prodAttrId");
+                List<Map<String, Object>> attrValueList = productNewMapper.selectProdAttrValue(prodAttrId);
+                if (attrValueList != null && attrValueList.size() > 0 && attrValueList.get(0) != null) {
+                    map.put("prodAttrValue", attrValueList);
+                } else {
+                    map.put("prodAttrValue", new ArrayList<Map<String, Object>>());
+                }
+                map.put("checkAttrValue", new ArrayList<Long>());
+            }
+            Page pageInfo = new Page(new PageInfo(mapList));
+            resultMap.put("data", mapList);
+            resultMap.put("page", pageInfo);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getProjectDetail(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+
+            Long prodId = (Long) params.get("prodId");
+
+            List<Product> productList = productNewMapper.selectByProdName(prodName);
+            for (Product product : productList) {
+                product.setManageGradeValue(ManageGradeEnum.getValuedById(product.getManageGrade()));
+                product.setProdCompTypeValue(ProdCompTypeEnum.getValuedById(product.getProdCompType()));
+            }
+            resultMap.put("data", productList);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
 }
