@@ -6,10 +6,13 @@ import com.ccssoft.interfaceplatform.zj.module.service.ISaleService;
 import com.ctzj.smt.bss.sysmgr.model.common.SysmgrResultObject;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
 import com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserDtoDubboService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mysql.jdbc.StringUtils;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
@@ -2193,10 +2196,12 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
         List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
+        PageHelper.startPage(1,10);
         if (strategyIdList!=null){
             List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             trialOperations.forEach(trialOperation -> {
-                if (trialOperation.getStatusCd().equals("7300") || trialOperation.getStatusCd().equals("8100")){
+                if (trialOperation.getStatusCd().equals(TrialStatus.ISEE_PUBLISH_SUCCESS.getValue())
+                        || trialOperation.getStatusCd().equals(TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue())){
                     Object o = redisUtils.get("SPECIAL_NUM_" + trialOperation.getBatchNum());
                     if ( o != null && "1000".equals(o.toString())){
                         trialOperation.setStatusCd(TrialStatus.SPECIAL_PUBLISH_SUCCESS.getValue());
@@ -2205,9 +2210,11 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
                 }
             });
             trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
+            Page pageInfo = new Page(new PageInfo(trialOperations));
             List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
             result.put("resultCode", CODE_SUCCESS);
             result.put("resultMsg", operationDetailList);
+            result.put("pageInfo",pageInfo);
         }else {
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "strategyIdList isEmpty");

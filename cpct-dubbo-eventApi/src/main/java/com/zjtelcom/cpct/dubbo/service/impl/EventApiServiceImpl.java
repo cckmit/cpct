@@ -1008,65 +1008,12 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.clear();
                     resultMapList.add(reultMap);
                 }
-                // 扫码下单、电话到家事件特殊逻辑
-                if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode) || "EVT0000000105".equals(eventCode) ) {
-                    Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
-                    log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
-                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
-                    evtContent.put("400600000040", "");
-                    evtContent.put("400600000041", "");
-                    if (onlineMap.get("wgbm")!=null){
-                        String wgbm = (String) onlineMap.get("wgbm");
-                        Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
-                        if (c3AndC4Map!=null && c3AndC4Map.get("c3")!=null && c3AndC4Map.get("c4")!=null){
-                            String c3Str = (String) c3AndC4Map.get("c3");
-                            String c4Str = (String) c3AndC4Map.get("c4");
-                            evtContent.put("400600000040", c3Str);
-                            evtContent.put("400600000041", c4Str);
-                        }
-                    }
-                    String staffCode = "";
-                    Object flg = evtContent.get("400600000052");
-                    if ("EVT0000000105".equals(eventCode)|| (flg!=null && "1".equals(flg.toString()))){
-                        if (onlineMap.get("wgbm")==null){
-                            staffCode = "GIS网格编码查询为空";
-                        }else {
-                            String wgbm = (String) onlineMap.get("wgbm");
-                            log.info("【商企专员查询】------》wgbm："+wgbm);
-                            Map<String, Object> mapRes = orgGridRelMapper.getC3AndC4(wgbm);
-                            if (mapRes!=null && mapRes.get("c4")!=null){
-                                log.info("【商企专员查询】------》C5 mapRes："+JSON.toJSONString(mapRes));
-                                String orgPath = orgGridRelMapper.getOrgPathByOrgId(mapRes.get("c4").toString());
-                                if (orgPath!=null && !"".equals(orgPath)){
-                                    List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
-                                    if (!list.isEmpty()){
-                                        staffCode = list.get(0);
-                                    }
-                                }
-                            }
-                            if ("".equals(staffCode)&& mapRes.get("c3")!=null){
-                                log.info("【商企专员查询】------》C4 mapRes："+JSON.toJSONString(mapRes));
-                                String orgPath = orgGridRelMapper.getOrgPathByOrgId(mapRes.get("c3").toString());
-                                if (orgPath!=null && !"".equals(orgPath)){
-                                    List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
-                                    if (!list.isEmpty()){
-                                        staffCode = list.get(0);
-                                    }else {
-                                        staffCode = "未查询到有效的接单人信息";
-                                    }
-                                }else {
-                                    staffCode = "未查询到有效的接单人信息";
-                                }
-                            }
-                        }
-                        log.info("【商企专员查询】------》staffCode："+staffCode);
-                        reultMap.put("CPCP_PUSH_NBR", staffCode);
-                    }else {
-                        reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel").toString());
-                    }
-                    resultMapList.clear();
-                    resultMapList.add(reultMap);
-                }
+
+                /**
+                 * 特殊事件处理
+                 * 101：扫码下单  102：电话到家  105：政企商城  107：9666协同单
+                 */
+                specailEventDeal(map, evtContent, eventCode, resultMapList);
 
                 List<String>  regionList = new ArrayList<>();
                 Map<String, Object> mktCamCodeListRedis = eventRedisService.getRedis("REGION_LIST_EVENT");
@@ -1497,6 +1444,116 @@ public class EventApiServiceImpl implements EventApiService {
             }
             log.info("事件计算流程结束:" + map.get("eventCode") + "***" + map.get("reqId") + "（" + (System.currentTimeMillis() - begin) + "）");
             return result;
+        }
+
+        /**
+         * 101：扫码下单  102：电话到家  105：政企商城  107：9666协同单
+         */
+        private void specailEventDeal(Map<String, String> map, Map<String, Object> evtContent, String eventCode, List<DefaultContext<String, Object>> resultMapList) {
+            if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode)
+                    || "EVT0000000105".equals(eventCode) || "EVT0000000107".equals(eventCode) ) {
+                DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                evtContent.put("400600000040", "");
+                evtContent.put("400600000041", "");
+                String lv3 = "";
+                String lv4 = "";
+                String staffCode = "";
+                if ("EVT0000000107".equals(eventCode)){
+                    String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
+                    String commLvl3Id = (String) reultMap.get("COMM_LVL3_ID");
+                    if (commLvl3Id != null) {
+                        Long lvl3OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl3Id));
+                        if (lvl3OrgId != null) {
+                            lv3 = lvl3OrgId.toString();
+                            evtContent.put("400600000040", lvl3OrgId.toString());
+                        }
+                    }
+                    if (commLvl4Id != null) {
+                        Long lvl4OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
+                        if (lvl4OrgId != null) {
+                            lv4 = lvl4OrgId.toString();
+                            evtContent.put("400600000041", lvl4OrgId.toString());
+                        }
+                    }
+                    if (!lv4.equals("")){
+                        String orgPath = orgGridRelMapper.getOrgPathByOrgId(lv4);
+                        if (orgPath!=null && !"".equals(orgPath)){
+                            List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
+                            if (!list.isEmpty()){
+                                staffCode = list.get(0);
+                            }
+                        }
+                    }
+                    if ("".equals(staffCode) && !lv3.equals("")){
+                        String orgPath = orgGridRelMapper.getOrgPathByOrgId(lv3);
+                        if (orgPath!=null && !"".equals(orgPath)){
+                            List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
+                            if (!list.isEmpty()){
+                                staffCode = list.get(0);
+                            }else {
+                                staffCode = "";
+                            }
+                        }else {
+                            staffCode = "";
+                        }
+                    }
+                    reultMap.put("CPCP_PUSH_NBR", staffCode);
+                }
+                if ("".equals(staffCode)){
+                    Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
+                    log.info("onlineScanCodeOrCallPhone4Home -->>>onlineMap: " + JSON.toJSONString(onlineMap));
+                    if (onlineMap.get("wgbm")!=null){
+                        String wgbm = (String) onlineMap.get("wgbm");
+                        Map<String, Object> c3AndC4Map = orgGridRelMapper.getC3AndC4(wgbm);
+                        if (c3AndC4Map!=null && c3AndC4Map.get("c3")!=null && c3AndC4Map.get("c4")!=null){
+                            String c3Str = (String) c3AndC4Map.get("c3");
+                            String c4Str = (String) c3AndC4Map.get("c4");
+                            evtContent.put("400600000040", c3Str);
+                            evtContent.put("400600000041", c4Str);
+                        }
+                    }
+                    Object flg = evtContent.get("400600000052");
+                    if ("EVT0000000105".equals(eventCode)|| (flg!=null && "1".equals(flg.toString()))){
+                        if (onlineMap.get("wgbm")==null){
+                            staffCode = "GIS网格编码查询为空";
+                        }else {
+                            String wgbm = (String) onlineMap.get("wgbm");
+                            log.info("【商企专员查询】------》wgbm："+wgbm);
+                            Map<String, Object> mapRes = orgGridRelMapper.getC3AndC4(wgbm);
+                            if (mapRes!=null && mapRes.get("c4")!=null){
+                                log.info("【商企专员查询】------》C5 mapRes："+JSON.toJSONString(mapRes));
+                                String orgPath = orgGridRelMapper.getOrgPathByOrgId(mapRes.get("c4").toString());
+                                if (orgPath!=null && !"".equals(orgPath)){
+                                    List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
+                                    if (!list.isEmpty()){
+                                        staffCode = list.get(0);
+                                    }
+                                }
+                            }
+                            if ("".equals(staffCode)&& mapRes.get("c3")!=null){
+                                log.info("【商企专员查询】------》C4 mapRes："+JSON.toJSONString(mapRes));
+                                String orgPath = orgGridRelMapper.getOrgPathByOrgId(mapRes.get("c3").toString());
+                                if (orgPath!=null && !"".equals(orgPath)){
+                                    List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
+                                    if (!list.isEmpty()){
+                                        staffCode = list.get(0);
+                                    }else {
+                                        staffCode = "未查询到有效的接单人信息";
+                                    }
+                                }else {
+                                    staffCode = "未查询到有效的接单人信息";
+                                }
+                            }
+                        }
+                        log.info("【商企专员查询】------》staffCode："+staffCode);
+                        reultMap.put("CPCP_PUSH_NBR", staffCode);
+                    }else {
+                        reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel").toString());
+                    }
+                }
+                resultMapList.clear();
+                resultMapList.add(reultMap);
+            }
         }
     }
 
