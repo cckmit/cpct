@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.channel;
 
+import com.zjtelcom.cpct.domain.channel.MktProductAttr;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 
 import java.util.List;
@@ -30,6 +31,13 @@ public interface ProductService {
     Map<String,Object> copyItemByCampaignPublish(Long oldCampaignId,Long newCampaignId, String mktCampaignCategory);
 
     Map<String, Object> copyItemByCampaign(Long oldCampaignId, Long newCampaignId);
+
+    Map<String, Object> addMktProductAttr(Map<String,Object> param);
+
+    Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr);
+
+    Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr);
+
 
 
 }

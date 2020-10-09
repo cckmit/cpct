@@ -1497,7 +1497,7 @@ public class EventApiServiceImpl implements EventApiService {
                             staffCode = "";
                         }
                     }
-                    reultMap.put("CPCP_PUSH_NBR", staffCode);
+                    reultMap.put("CPCP_ACCS_NBR", staffCode);
                 }
                 if ("".equals(staffCode)){
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
@@ -1546,7 +1546,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                         log.info("【商企专员查询】------》staffCode："+staffCode);
-                        reultMap.put("CPCP_PUSH_NBR", staffCode);
+                        reultMap.put("CPCP_ACCS_NBR", staffCode);
                     }else {
                         reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel").toString());
                     }

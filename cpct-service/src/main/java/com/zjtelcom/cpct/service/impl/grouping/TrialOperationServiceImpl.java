@@ -1031,7 +1031,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 addLog2Es(batchNumSt, "导入清单缺少渠道必填列");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
-                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                record.setStatusCd(TrialStatus.IMPORT_FAIL.value());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
                                 throw new RuntimeException("导入清单缺少渠道必填列");
@@ -1107,7 +1107,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     addLog2Es(batchNumSt, "导入清单工号地区不符");
                                     TrialOperation record = new TrialOperation();
                                     record.setId(Long.valueOf(insertId));
-                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.value());
                                     record.setRemark("导入清单工号地区不符");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单工号地区不符");
