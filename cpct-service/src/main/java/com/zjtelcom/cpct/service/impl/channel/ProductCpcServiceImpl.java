@@ -55,6 +55,26 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktProductAttrMapper mktProductAttrMapper;
 
     @Override
+    public Map<String, Object> copyMktProductAttr(Long oldProductId, Long newProductId, Long ruleId) {
+        Map<String,Object> result = new HashMap<>();
+        MktProductAttr  mktProductAttr = new MktProductAttr();
+        mktProductAttr.setProductId(oldProductId);
+        List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        if (!productAttrs.isEmpty()){
+            for (MktProductAttr oldAttr : productAttrs) {
+                MktProductAttr newAttr = BeanUtil.create(oldAttr, new MktProductAttr());
+                newAttr.setMktProductAttrId(null);
+                newAttr.setProductId(newProductId);
+                newAttr.setRuleId(ruleId);
+                mktProductAttrMapper.insert(newAttr);
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productAttrs);
+        return result;
+    }
+
+    @Override
     public Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr) {
         Map<String,Object> result = new HashMap<>();
         List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);

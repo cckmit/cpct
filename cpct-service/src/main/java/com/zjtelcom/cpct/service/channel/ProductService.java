@@ -38,6 +38,8 @@ public interface ProductService {
 
     Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr);
 
+    Map<String, Object> copyMktProductAttr(Long oldProductId,Long newProductId,Long ruleId);
+
 
 
 }
