@@ -234,7 +234,7 @@
     STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF, ORG_DIVISION, org_id_4a, ORG_CONTRACT_TYPE,
     ORG_AREA_LEVEL, REMARK, ORG_DESC, ORG_NAME_C3, ORG_NAME_C4, ORG_NAME_C5
     from organization
-    where ORG_NAME_C5 = #{orgNameC5}
+    where ORG_NAME_C5 = #{orgNameC5} and  ORG_LEVEL = 5
   </select>
 
   <select id="selectMenuByEleven" resultMap="BaseResultMap">
@@ -261,7 +261,7 @@
       staff s
     WHERE
       s.STAFF_ID = r.STAFF_ID
-    AND	r.REL_TYPE = 1900
+    AND	r.REL_TYPE = 1920
     AND r.STATUS_CD = 1000
     AND s.STATUS_CD = 1000
     AND r.ORG_ID = #{orgId,jdbcType=BIGINT}

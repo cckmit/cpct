@@ -54,6 +54,12 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     @Autowired
     private MktProductAttrMapper mktProductAttrMapper;
 
+
+    @Override
+    public Map<String, Object> copyMktCamResource(Long oldResourceId, Long newResourceId, Long ruleId) {
+        return null;
+    }
+
     @Override
     public Map<String, Object> copyMktProductAttr(Long oldProductId, Long newProductId, Long ruleId) {
         Map<String,Object> result = new HashMap<>();

@@ -288,6 +288,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             campaignIdList.add(Integer.valueOf(initId.toString()));
             campaignMap.put("idList", campaignIdList);
             campaignMap.put("perCampaign", "PER_CAMPAIGN");
+            campaignMap.put("isCamPool", "true");
             result = campaignIndexTask(campaignMap);
             mktDttsLogService.saveMktDttsLog("2222", "自动派发成功", new Date(), new Date(), "自动派发成功", JSON.toJSONString(param));
         } catch (Exception e) {
@@ -324,6 +325,9 @@ public class TrialProdServiceImpl implements TrialProdService {
         String perCampaign = MapUtil.getString(param.get("perCampaign"));
         //清单方案活动标记
         String userListCam =  MapUtil.getString(param.get("userListCam"));
+        //活动池派单
+        String isCamPool =  MapUtil.getString(param.get("isCamPool"));
+
         List<Integer> idList = ( List<Integer>)param.get("idList");
         List<String>  strategyList = new ArrayList<>();
         if (param.get("strategyList")!=null ){
@@ -383,6 +387,9 @@ public class TrialProdServiceImpl implements TrialProdService {
                 trialOperationMapper.insert(operation);
                 //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
+                    if ("true".equals(isCamPool)){
+                        redisUtils_es.set("IS_CAM_POOL"+batchNumSt,"true");
+                    }
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
                     mktDttsLogService.saveMktDttsLog("1000","周期性活动："+campaignDO.getMktCampaignName(),new Date(),new Date(),"成功",null);
                 }

@@ -12,9 +12,9 @@
         <module>cpct-web</module>
         <module>cpct-common</module>
         <module>cpct-service</module>
+        <module>cpct-shiro</module>
         <module>cpct-dubbo-server</module>
         <module>cpct-dubbo-eventApi</module>
-        <module>cpct-shiro</module>
         <module>cpct-dubbo-cpc</module>
         <module>cpct-dubbo-cpc-ser</module>
         <module>cpct-cache</module>
