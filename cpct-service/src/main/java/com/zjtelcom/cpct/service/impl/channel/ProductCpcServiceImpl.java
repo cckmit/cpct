@@ -1,11 +1,18 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.ctzj.smt.bss.cpc.query.service.api.ICouponApplyObjectService;
+import com.ctzj.smt.bss.cpc.query.service.api.ICouponEffExpRuleService;
+import com.ctzj.smt.bss.cpc.query.service.api.ICpcMktResCouponDubboService;
+import com.ctzj.smt.bss.cpc.write.service.api.ICouponApplyObjectWriteService;
+import com.ctzj.smt.bss.cpc.write.service.api.ICouponEffExpRuleWriteService;
+import com.ctzj.smt.bss.cpc.write.service.api.IMktResCouponWriteService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamResourceMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.dao.product.ProductNewMapper;
@@ -15,10 +22,7 @@ import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
-import com.zjtelcom.cpct.enums.ManageGradeEnum;
-import com.zjtelcom.cpct.enums.ProdCompTypeEnum;
-import com.zjtelcom.cpct.enums.CamItemType;
-import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -59,6 +63,27 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktProductAttrMapper mktProductAttrMapper;
     @Autowired
     private ProductNewMapper productNewMapper;
+
+    @Autowired(required = false)
+    private ICpcMktResCouponDubboService iCpcMktResCouponDubboService;
+
+    @Autowired(required = false)
+    private IMktResCouponWriteService iMktResCouponWriteService;
+
+    @Autowired(required = false)
+    private ICouponEffExpRuleWriteService iCouponEffExpRuleWriteService;
+
+    @Autowired(required = false)
+    private ICouponEffExpRuleService iCouponEffExpRuleService;
+
+    @Autowired(required = false)
+    private ICouponApplyObjectWriteService iCouponApplyObjectWriteService;
+
+    @Autowired(required = false)
+    private ICouponApplyObjectService iCouponApplyObjectService;
+
+    @Autowired
+    private MktCamResourceMapper mktCamResourceMapper;
 
 
 
@@ -656,10 +681,16 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
 
 
-    public Map<String, Object> mktCamResourceService(Map<String, Object> params) {
+    public Map<String, Object> mktCamResourceService(Long mktCampaignId) {
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            //查询
+            List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue());
+            for (MktCamResource mktCamResource : mktCamResourceList) {
+                if (mktCamResource.getResourceId() != null) {
 
+                }
+            }
 
             resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             resultMap.put("resultMsg", "查询成功！");

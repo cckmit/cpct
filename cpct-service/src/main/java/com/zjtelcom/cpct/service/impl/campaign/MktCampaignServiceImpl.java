@@ -1535,9 +1535,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyConfDetailList.add(mktStrategyConfDetail);
         }
         mktCampaignVO.setMktStrategyConfDetailList(mktStrategyConfDetailList);
-        MktCamResource mktCamResource = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.YES.getValue());
-        if (mktCamResource != null) {
-            mktCampaignVO.setMktCamResource(mktCamResource);
+        List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.YES.getValue());
+        if (mktCamResourceList != null && mktCamResourceList.size()>0) {
+            mktCampaignVO.setMktCamResource(mktCamResourceList.get(0));
         }
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);

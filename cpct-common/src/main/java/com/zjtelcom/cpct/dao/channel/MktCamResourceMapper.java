@@ -19,7 +19,7 @@ public interface MktCamResourceMapper {
 
     MktCamResource selectByPrimaryKey(Long mktCamResourceId);
 
-    MktCamResource selectByCampaignId(Long mktCampaignId, String frameFlg);
+    List<MktCamResource> selectByCampaignId(Long mktCampaignId, String frameFlg);
 
     MktCamResource selectByRuleId(Long rule, String frameFlg);
 
