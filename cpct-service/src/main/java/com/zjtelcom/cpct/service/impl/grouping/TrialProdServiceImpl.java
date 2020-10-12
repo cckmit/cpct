@@ -263,11 +263,6 @@ public class TrialProdServiceImpl implements TrialProdService {
                 result.put("resultMsg", "未查询到有效活动");
                 return result;
             }
-            List<TrialOperation> operationList = trialOperationMapper.listOperationByCamIdAndStatusCd(campaignDO.getMktCampaignId(), TrialStatus.ALL_SAMPEL_GOING.getValue());
-            if (!operationList.isEmpty()){
-                operationList.forEach(trialOperation ->{
-                });
-            }
             String orgCheck = redisUtils.get("ORG_CHECK_"+key)==null
                     ? null : redisUtils.get("ORG_CHECK_"+key).toString();
             if (orgCheck==null){
@@ -280,6 +275,11 @@ public class TrialProdServiceImpl implements TrialProdService {
                 result.put("resultMsg", "营销组织树配置正在努力加载请稍后再试");
                 return result;
             }
+            if (redisUtils.get("CAM_POLL_GOING_"+key)!=null){
+                result.put("resultCode", CODE_FAIL);
+                result.put("resultMsg", "请勿重复下发活动，请稍后再试");
+                return result;
+            }
             List<Integer> campaignIdList = new ArrayList<>();
             Map<String, Object> campaignMap = new HashMap<>();
             campaignIdList.add(Integer.valueOf(initId.toString()));
@@ -287,6 +287,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             campaignMap.put("perCampaign", "PER_CAMPAIGN");
             campaignMap.put("isCamPool", "true");
             campaignMap.put("camPoolKey", key);
+            redisUtils.setRedisUnit("CAM_POLL_GOING_"+key,"true",300);
             result = campaignIndexTask(campaignMap);
             mktDttsLogService.saveMktDttsLog("2222", "自动派发成功", new Date(), new Date(), "自动派发成功", JSON.toJSONString(param));
         } catch (Exception e) {
