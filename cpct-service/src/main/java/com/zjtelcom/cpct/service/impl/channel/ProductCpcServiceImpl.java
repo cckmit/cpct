@@ -57,6 +57,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
     @Override
     public Map<String, Object> copyMktCamResource(Long oldResourceId, Long newResourceId, Long ruleId) {
+
+
         return null;
     }
 
