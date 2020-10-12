@@ -172,5 +172,54 @@
         <dubbo:method name="queryPassword" servicecode="33.1016.queryPassword"/>
     </dubbo:reference>
 
+    <!--电子券二维码服务-->
+    <dubbo:reference interface="com.ctzj.service.outbound.QrCodeService" id="qrCodeService" version="1.0" retries="0" check="false">
+        <dubbo:method name="generate" servicecode="33.1056.generateQrCode"/>
+    </dubbo:reference>
+
+    <!--营销资源中心电子券相关服务（14个）-->
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.write.service.api.IMktResCouponWriteService"
+                   ref="mktResCouponCpcWriteServiceImpl" version="1.0">
+        <dubbo:method name="modifyMktresCoupon" servicecode="00.1076.modifyMktresCoupon"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.query.service.api.ICpcMktResCouponDubboService"
+                   ref="cpcMktResCouponServiceImpl" version="1.0">
+        <dubbo:method name="qryMktResCouponById" servicecode="00.1076.qryMktResCouponByIdForMkt"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.write.service.api.ICouponEffExpRuleWriteService"
+                   ref="couponEffExpRuleWriteServiceImpl" version="1.0">
+        <dubbo:method name="modifyCouponEffExpRlue" servicecode="00.1076.modifyCouponEffExpRlue"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.query.service.api.ICouponEffExpRuleService"
+                   ref="coupontEffExpRuleServiceImpl" version="1.0">
+        <dubbo:method name="qryCouponEffExpRule" servicecode="00.1076.qryCouponEffExpRuleForMkt"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.write.service.api.ICouponApplyObjectWriteService"
+                   ref="couponApplyObjectWriteServiceImpl" version="1.0">
+        <dubbo:method name="modifyCouponApplyObject" servicecode="00.1076.modifyCouponApplyObject"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.query.service.api.ICouponApplyObjectService"
+                   ref="couponApplyObjectServiceImpl" version="1.0">
+        <dubbo:method name="qryCouponApplyObjectList" servicecode="00.1076.qryCouponApplyObjectListForMkt"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.mktcenter.coupon.service.api.IMktResBatchRecDubboService"
+                   ref="mktResBatchRecDubboImpl" version="1.0">
+        <dubbo:method name="autoCreateCouponInst" servicecode="00.1078.autoCreateCouponInst"/>
+        <dubbo:method name="editCouponStatusCd" servicecode="00.1078.editCouponStatusCd"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.write.service.api.IMktCouponRelService"
+                   ref="mktCouponRelServiceImpl"
+                   version="1.0">
+        <dubbo:method name="addCouponOrgRel" servicecode="00.1076.addCouponOrgRelForMkt"/>
+        <dubbo:method name="delCouponProdAttr" servicecode="00.1076.delCouponProdAttrForMkt"/>
+        <dubbo:method name="addCouponProdAttr" servicecode="00.1076.addCouponProdAttrForMkt"/>
+        <dubbo:method name="delCouponOrgRel" servicecode="00.1076.delCouponOrgRelForMkt"/>
+    </dubbo:service>
+    <dubbo:service interface="com.ctzj.smt.bss.cpc.query.service.api.IMktResOrgRelInfoService"
+                   ref="mktResOrgRelInfoServiceImpl" version="1.0">
+        <dubbo:method name="qryChannelByOrgRel" servicecode="00.1076.qryChannelByOrgRelForMkt"/>
+        <dubbo:method name="qrySelectProdByCoupon" servicecode="00.1076.qrySelectProdByCouponForMkt"/>
+    </dubbo:service>
+
 </beans>
 
