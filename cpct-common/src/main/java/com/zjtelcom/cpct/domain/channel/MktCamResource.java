@@ -11,6 +11,52 @@ public class MktCamResource implements Serializable {
 
     private Long mktCampaignId;
 
+    private Long ruleId;
+
+    private Long resourceId;
+
+    private String resourceType;
+
+    private String resourceSubtype;
+
+    private Long resourceTotalNum;
+
+    private Long resourceApplyNum;
+
+    private String receiveType;
+
+    private Long days;
+
+    private Date startTime;
+
+    private Date endTime;
+
+    private String offerId;
+
+    private String dependOfferId;
+
+    private String dependProductId;
+
+    private String frameFlg;
+
+    private String statusCd;
+
+    private Long createStaff;
+
+    private Date createDate;
+
+    private Long updateStaff;
+
+    private Date updateDate;
+
+    private String remark;
+
+    private Long lanId;
+
+    private String offerCode;
+
+    private String offerName;
+
     private String camResourceName;
 
     private String faceAmount;
@@ -35,51 +81,13 @@ public class MktCamResource implements Serializable {
 
     private String applyUserPhone;
 
-    private Long ruleId;
+    private Long resourceOddNum;
 
-    private Long resourceId;
+    private Long parentId;
 
-    private String resourceType;
+    private String differentOfferId;
 
-    private String resourceSubtype;
-
-    private Long resourceTotalNum;
-
-    private Long resourceApplyNum;
-
-    private String receiveType;
-
-    private Long days;
-
-    private Date startTime;
-
-    private Date endTime;
-
-    private Long offerId;
-
-    private Long dependOfferId;
-
-    private Long dependProductId;
-
-    private String frameFlg;
-
-    private String statusCd;
-
-    private Long createStaff;
-
-    private Date createDate;
-
-    private Long updateStaff;
-
-    private Date updateDate;
-
-    private String remark;
-
-    private Long lanId;
-
-    private String offerCode;
-
-    private String offerName;
+    private String dealShops;
 
 
 }

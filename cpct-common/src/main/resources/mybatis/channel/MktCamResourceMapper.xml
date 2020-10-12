@@ -4,6 +4,29 @@
   <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktCamResource">
     <id column="MKT_CAM_RESOURCE_ID" jdbcType="BIGINT" property="mktCamResourceId" />
     <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+    <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
+    <result column="RESOURCE_ID" jdbcType="BIGINT" property="resourceId" />
+    <result column="RESOURCE_TYPE" jdbcType="VARCHAR" property="resourceType" />
+    <result column="RESOURCE_SUBTYPE" jdbcType="VARCHAR" property="resourceSubtype" />
+    <result column="RESOURCE_TOTAL_NUM" jdbcType="BIGINT" property="resourceTotalNum" />
+    <result column="RESOURCE_APPLY_NUM" jdbcType="BIGINT" property="resourceApplyNum" />
+    <result column="RECEIVE_TYPE" jdbcType="VARCHAR" property="receiveType" />
+    <result column="DAYS" jdbcType="BIGINT" property="days" />
+    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="OFFER_ID" jdbcType="VARCHAR" property="offerId" />
+    <result column="DEPEND_OFFER_ID" jdbcType="VARCHAR" property="dependOfferId" />
+    <result column="DEPEND_PRODUCT_ID" jdbcType="VARCHAR" property="dependProductId" />
+    <result column="FRAME_FLG" jdbcType="VARCHAR" property="frameFlg" />
+    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+    <result column="OFFER_CODE" jdbcType="VARCHAR" property="offerCode" />
+    <result column="OFFER_NAME" jdbcType="VARCHAR" property="offerName" />
     <result column="CAM_RESOURCE_NAME" jdbcType="VARCHAR" property="camResourceName" />
     <result column="FACE_AMOUNT" jdbcType="VARCHAR" property="faceAmount" />
     <result column="DIFFERENT_PRICE" jdbcType="VARCHAR" property="differentPrice" />
@@ -16,40 +39,17 @@
     <result column="PUBLISH_AREA" jdbcType="VARCHAR" property="publishArea" />
     <result column="APPLY_USER" jdbcType="VARCHAR" property="applyUser" />
     <result column="APPLY_USER_PHONE" jdbcType="VARCHAR" property="applyUserPhone" />
-    <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
-    <result column="RESOURCE_ID" jdbcType="BIGINT" property="resourceId" />
-    <result column="RESOURCE_TYPE" jdbcType="VARCHAR" property="resourceType" />
-    <result column="RESOURCE_SUBTYPE" jdbcType="VARCHAR" property="resourceSubtype" />
-    <result column="RESOURCE_TOTAL_NUM" jdbcType="BIGINT" property="resourceTotalNum" />
-    <result column="RESOURCE_APPLY_NUM" jdbcType="BIGINT" property="resourceApplyNum" />
-    <result column="RECEIVE_TYPE" jdbcType="VARCHAR" property="receiveType" />
-    <result column="DAYS" jdbcType="BIGINT" property="days" />
-    <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
-    <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
-    <result column="OFFER_ID" jdbcType="BIGINT" property="offerId" />
-    <result column="DEPEND_OFFER_ID" jdbcType="BIGINT" property="dependOfferId" />
-    <result column="DEPEND_PRODUCT_ID" jdbcType="BIGINT" property="dependProductId" />
-    <result column="FRAME_FLG" jdbcType="VARCHAR" property="frameFlg" />
-    <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
-    <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
-    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
-    <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
-    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
-    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-    <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
-    <result column="OFFER_CODE" jdbcType="VARCHAR" property="offerCode" />
-    <result column="OFFER_NAME" jdbcType="VARCHAR" property="offerName" />
+    <result column="RESOURCE_ODD_NUM" jdbcType="BIGINT" property="resourceOddNum" />
+    <result column="PARENT_ID" jdbcType="BIGINT" property="parentId" />
+    <result column="DIFFERENT_OFFER_ID" jdbcType="VARCHAR" property="differentOfferId" />
+    <result column="DEAL_SHOPS" jdbcType="VARCHAR" property="dealShops" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from mkt_cam_resource
     where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
-    insert into mkt_cam_resource (MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, CAM_RESOURCE_NAME,
-      FACE_AMOUNT, DIFFERENT_PRICE, RELEASE_TYPE,
-      GET_START_TIME, GET_END_TIME, QC_CODE_URL,
-      USE_AREA, USE_AREA_C4, PUBLISH_AREA,
-      APPLY_USER, APPLY_USER_PHONE, RULE_ID,
+    insert into mkt_cam_resource (MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, RULE_ID,
       RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
       RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE,
       DAYS, START_TIME, END_TIME,
@@ -57,24 +57,53 @@
       FRAME_FLG, STATUS_CD, CREATE_STAFF,
       CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
       REMARK, LAN_ID, OFFER_CODE,
-      OFFER_NAME)
-    values (#{mktCamResourceId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{camResourceName,jdbcType=VARCHAR},
-      #{faceAmount,jdbcType=VARCHAR}, #{differentPrice,jdbcType=VARCHAR}, #{releaseType,jdbcType=VARCHAR},
-      #{getStartTime,jdbcType=TIMESTAMP}, #{getEndTime,jdbcType=TIMESTAMP}, #{qcCodeUrl,jdbcType=VARCHAR},
-      #{useArea,jdbcType=VARCHAR}, #{useAreaC4,jdbcType=VARCHAR}, #{publishArea,jdbcType=VARCHAR},
-      #{applyUser,jdbcType=VARCHAR}, #{applyUserPhone,jdbcType=VARCHAR}, #{ruleId,jdbcType=BIGINT},
+      OFFER_NAME, CAM_RESOURCE_NAME, FACE_AMOUNT,
+      DIFFERENT_PRICE, RELEASE_TYPE, GET_START_TIME,
+      GET_END_TIME, QC_CODE_URL, USE_AREA,
+      USE_AREA_C4, PUBLISH_AREA, APPLY_USER,
+      APPLY_USER_PHONE, RESOURCE_ODD_NUM, PARENT_ID,
+      DIFFERENT_OFFER_ID, DEAL_SHOPS)
+    values (#{mktCamResourceId,jdbcType=BIGINT}, #{mktCampaignId,jdbcType=BIGINT}, #{ruleId,jdbcType=BIGINT},
       #{resourceId,jdbcType=BIGINT}, #{resourceType,jdbcType=VARCHAR}, #{resourceSubtype,jdbcType=VARCHAR},
       #{resourceTotalNum,jdbcType=BIGINT}, #{resourceApplyNum,jdbcType=BIGINT}, #{receiveType,jdbcType=VARCHAR},
       #{days,jdbcType=BIGINT}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
-      #{offerId,jdbcType=BIGINT}, #{dependOfferId,jdbcType=BIGINT}, #{dependProductId,jdbcType=BIGINT},
+      #{offerId,jdbcType=VARCHAR}, #{dependOfferId,jdbcType=VARCHAR}, #{dependProductId,jdbcType=VARCHAR},
       #{frameFlg,jdbcType=VARCHAR}, #{statusCd,jdbcType=VARCHAR}, #{createStaff,jdbcType=BIGINT},
       #{createDate,jdbcType=TIMESTAMP}, #{updateStaff,jdbcType=BIGINT}, #{updateDate,jdbcType=TIMESTAMP},
       #{remark,jdbcType=VARCHAR}, #{lanId,jdbcType=BIGINT}, #{offerCode,jdbcType=VARCHAR},
-      #{offerName,jdbcType=VARCHAR})
+      #{offerName,jdbcType=VARCHAR}, #{camResourceName,jdbcType=VARCHAR}, #{faceAmount,jdbcType=VARCHAR},
+      #{differentPrice,jdbcType=VARCHAR}, #{releaseType,jdbcType=VARCHAR}, #{getStartTime,jdbcType=TIMESTAMP},
+      #{getEndTime,jdbcType=TIMESTAMP}, #{qcCodeUrl,jdbcType=VARCHAR}, #{useArea,jdbcType=VARCHAR},
+      #{useAreaC4,jdbcType=VARCHAR}, #{publishArea,jdbcType=VARCHAR}, #{applyUser,jdbcType=VARCHAR},
+      #{applyUserPhone,jdbcType=VARCHAR}, #{resourceOddNum,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT},
+      #{differentOfferId,jdbcType=VARCHAR}, #{dealShops,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
     update mkt_cam_resource
     set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
+      RULE_ID = #{ruleId,jdbcType=BIGINT},
+      RESOURCE_ID = #{resourceId,jdbcType=BIGINT},
+      RESOURCE_TYPE = #{resourceType,jdbcType=VARCHAR},
+      RESOURCE_SUBTYPE = #{resourceSubtype,jdbcType=VARCHAR},
+      RESOURCE_TOTAL_NUM = #{resourceTotalNum,jdbcType=BIGINT},
+      RESOURCE_APPLY_NUM = #{resourceApplyNum,jdbcType=BIGINT},
+      RECEIVE_TYPE = #{receiveType,jdbcType=VARCHAR},
+      DAYS = #{days,jdbcType=BIGINT},
+      START_TIME = #{startTime,jdbcType=TIMESTAMP},
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+      OFFER_ID = #{offerId,jdbcType=VARCHAR},
+      DEPEND_OFFER_ID = #{dependOfferId,jdbcType=VARCHAR},
+      DEPEND_PRODUCT_ID = #{dependProductId,jdbcType=VARCHAR},
+      FRAME_FLG = #{frameFlg,jdbcType=VARCHAR},
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      LAN_ID = #{lanId,jdbcType=BIGINT},
+      OFFER_CODE = #{offerCode,jdbcType=VARCHAR},
+      OFFER_NAME = #{offerName,jdbcType=VARCHAR},
       CAM_RESOURCE_NAME = #{camResourceName,jdbcType=VARCHAR},
       FACE_AMOUNT = #{faceAmount,jdbcType=VARCHAR},
       DIFFERENT_PRICE = #{differentPrice,jdbcType=VARCHAR},
@@ -87,48 +116,31 @@
       PUBLISH_AREA = #{publishArea,jdbcType=VARCHAR},
       APPLY_USER = #{applyUser,jdbcType=VARCHAR},
       APPLY_USER_PHONE = #{applyUserPhone,jdbcType=VARCHAR},
-      RULE_ID = #{ruleId,jdbcType=BIGINT},
-      RESOURCE_ID = #{resourceId,jdbcType=BIGINT},
-      RESOURCE_TYPE = #{resourceType,jdbcType=VARCHAR},
-      RESOURCE_SUBTYPE = #{resourceSubtype,jdbcType=VARCHAR},
-      RESOURCE_TOTAL_NUM = #{resourceTotalNum,jdbcType=BIGINT},
-      RESOURCE_APPLY_NUM = #{resourceApplyNum,jdbcType=BIGINT},
-      RECEIVE_TYPE = #{receiveType,jdbcType=VARCHAR},
-      DAYS = #{days,jdbcType=BIGINT},
-      START_TIME = #{startTime,jdbcType=TIMESTAMP},
-      END_TIME = #{endTime,jdbcType=TIMESTAMP},
-      OFFER_ID = #{offerId,jdbcType=BIGINT},
-      DEPEND_OFFER_ID = #{dependOfferId,jdbcType=BIGINT},
-      DEPEND_PRODUCT_ID = #{dependProductId,jdbcType=BIGINT},
-      FRAME_FLG = #{frameFlg,jdbcType=VARCHAR},
-      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      LAN_ID = #{lanId,jdbcType=BIGINT},
-      OFFER_CODE = #{offerCode,jdbcType=VARCHAR},
-      OFFER_NAME = #{offerName,jdbcType=VARCHAR}
+      RESOURCE_ODD_NUM = #{resourceOddNum,jdbcType=BIGINT},
+      PARENT_ID = #{parentId,jdbcType=BIGINT},
+      DIFFERENT_OFFER_ID = #{differentOfferId,jdbcType=VARCHAR},
+      DEAL_SHOPS = #{dealShops,jdbcType=VARCHAR}
     where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, CAM_RESOURCE_NAME, FACE_AMOUNT, DIFFERENT_PRICE,
-    RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL, USE_AREA, USE_AREA_C4, PUBLISH_AREA,
-    APPLY_USER, APPLY_USER_PHONE, RULE_ID, RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
-    RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME, END_TIME,
-    OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME
+    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, RULE_ID, RESOURCE_ID, RESOURCE_TYPE,
+    RESOURCE_SUBTYPE, RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME,
+    END_TIME, OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME, CAM_RESOURCE_NAME,
+    FACE_AMOUNT, DIFFERENT_PRICE, RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL,
+    USE_AREA, USE_AREA_C4, PUBLISH_AREA, APPLY_USER, APPLY_USER_PHONE, RESOURCE_ODD_NUM,
+    PARENT_ID, DIFFERENT_OFFER_ID, DEAL_SHOPS
     from mkt_cam_resource
     where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, CAM_RESOURCE_NAME, FACE_AMOUNT, DIFFERENT_PRICE,
-    RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL, USE_AREA, USE_AREA_C4, PUBLISH_AREA,
-    APPLY_USER, APPLY_USER_PHONE, RULE_ID, RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
-    RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME, END_TIME,
-    OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
-    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME
+    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, RULE_ID, RESOURCE_ID, RESOURCE_TYPE,
+    RESOURCE_SUBTYPE, RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME,
+    END_TIME, OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME, CAM_RESOURCE_NAME, 
+    FACE_AMOUNT, DIFFERENT_PRICE, RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL,
+    USE_AREA, USE_AREA_C4, PUBLISH_AREA, APPLY_USER, APPLY_USER_PHONE, RESOURCE_ODD_NUM,
+    PARENT_ID, DIFFERENT_OFFER_ID, DEAL_SHOPS
     from mkt_cam_resource
   </select>
 </mapper>
