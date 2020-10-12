@@ -17,4 +17,7 @@ public interface ChannelMapper {
     int updateByPrimaryKey(Channel record);
 
     Channel selectByPrimaryKeyFromShiTi(Long aLong);
+
+    //regionId与regionName模糊匹配
+    List<String> getChannelInfoByRegionId(Long regionId,String channelName);
 }

@@ -209,19 +209,19 @@
     </dubbo:reference>
 
     <dubbo:reference interface="com.ctzj.smt.bss.mktcenter.coupon.service.api.IMktResBatchRecDubboService"
-                   id="mktResBatchRecDubboImpl" version="1.0" check="false">
+                     id="mktResBatchRecDubboImpl" version="1.0" check="false">
         <dubbo:method name="autoCreateCouponInst" servicecode="00.1078.autoCreateCouponInst"/>
         <dubbo:method name="editCouponStatusCd" servicecode="00.1078.editCouponStatusCd"/>
     </dubbo:reference>
     <dubbo:reference interface="com.ctzj.smt.bss.cpc.write.service.api.IMktCouponRelService"
-                   id="mktCouponRelServiceImpl" version="1.0" check="false">
+                     id="mktCouponRelServiceImpl" version="1.0" check="false">
         <dubbo:method name="addCouponOrgRel" servicecode="00.1076.addCouponOrgRelForMkt"/>
         <dubbo:method name="delCouponProdAttr" servicecode="00.1076.delCouponProdAttrForMkt"/>
         <dubbo:method name="addCouponProdAttr" servicecode="00.1076.addCouponProdAttrForMkt"/>
         <dubbo:method name="delCouponOrgRel" servicecode="00.1076.delCouponOrgRelForMkt"/>
     </dubbo:reference>
     <dubbo:reference interface="com.ctzj.smt.bss.cpc.query.service.api.IMktResOrgRelInfoService"
-                   id="mktResOrgRelInfoServiceImpl" version="1.0" check="false">
+                     id="mktResOrgRelInfoServiceImpl" version="1.0" check="false">
         <dubbo:method name="qryChannelByOrgRel" servicecode="00.1076.qryChannelByOrgRelForMkt"/>
         <dubbo:method name="qrySelectProdByCoupon" servicecode="00.1076.qrySelectProdByCouponForMkt"/>
     </dubbo:reference>

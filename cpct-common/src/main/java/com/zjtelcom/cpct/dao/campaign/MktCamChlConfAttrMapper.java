@@ -39,4 +39,8 @@ public interface MktCamChlConfAttrMapper {
 
     List<String> selectAttrTimeInfoByCampaignId(@Param("campaignId") Long campaignId,@Param("attrId") Long attrId);
 
+    int updateAttridByChannelId(@Param("attrId") Long attrId,
+                                @Param("attrValueId") Long attrValueId,
+                                @Param("attrValue") String attrValue,
+                                @Param("evtContactConfId") Long evtContactConfId);
 }

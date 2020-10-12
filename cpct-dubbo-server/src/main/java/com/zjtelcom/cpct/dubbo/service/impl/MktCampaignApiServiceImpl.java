@@ -91,10 +91,10 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
     @Autowired
     private MktCampaignService mktCampaignService;
-
+    @Autowired
+    private MktRequestMapper  mktRequestMapper;
     //同步表名
     private static final String tableName = "mkt_campaign";
-
 
 
     @Override
@@ -264,6 +264,38 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
             e.printStackTrace();
         }
         return map;
+    }
+
+    @Override
+    public Map<String, Object> getStaffByMktRequest(Map<String, Object> paramMap) {
+
+        Map<String,Object> resultMap  = new HashMap<>();
+        String requestType =(String) paramMap.get("requestType");
+        String nodeId = (String)paramMap.get("nodeId");
+        Long mktCamId = (Long)paramMap.get("mktCamId");
+        Map<String,Object> dataMap  = new HashMap<>();
+        logger.info("需求函类型获取审批员工：" + requestType);
+        logger.info("需求函类型获取审批员工：" + nodeId);
+        logger.info("需求函类型获取审批员工：" + mktCamId);
+        try {
+            MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId);
+            logger.info("需求函类型获取审批员工：" + mktRequestDO);
+            dataMap.put("requestId",mktRequestDO.getRequestId());
+            dataMap.put("requestType",mktRequestDO.getRequestType());
+            dataMap.put("nodeId",mktRequestDO.getNodeId());
+            dataMap.put("catelogId",mktRequestDO.getCatelogId());
+            dataMap.put("lanId",mktRequestDO.getLanId());
+            dataMap.put("staff",mktRequestDO.getStaff());
+        }catch ( Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMessage","消息返回异常");
+            return resultMap;
+        }
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMessage","消息返回成功");
+        resultMap.put("data",dataMap);
+        return resultMap;
     }
 
 }

@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.MqService;
+import com.zjtelcom.cpct.service.campaign.MktCamResourceQRCodeService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
@@ -66,6 +67,9 @@ public class CampaignController extends BaseController {
     private CatalogService catalogService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
+
+    @Autowired
+    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
 
     /**
      * 需求函类型限制活动类型校验
@@ -827,5 +831,28 @@ public class CampaignController extends BaseController {
         }
         return result;
     }
+
+/*
+*生成二维码url，如果存在则直接获取
+ */
+    @PostMapping(value = "/generatePoster")
+    @CrossOrigin
+    public Map<String, Object> generatePoster(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.generatePoster(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "成功");
+        result.put("data",data);
+        return result;
+    }
+
 
 }

@@ -51,6 +51,7 @@
         <dubbo:method name="copyMktCampaign" servicecode="00.1083.copyMktCampaign" timeout="10000"/>
         <!--回滚活动服务-->
         <dubbo:method name="rollBackMktCampaign" servicecode="00.1083.rollBackMktCampaign" timeout="10000"/>
+        <dubbo:method name="getStaffByMktRequest" servicecode="00.1083.getStaffByMktRequest" timeout="10000"/>
     </dubbo:service>
 
 

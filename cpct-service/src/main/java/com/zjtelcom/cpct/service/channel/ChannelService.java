@@ -48,4 +48,5 @@ public interface ChannelService {
 
     Map<String,Object> getUamServicePswd(String accountID, String areaCode, String custID);
 
+    List<String>  getChannelByChannelName(Long regionId, String channelName);
 }

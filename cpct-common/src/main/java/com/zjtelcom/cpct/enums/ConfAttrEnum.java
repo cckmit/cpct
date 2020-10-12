@@ -33,7 +33,8 @@ public enum ConfAttrEnum {
     ISEE_LABEL_AREA(500600010022L, "ISEE标签选择区域"),
     EFFECTIVE_DAYS(500600010023L, "有效天数"),
     SERVICE_PACKAGE(500600010024L, "服务包"),
-    DEDICATED_TEAM(500600010027L, "专属团队");
+    DEDICATED_TEAM(500600010027L, "专属团队"),
+    POST_TYPE(500600010028L, "二维码海报");
 
     private Long arrId;
     private String arrName;

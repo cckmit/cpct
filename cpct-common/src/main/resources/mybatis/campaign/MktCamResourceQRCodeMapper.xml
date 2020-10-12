@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktCamResourceQRCodeMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.MktCamResource">
+        <id column="MKT_CAM_RESOURCE_ID" jdbcType="BIGINT" property="mktCamResourceId" />
+        <result column="MKT_CAMPAIGN_ID" jdbcType="BIGINT" property="mktCampaignId" />
+        <result column="CAM_RESOURCE_NAME" jdbcType="VARCHAR" property="camResourceName" />
+        <result column="FACE_AMOUNT" jdbcType="VARCHAR" property="faceAmount" />
+        <result column="DIFFERENT_PRICE" jdbcType="VARCHAR" property="differentPrice" />
+        <result column="RELEASE_TYPE" jdbcType="VARCHAR" property="releaseType" />
+        <result column="GET_START_TIME" jdbcType="TIMESTAMP" property="getStartTime" />
+        <result column="GET_END_TIME" jdbcType="TIMESTAMP" property="getEndTime" />
+        <result column="QC_CODE_URL" jdbcType="VARCHAR" property="qcCodeUrl" />
+        <result column="USE_AREA" jdbcType="VARCHAR" property="useArea" />
+        <result column="USE_AREA_C4" jdbcType="VARCHAR" property="useAreaC4" />
+        <result column="PUBLISH_AREA" jdbcType="VARCHAR" property="publishArea" />
+        <result column="APPLY_USER" jdbcType="VARCHAR" property="applyUser" />
+        <result column="APPLY_USER_PHONE" jdbcType="VARCHAR" property="applyUserPhone" />
+        <result column="RULE_ID" jdbcType="BIGINT" property="ruleId" />
+        <result column="RESOURCE_ID" jdbcType="BIGINT" property="resourceId" />
+        <result column="RESOURCE_TYPE" jdbcType="VARCHAR" property="resourceType" />
+        <result column="RESOURCE_SUBTYPE" jdbcType="VARCHAR" property="resourceSubtype" />
+        <result column="RESOURCE_TOTAL_NUM" jdbcType="BIGINT" property="resourceTotalNum" />
+        <result column="RESOURCE_APPLY_NUM" jdbcType="BIGINT" property="resourceApplyNum" />
+        <result column="RECEIVE_TYPE" jdbcType="VARCHAR" property="receiveType" />
+        <result column="DAYS" jdbcType="BIGINT" property="days" />
+        <result column="START_TIME" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="END_TIME" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="OFFER_ID" jdbcType="BIGINT" property="offerId" />
+        <result column="DEPEND_OFFER_ID" jdbcType="BIGINT" property="dependOfferId" />
+        <result column="DEPEND_PRODUCT_ID" jdbcType="BIGINT" property="dependProductId" />
+        <result column="FRAME_FLG" jdbcType="VARCHAR" property="frameFlg" />
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd" />
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="LAN_ID" jdbcType="BIGINT" property="lanId" />
+        <result column="OFFER_CODE" jdbcType="VARCHAR" property="offerCode" />
+        <result column="OFFER_NAME" jdbcType="VARCHAR" property="offerName" />
+    </resultMap>
+
+    <select id="selectRecordByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select MKT_CAM_RESOURCE_ID, RULE_ID from mkt_cam_resource where RULE_ID = #{ruleId};
+    </select>
+    <select id="updateQRUrlbyMktResourceId"  resultType="java.lang.Boolean">
+        update mkt_cam_resource
+        set QC_CODE_URL = #{qrUrl, jdbcType = VARCHAR}
+        where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
+    </select>
+
+</mapper>

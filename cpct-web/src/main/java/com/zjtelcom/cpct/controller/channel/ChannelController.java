@@ -7,11 +7,13 @@ import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @RestController
 @RequestMapping("${adminPath}/channel")
@@ -342,5 +344,30 @@ public class ChannelController extends BaseController {
             return result;
         }
         return result;
+    }
+
+    /**
+     * 门店名称模糊查询
+     */
+    @PostMapping("getChannelByChannelName")
+    @CrossOrigin
+    public Map<String,Object> getChannelByChannelName(@RequestBody Map<String,Object> param) {
+        Map<String,Object> resultMap = new HashMap<>();
+        List<String> channelNameList = new ArrayList<>();
+        try {
+            Integer regionId =(Integer)(param.get("regionId"));
+            String channelName = (String)param.get("channelName");
+            channelNameList = channelService.getChannelByChannelName(regionId.longValue(),channelName);
+
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getChannelByChannelName",e);
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMsg", "门店名称模糊查询失败");
+            return resultMap;
+        }
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMessage","消息返回成功");
+        resultMap.put("data",channelNameList);
+        return resultMap;
     }
 }

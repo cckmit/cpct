@@ -91,4 +91,8 @@
     where STATUS_CD = 1000 AND CHN_TYPE_CD in (110101,110102,110201,110202) AND  ORG_ID = #{orgId,jdbcType=BIGINT}
   </select>
 
+  <select id="getChannelInfoByRegionId" resultType="java.lang.String">
+    select CHANNEL_NAME
+    from channel where REGION_ID = #{regionId} and CHANNEL_NAME like CONCAT("%",#{channelName},'%')
+  </select>
 </mapper>
