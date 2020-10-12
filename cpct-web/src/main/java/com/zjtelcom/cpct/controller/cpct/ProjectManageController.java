@@ -42,7 +42,8 @@ public class ProjectManageController {
     @RequestMapping("/updateProjectPcState")
     @CrossOrigin
     public String updateProjectPcState(@RequestBody Map<String, Object> params) {
-        Map<String, Object> resultMap = projectManageService.updateProjectStateTime(params);
+        Long mktCampaginId = (Long) params.get("mktCampaginId");
+        Map<String, Object> resultMap = projectManageService.updateProjectPcState(mktCampaginId);
         return JSON.toJSONString(resultMap);
     }
 

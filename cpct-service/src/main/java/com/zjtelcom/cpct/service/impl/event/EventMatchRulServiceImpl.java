@@ -254,7 +254,7 @@ public class EventMatchRulServiceImpl extends BaseService implements EventMatchR
 //            FitDomain fitDomain = null;
 //            if (label.getFitDomain() != null) {
 //                fitDomain = FitDomain.getFitDomain(Integer.parseInt(label.getFitDomain()));
-//                tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.value()));
+//                tarGrpConditionVO.setFitDomainId(Long.valueOf(fitDomain.getValue()));
 //                tarGrpConditionVO.setFitDomainName(fitDomain.getDescription());
 //            }
             //将操作符转为中文

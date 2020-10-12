@@ -146,7 +146,6 @@ public class TrialProdServiceImpl implements TrialProdService {
     public Map<String, Object> orgListCached(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
         Long initId = MapUtil.getLongNum(param.get("initId"));
-        String staffCode = MapUtil.getString(param.get("staffCode"));
         List<String> areaId = (List<String>)param.get("orgList");
         MktCampaignDO campaignDO = campaignMapper.selectByInitId(initId);
         if (campaignDO==null){
@@ -155,13 +154,15 @@ public class TrialProdServiceImpl implements TrialProdService {
             return result;
         }
         List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
-        List<String> staffList = new ArrayList<>();
-        staffList.add(staffCode+initId.toString());
+        List<Long> ruleIdList = new ArrayList<>();
+            ruleDOList.forEach(ruleDO -> {
+               ruleIdList.add(ruleDO.getMktStrategyConfRuleId());
+            });
         List<Long> orgIdList = new ArrayList<>();
         for (String integer : areaId) {
             orgIdList.add(Long.valueOf(integer));
         }
-        area2RedisThread(staffList,orgIdList);
+        area2RedisThread(ruleIdList,orgIdList);
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "营销组织树加载中");
         return result;
@@ -169,41 +170,41 @@ public class TrialProdServiceImpl implements TrialProdService {
 
 
     //添加营销组织树集合
-    private void area2RedisThread(List<String> staffList,List<Long> orgIdList) {
+    private void area2RedisThread(List<Long> ruleId,List<Long> orgIdList) {
         //过滤 选择level 大于3 的
         List<Long> orgs = organizationMapper.selectByIdList(orgIdList);
         if (orgs == null || orgs.isEmpty()){
-            for (String aLong : staffList) {
+            for (Long aLong : ruleId) {
                 redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
             }
         }else {
             //添加所有选择的节点信息到缓存
-            for (String aLong : staffList) {
+            for (Long aLong : ruleId) {
                 redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"false",3600);
                 redisUtils.setRedisUnit("ORG_ID_"+aLong.toString(),orgs,3600);
                 redisUtils.remove("AREA_RULE_ISSURE_"+aLong);
             }
             new Thread(){
                 public void run(){
-                    areaList2Redis(staffList,orgs);
+                    areaList2Redis(ruleId,orgs);
                 }
             }.start();
         }
     }
 
-    public void areaList2Redis(List<String> staffList,List<Long> areaIdList){
+    public void areaList2Redis(List<Long> ruleId,List<Long> areaIdList){
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(areaIdList.size());
         List<Organization> sysAreaList = new ArrayList<>();
         List<Future<Map<String,Object>>> futureList = new ArrayList<>();
         try {
             for (Long id : areaIdList){
-                Future<Map<String,Object>> future = fixedThreadPool.submit(new areaTask(staffList,id,sysAreaList));
+                Future<Map<String,Object>> future = fixedThreadPool.submit(new areaTask(ruleId,id,sysAreaList));
                 futureList.add(future);
             }
             for (Future<Map<String,Object>> future : futureList){
                 future.get();
             }
-            for (String aLong : staffList) {
+            for (Long aLong : ruleId) {
                 redisUtils.setRedisUnit("ORG_CHECK_"+aLong.toString(),"true",3600);
             }
         }catch (Exception e){
@@ -212,11 +213,11 @@ public class TrialProdServiceImpl implements TrialProdService {
     }
 
     class areaTask implements Callable<Map<String,Object>>{
-        private List<String> staffList;
+        private List<Long> ruleId;
         private Long id;
         private  List<Organization> sysAreaList;
-        public areaTask(List<String> staffList,Long id, List<Organization> sysAreaList){
-            this.staffList = staffList;
+        public areaTask(List<Long> ruleId,Long id, List<Organization> sysAreaList){
+            this.ruleId = ruleId;
             this.id = id;
             this.sysAreaList = sysAreaList;
         }
@@ -229,7 +230,7 @@ public class TrialProdServiceImpl implements TrialProdService {
                 List<String> resultList = new ArrayList<>();
                 resultList.add(org.getOrgId4a().toString());
                 areaList(id,resultList,sysAreaList);
-                for (String aLong : staffList) {
+                for (Long aLong : ruleId) {
                     redisUtils.hsetUnit("AREA_RULE_ISSURE_"+aLong,id.toString(),resultList,3600);
                 }
             }
@@ -255,8 +256,7 @@ public class TrialProdServiceImpl implements TrialProdService {
         Map<String,Object> result = new HashMap<>();
         try {
             Long initId = MapUtil.getLongNum(param.get("initId"));
-            String staffCode = MapUtil.getString(param.get("staffCode"));
-            String key =  staffCode+initId.toString();
+
             MktCampaignDO campaignDO = campaignMapper.selectByInitId(initId);
             if (campaignDO==null){
                 result.put("resultCode", CODE_FAIL);
@@ -268,25 +268,26 @@ public class TrialProdServiceImpl implements TrialProdService {
                 operationList.forEach(trialOperation ->{
                 });
             }
-            String orgCheck = redisUtils.get("ORG_CHECK_"+key)==null
-                    ? null : redisUtils.get("ORG_CHECK_"+key).toString();
-            if (orgCheck==null){
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "请先选则派单组织区域");
-                return result;
-            }
-            if (orgCheck.equals("false")) {
-                result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "营销组织树配置正在努力加载请稍后再试");
-                return result;
+            List<MktStrategyConfRuleDO> ruleDOList = ruleMapper.selectByCampaignId(campaignDO.getMktCampaignId());
+            for (MktStrategyConfRuleDO rule : ruleDOList){
+                String orgCheck = redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString())==null
+                        ? null : redisUtils.get("ORG_CHECK_"+rule.getMktStrategyConfRuleId().toString()).toString();
+                if (orgCheck==null){
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "请先选则派单组织区域");
+                    return result;
+                }
+                if (orgCheck.equals("false")) {
+                    result.put("resultCode", CODE_FAIL);
+                    result.put("resultMsg", "规则：" + rule.getMktStrategyConfRuleName() + "营销组织树配置正在努力加载请稍后再试");
+                    return result;
+                }
             }
             List<Integer> campaignIdList = new ArrayList<>();
             Map<String, Object> campaignMap = new HashMap<>();
             campaignIdList.add(Integer.valueOf(initId.toString()));
             campaignMap.put("idList", campaignIdList);
             campaignMap.put("perCampaign", "PER_CAMPAIGN");
-            campaignMap.put("isCamPool", "true");
-            campaignMap.put("camPoolKey", key);
             result = campaignIndexTask(campaignMap);
             mktDttsLogService.saveMktDttsLog("2222", "自动派发成功", new Date(), new Date(), "自动派发成功", JSON.toJSONString(param));
         } catch (Exception e) {
@@ -323,12 +324,6 @@ public class TrialProdServiceImpl implements TrialProdService {
         String perCampaign = MapUtil.getString(param.get("perCampaign"));
         //清单方案活动标记
         String userListCam =  MapUtil.getString(param.get("userListCam"));
-        //活动池派单
-        String isCamPool =  MapUtil.getString(param.get("isCamPool"));
-        //活动池派单
-        String camPoolKey =  MapUtil.getString(param.get("camPoolKey"));
-
-
         List<Integer> idList = ( List<Integer>)param.get("idList");
         List<String>  strategyList = new ArrayList<>();
         if (param.get("strategyList")!=null ){
@@ -388,10 +383,6 @@ public class TrialProdServiceImpl implements TrialProdService {
                 trialOperationMapper.insert(operation);
                 //周期性活动标记
                 if (perCampaign.equals("PER_CAMPAIGN")){
-                    if ("true".equals(isCamPool)){
-                        redisUtils_es.set("IS_CAM_POOL"+batchNumSt,"true");
-                        redisUtils_es.set("CAM_POOL_KEY_"+batchNumSt,camPoolKey);
-                    }
                     redisUtils_es.set("PER_CAMPAIGN_"+batchNumSt,"true");
                     mktDttsLogService.saveMktDttsLog("1000","周期性活动："+campaignDO.getMktCampaignName(),new Date(),new Date(),"成功",null);
                 }

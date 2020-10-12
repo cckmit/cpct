@@ -1443,7 +1443,7 @@
         where (STATUS_CD = 2002 OR STATUS_CD = 2008)
         and t.AUTO_TRIAL = 1
         <if test="lanId!=null">
-            and (t.LAN_ID = #{lanId,jdbcType=BIGINT} or t.LAN_ID = 1)
+            and (t.LAN_ID = #{lanId,jdbcType=BIGINT} OR t.LAN_ID = 1)
         </if>
         <if test="mktCampaignName!=null and mktCampaignName!=''">
             and t.MKT_CAMPAIGN_NAME LIKE concat ('%', #{mktCampaignName}, '%')
