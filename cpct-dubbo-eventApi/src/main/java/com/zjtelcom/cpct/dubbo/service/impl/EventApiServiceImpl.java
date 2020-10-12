@@ -1079,7 +1079,6 @@ public class EventApiServiceImpl implements EventApiService {
                         String commLvl5Id = (String) reultMap.get("COMM_LVL5_ID");
                         String commLvl4Id = (String) reultMap.get("COMM_LVL4_ID");
                         String commLvl3Id = (String) reultMap.get("COMM_LVL3_ID");
-
                         evtContent.put("400600000040", "");
                         if (commLvl3Id != null) {
                             Long lvl3OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl3Id));
@@ -1087,7 +1086,6 @@ public class EventApiServiceImpl implements EventApiService {
                                 evtContent.put("400600000040", lvl3OrgId.toString());
                             }
                         }
-
                         evtContent.put("400600000041", "");
                         if (commLvl4Id != null) {
                             Long lvl4OrgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
@@ -1095,66 +1093,25 @@ public class EventApiServiceImpl implements EventApiService {
                                 evtContent.put("400600000041", lvl4OrgId.toString());
                             }
                         }
-
                         log.info("4-获取到COMM_LVL5_ID标签的值为：" + commLvl5Id);
                         if (commLvl5Id != null) {
-                            Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl5Id));
-                            log.info("4-查询orgId为：" + orgId);
-                            if (orgId != null) {
-                                List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
-                                log.info("4-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
-                                if (staffIdAndTypeMapList != null) {
-                                    for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
-                                        if (staffIdAndTypeMap.get("staffId") != null) {
-                                            Long staffId = (Long) staffIdAndTypeMap.get("staffId");
-                                            log.info("4-staffId: " + staffId);
-                                            int count = organizationMapper.getCount(staffId);
-                                            log.info("4-统计的数量为：" + count);
-                                            if (count > 0) {
-                                                if(staffIdAndTypeMap.get("staffCode") != null){
-                                                    reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
-                                                    isCommLvl5 = true;
-                                                    break;
-                                                } else {
-                                                    log.info("4-staffTel的值为空");
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            isCommLvl5 = isCommLvl(isCommLvl5, reultMap, commLvl5Id);
                         }
-
                         //
                         if (!isCommLvl5) {
                             // 从3A组织ID
-
                             log.info("3-获取到COMM_LVL4_ID标签的值为：" + commLvl4Id);
                             if (commLvl4Id != null) {
-                                Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
-                                log.info("3-查询orgId为：" + orgId);
-                                if (orgId != null) {
-                                    List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId);
-                                    log.info("3-staffIdAndTypeMapList的值为："+ JSON.toJSONString(staffIdAndTypeMapList));
-                                    if (staffIdAndTypeMapList != null) {
-                                        for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
-                                            if (staffIdAndTypeMap.get("staffId") != null) {
-                                                Long staffId = (Long) staffIdAndTypeMap.get("staffId");
-                                                log.info("3-staffId: " + staffId);
-                                                int count = organizationMapper.getCount(staffId);
-                                                log.info("3-统计的数量为：" + count);
-                                                if (count > 0) {
-                                                    if (staffIdAndTypeMap.get("staffCode") != null) {
-                                                        reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
-                                                        isCommLvl4 =true;
-                                                        break;
-                                                    } else {
-                                                        log.info("3-staffTel的值为空");
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                isCommLvl4 = isCommLvl(isCommLvl4, reultMap, commLvl4Id);
+                            }
+                        }
+                        //如果lv4\lv5都没有 取lv4下面所有的lv5 遍历取经理编码
+                        if (!isCommLvl4 && !isCommLvl5) {
+                            Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
+                            if (orgId != null) {
+                                List<Organization> orgNameC5List = organizationMapper.getByOrgNameC5(orgId.toString());
+                                for (Organization c5 : orgNameC5List) {
+                                    isCommLvl4 = isCommLvl4(isCommLvl4, reultMap, c5.getOrgId());
                                 }
                             }
                         }
@@ -1497,7 +1454,7 @@ public class EventApiServiceImpl implements EventApiService {
                             staffCode = "";
                         }
                     }
-                    reultMap.put("CPCP_PUSH_NBR", staffCode);
+                    reultMap.put("CPCP_ACCS_NBR", staffCode);
                 }
                 if ("".equals(staffCode)){
                     Map<String, Object> onlineMap = camCpcSpecialLogic.onlineScanCodeOrCallPhone4Home(evtContent, eventCode, map.get("lanId"));
@@ -1546,7 +1503,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                         log.info("【商企专员查询】------》staffCode："+staffCode);
-                        reultMap.put("CPCP_PUSH_NBR", staffCode);
+                        reultMap.put("CPCP_ACCS_NBR", staffCode);
                     }else {
                         reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel").toString());
                     }
@@ -1555,6 +1512,35 @@ public class EventApiServiceImpl implements EventApiService {
                 resultMapList.add(reultMap);
             }
         }
+    }
+
+    private boolean isCommLvl(boolean isCommLvl4, DefaultContext<String, Object> reultMap, String commLvl4Id) {
+        Long orgId = organizationMapper.getByOrgid4a(Long.valueOf(commLvl4Id));
+        if (orgId != null) {
+            isCommLvl4 = isCommLvl4(isCommLvl4, reultMap, orgId);
+        }
+        return isCommLvl4;
+    }
+
+    private boolean isCommLvl4(boolean isCommLvl4, DefaultContext<String, Object> reultMap, Long orgId2) {
+        List<Map<String, Object>> staffIdAndTypeMapList = organizationMapper.getStaffIdAndType(orgId2);
+        if (staffIdAndTypeMapList != null) {
+            for (Map<String, Object> staffIdAndTypeMap : staffIdAndTypeMapList) {
+                if (staffIdAndTypeMap.get("staffId") != null) {
+                    Long staffId = (Long) staffIdAndTypeMap.get("staffId");
+                    int count = organizationMapper.getCount(staffId);
+                    if (count > 0) {
+                        if (staffIdAndTypeMap.get("staffCode") != null) {
+                            reultMap.put("CPCP_ACCS_NBR", staffIdAndTypeMap.get("staffCode"));
+                            isCommLvl4 = true;
+                            break;
+                        } else {
+                        }
+                    }
+                }
+            }
+        }
+        return isCommLvl4;
     }
 
 
@@ -1600,7 +1586,8 @@ public class EventApiServiceImpl implements EventApiService {
         labelList.addAll(custLabelList);
         // 添加落地网格AREA_ID标签
         labelList.add("AREA_ID");
-        if ("EVT0000000103".equals(eventCode) && (assetLabelList == null || assetLabelList.size() == 0)) {
+        if (("EVT0000000103".equals(eventCode) ||"EVT0000000107".equals(eventCode))
+                && assetLabelList.isEmpty()) {
             assetLabelList.add("COMM_LVL4_ID");
             assetLabelList.add("COMM_LVL5_ID");
             assetLabelList.add("COMM_LVL3_ID");
@@ -1615,7 +1602,7 @@ public class EventApiServiceImpl implements EventApiService {
         String followFlgType = (String) followFlgRedis.get("FOLLOW_FLG");
         labelList.add(followFlgType);
 
-        if (assetLabelList != null && assetLabelList.size() > 0) {
+        if (assetLabelList.size() > 0) {
             mktAllLabel.put("assetLabels", ChannelUtil.StringList2String(labelList));
         }
         return mktAllLabel;

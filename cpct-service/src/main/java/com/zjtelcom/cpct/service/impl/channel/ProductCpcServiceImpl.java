@@ -6,6 +6,7 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.dao.product.ProductNewMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
@@ -54,7 +55,64 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktStrategyConfRuleMapper ruleMapper;
     @Autowired
     private ProductMapper productProdMapper;
+    @Autowired
+    private MktProductAttrMapper mktProductAttrMapper;
 
+
+    @Override
+    public Map<String, Object> copyMktCamResource(Long oldResourceId, Long newResourceId, Long ruleId) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> copyMktProductAttr(Long oldProductId, Long newProductId, Long ruleId) {
+        Map<String,Object> result = new HashMap<>();
+        MktProductAttr  mktProductAttr = new MktProductAttr();
+        mktProductAttr.setProductId(oldProductId);
+        List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        if (!productAttrs.isEmpty()){
+            for (MktProductAttr oldAttr : productAttrs) {
+                MktProductAttr newAttr = BeanUtil.create(oldAttr, new MktProductAttr());
+                newAttr.setMktProductAttrId(null);
+                newAttr.setProductId(newProductId);
+                newAttr.setRuleId(ruleId);
+                mktProductAttrMapper.insert(newAttr);
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productAttrs);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productAttrs);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr) {
+        Map<String,Object> result = new HashMap<>();
+        mktProductAttrMapper.updateByPrimaryKey(mktProductAttr);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","更新成功");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> addMktProductAttr(Map<String, Object> param) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktProductAttr> productAttrs = (List<MktProductAttr>) param.get("list");
+        for (MktProductAttr productAttr : productAttrs) {
+            mktProductAttrMapper.insert(productAttr);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productAttrs);
+        return result;
+    }
 
     @Override
     public Map<String, Object> getProductNameById(Long userId, List<Long> productIdList, String itemType) {
@@ -257,8 +315,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         List<MktCamItem> mktCamItems = new ArrayList<>();
 
         //销售品
-        if (param.getItemType().equals("1000") || param.getItemType().equals("2000")
-                || param.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
+        if (CamItemType.OFFER.value().equals(param.getItemType())|| CamItemType.PACKAGE.value().equals(param.getItemType())
+                || param.getItemType().equals(CamItemType.DEPEND_OFFER.value())){
             for (Long productId : param.getIdList()){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
@@ -284,7 +342,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
             //促销券
-        }else if ("3000".equals(param.getItemType())){
+        }else if (CamItemType.RESOURCE.value().equals(param.getItemType())){
             for (Long resourceId : param.getIdList()){
                 MktResource resource = resourceMapper.selectByPrimaryKey(resourceId);
                 if (resource==null){
@@ -298,7 +356,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setOfferName(resource.getMktResName());
                 itemBuild(param, mktCamItems, resourceId, item);
             }
-        }else if ("4000".equals(param.getItemType())){
+        }else if (CamItemType.SERVICE.value().equals(param.getItemType())){
             for (Long serviceId : param.getIdList()){
                 ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(serviceId);
                 if (serviceEntity==null){
@@ -312,7 +370,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setOfferName(serviceEntity.getServiceName());
                 itemBuild(param, mktCamItems, serviceId, item);
             }
-        }else if (CamItemType.DEPEND_PRODUCT.getValue().equals(param.getItemType())){
+        }else if (CamItemType.DEPEND_PRODUCT.value().equals(param.getItemType())){
             for (Long productId : param.getIdList()){
                 Product product = productProdMapper.selectByPrimaryKey(productId);
                 if (product==null){
@@ -392,7 +450,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 continue;
             }
             //销售品
-            if (item.getItemType().equals("1000") || item.getItemType().equals("2000")){
+            if (CamItemType.OFFER.value().equals(item.getItemType())|| CamItemType.PACKAGE.value().equals(item.getItemType())
+                    || item.getItemType().equals(CamItemType.DEPEND_OFFER.value())){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
                 if (product==null){
                     continue;
@@ -418,16 +477,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                     continue;
                 }
                 MktProductRule rule = new MktProductRule();
-                rule.setId(item.getMktCamItemId());
-                rule.setProductId(item.getItemId());
-                rule.setProductName(resource.getMktResName());
-                rule.setProductCode(resource.getMktResNbr());
-                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
-                rule.setRemark(item.getRemark());
-                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
-                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
-                rule.setStatusCd(item.getStatusCd());
-                ruleList.add(rule);
+                itemListBuild(ruleList, item, rule, resource.getMktResName(), resource.getMktResNbr());
             } else if (item.getItemType().equals("4000")){
                 //促销券
                 ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(item.getItemId());
@@ -435,21 +485,32 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                     continue;
                 }
                 MktProductRule rule = new MktProductRule();
-                rule.setId(item.getMktCamItemId());
-                rule.setProductId(item.getItemId());
-                rule.setProductName(serviceEntity.getServiceName());
-                rule.setProductCode(serviceEntity.getServiceNbr());
-                rule.setProductType(item.getItemType()==null ? "" : item.getItemType());
-                rule.setRemark(item.getRemark());
-                rule.setItemType(item.getItemType()==null ? "" : item.getItemType());
-                rule.setPriority(item.getPriority()==null ? 0 : item.getPriority());
-                rule.setStatusCd(item.getStatusCd());
-                ruleList.add(rule);
+                itemListBuild(ruleList, item, rule, serviceEntity.getServiceName(), serviceEntity.getServiceNbr());
+            }else if (CamItemType.DEPEND_PRODUCT.value().equals(item.getItemType())){
+                Product product = productProdMapper.selectByPrimaryKey(item.getItemId());
+                if (product==null){
+                    continue;
+                }
+                MktProductRule rule = new MktProductRule();
+                itemListBuild(ruleList, item, rule, product.getProdName(), product.getProdNbr());
             }
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",ruleList);
         return result;
+    }
+
+    private void itemListBuild(List<MktProductRule> ruleList, MktCamItem item, MktProductRule rule, String serviceName, String serviceNbr) {
+        rule.setId(item.getMktCamItemId());
+        rule.setProductId(item.getItemId());
+        rule.setProductName(serviceName);
+        rule.setProductCode(serviceNbr);
+        rule.setProductType(item.getItemType() == null ? "" : item.getItemType());
+        rule.setRemark(item.getRemark());
+        rule.setItemType(item.getItemType() == null ? "" : item.getItemType());
+        rule.setPriority(item.getPriority() == null ? 0 : item.getPriority());
+        rule.setStatusCd(item.getStatusCd());
+        ruleList.add(rule);
     }
 
     @Override

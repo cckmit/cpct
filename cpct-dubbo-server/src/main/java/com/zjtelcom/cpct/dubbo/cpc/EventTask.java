@@ -707,7 +707,7 @@
 //                        for (Map.Entry<String, Object> entry : body.entrySet()) {
 //                            Map<String, Object> map = new HashMap<>();
 //                            map.put("key", entry.getKey());
-//                            map.put("value", entry.getValue().toString());
+//                            map.put("value", entry.value().toString());
 //                            map.put("display", "0");
 //                            map.put("name", "");
 //                            triggerList.add(map);
@@ -1114,10 +1114,10 @@
 //                        //拼接规则引擎上下文
 //                        for (Map.Entry<String, Object> entry : body.entrySet()) {
 //                            //添加到上下文
-//                            context.put(entry.getKey(), entry.getValue());
+//                            context.put(entry.getKey(), entry.value());
 //
 //                            if ("PROM_INTEG_ID".equals(entry.getKey())) {
-//                                saleId = entry.getValue().toString();
+//                                saleId = entry.value().toString();
 //                            }
 //                        }
 ////                        System.out.println("查询资产标签成功:" + context.toString());
@@ -1154,7 +1154,7 @@
 //                        //拼接规则引擎上下文
 //                        for (Map.Entry<String, Object> entry : body.entrySet()) {
 //                            //添加到上下文
-//                            context.put(entry.getKey(), entry.getValue());
+//                            context.put(entry.getKey(), entry.value());
 //                        }
 //                    } else {
 //                        esJson.put("hit", "false");
@@ -1195,7 +1195,7 @@
 //                        //拼接规则引擎上下文
 //                        for (Map.Entry<String, Object> entry : body.entrySet()) {
 //                            //添加到上下文
-//                            context.put(entry.getKey(), entry.getValue());
+//                            context.put(entry.getKey(), entry.value());
 //                        }
 //
 //                    } else {
@@ -1997,10 +1997,10 @@
 //                for (Map.Entry<String, Object> entry : allBody.entrySet()) {
 //                    //替换标签值内容
 //                    if (contactScript != null) {
-//                        contactScript = contactScript.replace("${" + entry.getKey() + "}$", entry.getValue().toString());
+//                        contactScript = contactScript.replace("${" + entry.getKey() + "}$", entry.value().toString());
 //                    }
 //                    if (mktVerbalStr != null) {
-//                        mktVerbalStr = mktVerbalStr.replace("${" + entry.getKey() + "}$", entry.getValue().toString());
+//                        mktVerbalStr = mktVerbalStr.replace("${" + entry.getKey() + "}$", entry.value().toString());
 //                    }
 //                }
 //            }
@@ -2365,8 +2365,8 @@
 //                    //拼装参数
 //                    for (Map.Entry<String, Object> entry : body.entrySet()) {
 //                        if (entry.getKey().equals(label.getInjectionLabelCode())) {
-//                            context.put(entry.getKey(), entry.getValue());
-//                            log.info("规则计算标签：" + entry.getKey() + "  对应值：" + entry.getValue());
+//                            context.put(entry.getKey(), entry.value());
+//                            log.info("规则计算标签：" + entry.getKey() + "  对应值：" + entry.value());
 //                            break;
 //                        }
 //                    }

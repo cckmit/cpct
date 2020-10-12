@@ -197,6 +197,28 @@
             <artifactId>policy-query-service</artifactId>
         </dependency>
 
+        <!--营销资源中心电子券服务-->
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cpc-query-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cpc-query-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-cpc-write-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-mktcenter-coupon-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctzj.smt.bss</groupId>
+            <artifactId>bss-mktcenter-model</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.ccssoft.zj</groupId>
             <artifactId>interfaceplatform-module-service</artifactId>

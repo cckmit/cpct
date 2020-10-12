@@ -27,7 +27,7 @@ public enum CamItemType {
         return null;
     }
 
-    public String getValue() {
+    public String value() {
         return value;
     }
 
