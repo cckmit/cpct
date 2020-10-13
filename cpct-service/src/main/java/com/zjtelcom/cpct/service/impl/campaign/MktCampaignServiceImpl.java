@@ -2019,6 +2019,12 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
                 mktCampaignDO.setMktCampaignType("(1000)");
+                mktCampaignDO.setLanId(1L);
+            }
+            if ("C3".equals(userLevl)){
+                Long regionId = UserUtil.getUser().getLanId();
+                Long lanId = AreaCodeEnum.getLandIdByRegionId(regionId);
+                mktCampaignDO.setLanId(lanId);
             }
             if ("C4".equals(userLevl)){
                 mktCampaignDO.setTiggerType("1000");
