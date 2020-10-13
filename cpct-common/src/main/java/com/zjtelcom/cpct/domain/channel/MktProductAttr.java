@@ -5,7 +5,7 @@ import java.util.Date;
 public class MktProductAttr {
     private Long mktProductAttrId;
 
-    private Long productId;
+    private Long productId;//推荐条目id
 
     private Long ruleId;
 
