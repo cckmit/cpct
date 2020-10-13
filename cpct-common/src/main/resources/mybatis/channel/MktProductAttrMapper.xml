@@ -21,7 +21,7 @@
     delete from mkt_product_attr
     where MKT_PRODUCT_ATTR_ID = #{mktProductAttrId,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductAttr" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktProductAttr">
     insert into mkt_product_attr (MKT_PRODUCT_ATTR_ID, PRODUCT_ID, RULE_ID, 
       ATTR_ID, ATTR_NAME, ATTR_VALUE, 
       EDIT_FLG, FRAME_FLG, STATUS_CD, 

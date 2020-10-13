@@ -48,6 +48,10 @@
     delete from mkt_cam_resource
     where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByCampaignId" parameterType="java.lang.Long">
+    delete from mkt_cam_resource
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+  </delete>
   <insert id="insert" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
     insert into mkt_cam_resource (MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, RULE_ID,
       RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
@@ -133,6 +137,35 @@
     from mkt_cam_resource
     where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
   </select>
+  <select id="selectByCampaignId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, CAM_RESOURCE_NAME, FACE_AMOUNT, DIFFERENT_PRICE,
+    RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL, USE_AREA, USE_AREA_C4, PUBLISH_AREA,
+    APPLY_USER, APPLY_USER_PHONE, RULE_ID, RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
+    RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME, END_TIME,
+    OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME
+    from mkt_cam_resource
+    where MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT}
+    <if test="ruleId!=null">
+      AND RULE_ID = #{ruleId}
+    </if>
+    <if test="frameFlg!=null and frameFlg!=''">
+      AND FRAME_FLG = #{frameFlg}
+    </if>
+  </select>
+  <select id="selectByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, CAM_RESOURCE_NAME, FACE_AMOUNT, DIFFERENT_PRICE,
+    RELEASE_TYPE, GET_START_TIME, GET_END_TIME, QC_CODE_URL, USE_AREA, USE_AREA_C4, PUBLISH_AREA,
+    APPLY_USER, APPLY_USER_PHONE, RULE_ID, RESOURCE_ID, RESOURCE_TYPE, RESOURCE_SUBTYPE,
+    RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME, END_TIME,
+    OFFER_ID, DEPEND_OFFER_ID, DEPEND_PRODUCT_ID, FRAME_FLG, STATUS_CD, CREATE_STAFF,
+    CREATE_DATE, UPDATE_STAFF, UPDATE_DATE, REMARK, LAN_ID, OFFER_CODE, OFFER_NAME
+    from mkt_cam_resource
+    where RULE_ID = #{ruleId,jdbcType=BIGINT}
+    <if test="frameFlg!=null and frameFlg!=''">
+      AND FRAME_FLG = #{frameFlg}
+    </if>
+  </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select MKT_CAM_RESOURCE_ID, MKT_CAMPAIGN_ID, RULE_ID, RESOURCE_ID, RESOURCE_TYPE,
     RESOURCE_SUBTYPE, RESOURCE_TOTAL_NUM, RESOURCE_APPLY_NUM, RECEIVE_TYPE, DAYS, START_TIME,
@@ -143,4 +176,5 @@
     PARENT_ID, DIFFERENT_OFFER_ID, DEAL_SHOPS
     from mkt_cam_resource
   </select>
+
 </mapper>

@@ -38,6 +38,8 @@ public interface TarGrpTemplateService {
 
     Map<String, Object> listTarGrpTemplatePage(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize);
 
+    Map<String, Object> listTarGrpTemplatePageForRel(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize);
+
     Map<String, Object> getTarGrpTemByOfferId(Long requestId);
 
     Map<String, Object> importUserList4TarTemp(MultipartFile file,String tempName)throws IOException ;

@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.dto.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.CityProperty;
+import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.dto.event.EventDTO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConf;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
@@ -117,6 +118,11 @@ public class MktCampaignDetailVO extends MktCampaign  {
      * 关单规则id集合
      */
     private List<Long>  closeRuleIdList;
+
+    /**
+     * 电子券信息
+     */
+    private MktCamResource mktCamResource;
 
 
 
@@ -286,5 +292,13 @@ public class MktCampaignDetailVO extends MktCampaign  {
 
     public void setCloseRuleIdList(List<Long> closeRuleIdList) {
         this.closeRuleIdList = closeRuleIdList;
+    }
+
+    public MktCamResource getMktCamResource() {
+        return mktCamResource;
+    }
+
+    public void setMktCamResource(MktCamResource mktCamResource) {
+        this.mktCamResource = mktCamResource;
     }
 }

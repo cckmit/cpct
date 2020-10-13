@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.product.ProductNewMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.channel.Product">
+        <id column="PROD_ID" jdbcType="BIGINT" property="prodId"/>
+        <result column="PROD_NBR" jdbcType="VARCHAR" property="prodNbr"/>
+        <result column="PROD_SYS_NBR" jdbcType="VARCHAR" property="prodSysNbr"/>
+        <result column="PROD_NAME" jdbcType="VARCHAR" property="prodName"/>
+        <result column="PROD_DESC" jdbcType="VARCHAR" property="prodDesc"/>
+        <result column="MANAGE_GRADE" jdbcType="VARCHAR" property="manageGrade"/>
+        <result column="EFF_DATE" jdbcType="TIMESTAMP" property="effDate"/>
+        <result column="EXP_DATE" jdbcType="TIMESTAMP" property="expDate"/>
+        <result column="PROD_COMP_TYPE" jdbcType="VARCHAR" property="prodCompType"/>
+        <result column="PROD_FUNC_TYPE" jdbcType="VARCHAR" property="prodFuncType"/>
+        <result column="BILL_PROD_TYPE" jdbcType="VARCHAR" property="billProdType"/>
+        <result column="PROD_USE_TYPE" jdbcType="VARCHAR" property="prodUseType"/>
+        <result column="BASE_OFFER_ID" jdbcType="BIGINT" property="baseOfferId"/>
+        <result column="MANAGE_REGION_ID" jdbcType="BIGINT" property="manageRegionId"/>
+        <result column="STATUS_CD" jdbcType="VARCHAR" property="statusCd"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="STATUS_DATE" jdbcType="TIMESTAMP" property="statusDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="ALIAS_NAME" jdbcType="VARCHAR" property="aliasName"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="GRP_PROD_NBR" jdbcType="VARCHAR" property="grpProdNbr"/>
+    </resultMap>
+
+    <select id="selectByProdName" resultMap="BaseResultMap">
+        select PROD_ID, PROD_NBR, PROD_SYS_NBR, PROD_NAME, PROD_DESC, MANAGE_GRADE, EFF_DATE,
+        EXP_DATE, PROD_COMP_TYPE, PROD_FUNC_TYPE, BILL_PROD_TYPE, PROD_USE_TYPE, BASE_OFFER_ID,
+        MANAGE_REGION_ID, STATUS_CD, CREATE_STAFF, UPDATE_STAFF, CREATE_DATE, STATUS_DATE,
+        UPDATE_DATE, ALIAS_NAME, REMARK, GRP_PROD_NBR
+        from product
+        where STATUS_CD = 1000
+        <if test="prodName!=null and prodName!=''">
+            AND (PROD_NAME LIKE CONCAT ('%', #{prodName} ,'%')
+            OR PROD_NBR LIKE CONCAT ('%', #{prodName} ,'%'))
+        </if>
+    </select>
+
+
+    <select id="selectAttrSpec" resultType="java.util.Map">
+        select a.ATTR_NAME AS attrName,
+        a.ATTR_NBR AS attrNbr,
+        p.PROD_ATTR_ID AS prodAttrId
+        FROM
+        prod_attr p
+        JOIN attr_spec a ON a.ATTR_ID = p.ATTR_ID
+        WHERE
+        p.PROD_ID = #{prodId}
+        <if test="attrName!=null and attrName!=''">
+            AND (a.ATTR_NAME LIKE CONCAT ('%', #{attrName} ,'%')
+            OR a.ATTR_NBR LIKE CONCAT ('%', #{attrName} ,'%'))
+        </if>
+    </select>
+
+    <select id="selectProdAttrValue" resultType="java.util.Map">
+     SELECT
+        c1.ATTR_VALUE_ID AS attrValueId,
+        c1.ATTR_VALUE_NAME AS attrValueName
+     FROM
+        prod_attr b
+     LEFT JOIN prod_attr_value c ON b.PROD_ATTR_ID = c.PROD_ATTR_ID
+     LEFT JOIN attr_value c1 ON c.ATTR_VALUE_ID = c1.ATTR_VALUE_ID
+     WHERE b.PROD_ATTR_ID = #{prodAttrId}
+  </select>
+
+
+</mapper>

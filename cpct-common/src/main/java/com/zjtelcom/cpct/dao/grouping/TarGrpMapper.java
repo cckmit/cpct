@@ -29,6 +29,8 @@ public interface TarGrpMapper {
 
     List<TarGrp> selectByName(@Param("tarGrpTemplateName") String tarGrpTemplateName,@Param("tarGrpType")String tarGrpType,@Param("remark")String remark);
 
+    List<TarGrp> selectByCondition(@Param("tarGrpTemplateName") String tarGrpTemplateName,@Param("tarGrpType")String tarGrpType,@Param("remark")String remark, @Param("lanId") Long lanId);
+
     List<TarGrp> queryList(TarGrp tarGrp);
 
     int modTarGrpOther(TarGrp tarGrp);

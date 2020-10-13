@@ -1,7 +1,5 @@
 package com.zjtelcom.cpct.domain.channel;
 
-import com.zjtelcom.cpct.BaseEntity;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,11 +16,17 @@ public class Product implements Serializable {
 
     private String manageGrade;
 
+    // 产品管理级别(回显用)
+    private String manageGradeValue;
+
     private Date effDate;
 
     private Date expDate;
 
     private String prodCompType;
+
+    // 产品构成类型(回显用)
+    private String prodCompTypeValue;
 
     private String prodFuncType;
 
@@ -51,6 +55,22 @@ public class Product implements Serializable {
     private String remark;
 
     private String grpProdNbr;
+
+    public String getManageGradeValue() {
+        return manageGradeValue;
+    }
+
+    public void setManageGradeValue(String manageGradeValue) {
+        this.manageGradeValue = manageGradeValue;
+    }
+
+    public String getProdCompTypeValue() {
+        return prodCompTypeValue;
+    }
+
+    public void setProdCompTypeValue(String prodCompTypeValue) {
+        this.prodCompTypeValue = prodCompTypeValue;
+    }
 
     public Long getProdId() {
         return prodId;

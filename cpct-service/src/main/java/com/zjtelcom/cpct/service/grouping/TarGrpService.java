@@ -1,8 +1,10 @@
 package com.zjtelcom.cpct.service.grouping;
 
+import com.zjtelcom.cpct.domain.grouping.TarGrpRel;
 import com.zjtelcom.cpct.dto.grouping.TarGrp;
 import com.zjtelcom.cpct.dto.grouping.TarGrpCondition;
 import com.zjtelcom.cpct.dto.grouping.TarGrpDetail;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -49,4 +51,12 @@ public interface TarGrpService {
     Integer modTarGrpOther(TarGrp tarGrp);
 
     Map<String, Object> queryTarGrpOther(TarGrp tarGrp);
+
+    Map<String, Object> getNewTarGrpByTemplate(TarGrpRel tarGrpRel);
+
+    Map<String, Object> getTarGrpRel(Long id);
+
+    Map<String, Object> deleteTarGrpRel(Long id);
+
+    Map<String, Object> updateTarGrpName(TarGrp tarGrp);
 }
