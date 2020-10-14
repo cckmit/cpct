@@ -10,6 +10,17 @@ public class TrialOperationDetail extends TrialOperation implements Serializable
     private String ruleName;
     private String flg;
     private String batchFlg;
+    private String batchNumSt;
+
+
+    public String getBatchNumSt() {
+        return batchNumSt;
+    }
+
+    public void setBatchNumSt(String batchNumSt) {
+        this.batchNumSt = batchNumSt;
+    }
+
     public String getBatchFlg() {
         return batchFlg;
     }

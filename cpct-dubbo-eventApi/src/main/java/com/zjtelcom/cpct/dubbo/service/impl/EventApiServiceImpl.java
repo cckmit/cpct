@@ -1447,11 +1447,7 @@ public class EventApiServiceImpl implements EventApiService {
                             List<String> list = orgGridRelMapper.getStaffByOrgPath(orgPath);
                             if (!list.isEmpty()){
                                 staffCode = list.get(0);
-                            }else {
-                                staffCode = "";
                             }
-                        }else {
-                            staffCode = "";
                         }
                     }
                     reultMap.put("CPCP_ACCS_NBR", staffCode);
@@ -1503,7 +1499,7 @@ public class EventApiServiceImpl implements EventApiService {
                             }
                         }
                         log.info("【商企专员查询】------》staffCode："+staffCode);
-                        reultMap.put("CPCP_ACCS_NBR", staffCode);
+                        reultMap.put("CPCP_PUSH_NBR", staffCode);
                     }else {
                         reultMap.put("CPCP_ACCS_NBR", onlineMap.get("tel").toString());
                     }
