@@ -1,20 +1,28 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.ctzj.smt.bss.cpc.query.service.api.ICouponApplyObjectService;
+import com.ctzj.smt.bss.cpc.query.service.api.ICouponEffExpRuleService;
+import com.ctzj.smt.bss.cpc.query.service.api.ICpcMktResCouponDubboService;
+import com.ctzj.smt.bss.cpc.write.service.api.ICouponApplyObjectWriteService;
+import com.ctzj.smt.bss.cpc.write.service.api.ICouponEffExpRuleWriteService;
+import com.ctzj.smt.bss.cpc.write.service.api.IMktResCouponWriteService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjtelcom.cpct.common.Page;
+import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamResourceMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
+import com.zjtelcom.cpct.dao.product.ProductNewMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
-import com.zjtelcom.cpct.enums.CamItemType;
-import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -53,6 +61,30 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private ProductMapper productProdMapper;
     @Autowired
     private MktProductAttrMapper mktProductAttrMapper;
+    @Autowired
+    private ProductNewMapper productNewMapper;
+
+    @Autowired(required = false)
+    private ICpcMktResCouponDubboService iCpcMktResCouponDubboService;
+
+    @Autowired(required = false)
+    private IMktResCouponWriteService iMktResCouponWriteService;
+
+    @Autowired(required = false)
+    private ICouponEffExpRuleWriteService iCouponEffExpRuleWriteService;
+
+    @Autowired(required = false)
+    private ICouponEffExpRuleService iCouponEffExpRuleService;
+
+    @Autowired(required = false)
+    private ICouponApplyObjectWriteService iCouponApplyObjectWriteService;
+
+    @Autowired(required = false)
+    private ICouponApplyObjectService iCouponApplyObjectService;
+
+    @Autowired
+    private MktCamResourceMapper mktCamResourceMapper;
+
 
 
     @Override
@@ -313,8 +345,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         List<MktCamItem> mktCamItems = new ArrayList<>();
 
         //销售品
-        if (CamItemType.OFFER.value().equals(param.getItemType())|| CamItemType.PACKAGE.value().equals(param.getItemType())
-                || param.getItemType().equals(CamItemType.DEPEND_OFFER.value())){
+        if (CamItemType.OFFER.getValue().equals(param.getItemType())|| CamItemType.PACKAGE.getValue().equals(param.getItemType())
+                || param.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
             for (Long productId : param.getIdList()){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
@@ -340,7 +372,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 redisUtils.set("MKT_CAM_ITEM_"+item.getMktCamItemId(),item);
             }
             //促销券
-        }else if (CamItemType.RESOURCE.value().equals(param.getItemType())){
+        }else if (CamItemType.RESOURCE.getValue().equals(param.getItemType())){
             for (Long resourceId : param.getIdList()){
                 MktResource resource = resourceMapper.selectByPrimaryKey(resourceId);
                 if (resource==null){
@@ -354,7 +386,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setOfferName(resource.getMktResName());
                 itemBuild(param, mktCamItems, resourceId, item);
             }
-        }else if (CamItemType.SERVICE.value().equals(param.getItemType())){
+        }else if (CamItemType.SERVICE.getValue().equals(param.getItemType())){
             for (Long serviceId : param.getIdList()){
                 ServiceEntity serviceEntity = serviceMapper.selectByPrimaryKey(serviceId);
                 if (serviceEntity==null){
@@ -368,7 +400,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 item.setOfferName(serviceEntity.getServiceName());
                 itemBuild(param, mktCamItems, serviceId, item);
             }
-        }else if (CamItemType.DEPEND_PRODUCT.value().equals(param.getItemType())){
+        }else if (CamItemType.DEPEND_PRODUCT.getValue().equals(param.getItemType())){
             for (Long productId : param.getIdList()){
                 Product product = productProdMapper.selectByPrimaryKey(productId);
                 if (product==null){
@@ -448,8 +480,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 continue;
             }
             //销售品
-            if (CamItemType.OFFER.value().equals(item.getItemType())|| CamItemType.PACKAGE.value().equals(item.getItemType())
-                    || item.getItemType().equals(CamItemType.DEPEND_OFFER.value())){
+            if (CamItemType.OFFER.getValue().equals(item.getItemType())|| CamItemType.PACKAGE.getValue().equals(item.getItemType())
+                    || item.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
                 if (product==null){
                     continue;
@@ -484,7 +516,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 }
                 MktProductRule rule = new MktProductRule();
                 itemListBuild(ruleList, item, rule, serviceEntity.getServiceName(), serviceEntity.getServiceNbr());
-            }else if (CamItemType.DEPEND_PRODUCT.value().equals(item.getItemType())){
+            }else if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
                 Product product = productProdMapper.selectByPrimaryKey(item.getItemId());
                 if (product==null){
                     continue;
@@ -553,4 +585,124 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             redisUtils.set("MKT_CAM_ITEM_"+strategyRuleId,nameList);
         }
     }
+
+
+    @Override
+    public Map<String, Object> getProjectListPage(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            //获取分页参数
+            Integer page = Integer.parseInt(params.get("page").toString());
+            Integer pageSize = Integer.parseInt(params.get("pageSize").toString());
+            String prodName = (String) params.get("prodName");
+            //分页
+            PageHelper.startPage(page, pageSize);
+            List<Product> productList = productNewMapper.selectByProdName(prodName);
+            for (Product product : productList) {
+                product.setManageGradeValue(ManageGradeEnum.getValuedById(product.getManageGrade()));
+                product.setProdCompTypeValue(ProdCompTypeEnum.getValuedById(product.getProdCompType()));
+            }
+            Page pageInfo = new Page(new PageInfo(productList));
+            resultMap.put("data", productList);
+            resultMap.put("page", pageInfo);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getAttrSpecListPage(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            //获取分页参数
+            Long prodId = Long.valueOf(params.get("prodId").toString());
+            Integer page = Integer.parseInt(params.get("page").toString());
+            Integer pageSize = Integer.parseInt(params.get("pageSize").toString());
+            String attrName = (String) params.get("attrName");
+            //分页
+            PageHelper.startPage(page, pageSize);
+            List<Map<String, Object>> mapList = productNewMapper.selectAttrSpec(prodId, attrName);
+            for (Map<String, Object> map : mapList) {
+                Long prodAttrId = (Long) map.get("prodAttrId");
+                List<Map<String, Object>> attrValueList = productNewMapper.selectProdAttrValue(prodAttrId);
+                if (attrValueList != null && attrValueList.size() > 0 && attrValueList.get(0) != null) {
+                    map.put("prodAttrValue", attrValueList);
+                } else {
+                    map.put("prodAttrValue", new ArrayList<Map<String, Object>>());
+                }
+                map.put("checkAttrValue", new ArrayList<Long>());
+            }
+            Page pageInfo = new Page(new PageInfo(mapList));
+            resultMap.put("data", mapList);
+            resultMap.put("page", pageInfo);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
+/*    @Override
+    public Map<String, Object> getProjectDetail(Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+
+            Long prodId = (Long) params.get("prodId");
+
+            List<Product> productList = productNewMapper.selectByProdName(prodName);
+            for (Product product : productList) {
+                product.setManageGradeValue(ManageGradeEnum.getValuedById(product.getManageGrade()));
+                product.setProdCompTypeValue(ProdCompTypeEnum.getValuedById(product.getProdCompType()));
+            }
+            resultMap.put("data", productList);
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }*/
+
+
+
+    public Map<String, Object> mktCamResourceService(Long mktCampaignId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            //查询
+            List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue());
+            for (MktCamResource mktCamResource : mktCamResourceList) {
+                if (mktCamResource.getResourceId() != null) {
+
+                }
+            }
+
+            resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+            resultMap.put("resultMsg", "查询成功！");
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("getProjectList失败= {}", e);
+            resultMap.put("resultCode", CommonConstant.CODE_FAIL);
+            resultMap.put("resultMsg", "查询失败！");
+            return resultMap;
+        }
+    }
+
+
 }

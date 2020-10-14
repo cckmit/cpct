@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.grouping.TarGrpRelMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.grouping.TarGrpRel">
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="NEGATION1" jdbcType="VARCHAR" property="negation1"/>
+        <result column="TAR_GRP_ID1" jdbcType="BIGINT" property="tarGrpId1"/>
+        <result column="REL" jdbcType="VARCHAR" property="rel"/>
+        <result column="NEGATION2" jdbcType="VARCHAR" property="negation2"/>
+        <result column="TAR_GRP_ID2" jdbcType="BIGINT" property="tarGrpId2"/>
+        <result column="CREATE_STAFF" jdbcType="BIGINT" property="createStaff"/>
+        <result column="UPDATE_STAFF" jdbcType="BIGINT" property="updateStaff"/>
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpRel">
+    insert into tar_grp_rel (ID, NEGATION1,
+      TAR_GRP_ID1, REL, NEGATION2, TAR_GRP_ID2, CREATE_STAFF,
+      UPDATE_STAFF, CREATE_DATE, UPDATE_DATE)
+    values ( #{id,jdbcType=BIGINT}, #{negation1,jdbcType=VARCHAR},
+      #{tarGrpId1,jdbcType=BIGINT}, #{rel,jdbcType=VARCHAR}, #{negation2,jdbcType=VARCHAR}, #{tarGrpId2,jdbcType=BIGINT},
+      #{createStaff,jdbcType=BIGINT}, #{updateStaff,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},
+      #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        r.ID,
+        r.NEGATION1,
+        r.TAR_GRP_ID1,
+        r.REL,
+        r.NEGATION2,
+        r.TAR_GRP_ID2 ,
+        r.CREATE_STAFF,
+        r.UPDATE_STAFF,
+        r.CREATE_DATE,
+        r.UPDATE_DATE,
+        t1.TAR_GRP_NAME AS tarGrpName1,
+        t2.TAR_GRP_NAME AS tarGrpName2,
+        s.PARAM_NAME AS relName
+        FROM
+          tar_grp_rel r
+        LEFT JOIN tar_grp t1 ON r.TAR_GRP_ID1 = t1.TAR_GRP_ID
+        LEFT JOIN tar_grp t2 ON r.TAR_GRP_ID2 = t2.TAR_GRP_ID
+        LEFT JOIN sys_params s ON ( s.PARAM_KEY = "TAR_GRP_REL" and r.REL = s.PARAM_VALUE)
+        WHERE r.ID = #{id,jdbcType=BIGINT}
+    </select>
+
+
+    <update id="updateTarGrpRel" parameterType="com.zjtelcom.cpct.domain.grouping.TarGrpRel">
+        update tar_grp
+        set
+        <if test="negation1 != null and negation1 != ''">
+            NEGATION1 = #{negation1,jdbcType=VARCHAR},
+        </if>
+        <if test="tarGrpId1 != null and tarGrpId1 != ''">
+            TAR_GRP_ID1 = #{tarGrpId1,jdbcType=BIGINT},
+        </if>
+        <if test="rel != null and rel != ''">
+            REL = #{rel, jdbcType=VARCHAR},
+        </if>
+        <if test="negation2 != null and negation2 != ''">
+            NEGATION2 = #{negation2,jdbcType=VARCHAR},
+        </if>
+        <if test="tarGrpId2 != null and tarGrpId2 != ''">
+            TAR_GRP_ID2 = #{tarGrpId2,jdbcType=BIGINT},
+        </if>
+        <if test="createStaff != null and createStaff != 0">
+            CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+        </if>
+        <if test="updateStaff != null and updateStaff != 0">
+            UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+        </if>
+        <if test="createDate != null">
+            CREATE_DATE = #{createDate},
+        </if>
+        UPDATE_DATE = #{updateDate}
+        where ID = #{id,jdbcType=BIGINT}
+    </update>
+
+    <delete id="delTarGrpRel" parameterType="java.lang.Long">
+        delete from tar_grp_rel
+        where ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+
+</mapper>

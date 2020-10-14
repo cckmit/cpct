@@ -32,6 +32,10 @@ public interface ProductService {
 
     Map<String, Object> copyItemByCampaign(Long oldCampaignId, Long newCampaignId);
 
+    Map<String, Object> getProjectListPage(Map<String, Object> params);
+
+    Map<String, Object> getAttrSpecListPage(Map<String, Object> params);
+
     Map<String, Object> addMktProductAttr(Map<String,Object> param);
 
     Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr);

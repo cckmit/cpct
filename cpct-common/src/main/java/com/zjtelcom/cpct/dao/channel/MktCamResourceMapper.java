@@ -13,9 +13,15 @@ import java.util.List;
 public interface MktCamResourceMapper {
     int deleteByPrimaryKey(Long mktCamResourceId);
 
+    int deleteByCampaignId(Long mktCampaignId);
+
     int insert(MktCamResource record);
 
     MktCamResource selectByPrimaryKey(Long mktCamResourceId);
+
+    List<MktCamResource> selectByCampaignId(Long mktCampaignId, String frameFlg);
+
+    MktCamResource selectByRuleId(Long rule, String frameFlg);
 
     List<MktCamResource> selectAll();
 

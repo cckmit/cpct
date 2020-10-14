@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.channel.CatalogService;
@@ -267,5 +268,21 @@ public class PpmProductController extends BaseController  {
         }
         return result;
     }
+
+
+    @RequestMapping("/getProjectListPage")
+    @CrossOrigin
+    public String getProjectListPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> resultMap = productService.getProjectListPage(params);
+        return JSON.toJSONString(resultMap);
+    }
+
+    @RequestMapping("/getAttrSpecListPage")
+    @CrossOrigin
+    public String getAttrSpecListPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> resultMap = productService.getAttrSpecListPage(params);
+        return JSON.toJSONString(resultMap);
+    }
+
 
 }

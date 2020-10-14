@@ -1,5 +1,7 @@
 package com.zjtelcom.cpct.service.impl.grouping;
 
+import com.alibaba.fastjson.JSONArray;
+import com.sun.net.httpserver.Authenticator;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamEvtRelMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
@@ -10,12 +12,14 @@ import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
 import com.zjtelcom.cpct.dao.grouping.OrgGridRelMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpMapper;
+import com.zjtelcom.cpct.dao.grouping.TarGrpRelMapper;
 import com.zjtelcom.cpct.dao.org.OrgTreeMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamGrpRul;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.grouping.TarGrpConditionDO;
+import com.zjtelcom.cpct.domain.grouping.TarGrpRel;
 import com.zjtelcom.cpct.domain.org.OrgTreeDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.dto.channel.LabelDTO;
@@ -91,6 +95,8 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
     private CloseRuleMapper closeRuleMapper;
     @Autowired
     private OrgGridRelMapper orgGridRelMapper;
+    @Autowired
+    private TarGrpRelMapper tarGrpRelMapper;
 
     @Override
     public Map<String, Object> conditionSwitch(Long conditionId, String type, String value) {
@@ -923,5 +929,159 @@ public class TarGrpServiceImpl extends BaseService implements TarGrpService {
         map.put("tarGrpId", tarGrp.getTarGrpId());
         return map;
     }
+
+
+    /**
+     * 根据模板创建客户分群（创建模板关系用）
+     * @param templateId
+     * @return‘
+     */
+    private Map<String, Object> CreateTarGrpByTemplate(Long templateId,Long oldTarGrpId,String needDeleted) {
+        Map<String, Object> result = new HashMap<>();
+        TarGrp template = tarGrpMapper.selectByPrimaryKey(templateId);
+        if (template==null){
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "模板不存在");
+            return result;
+        }
+        List<TarGrpCondition> conditionDOList = tarGrpConditionMapper.listTarGrpCondition(templateId);
+
+        TarGrpDetail addVO = BeanUtil.create(template,new TarGrpDetail());
+
+        if (needDeleted .equals("0")){
+            tarGrpConditionMapper.deleteByTarGrpTemplateId(templateId);
+            tarGrpMapper.deleteByPrimaryKey(templateId);
+        }
+        addVO.setTarGrpId(null);
+        addVO.setRemark(null);
+        List<TarGrpCondition> conditionAdd = new ArrayList<>();
+        for (TarGrpCondition conditionDO : conditionDOList){
+            TarGrpCondition con = BeanUtil.create(conditionDO,new TarGrpCondition());
+            con.setRemark(con.getRemark()==null ? "2000" : con.getRemark());
+            con.setConditionText(con.getConditionText()==null ?"2000" : con.getConditionText());
+            if (needDeleted.equals("0")){
+                con.setStatusCd("1100");
+            }
+            conditionAdd.add(con);
+        }
+        addVO.setTarGrpConditions(conditionAdd);
+        Map<String,Object> crMap = createTarGrp(addVO,false);
+
+        if (crMap.get("resultCode").equals(CODE_SUCCESS)){
+            if (oldTarGrpId!=0){
+                TarGrp grp = tarGrpMapper.selectByPrimaryKey(oldTarGrpId);
+                if (grp!=null){
+                    tarGrpMapper.deleteByPrimaryKey(oldTarGrpId);
+                    List<TarGrpCondition> conditions = tarGrpConditionMapper.listTarGrpCondition(oldTarGrpId);
+                    for (TarGrpCondition condition : conditions){
+                        tarGrpConditionMapper.deleteByPrimaryKey(condition.getConditionId());
+                    }
+                    MktCamGrpRul rul = grpRulMapper.selectByTarGrpId(oldTarGrpId);
+                    if (rul!=null){
+                        grpRulMapper.deleteByTarGrpId(oldTarGrpId);
+                    }
+                }
+            }
+            result = crMap;
+            return result;
+        }else {
+            result = crMap;
+        }
+        return result;
+    }
+
+
+    @Override
+    public Map<String, Object> getNewTarGrpByTemplate(TarGrpRel tarGrpRel){
+        Map<String, Object> maps = new HashMap<>();
+        TarGrpRel tarGrpRelNew = new TarGrpRel();
+        try {
+            Long oldTarGrpId = 0L;
+            String needDeleted = "1";
+            //Long tarGrpId1 = Long.valueOf(param.get("tarGrpId1").toString());
+            Map<String, Object> map1 = CreateTarGrpByTemplate(tarGrpRel.getTarGrpId1(),oldTarGrpId,needDeleted);
+            if(map1!=null &&  map1.get("tarGrp")!=null){
+                TarGrp tarGrp1 = (TarGrp) map1.get("tarGrp");
+                if(tarGrp1!=null){
+                    tarGrpRelNew.setTarGrpId1(tarGrp1.getTarGrpId());
+                }
+            }
+            //Long tarGrpId2 = Long.valueOf(param.get("tarGrpId1").toString());
+            Map<String, Object> map2 = CreateTarGrpByTemplate(tarGrpRel.getTarGrpId2(), oldTarGrpId, needDeleted);
+            if (map2 != null && map2.get("tarGrp") != null) {
+                TarGrp tarGrp2 = (TarGrp) map2.get("tarGrp");
+                if (tarGrp2 != null) {
+                    tarGrpRelNew.setTarGrpId2(tarGrp2.getTarGrpId());
+                }
+            }
+            tarGrpRelNew.setNegation1(tarGrpRel.getNegation1());
+            tarGrpRelNew.setNegation2(tarGrpRel.getNegation2());
+            tarGrpRelNew.setRel(tarGrpRel.getRel());
+            tarGrpRelNew.setCreateDate(new Date());
+            tarGrpRelNew.setUpdateDate(new Date());
+            tarGrpRelNew.setCreateStaff(UserUtil.loginId());
+            tarGrpRelNew.setUpdateStaff(UserUtil.loginId());
+            tarGrpRelMapper.insert(tarGrpRelNew);
+            maps.put("id", tarGrpRelNew.getId());
+            maps.put("resultCode", CODE_SUCCESS);
+            maps.put("id", tarGrpRelNew.getId());
+        } catch (Exception e) {
+            maps.put("resultCode", CODE_FAIL);
+            logger.error("fail to getNewTarGrpByTemplate = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return maps;
+        }
+        return maps;
+    }
+
+    @Override
+    public Map<String, Object> getTarGrpRel(Long id){
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            TarGrpRel tarGrpRel = tarGrpRelMapper.selectByPrimaryKey(id);
+            maps.put("resultCode", CODE_SUCCESS);
+            maps.put("data", tarGrpRel);
+            return maps;
+        } catch (Exception e){
+            maps.put("resultCode", CODE_FAIL);
+            logger.error("fail to getTarGrpRel = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return maps;
+        }
+    }
+
+    @Override
+    public Map<String, Object> deleteTarGrpRel(Long id){
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            TarGrpRel tarGrpRel = tarGrpRelMapper.selectByPrimaryKey(id);
+            tarGrpRelMapper.delTarGrpRel(id);
+            tarGrpMapper.deleteByPrimaryKey(tarGrpRel.getTarGrpId1());
+            tarGrpMapper.deleteByPrimaryKey(tarGrpRel.getTarGrpId2());
+            maps.put("resultCode", CODE_SUCCESS);
+            return maps;
+        } catch (Exception e){
+            maps.put("resultCode", CODE_FAIL);
+            logger.error("fail to getTarGrpRel = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return maps;
+        }
+    }
+
+    @Override
+    public Map<String, Object> updateTarGrpName(TarGrp tarGrp){
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            tarGrpMapper.modTarGrp(tarGrp);
+            maps.put("resultCode", CODE_SUCCESS);
+            return maps;
+        } catch (Exception e){
+            maps.put("resultCode", CODE_FAIL);
+            logger.error("fail to updateTarGrpName = {}!" +
+                    " Exception: ", JSONArray.toJSON(maps), e);
+            return maps;
+        }
+    }
+
 
 }
