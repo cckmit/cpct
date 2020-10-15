@@ -26,4 +26,6 @@ public interface MktCamResourceMapper {
     List<MktCamResource> selectAll();
 
     int updateByPrimaryKey(MktCamResource record);
+
+    int updateResourceId(Long mktCamResourceId, Long resourceId);
 }
