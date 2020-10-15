@@ -98,4 +98,10 @@
     from product where PROD_NBR = #{code}
   </select>
 
+  <select id="listAttrValue" resultMap="Map">
+    select ATTR_VALUE_ID as attrValueId ,ATTR_VALUE_NAME as valueName
+    from attr_value where ATTR_VALUE_ID = #{attrId}
+  </select>
+
+
 </mapper>

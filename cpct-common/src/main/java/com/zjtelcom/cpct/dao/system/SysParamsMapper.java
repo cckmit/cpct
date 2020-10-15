@@ -38,4 +38,7 @@ public interface SysParamsMapper {
     SysParams selectByParamKey(@Param("paramKey")String paramKey);
 
     List<String> listValueByKey(String key,String withoutList);
+
+    String listMainData(String attrNbr,String attrValue);
+
 }

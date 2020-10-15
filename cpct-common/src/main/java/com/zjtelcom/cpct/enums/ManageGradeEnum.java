@@ -41,12 +41,15 @@ public enum ManageGradeEnum {
 
 
     public static String getValuedById(String id){
+        if (id==null){
+            return "";
+        }
         for (ManageGradeEnum areaCodeEnum : ManageGradeEnum.values()) {
             if(id.equals(areaCodeEnum.id)){
                 return areaCodeEnum.getValue();
             }
         }
-        return null;
+        return "";
     }
 
 }
