@@ -1,5 +1,10 @@
 package com.zjtelcom.cpct.service.impl.channel;
 
+import com.alibaba.fastjson.JSON;
+import com.ctzj.smt.bss.cpc.model.common.CpcResultObject;
+import com.ctzj.smt.bss.cpc.model.dto.CouponApplyObjectDto;
+import com.ctzj.smt.bss.cpc.model.dto.CouponEffExpDto;
+import com.ctzj.smt.bss.cpc.model.dto.MktResCouponDto;
 import com.ctzj.smt.bss.cpc.query.service.api.ICouponApplyObjectService;
 import com.ctzj.smt.bss.cpc.query.service.api.ICouponEffExpRuleService;
 import com.ctzj.smt.bss.cpc.query.service.api.ICpcMktResCouponDubboService;
@@ -681,14 +686,192 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
 
 
+
+    @Override
     public Map<String, Object> mktCamResourceService(Long mktCampaignId) {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             //查询
             List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue());
             for (MktCamResource mktCamResource : mktCamResourceList) {
-                if (mktCamResource.getResourceId() != null) {
+                Long mktResId = mktCamResource.getResourceId();
+                MktResCouponDto mktResCouponDto = new MktResCouponDto();
+                mktResCouponDto.setShowAmount(Double.valueOf(mktCamResource.getFaceAmount()) + Double.valueOf(mktCamResource.getDifferentPrice()));
+                mktResCouponDto.setSalePrice(Double.valueOf(mktCamResource.getFaceAmount()));
+                mktResCouponDto.setPriceDifference(Double.valueOf(mktCamResource.getDifferentPrice()));
+                mktResCouponDto.setRemark(mktCamResource.getRemark());
+                mktResCouponDto.setMktResName(mktCamResource.getCamResourceName());
+                //mktResCouponDto.setMktResDesc(mktCamResource.get);
+                mktResCouponDto.setMktResTypeId(Long.valueOf(mktCamResource.getResourceType()));
+                mktResCouponDto.setMktResExtTypeId(Long.valueOf(mktCamResource.getResourceSubtype()));
+                mktResCouponDto.setManageRegionId(mktCamResource.getLanId());
+                mktResCouponDto.setEffDate(mktCamResource.getStartTime());
+                mktResCouponDto.setExpDate(mktCamResource.getEndTime());
+                mktResCouponDto.setQuantity(mktCamResource.getResourceApplyNum().toString());
+                mktResCouponDto.setReleaseType(mktCamResource.getReleaseType());
+                //mktResCouponDto.setAlgorithm();
+                mktResCouponDto.setIssueLan(mktCamResource.getPublishArea());
+                mktResCouponDto.setCreateStaff(UserUtil.loginId());
+                mktResCouponDto.setUpdateStaff(UserUtil.loginId());
+                mktResCouponDto.setSupplierId(mktCamResource.getMktCampaignId());
+                if (mktResId != null) {
+                    // 有电子券 -> 修改
+                    mktResCouponDto.setActType("MOD");
+                    logger.info("1--->>> 入参（MOD）：" + JSON.toJSONString(mktResCouponDto));
+                    CpcResultObject<String> stringCpcResultObject = iMktResCouponWriteService.modifyMktresCoupon(mktResCouponDto);
+                    logger.info("1--->>> 出参（MOD）：" + JSON.toJSONString(mktResCouponDto));
 
+                    CouponEffExpDto couponEffExpDto = new CouponEffExpDto();
+                    couponEffExpDto.setEffExpRuleId(mktCamResource.getRuleId());
+                    couponEffExpDto.setMktResId(mktCamResource.getResourceId());
+                    couponEffExpDto.setRemark(mktCamResource.getRemark());
+                    couponEffExpDto.setEffDate(mktCamResource.getStartTime());
+                    couponEffExpDto.setExpDate(mktCamResource.getEndTime());
+                    couponEffExpDto.setStaffId(mktCamResource.getCreateStaff());
+                    couponEffExpDto.setActType("MOD");
+                    logger.info("2--->>> 入参（MOD）：" + JSON.toJSONString(couponEffExpDto));
+                    CpcResultObject cpcResultObject = iCouponEffExpRuleWriteService.modifyCouponEffExpRlue(couponEffExpDto);
+                    logger.info("2--->>> 出参（MOD）：" + JSON.toJSONString(cpcResultObject));
+
+                } else {
+                    // 没有电子券 -> 新增
+                    mktResCouponDto.setActType("ADD");
+                    logger.info("3--->>> 入参（ADD）：" + JSON.toJSONString(mktResCouponDto));
+                    CpcResultObject<String> stringCpcResultObject = iMktResCouponWriteService.modifyMktresCoupon(mktResCouponDto);
+                    logger.info("3--->>> 出参（ADD）：" + JSON.toJSONString(mktResCouponDto));
+                    if ("0".equals(stringCpcResultObject.getResultCode())) {
+                        String idStr = stringCpcResultObject.getResultObject();
+                        if (idStr != null && !"".equals(idStr)) {
+                            mktResId = Long.valueOf(idStr);
+                            mktCamResourceMapper.updateResourceId(mktCamResource.getMktCamResourceId(), mktResId);
+                            logger.info("回填电子券标识到数据库中...");
+                        }
+                    }
+
+                    CouponEffExpDto couponEffExpDto = new CouponEffExpDto();
+                    couponEffExpDto.setEffExpRuleId(mktCamResource.getRuleId());
+                    couponEffExpDto.setMktResId(mktResId);
+                    couponEffExpDto.setRemark(mktCamResource.getRemark());
+                    couponEffExpDto.setEffDate(mktCamResource.getStartTime());
+                    couponEffExpDto.setExpDate(mktCamResource.getEndTime());
+                    couponEffExpDto.setStaffId(mktCamResource.getCreateStaff());
+                    couponEffExpDto.setActType("ADD");
+                    logger.info("4--->>>入参（ADD）：" + JSON.toJSONString(couponEffExpDto));
+                    CpcResultObject cpcResultObject = iCouponEffExpRuleWriteService.modifyCouponEffExpRlue(couponEffExpDto);
+                    logger.info("4--->>>出参（ADD）：" + JSON.toJSONString(cpcResultObject));
+                }
+
+                // 销售品
+                if (mktCamResource.getOfferId() != null) {
+                    //MktCamItem mktCamItem = camItemMapper.selectByPrimaryKey(Long.valueOf(mktCamResource.getOfferId()));
+                    CouponApplyObjectDto couponApplyObjectDto = new CouponApplyObjectDto();
+                    couponApplyObjectDto.setMktResId(mktResId);
+                    couponApplyObjectDto.setRemark(ProductTypeEnum.OFFER.getName());
+                    // 查询销售品
+                    logger.info("5--->>> 入参：" + JSON.toJSONString(couponApplyObjectDto));
+                    CpcResultObject<List<CouponApplyObjectDto>> listCpcResultObject = iCouponApplyObjectService.qryCouponApplyObjectList(couponApplyObjectDto);
+                    logger.info("5--->>> 出参：" + JSON.toJSONString(listCpcResultObject));
+                    // 删除销售品
+                    if("0".equals(listCpcResultObject.getResultCode())){
+                        List<CouponApplyObjectDto> couponApplyObjectDtos = listCpcResultObject.getResultObject();
+                        for (CouponApplyObjectDto applyObjectDto : couponApplyObjectDtos) {
+                            applyObjectDto.setActType("DEL");
+                        }
+                        logger.info("6--->>> 入参（DEL）：" + JSON.toJSONString(couponApplyObjectDtos));
+                        CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                        logger.info("6--->>> 出参（DEL）：" + JSON.toJSONString(booleanCpcResultObject));
+                    }
+                    // 新增销售品
+                    MktCamItem mktCamItem = camItemMapper.selectByPrimaryKey(Long.valueOf(mktCamResource.getOfferId()));
+                    List<CouponApplyObjectDto> couponApplyObjectDtos = new ArrayList<>();
+                    CouponApplyObjectDto couponApplyObjectDtoNew = new CouponApplyObjectDto();
+                    couponApplyObjectDtoNew.setMktResId(mktResId);
+                    couponApplyObjectDtoNew.setObjId(mktCamItem.getItemId());
+                    couponApplyObjectDtoNew.setObjType(Long.valueOf(mktCamItem.getItemType()));
+                    couponApplyObjectDtoNew.setStaffId(UserUtil.loginId());
+                    couponApplyObjectDtoNew.setActType("ADD");
+                    couponApplyObjectDtoNew.setRemark(ProductTypeEnum.OFFER.getName());
+                    couponApplyObjectDtos.add(couponApplyObjectDtoNew);
+                    logger.info("7--->>> 入参（ADD）" + JSON.toJSONString(couponApplyObjectDtos));
+                    CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                    logger.info("7--->>> 出参（ADD）" + JSON.toJSONString(booleanCpcResultObject));
+                }
+
+                //依赖销售品条目id(多个以“/”分开)
+                if (mktCamResource.getDependOfferId() != null && !"".equals(mktCamResource.getDependOfferId())) {
+                    CouponApplyObjectDto couponApplyObjectDto = new CouponApplyObjectDto();
+                    couponApplyObjectDto.setMktResId(mktResId);
+                    couponApplyObjectDto.setRemark(ProductTypeEnum.DEPEND_OFFER.getName());
+                    // 查询依赖销售品
+                    logger.info("8--->>> 入参：" + JSON.toJSONString(couponApplyObjectDto));
+                    CpcResultObject<List<CouponApplyObjectDto>> listCpcResultObject = iCouponApplyObjectService.qryCouponApplyObjectList(couponApplyObjectDto);
+                    logger.info("8--->>> 出参：" + JSON.toJSONString(listCpcResultObject));
+                    // 删除依赖销售品
+                    if ("0".equals(listCpcResultObject.getResultCode())) {
+                        List<CouponApplyObjectDto> couponApplyObjectDtos = listCpcResultObject.getResultObject();
+                        for (CouponApplyObjectDto applyObjectDto : couponApplyObjectDtos) {
+                            applyObjectDto.setActType("DEL");
+                        }
+                        logger.info("9---> modifyCouponApplyObject入参（DEL） --->>>" + JSON.toJSONString(couponApplyObjectDtos));
+                        CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                        logger.info("9---> modifyCouponApplyObject出参（DEL） --->>>" + JSON.toJSONString(booleanCpcResultObject));
+                    }
+                    String[] dependOfferIds = mktCamResource.getDependOfferId().split("/");
+                    List<CouponApplyObjectDto> couponApplyObjectDtos = new ArrayList<>();
+                    for (String dependOfferId : dependOfferIds) {
+                        // 新增依赖销售品
+                        MktCamItem mktCamItem = camItemMapper.selectByPrimaryKey(Long.valueOf(dependOfferId));
+                        CouponApplyObjectDto couponApplyObjectDtoNew = new CouponApplyObjectDto();
+                        couponApplyObjectDtoNew.setMktResId(mktResId);
+                        couponApplyObjectDtoNew.setObjId(mktCamItem.getItemId());
+                        couponApplyObjectDtoNew.setObjType(Long.valueOf(mktCamItem.getItemType()));
+                        couponApplyObjectDtoNew.setStaffId(UserUtil.loginId());
+                        couponApplyObjectDtoNew.setActType("ADD");
+                        couponApplyObjectDtoNew.setRemark(ProductTypeEnum.DEPEND_OFFER.getName());
+                        couponApplyObjectDtos.add(couponApplyObjectDtoNew);
+                    }
+                    logger.info("10--->>> 入参（ADD）" + JSON.toJSONString(couponApplyObjectDtos));
+                    CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                    logger.info("10--->>> 出参（ADD）" + JSON.toJSONString(booleanCpcResultObject));
+                }
+
+
+                //批零差包 销售品条目id(多个以“/”分开)
+                if (mktCamResource.getDifferentOfferId() != null && !"".equals(mktCamResource.getDifferentOfferId())) {
+                    CouponApplyObjectDto couponApplyObjectDto = new CouponApplyObjectDto();
+                    couponApplyObjectDto.setMktResId(mktResId);
+                    couponApplyObjectDto.setRemark(ProductTypeEnum.DIFFERENT_OFFER.getName());
+                    // 查询批零差包
+                    logger.info("11--->>> 入参：" + JSON.toJSONString(couponApplyObjectDto));
+                    CpcResultObject<List<CouponApplyObjectDto>> listCpcResultObject = iCouponApplyObjectService.qryCouponApplyObjectList(couponApplyObjectDto);
+                    logger.info("11--->>> 出参：" + JSON.toJSONString(listCpcResultObject));
+                    // 删除批零差包
+                    if ("0".equals(listCpcResultObject.getResultCode())) {
+                        List<CouponApplyObjectDto> couponApplyObjectDtos = listCpcResultObject.getResultObject();
+                        for (CouponApplyObjectDto applyObjectDto : couponApplyObjectDtos) {
+                            applyObjectDto.setActType("DEL");
+                        }
+                        logger.info("12---> modifyCouponApplyObject入参（DEL） --->>>" + JSON.toJSONString(couponApplyObjectDtos));
+                        CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                        logger.info("12---> modifyCouponApplyObject出参（DEL） --->>>" + JSON.toJSONString(booleanCpcResultObject));
+                    }
+                    String[] dependOfferIds = mktCamResource.getDependOfferId().split("/");
+                    List<CouponApplyObjectDto> couponApplyObjectDtos = new ArrayList<>();
+                    for (String dependOfferId : dependOfferIds) {
+                        // 新增批零差包
+                        MktCamItem mktCamItem = camItemMapper.selectByPrimaryKey(Long.valueOf(dependOfferId));
+                        CouponApplyObjectDto couponApplyObjectDtoNew = new CouponApplyObjectDto();
+                        couponApplyObjectDtoNew.setMktResId(mktResId);
+                        couponApplyObjectDtoNew.setObjId(mktCamItem.getItemId());
+                        couponApplyObjectDtoNew.setObjType(Long.valueOf(mktCamItem.getItemType()));
+                        couponApplyObjectDtoNew.setStaffId(UserUtil.loginId());
+                        couponApplyObjectDtoNew.setActType("ADD");
+                        couponApplyObjectDtoNew.setRemark(ProductTypeEnum.DIFFERENT_OFFER.getName());
+                        couponApplyObjectDtos.add(couponApplyObjectDtoNew);
+                    }
+                    logger.info("13--->>> 入参（ADD）" + JSON.toJSONString(couponApplyObjectDtos));
+                    CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
+                    logger.info("13--->>> 出参（ADD）" + JSON.toJSONString(booleanCpcResultObject));
                 }
             }
 
