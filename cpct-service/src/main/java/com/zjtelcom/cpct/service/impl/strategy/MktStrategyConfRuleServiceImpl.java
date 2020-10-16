@@ -1027,6 +1027,7 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             if (tarGrp != null) {
                 chiledMktStrategyConfRuleDO.setTarGrpId(tarGrp.getTarGrpId());
             }
+
             chiledMktStrategyConfRuleDO.setProductId(childProductIds);
             chiledMktStrategyConfRuleDO.setEvtContactConfId(childEvtContactConfIds);
             chiledMktStrategyConfRuleDO.setMktCamChlResultId(childMktCamChlResultIds);
@@ -1036,6 +1037,19 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             chiledMktStrategyConfRuleDO.setUpdateStaff(UserUtil.loginId());
             mktStrategyConfRuleMapper.insert(chiledMktStrategyConfRuleDO);
             Long chiledMktStrategyConfRuleId = chiledMktStrategyConfRuleDO.getMktStrategyConfRuleId();
+
+            // 电子券
+            MktCamResource mktCamResourceParent = mktCamResourceMapper.selectByRuleId(parentMktStrategyConfRuleId, FrameFlgEnum.NO.getValue());
+            MktCamResource mktCamResource = new MktCamResource();
+            mktCamResource.setRuleId(chiledMktStrategyConfRuleId);
+            mktCamResource.setMktCampaignId(mktCamResourceParent.getMktCampaignId());
+            mktCamResource.setCreateDate(new Date());
+            mktCamResource.setFrameFlg(FrameFlgEnum.NO.getValue());
+            mktCamResource.setResourceApplyNum(mktCamResourceParent.getResourceApplyNum());
+            mktCamResource.setStartTime(mktCamResourceParent.getStartTime());
+            mktCamResource.setEndTime(mktCamResourceParent.getEndTime());
+            mktCamResource.setDays(mktCamResourceParent.getDays());
+            mktCamResourceMapper.insert(mktCamResource);
 
             // initId
             chiledMktStrategyConfRuleDO.setInitId(chiledMktStrategyConfRuleId);
