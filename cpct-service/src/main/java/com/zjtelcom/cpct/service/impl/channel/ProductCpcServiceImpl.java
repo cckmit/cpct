@@ -22,9 +22,11 @@ import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
 import com.zjtelcom.cpct.dao.channel.ServiceMapper;
 import com.zjtelcom.cpct.dao.product.ProductNewMapper;
 import com.zjtelcom.cpct.dao.strategy.MktStrategyConfRuleMapper;
+import com.zjtelcom.cpct.dao.system.SysParamsMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
+import com.zjtelcom.cpct.dto.channel.MktProductAttrVO;
 import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.enums.*;
@@ -89,6 +91,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
     @Autowired
     private MktCamResourceMapper mktCamResourceMapper;
+    @Autowired
+    private SysParamsMapper sysParamsMapper;
 
 
 
@@ -119,12 +123,54 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         return result;
     }
 
+
+    @Override
+    public Map<String, Object> deleteMktProductAttr(Long attrId) {
+        Map<String,Object> result = new HashMap<>();
+        MktProductAttr mktProductAttr = mktProductAttrMapper.selectByPrimaryKey(attrId);
+        if (mktProductAttr!=null){
+            mktProductAttrMapper.deleteByPrimaryKey(attrId);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","删除成功");
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> deleteMktProductItem(MktProductAttr mktProductAttr) {
+        Map<String,Object> result = new HashMap<>();
+        List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        for (MktProductAttr productAttr : productAttrs) {
+            mktProductAttrMapper.deleteByPrimaryKey(productAttr.getMktProductAttrId());
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","删除成功");
+        return result;
+    }
+
     @Override
     public Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr) {
         Map<String,Object> result = new HashMap<>();
+        Map<String,Object> data =  new HashMap<>();
         List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        MktCamItem item = camItemMapper.selectByPrimaryKey(mktProductAttr.getProductId());
+        if (item!=null) {
+            Product product = productProdMapper.selectByPrimaryKey(item.getItemId());
+            String s = sysParamsMapper.listMainData("PRD-0003", product.getProdCompType());
+            product.setProdCompType(s);
+            product.setManageGrade(ManageGradeEnum.getValuedById(product.getManageGrade()));
+            List<MktProductAttrVO> attrVOList = new ArrayList<>();
+            for (MktProductAttr productAttr : productAttrs) {
+                MktProductAttrVO mktProductAttrVO = BeanUtil.create(productAttr, new MktProductAttrVO());
+                List<Map<String, Object>> maps = productProdMapper.listAttrValue(productAttr.getAttrId());
+                mktProductAttrVO.setAttrValueList(maps);
+                attrVOList.add(mktProductAttrVO);
+            }
+            data.put("product",product);
+            data.put("attrList",attrVOList);
+        }
         result.put("resultCode",CODE_SUCCESS);
-        result.put("resultMsg",productAttrs);
+        result.put("resultMsg",data);
         return result;
     }
 
@@ -140,8 +186,14 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     @Override
     public Map<String, Object> addMktProductAttr(Map<String, Object> param) {
         Map<String,Object> result = new HashMap<>();
+        Long productId = MapUtil.getLongNum(param.get("productId"));
+        Long ruleId = MapUtil.getLongNum(param.get("ruleId"));
+        String frameFlg = MapUtil.getString(param.get("frameFlg"));
         List<MktProductAttr> productAttrs = (List<MktProductAttr>) param.get("list");
         for (MktProductAttr productAttr : productAttrs) {
+            productAttr.setProductId(productId);
+            productAttr.setRuleId(ruleId);
+            productAttr.setFrameFlg(frameFlg);
             mktProductAttrMapper.insert(productAttr);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -468,8 +520,6 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         Map<String,Object> result = new HashMap<>();
         List<MktProductRule> ruleList = new ArrayList<>();
         List<MktCamItem> itemList = camItemMapper.selectByCampaignAndType(param.getCampaignId(),param.getItemType(),param.getName());
-        for (MktCamItem item : itemList) {
-        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",itemList);
         return result;

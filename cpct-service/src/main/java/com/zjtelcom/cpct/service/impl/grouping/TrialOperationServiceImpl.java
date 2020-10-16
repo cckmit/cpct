@@ -2196,7 +2196,6 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
         List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
-        PageHelper.startPage(1,10);
         if (strategyIdList!=null){
             List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             trialOperations.forEach(trialOperation -> {
@@ -2209,6 +2208,7 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
                     }
                 }
             });
+            PageHelper.startPage(1,10);
             trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             Page pageInfo = new Page(new PageInfo(trialOperations));
             List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
@@ -2243,6 +2243,7 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
         List<TrialOperationDetail> operationDetailList = new ArrayList<>();
         for (TrialOperation trialOperation : trialOperations) {
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
+            detail.setBatchNumSt(trialOperation.getBatchNum().toString());
             if (trialOperation.getUpdateDate() != null && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())) {
                 Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
                 cost = cost<0L ? 0L : cost;

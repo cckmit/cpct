@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -23,4 +24,8 @@ public interface ProductMapper {
     int updateByPrimaryKey(Product record);
 
     List<Product> selectByCode(@Param("code") String code);
+
+    List<Map<String,Object>> listAttrValue(@Param("attrId") Long attrId);
+
+
 }

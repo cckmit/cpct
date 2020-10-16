@@ -40,7 +40,11 @@ public interface ProductService {
 
     Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr);
 
+    Map<String, Object> deleteMktProductAttr(Long attrId);
+
     Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr);
+
+    Map<String, Object> deleteMktProductItem(MktProductAttr mktProductAttr);
 
     Map<String, Object> copyMktProductAttr(Long oldProductId,Long newProductId,Long ruleId);
 

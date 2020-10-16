@@ -2506,7 +2506,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     try {
                         List<TrialOperation> trialOperations = trialOperationMapper.listOperationByCamIdAndStatusCd(mktCampaignId, TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue());
                         if (trialOperations != null && trialOperations.size() > 0) {
-                            projectManageService.updateProjectPcState(mktCampaignId);
+                            updateProjectStateTime(mktCampaignDO.getInitId());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

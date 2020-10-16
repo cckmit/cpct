@@ -128,6 +128,14 @@
         and PARAM_VALUE not in ${withoutList}
     </select>
 
+    <select id="listMainData" resultType="java.lang.String">
+       select y.ATTR_VALUE_NAME
+ from attr_spec x,attr_value y where x.attr_id=y.attr_id and x.attr_nbr = #{attrNbr} and y.ATTR_VALUE = #{attrValue}
+and y.status_cd='1000' and x.status_cd='1000';
+    </select>
+
+
+
 
 
 </mapper>

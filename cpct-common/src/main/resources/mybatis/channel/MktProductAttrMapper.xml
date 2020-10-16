@@ -73,6 +73,9 @@
     <if test="ruleId != null and ruleId != 0">
       and  RULE_ID = #{ruleId}
     </if>
+    <if test="frameFlg != null and frameFlg != ''">
+      and  FRAME_FLG = #{FRAME_FLG}
+    </if>
     order by CREATE_DATE asc
   </select>
 
