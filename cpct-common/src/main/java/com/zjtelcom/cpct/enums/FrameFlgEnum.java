@@ -1,26 +1,21 @@
 package com.zjtelcom.cpct.enums;
 
-public enum CamItemType {
+public enum FrameFlgEnum {
 
-    OFFER("1000", "销售品"),
-    PACKAGE("2000","礼包"),
-    RESOURCE("3000", "营销资源"),
-    SERVICE("4000", "服务"),
-    DEPEND_OFFER("5000", "依赖销售品"),
-    DEPEND_PRODUCT("6000","依赖产品"),
-    DIFFERENT_OFFER("7000","依赖产品");
+    YES("yes", "是电子券框架类型"),
+    NO("no","不是电子券框架类型");
 
 
     private String value;
     private String name;
 
-    CamItemType(String value, String name) {
+    FrameFlgEnum(String value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public static CamItemType getNameByCode(String code) {
-        for (CamItemType trialStatus : CamItemType.values()) {
+    public static FrameFlgEnum getNameByCode(String code) {
+        for (FrameFlgEnum trialStatus : FrameFlgEnum.values()) {
             if (code != null && code.equals(trialStatus.value)) {
                 return trialStatus;
             }

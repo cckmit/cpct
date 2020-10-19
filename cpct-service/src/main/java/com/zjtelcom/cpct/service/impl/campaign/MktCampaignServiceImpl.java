@@ -522,6 +522,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     @Autowired
     private ObjCatItemRelMapper objCatItemRelMapper;
 
+    @Autowired
+    private MktCamResourceMapper mktCamResourceMapper;
+
     //指定下发地市人员的数据集合
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
     // 集团活动指定承接人
@@ -972,6 +975,17 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             //创建主题关系
             ObjLabelRelCreate(mktCampaignDO);
+
+            //活动级别创建电子券模板信息
+            MktCamResource mktCamResource = new MktCamResource();
+            mktCamResource.setFrameFlg(FrameFlgEnum.YES.getValue()); // 是否电子券框架类型, yes-是，no-不是
+            mktCamResource.setMktCampaignId(mktCampaignId);
+            mktCamResource.setCreateStaff(UserUtil.loginId());
+            mktCamResource.setCreateDate(new Date());
+            mktCamResource.setUpdateStaff(UserUtil.loginId());
+            mktCamResource.setUpdateDate(new Date());
+            mktCamResourceMapper.insert(mktCamResource);
+
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -1374,6 +1388,15 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     e.printStackTrace();
                 }
             }
+
+            //修改电子券的信息
+            MktCamResource mktCamResource = mktCampaignVO.getMktCamResource();
+            if(mktCamResource!=null){
+                mktCamResource.setUpdateStaff(UserUtil.loginId());
+                mktCamResource.setUpdateDate(new Date());
+                mktCamResourceMapper.updateByPrimaryKey(mktCamResource);
+            }
+
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.UPDATE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -1512,7 +1535,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyConfDetailList.add(mktStrategyConfDetail);
         }
         mktCampaignVO.setMktStrategyConfDetailList(mktStrategyConfDetailList);
-
+        List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.YES.getValue());
+        if (mktCamResourceList != null && mktCamResourceList.size()>0) {
+            mktCampaignVO.setMktCamResource(mktCamResourceList.get(0));
+        }
         Map<String, Object> maps = new HashMap<>();
         maps.put("resultCode", CommonConstant.CODE_SUCCESS);
         maps.put("resultMsg", "查询活动成功");
@@ -1994,8 +2020,20 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
                 mktCampaignDO.setMktCampaignType("(1000)");
             }
+            if ("C1".equals(userLevl) ||  "C2".equals(userLevl)){
+                mktCampaignDO.setLanId(1L);
+            }
+            if ("C3".equals(userLevl)){
+                Long regionId = UserUtil.getUser().getLanId();
+                Long lanId = AreaCodeEnum.getLandIdByRegionId(regionId);
+                mktCampaignDO.setLanId(lanId);
+            }
             if ("C4".equals(userLevl)){
                 mktCampaignDO.setTiggerType("1000");
+                String c4CodeName = (String) params.get("c4CodeName");
+                if(c4CodeName != null && !"".equals(c4CodeName)) {
+                    mktCampaignDO.setLanIdFour(Long.valueOf(c4CodeName));
+                }
             }
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
@@ -2474,7 +2512,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     try {
                         List<TrialOperation> trialOperations = trialOperationMapper.listOperationByCamIdAndStatusCd(mktCampaignId, TrialStatus.CHANNEL_PUBLISH_SUCCESS.getValue());
                         if (trialOperations != null && trialOperations.size() > 0) {
-                            projectManageService.updateProjectPcState(mktCampaignId);
+                            updateProjectStateTime(mktCampaignDO.getInitId());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

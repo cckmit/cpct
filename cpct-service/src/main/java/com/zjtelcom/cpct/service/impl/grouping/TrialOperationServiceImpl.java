@@ -1031,7 +1031,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                 addLog2Es(batchNumSt, "导入清单缺少渠道必填列");
                                 TrialOperation record = new TrialOperation();
                                 record.setId(Long.valueOf(insertId));
-                                record.setStatusCd(TrialStatus.IMPORT_FAIL.value());
+                                record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                 record.setRemark("清单导入数据错误");
                                 int i = trialOperationMapper.updateByPrimaryKey(record);
                                 throw new RuntimeException("导入清单缺少渠道必填列");
@@ -1107,7 +1107,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     addLog2Es(batchNumSt, "导入清单工号地区不符");
                                     TrialOperation record = new TrialOperation();
                                     record.setId(Long.valueOf(insertId));
-                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.value());
+                                    record.setStatusCd(TrialStatus.IMPORT_FAIL.getValue());
                                     record.setRemark("导入清单工号地区不符");
                                     int i = trialOperationMapper.updateByPrimaryKey(record);
                                     throw new RuntimeException("导入清单工号地区不符");
@@ -2196,7 +2196,6 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
     public Map<String, Object> getTrialListByStrategyId(Long strategyId) {
         Map<String, Object> result = new HashMap<>();
         List<String> strategyIdList = strategyMapper.selectByIdForInitId(strategyId);
-        PageHelper.startPage(1,10);
         if (strategyIdList!=null){
             List<TrialOperation> trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             trialOperations.forEach(trialOperation -> {
@@ -2209,6 +2208,7 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
                     }
                 }
             });
+            PageHelper.startPage(1,10);
             trialOperations = trialOperationMapper.findOperationListByStrategyIdLsit(strategyIdList);
             Page pageInfo = new Page(new PageInfo(trialOperations));
             List<TrialOperationDetail> operationDetailList = supplementOperation(trialOperations);
@@ -2243,6 +2243,7 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
         List<TrialOperationDetail> operationDetailList = new ArrayList<>();
         for (TrialOperation trialOperation : trialOperations) {
             TrialOperationDetail detail = BeanUtil.create(trialOperation, new TrialOperationDetail());
+            detail.setBatchNumSt(trialOperation.getBatchNum().toString());
             if (trialOperation.getUpdateDate() != null && !trialOperation.getStatusCd().equals(TrialStatus.SAMPEL_GOING.getValue())) {
                 Long cost = (trialOperation.getUpdateDate().getTime() - trialOperation.getCreateDate().getTime());
                 cost = cost<0L ? 0L : cost;

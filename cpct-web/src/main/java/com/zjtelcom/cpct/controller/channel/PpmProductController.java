@@ -1,6 +1,8 @@
 package com.zjtelcom.cpct.controller.channel;
 
+import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.channel.MktProductAttr;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
@@ -25,8 +27,98 @@ public class PpmProductController extends BaseController  {
     private CatalogService catalogService;
 
 
+    /**
+     *批量新增依赖产品属性
+     * parram: list
+     * @return
+     */
+    @PostMapping("addMktProductAttr")
+    @CrossOrigin
+    public Map<String, Object> addMktProductAttr(@RequestBody Map<String,Object> param) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.addMktProductAttr(param);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to addMktProductAttr",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addMktProductAttr");
+            return result;
+        }
+        return result;
+    }
 
-
+    /**
+     *编辑产品属性值
+     * @return
+     */
+    @PostMapping("editMktProductAttr")
+    @CrossOrigin
+    public Map<String, Object> editMktProductAttr(@RequestBody MktProductAttr mktProductAttr) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.editMktProductAttr(mktProductAttr);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to addMktProductAttr",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addMktProductAttr");
+            return result;
+        }
+        return result;
+    }
+    /**
+     *删除产品属性
+     * @return
+     */
+    @PostMapping("deleteMktProductAttr")
+    @CrossOrigin
+    public Map<String, Object> deleteMktProductAttr(@RequestBody Map<String,Object> param) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.deleteMktProductAttr(MapUtil.getLongNum(param.get("mktProductAttrId")));
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to deleteMktProductAttr",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to deleteMktProductAttr");
+            return result;
+        }
+        return result;
+    }
+    /**
+     *获取产品属性列表
+     * @return
+     */
+    @PostMapping("listMktProductAttr")
+    @CrossOrigin
+    public Map<String, Object> listMktProductAttr(@RequestBody MktProductAttr mktProductAttr) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.listMktProductAttr(mktProductAttr);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to listMktProductAttr",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to listMktProductAttr");
+            return result;
+        }
+        return result;
+    }
+    /**
+     *删除整个产品
+     * @return
+     */
+    @PostMapping("deleteMktProductItem")
+    @CrossOrigin
+    public Map<String, Object> deleteMktProductItem(@RequestBody MktProductAttr mktProductAttr) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = productService.deleteMktProductItem(mktProductAttr);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to deleteMktProductItem",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to deleteMktProductItem");
+            return result;
+        }
+        return result;
+    }
 
 
     /**
@@ -266,6 +358,30 @@ public class PpmProductController extends BaseController  {
             return result;
         }
         return result;
+    }
+
+
+    @RequestMapping("/getProjectListPage")
+    @CrossOrigin
+    public String getProjectListPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> resultMap = productService.getProjectListPage(params);
+        return JSON.toJSONString(resultMap);
+    }
+
+    @RequestMapping("/getAttrSpecListPage")
+    @CrossOrigin
+    public String getAttrSpecListPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> resultMap = productService.getAttrSpecListPage(params);
+        return JSON.toJSONString(resultMap);
+    }
+
+
+    @RequestMapping("/mktCamResourceService")
+    @CrossOrigin
+    public String mktCamResourceService(@RequestBody Map<String, Object> params) {
+        Long mktCampaignId = (Long) params.get("mktCampaignId");
+        Map<String, Object> resultMap = productService.mktCamResourceService(mktCampaignId);
+        return JSON.toJSONString(resultMap);
     }
 
 }

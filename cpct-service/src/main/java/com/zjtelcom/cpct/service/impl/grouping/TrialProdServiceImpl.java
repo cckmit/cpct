@@ -277,7 +277,7 @@ public class TrialProdServiceImpl implements TrialProdService {
             }
             if (redisUtils.get("CAM_POLL_GOING_"+key)!=null){
                 result.put("resultCode", CODE_FAIL);
-                result.put("resultMsg", "请勿重复下发活动，请稍后再试");
+                result.put("resultMsg", "活动正在下发请稍后再试！");
                 return result;
             }
             List<Integer> campaignIdList = new ArrayList<>();
@@ -522,7 +522,7 @@ public class TrialProdServiceImpl implements TrialProdService {
         trialOperation.setStatusCd(TrialStatus.ALL_SAMPEL_GOING.getValue());
         trialOperationMapper.updateByPrimaryKey(trialOperation);
         result.put("name", campaignDO.getMktCampaignName() + "&&&" + strategyConfDO.getMktStrategyConfName());
-        result.put("batchNum",trialOperation.getBatchNum());
+        result.put("batchNum",trialOperation.getBatchNum().toString());
         return result;
     }
 

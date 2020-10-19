@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.dto.strategy;
 
+import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
 
@@ -68,6 +69,8 @@ public class MktStrategyConfRule {
      * 营销组织树id list
      */
     private List<Long> organizationList;
+
+    private MktCamResource mktCamResource;
 
     public List<Long> getOrganizationList() {
         return organizationList;
@@ -163,5 +166,13 @@ public class MktStrategyConfRule {
 
     public void setMktCampaignType(String mktCampaignType) {
         this.mktCampaignType = mktCampaignType;
+    }
+
+    public MktCamResource getMktCamResource() {
+        return mktCamResource;
+    }
+
+    public void setMktCamResource(MktCamResource mktCamResource) {
+        this.mktCamResource = mktCamResource;
     }
 }

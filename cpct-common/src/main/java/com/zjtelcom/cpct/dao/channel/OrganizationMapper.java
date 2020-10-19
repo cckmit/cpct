@@ -50,6 +50,4 @@ public interface OrganizationMapper {
     List<Map<String, Object>> getStaffIdAndType(Long orgId);
 
     int getCount(@Param("staffId") Long staffId);
-
-
 }

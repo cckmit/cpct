@@ -32,15 +32,25 @@ public interface ProductService {
 
     Map<String, Object> copyItemByCampaign(Long oldCampaignId, Long newCampaignId);
 
+    Map<String, Object> getProjectListPage(Map<String, Object> params);
+
+    Map<String, Object> getAttrSpecListPage(Map<String, Object> params);
+
     Map<String, Object> addMktProductAttr(Map<String,Object> param);
 
     Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr);
 
+    Map<String, Object> deleteMktProductAttr(Long attrId);
+
     Map<String, Object> listMktProductAttr(MktProductAttr mktProductAttr);
+
+    Map<String, Object> deleteMktProductItem(MktProductAttr mktProductAttr);
 
     Map<String, Object> copyMktProductAttr(Long oldProductId,Long newProductId,Long ruleId);
 
     Map<String, Object> copyMktCamResource(Long oldResourceId,Long newResourceId,Long ruleId);
+
+    Map<String, Object> mktCamResourceService(Long mktCampaignId);
 
 
 

@@ -257,7 +257,7 @@ public class ActivityStatisticsController extends BaseController {
                         "关单规则名称","所属地市","批次编码","派单方式","派单数","外呼数", "处理数", "过扰关单数" ,"成功数","回单数","回单率","外呼率","转化率",
                         "处理率", "过扰关单率", "门店有销率", "是否框架子活动", "对应框架母活动编码", "对应母框架活动生效时间",
                         "成功/已接触,成功办理","成功/转商机单","失败/没有需求","失败/价格太高","失败/已转他网", "失败/拒绝","营销过滤/已办理",
-                        "二次营销/有意向","二次营销/犹豫中","二次营销/接触失败","二次营销/二次营销","短信过扰差值","黑名单过滤个数","销售品过滤个数"};
+                        "二次营销/有意向","二次营销/犹豫中","二次营销/接触失败","二次营销/二次营销","接触成功量","接触成功率","短信过扰差值","黑名单过滤个数","销售品过滤个数"};
                 String fileName = "派单报表"+ DateUtil.formatDate(new Date())+".xls"; //表名
                 //开始解析
                 Object resultMsg = map.get("resultMsg");
@@ -325,6 +325,10 @@ public class ActivityStatisticsController extends BaseController {
                                     content[i][37] = String.valueOf(map3.get("nub"));
                                 }else if (name.equals("二次营销/二次营销")){
                                     content[i][38] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("接触成功量")){
+                                    content[i][39] = String.valueOf(map3.get("nub"));
+                                }else if (name.equals("接触成功率")){
+                                    content[i][40] = String.valueOf(map3.get("nub"));
                                 }
                             }
                             // 获取批次号
@@ -333,18 +337,18 @@ public class ActivityStatisticsController extends BaseController {
                             TrialOperation trialOperation = trialOperationService.selectByBatchNum(batchNum);
                             if (trialOperation!=null){
                                 // 短信过扰差值
-                                content[i][39] = trialOperation.getSubNum() ==null ? "0" : trialOperation.getSubNum();
+                                content[i][41] = trialOperation.getSubNum() ==null ? "0" : trialOperation.getSubNum();
                                 // 黑名单过滤个数
-                                content[i][40] = trialOperation.getBeforeNum() ==null ? "0" : trialOperation.getBeforeNum();
+                                content[i][42] = trialOperation.getBeforeNum() ==null ? "0" : trialOperation.getBeforeNum();
                                 // 销售品过滤个数
-                                content[i][41] = trialOperation.getEndNum() ==null ? "0" : trialOperation.getEndNum();
+                                content[i][43] = trialOperation.getEndNum() ==null ? "0" : trialOperation.getEndNum();
                             } else {
                                 // 短信过扰差值
-                                content[i][39] = "0";
-                                // 黑名单过滤个数
-                                content[i][40] = "0";
-                                // 销售品过滤个数
                                 content[i][41] = "0";
+                                // 黑名单过滤个数
+                                content[i][42] = "0";
+                                // 销售品过滤个数
+                                content[i][43] = "0";
                             }
                         }
                     }catch (Exception e) {

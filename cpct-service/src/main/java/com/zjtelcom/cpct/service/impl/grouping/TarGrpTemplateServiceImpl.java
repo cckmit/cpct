@@ -8,7 +8,7 @@ package com.zjtelcom.cpct.service.impl.grouping;
 
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.fastjson.JSON;
-import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
+//import com.ctzj.smt.bss.cpc.configure.service.api.offer.IOfferRestrictConfigureService;
 import com.ctzj.smt.bss.cpc.evn.type.EvnType;
 import com.ctzj.smt.bss.cpc.model.offer.atomic.OfferRestrict;
 import com.ctzj.smt.bss.sysmgr.model.dto.SystemUserDto;
@@ -106,8 +106,8 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
     private ProductService productService;
     @Autowired
     private MktCamCustMapper camCustMapper;
-    @Autowired(required = false)
-    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
+//    @Autowired(required = false)
+//    private IOfferRestrictConfigureService iOfferRestrictConfigureService;
     @Autowired(required = false)
     private EsTarGrpTemplate esTarGrpTemplateService;
     @Autowired
@@ -595,7 +595,7 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
                 RpcContext.getContext().setAttachment("cpcId", offerId);
                 RpcContext.getContext().setAttachment("cpcType", "OFFER");
 
-                iOfferRestrictConfigureService.saveOfferRestrict(offerRestrict, EvnType.EVO);
+               // iOfferRestrictConfigureService.saveOfferRestrict(offerRestrict, EvnType.EVO);
 
             }
         } catch (Exception e) {
@@ -876,4 +876,70 @@ public class TarGrpTemplateServiceImpl extends BaseService implements TarGrpTemp
         }
         return tarGrpTemplateMap;
     }
+
+
+    /**
+     * 获取目标分群列表(分页)
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public Map<String, Object> listTarGrpTemplatePageForRel(String tarGrpTemplateName,String tarGrpType, Integer page, Integer pageSize) {
+        Map<String, Object> tarGrpTemplateMap = new HashMap<>();
+        Long region = 0L;
+        String createChannel = PostEnum.ADMIN.getPostCode();
+/*        if (UserUtil.getUser() != null) {
+            // 获取当前用户的岗位编码包含“cpcpch”
+            SystemUserDto userDetail = UserUtil.getRoleCode();
+            region = userDetail.getLanId();
+            for (SystemPostDto role : userDetail.getSystemPostDtoList()) {
+                // 判断是否为超级管理员
+                if (role.getSysPostCode().contains(PostEnum.ADMIN.getPostCode())) {
+                    createChannel = role.getSysPostCode();
+                    break;
+                } else if (role.getSysPostCode().contains("cpcpch")) {
+                    createChannel = role.getSysPostCode();
+                    continue;
+                }
+            }
+        }*/
+        String sysPostCode =  AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea();
+        if (createChannel.equals(AreaCodeEnum.sysAreaCode.SHENGJI.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.FENGONGSI.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGONGSI.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.FENGJU.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.FENGJU.getSysArea();
+        } else if (createChannel.equals(AreaCodeEnum.sysAreaCode.ZHIJU.getSysPostCode())) {
+            sysPostCode = AreaCodeEnum.sysAreaCode.ZHIJU.getSysArea();
+        }
+        Long lanId = 0L;
+        if(!AreaCodeEnum.sysAreaCode.CHAOGUAN.getSysArea().equals(sysPostCode) &&
+            !AreaCodeEnum.sysAreaCode.SHENGJI.getSysArea().equals(sysPostCode)){
+            lanId = AreaCodeEnum.getLandIdByRegionId(region);
+        }
+
+        // 分页获取目标分群模板
+        PageHelper.startPage(page, pageSize);
+        List<TarGrp> tarGrpTemplateDOList = tarGrpMapper.selectByCondition(tarGrpTemplateName,tarGrpType,"0", lanId);
+        Page pageInfo = new Page(new PageInfo(tarGrpTemplateDOList));
+        List<TarGrpTemplateDetail> tarGrpTemplateDetailList = new ArrayList<>();
+        for (TarGrp tarGrpTemplateDO : tarGrpTemplateDOList) {
+            TarGrpTemplateDetail tarGrpTemplateDetail = BeanUtil.create(tarGrpTemplateDO, new TarGrpTemplateDetail());
+            tarGrpTemplateDetail.setTarGrpTemplateId(tarGrpTemplateDO.getTarGrpId());
+            tarGrpTemplateDetail.setTarGrpTemplateName(tarGrpTemplateDO.getTarGrpName()==null ? "" : tarGrpTemplateDO.getTarGrpName() );
+            tarGrpTemplateDetail.setTarGrpTemplateDesc(tarGrpTemplateDO.getTarGrpDesc()==null ? "" : tarGrpTemplateDO.getTarGrpDesc() );
+            if (tarGrpTemplateDO.getTarGrpType()!=null){
+                tarGrpTemplateDetail.setTarGrpTypeName(tarGrpTemplateDO.getTarGrpType().equals("1000") ? "客户类型" : "销售品类型");
+            }
+            tarGrpTemplateDetailList.add(tarGrpTemplateDetail);
+        }
+        tarGrpTemplateMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        tarGrpTemplateMap.put("tarGrpTemplateDetailList", tarGrpTemplateDetailList);
+        tarGrpTemplateMap.put("pageInfo", pageInfo);
+        return tarGrpTemplateMap;
+    }
+
 }

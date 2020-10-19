@@ -1,26 +1,24 @@
 package com.zjtelcom.cpct.enums;
 
-public enum CamItemType {
+public enum ManageGrade {
 
-    OFFER("1000", "销售品"),
-    PACKAGE("2000","礼包"),
-    RESOURCE("3000", "营销资源"),
-    SERVICE("4000", "服务"),
-    DEPEND_OFFER("5000", "依赖销售品"),
-    DEPEND_PRODUCT("6000","依赖产品"),
-    DIFFERENT_OFFER("7000","依赖产品");
+    BLOC("10", "集团级"),
+    PROVINCE("11","省级"),
+    BEN_DI_WANG("12", "本地网级"),
+    HAI_WAI("13", "海外级"),
+    LIANG_JI("14", "两级共管");
 
 
     private String value;
     private String name;
 
-    CamItemType(String value, String name) {
+    ManageGrade(String value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public static CamItemType getNameByCode(String code) {
-        for (CamItemType trialStatus : CamItemType.values()) {
+    public static ManageGrade getNameByCode(String code) {
+        for (ManageGrade trialStatus : ManageGrade.values()) {
             if (code != null && code.equals(trialStatus.value)) {
                 return trialStatus;
             }

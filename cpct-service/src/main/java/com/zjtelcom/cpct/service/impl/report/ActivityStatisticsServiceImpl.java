@@ -921,6 +921,16 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
                                     msgMap.put("nub", o);
                                     statisicts.add(msgMap);
                                 }
+                                if (key.equals("contactSuccessNum")) {
+                                    msgMap.put("name", "接触成功量");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
+                                if (key.equals("contactSuccessRate")) {
+                                    msgMap.put("name", "接触成功率");
+                                    msgMap.put("nub", o);
+                                    statisicts.add(msgMap);
+                                }
 
 
                                 // todo 新加关单编码 2020 1/2 x
