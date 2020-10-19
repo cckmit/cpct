@@ -66,7 +66,7 @@
 
   <select id="selectByProduct" resultMap="BaseResultMap">
     select MKT_PRODUCT_ATTR_ID, PRODUCT_ID, RULE_ID, ATTR_ID, ATTR_NAME, ATTR_VALUE,
-    EDIT_FLG, FRAME_FLG, STATUS_CD, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
+    EDIT_FLG,FRAME_FLG, STATUS_CD, CREATE_STAFF, CREATE_DATE, UPDATE_STAFF, UPDATE_DATE,
     REMARK
     from mkt_product_attr
     where PRODUCT_ID = #{productId}
@@ -74,7 +74,7 @@
       and  RULE_ID = #{ruleId}
     </if>
     <if test="frameFlg != null and frameFlg != ''">
-      and  FRAME_FLG = #{FRAME_FLG}
+      and  FRAME_FLG = #{frameFlg}
     </if>
     order by CREATE_DATE asc
   </select>

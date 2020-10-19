@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,10 @@ public class SysAreaController {
     @CrossOrigin
     public String listSysCity(@RequestBody  Map<String, Object> params) {
         String lanId = (String) params.get("lanId");
+        List<String> list = new ArrayList<>();
+        if (params.get("list")!=null){
+            list = (List<String>)params.get("list");
+        }
         Integer areaId;
         if (lanId == null || "".equals(lanId) || "null".equals(lanId)) {
             //TODO 获取当前用户所在地区
@@ -65,6 +70,27 @@ public class SysAreaController {
         }
         return JSON.toJSONString(map);
     }
+
+
+    /**
+     * 获取地市级别列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/listAreaByCityList", method = RequestMethod.POST)
+    @CrossOrigin
+    public String listAreaByCityList(@RequestBody  Map<String, Object> params) {
+        List<String> list = (List<String>)params.get("list");
+        Map<String, Object> resulut = null;
+        try {
+            resulut = sysAreaService.listAreaByCityList(list);
+            resulut.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            resulut.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(resulut);
+    }
+
 
 
     /**

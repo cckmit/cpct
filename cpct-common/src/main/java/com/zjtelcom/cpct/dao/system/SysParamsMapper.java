@@ -39,6 +39,6 @@ public interface SysParamsMapper {
 
     List<String> listValueByKey(String key,String withoutList);
 
-    String listMainData(String attrNbr,String attrValue);
+    String listMainData(@Param("attrNbr")String attrNbr,@Param("attrValue")String attrValue);
 
 }

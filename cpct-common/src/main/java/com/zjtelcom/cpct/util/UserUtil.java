@@ -41,12 +41,12 @@ public class UserUtil {
      * @return
      */
     public static SystemUserDto getUser(){
-        SystemUserDto userDetail = null;
+        SystemUserDto userDetail = new SystemUserDto();
         try {
-             userDetail = BssSessionHelp.getSystemUserDto();
+             userDetail = BssSessionHelp.getCpctSystemUserDto();
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return userDetail;
         }
         return userDetail;
     }

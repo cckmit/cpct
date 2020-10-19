@@ -7,7 +7,8 @@ public enum CamItemType {
     RESOURCE("3000", "营销资源"),
     SERVICE("4000", "服务"),
     DEPEND_OFFER("5000", "依赖销售品"),
-    DEPEND_PRODUCT("6000","依赖产品");
+    DEPEND_PRODUCT("6000","依赖产品"),
+    DIFFERENT_OFFER("7000","依赖产品");
 
 
     private String value;
