@@ -2019,6 +2019,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             String userLevl = getUserLevl();
             if (!"C1".equals(userLevl) &&  !"C2".equals(userLevl)){
                 mktCampaignDO.setMktCampaignType("(1000)");
+            }
+            if ("C1".equals(userLevl) ||  "C2".equals(userLevl)){
                 mktCampaignDO.setLanId(1L);
             }
             if ("C3".equals(userLevl)){
@@ -2028,6 +2030,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             }
             if ("C4".equals(userLevl)){
                 mktCampaignDO.setTiggerType("1000");
+                String c4CodeName = (String) params.get("c4CodeName");
+                if(c4CodeName != null && !"".equals(c4CodeName)) {
+                    mktCampaignDO.setLanIdFour(Long.valueOf(c4CodeName));
+                }
             }
             List<Integer> landIdList = (List) params.get("landIds");
             if (landIdList.size() > 0 && !"".equals(landIdList.get(0))) {
