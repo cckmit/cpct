@@ -2,8 +2,10 @@ package com.zjtelcom.cpct.controller.channel;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.domain.channel.MktProductAttr;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
+import com.zjtelcom.cpct.service.channel.CamElectronService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.util.MapUtil;
@@ -25,6 +27,31 @@ public class PpmProductController extends BaseController  {
     private ProductService productService;
     @Autowired
     private CatalogService catalogService;
+    @Autowired
+    private CamElectronService camElectronService;
+
+    /**
+     *活动发布调用营服接口
+     * parram: list
+     * @return
+     */
+    @PostMapping("publish4Mktcamresource")
+    @CrossOrigin
+    public Map<String, Object> publish4Mktcamresource(@RequestBody MktCamResource camResource) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            result = camElectronService.publish4Mktcamresource(camResource);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to publish4Mktcamresource",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to publish4Mktcamresource");
+            return result;
+        }
+        return result;
+    }
+
+
+
 
 
     /**

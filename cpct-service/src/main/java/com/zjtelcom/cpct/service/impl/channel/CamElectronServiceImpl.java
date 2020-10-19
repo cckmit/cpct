@@ -10,9 +10,9 @@ import com.ctzj.smt.bss.cpc.query.service.api.IMktResOrgRelInfoService;
 import com.ctzj.smt.bss.cpc.write.service.api.IMktCouponRelService;
 import com.ctzj.smt.bss.mktcenter.coupon.service.api.ICouponInstImportDubboService;
 import com.ctzj.smt.bss.mktcenter.coupon.service.api.IMktResBatchRecDubboService;
+import com.ctzj.smt.bss.mktcenter.model.common.MktResResultObject;
 import com.ctzj.smt.bss.mktcenter.model.dto.ImportCouponInstReq;
 import com.ctzj.smt.bss.mktcenter.model.dto.MktResCouponReq;
-import com.sun.xml.internal.bind.v2.TODO;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamResourceMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
@@ -22,7 +22,6 @@ import com.zjtelcom.cpct.domain.channel.MktProductAttr;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CamElectronService;
 import com.zjtelcom.cpct.util.ChannelUtil;
-import com.zjtelcom.cpct.util.MapUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,19 +55,22 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         Map<String,Object> result = new HashMap<>();
         Long staffId = UserUtil.getUser().getStaffId();
         //4.7	按指定数量自动生成电子券实例
-        autoCreateCouponInst(mktCamResource.getResourceId(),mktCamResource.getResourceApplyNum());
+        logger.info("【按指定数量自动生成电子券实例】--->>> 入参：" + JSON.toJSONString(mktCamResource.getResourceId()));
+        Map<String, Object> map = autoCreateCouponInst(mktCamResource.getResourceId(), mktCamResource.getResourceApplyNum());
+        logger.info("【按指定数量自动生成电子券实例】--->>> 出参：" + JSON.toJSONString(map));
         //4.8	电子券发布接口
         List<Long> idList = new ArrayList<>();
         idList.add(mktCamResource.getResourceId());
         editCouponStatusCd(idList,"1");
         //删除宽带券和渠道网点关联
-        logger.info("【查询电子券关联渠道网点】--->>> 入参（DEL）：" + JSON.toJSONString(mktCamResource.getResourceId()));
+        logger.info("【查询电子券关联渠道网点】--->>> 入参：" + JSON.toJSONString(mktCamResource.getResourceId()));
         CpcResultObject<CpcPage<ChannelCouponDto>> cpcPageCpcResultObject = orgRelInfoService.qryChannelByOrgRel(mktCamResource.getResourceId(), 1, 1000);
-        logger.info("【查询电子券关联渠道网点】--->>> 出参（DEL）：" + JSON.toJSONString(mktCamResource.getResourceId()));
+        logger.info("【查询电子券关联渠道网点】--->>> 出参：" + JSON.toJSONString(cpcPageCpcResultObject));
         CpcPage<ChannelCouponDto> resultObject = cpcPageCpcResultObject.getResultObject();
         List<ChannelCouponDto> datas = resultObject.getDatas();
         for (ChannelCouponDto data : datas) {
-            couponRelService.delCouponOrgRel(data.getOrgRelId(),staffId);
+            CpcResultObject<String> stringCpcResultObject = couponRelService.delCouponOrgRel(data.getOrgRelId(), staffId);
+            logger.info("【删除电子券关联渠道网点】--->>> 出参："+ data.getOrgRelId()+":"+ JSON.toJSONString(stringCpcResultObject));
         }
         //4.9	新增宽带券和渠道网点关联
         List<String> shopList = ChannelUtil.StringToList(mktCamResource.getDealShops());
@@ -77,13 +79,17 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
             mktResOrgRelDto.setMktResId(mktCamResource.getResourceId());
             mktResOrgRelDto.setOrgId(Long.valueOf(shop));
             mktResOrgRelDto.setCreateStaff(staffId);
-            couponRelService.addCouponOrgRel(mktResOrgRelDto);
+            logger.info("【新增宽带券和渠道网点关联】--->>> 入参：" + JSON.toJSONString(mktResOrgRelDto));
+            CpcResultObject<String> stringCpcResultObject = couponRelService.addCouponOrgRel(mktResOrgRelDto);
+            logger.info("【新增宽带券和渠道网点关联】--->>> 出参：" + JSON.toJSONString(stringCpcResultObject));
         }
         //删除宽带券和产品属性关联
         CpcResultObject<CpcPage<ProductCouponDto>> object2 = orgRelInfoService.qrySelectProdByCoupon(mktCamResource.getResourceId(), 1, 1000);
+        logger.info("【查询宽带券和产品属性关联】--->>> 出参：" + JSON.toJSONString(object2));
         List<ProductCouponDto> datas2 = object2.getResultObject().getDatas();
         for (ProductCouponDto data : datas2) {
-            couponRelService.delCouponProdAttr(data.getMktResAttrId(), staffId);
+            CpcResultObject<String> object = couponRelService.delCouponProdAttr(data.getMktResAttrId(), staffId);
+            logger.info("【删除宽带券和产品属性关联】--->>> 出参："+ data.getMktResAttrId()+":"+ JSON.toJSONString(object));
         }
         //4.10 新增宽带券和产品属性依赖
         List<String> productItemList = ChannelUtil.StringToList(mktCamResource.getDependProductId());
@@ -96,7 +102,9 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
             for (MktProductAttr attr : productAttrs) {
                 MktCamItem item = mktCamItemMapper.selectByPrimaryKey(attr.getProductId());
                 if (item!=null){
-                    couponRelService.addCouponProdAttr(item.getOfferCode(),mktCamResource.getResourceId(),staffId,attr.getAttrId());
+                    CpcResultObject<String> object = couponRelService.addCouponProdAttr(item.getOfferCode()
+                            , mktCamResource.getResourceId(), staffId, attr.getAttrId());
+                    logger.info("【新增宽带券和产品属性依赖】--->>> 出参："+ item.getOfferCode()+":"+ JSON.toJSONString(object));
                 }
             }
         }
@@ -112,13 +120,15 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
      */
     @Override
     public Map<String, Object> autoCreateCouponInst(Long resourceId,Long num) {
+        Map<String,Object> result = new HashMap<>();
         Long staffId = UserUtil.getUser().getStaffId();
         ImportCouponInstReq param = new ImportCouponInstReq();
         param.setStaffId(staffId);
         param.setMktResId(resourceId);
         param.setQuantity(num);
-        instImportDubboService.autoCreateCouponInst(param);
-        return null;
+        MktResResultObject<Boolean> booleanMktResResultObject = instImportDubboService.autoCreateCouponInst(param);
+        result.put("return",booleanMktResResultObject);
+        return result;
     }
 
     /**
