@@ -846,10 +846,77 @@ public class CampaignController extends BaseController {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
             result.put("resultMsg", "失败");
+            result.put("data",data);
             return  result;
         }
         result.put("resultCode", CODE_SUCCESS);
         result.put("resultMsg", "成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     *保存海报url到渠道属性表
+     */
+    @PostMapping(value = "/savePostUrl")
+    @CrossOrigin
+    public Map<String, Object> savePostToChanlAttr(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.savePostUrl(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "保存失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "保存成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     *上传海报背景图
+     */
+    @PostMapping(value = "/savePostBackgroundUrl")
+    @CrossOrigin
+    public Map<String, Object> savePostBackgroundUrl(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "保存失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "保存成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     * 海报背景图分页查询
+     */
+    @PostMapping(value = "/getPostgroundPathPage")
+    @CrossOrigin
+    public Map<String, Object> getPostgroundPathPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "获取失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "获取成功");
         result.put("data",data);
         return result;
     }

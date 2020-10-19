@@ -138,7 +138,7 @@ public class BlackListController extends BaseController {
         return result;
     }
 
-    /*模糊查询*/
+    /*分页查询*/
     @PostMapping("/getBlackListByKey")
     @CrossOrigin
     public  Map<String,Object> getBlackListPageByKey(@RequestBody Map<String,Object> pageParams){

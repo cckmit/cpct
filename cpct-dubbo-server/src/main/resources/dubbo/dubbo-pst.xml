@@ -192,4 +192,13 @@
                    version="1.0">
         <dubbo:method name="deleteBlackList" servicecode="00.1083.deleteBlackList" timeout="10000"/>
     </dubbo:service>
+
+    <!--海报二维码查询保存接口-->
+    <dubbo:service interface="com.zjtelcom.cpct.dubbo.service.MktCamResourceQRCodeService" ref="mktCamResourceQRCodeImpl"
+                   version="1.0">
+        <dubbo:method name="generatePoster" servicecode="00.1083.generatePoster" timeout="10000"/>
+        <dubbo:method name="savePostUrl" servicecode="00.1083.savePostUrl" timeout="10000"/>
+        <dubbo:method name="savePostBackgroundUrl" servicecode="00.1083.savePostBackgroundUrl" timeout="10000"/>
+        <dubbo:method name="getPostgroundPathPage" servicecode="00.1083.getPostgroundPathPage" timeout="10000"/>
+    </dubbo:service>
 </beans>

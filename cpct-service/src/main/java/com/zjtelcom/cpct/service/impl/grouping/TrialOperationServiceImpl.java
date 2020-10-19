@@ -887,6 +887,13 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
             }
             String[] nameList = dataVO.getContentList().get(0).split("\\|@\\|");
             String[] codeList = dataVO.getContentList().get(1).split("\\|@\\|");
+
+            logger.info("codeList: " + codeList.length);
+            for (String s: codeList){
+                System.out.println(s);//日志
+            }
+            logger.info("nameList: " + nameList.length);
+
             if (nameList.length != codeList.length) {
                 result.put("resultCode", CODE_FAIL);
                 result.put("resultMsg", "标签中文名个数与英文个数不匹配请重新检查文件");
@@ -1062,8 +1069,12 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                         if (Arrays.asList(nameList).contains("接单人号码") && Arrays.asList(codeList).contains("SALE_EMP_NBR")) {
                             flag2 = true;
                         }
+                        logger.info("dataVO.contentList.size()" + dataVO.contentList.size());
                         for (int j = 3; j < dataVO.contentList.size(); j++) {
                             List<String> data = Arrays.asList(dataVO.contentList.get(j).split("\\|@\\|"));
+                            for(String s : data){
+                                System.out.println("s" + s);
+                            }
                             Object[] objects = data.toArray();
                             if (flag) {
                                 if (flag2 && (this.getIndex() >= data.size() ? true:(data.get(this.getIndex()) == null || data.get(this.getIndex()).equals("")))) {
@@ -1089,6 +1100,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                             Map<String, Object> customers = new HashMap<>();
                             boolean check = true;
                             for (int x = 0; x < codeList.length; x++) {
+                                logger.info("codeList[x]: " + codeList[x]);
                                 if (codeList[x] == null) {
                                     break;
                                 }
@@ -1154,21 +1166,21 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                                     logger.info("c4: " + c4);
                                     logger.info("lanId: " + lanId);
                                     logger.info("addr: " + addr);
-                                    String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);
+                                    String wgbm = getWgbmByLanId(lanId.toString(),c4,addr);//地址获取网格编码
                                     logger.info("wgbm: " + wgbm);
                                     if(wgbm == null || wgbm.equals("")){
                                         customMap.put("SALE_EMP_NBR ",staffid);
                                         customMap.put("CLUSTER_NAME",orgName);
                                         continue;
                                     }
-                                    String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm);
+                                    String orgpath = trialOperationMapper.selectOrgpathPathByWgbm(wgbm); //网格编码获取组织路径
                                     logger.info("orgpath: " + orgpath);
                                     if (orgpath!=null){
                                         String [] orgpathToUse = orgpath.split("-");
                                         if (orgpathToUse.length>2){
-                                            Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgpathToUse[orgpathToUse.length-1]));
+                                            Organization organization = organizationMapper.selectByPrimaryKey(Long.valueOf(orgpathToUse[orgpathToUse.length-1]));//取最后一个组织
                                             orgName = organization.getOrgName();
-                                            staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);
+                                            staffid = trialOperationMapper.selectStaffByOrgpath(orgpathToUse);//获取审核人
                                             logger.info("orgName: " + orgName + "staffid: " + staffid);
                                         }
                                     }

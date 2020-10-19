@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface MktCamResourceQRCodeMapper {
-    MktCamResource selectRecordByRuleId(Long ruleId);
-    boolean updateQRUrlbyMktResourceId(@Param("qrUrl") String qrUrl,@Param("mktCamResourceId") Long mktCamResourceId);
+    MktCamResource selectRecordByRuleId(@Param("mktCamResourceId") Long mktCamResourceId);
+    void updateQRUrlbyMktResourceId(@Param("qrUrl") String qrUrl,@Param("mktCamResourceId") Long mktCamResourceId);
+    void updatePostUrlbyMktResourceId(@Param("postUrl") String postUrl,@Param("mktCamResourceId") Long mktCamResourceId);
 
 }

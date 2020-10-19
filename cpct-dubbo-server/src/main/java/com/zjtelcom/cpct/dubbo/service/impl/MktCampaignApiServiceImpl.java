@@ -279,13 +279,17 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         logger.info("需求函类型获取审批员工：" + mktCamId);
         try {
             MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId);
-            logger.info("需求函类型获取审批员工：" + mktRequestDO);
-            dataMap.put("requestId",mktRequestDO.getRequestId());
-            dataMap.put("requestType",mktRequestDO.getRequestType());
-            dataMap.put("nodeId",mktRequestDO.getNodeId());
-            dataMap.put("catelogId",mktRequestDO.getCatelogId());
-            dataMap.put("lanId",mktRequestDO.getLanId());
-            dataMap.put("staff",mktRequestDO.getStaff());
+            //12是外场营销目录
+            if(mktRequestDO.getCatelogId() == 12){
+                logger.info("需求函类型获取审批员工：" + mktRequestDO);
+                dataMap.put("requestId",mktRequestDO.getRequestId());
+                dataMap.put("requestType",mktRequestDO.getRequestType());
+                dataMap.put("nodeId",mktRequestDO.getNodeId());
+                dataMap.put("catelogId",mktRequestDO.getCatelogId());
+                dataMap.put("lanId",mktRequestDO.getLanId());
+                dataMap.put("staff",mktRequestDO.getStaff());
+            }
+
         }catch ( Exception e){
             e.printStackTrace();
             resultMap.put("resultCode",CODE_FAIL);
