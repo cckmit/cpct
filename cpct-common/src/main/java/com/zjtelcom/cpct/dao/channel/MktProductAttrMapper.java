@@ -22,4 +22,5 @@ public interface MktProductAttrMapper {
     int updateByPrimaryKey(MktProductAttr record);
 
     List<MktProductAttr> selectByProduct(MktProductAttr record);
+
 }

@@ -177,7 +177,11 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     @Override
     public Map<String, Object> editMktProductAttr(MktProductAttr mktProductAttr) {
         Map<String,Object> result = new HashMap<>();
-        mktProductAttrMapper.updateByPrimaryKey(mktProductAttr);
+        MktProductAttr attr = mktProductAttrMapper.selectByPrimaryKey(mktProductAttr.getMktProductAttrId());
+        if (attr!=null){
+            attr.setAttrValue(mktProductAttr.getAttrValue());
+            mktProductAttrMapper.updateByPrimaryKey(attr);
+        }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg","更新成功");
         return result;
@@ -189,12 +193,20 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         Long productId = MapUtil.getLongNum(param.get("productId"));
         Long ruleId = MapUtil.getLongNum(param.get("ruleId"));
         String frameFlg = MapUtil.getString(param.get("frameFlg"));
-        List<MktProductAttr> productAttrs = (List<MktProductAttr>) param.get("list");
-        for (MktProductAttr productAttr : productAttrs) {
+
+        List<Map<String,Object>>mapList = (List<Map<String,Object>>) param.get("list");
+        List<MktProductAttr> productAttrs = new ArrayList<>();
+        for (Map<String,Object> map  : mapList) {
+            MktProductAttr productAttr = ChannelUtil.mapToEntity(map, MktProductAttr.class);
+            productAttr.setAttrId(MapUtil.getLongNum(map.get("prodAttrId")));
             productAttr.setProductId(productId);
             productAttr.setRuleId(ruleId);
             productAttr.setFrameFlg(frameFlg);
+            productAttr.setCreateDate(new Date());
+            productAttr.setUpdateDate(new Date());
+            productAttr.setStatusCd("1000");
             mktProductAttrMapper.insert(productAttr);
+            productAttrs.add(productAttr);
         }
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",productAttrs);
@@ -403,7 +415,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
 
         //销售品
         if (CamItemType.OFFER.getValue().equals(param.getItemType())|| CamItemType.PACKAGE.getValue().equals(param.getItemType())
-                || param.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
+                || param.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())
+                ||  param.getItemType().equals(CamItemType.DIFFERENT_OFFER.getValue())){
             for (Long productId : param.getIdList()){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(productId.toString()));
                 if (product==null){
@@ -536,7 +549,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             }
             //销售品
             if (CamItemType.OFFER.getValue().equals(item.getItemType())|| CamItemType.PACKAGE.getValue().equals(item.getItemType())
-                    || item.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())){
+                    || item.getItemType().equals(CamItemType.DEPEND_OFFER.getValue())
+                    ||  item.getItemType().equals(CamItemType.DIFFERENT_OFFER.getValue())){
                 Offer product = offerProdMapper.selectByPrimaryKey(Integer.valueOf(item.getItemId().toString()));
                 if (product==null){
                     continue;

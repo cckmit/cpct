@@ -98,9 +98,10 @@
     from product where PROD_NBR = #{code}
   </select>
 
-  <select id="listAttrValue" resultMap="Map">
-    select ATTR_VALUE_ID as attrValueId ,ATTR_VALUE_NAME as valueName
-    from attr_value where ATTR_VALUE_ID = #{attrId}
+  <select id="listAttrValue" resultType="Map">
+    select c1.ATTR_VALUE_ID as attrValueId ,c1.ATTR_VALUE_NAME as valueName
+    from prod_attr_value c LEFT JOIN attr_value c1 on c.ATTR_VALUE_ID=c1.ATTR_VALUE_ID
+    where c.PROD_ATTR_ID = #{attrId}
   </select>
 
 
