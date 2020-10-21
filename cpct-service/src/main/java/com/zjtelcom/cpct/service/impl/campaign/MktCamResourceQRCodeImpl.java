@@ -10,19 +10,18 @@ import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.MktCamChlConfAttrMapper;
 import com.zjtelcom.cpct.dao.campaign.MktCamResourceQRCodeMapper;
+import com.zjtelcom.cpct.domain.campaign.PostBackgroundDO;
 import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.enums.ConfAttrEnum;
 import com.zjtelcom.cpct.service.campaign.MktCamResourceQRCodeService;
-import com.zjtelcom.cpct.util.DateUtil;
-import com.zjtelcom.cpct.util.FileUtil;
-import com.zjtelcom.cpct.util.FtpUtils;
-import com.zjtelcom.cpct.util.SftpUtils;
+import com.zjtelcom.cpct.util.*;
 import javafx.beans.binding.ObjectBinding;
 import net.sf.ehcache.transaction.xa.EhcacheXAException;
 import org.bouncycastle.asn1.cms.PasswordRecipientInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.codec.binary.Base64;
@@ -37,7 +36,7 @@ import java.util.*;
 @Service
 @Transactional
 public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
-    @Autowired
+    @Autowired(required = false)
     private QrCodeService qrCodeService;
     @Autowired
     private MktCamResourceQRCodeMapper mktCamResourceQRCodeMapper;
@@ -45,6 +44,28 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
     private MktCamChlConfAttrMapper mktCamChlConfAttrMapper;
     @Autowired
     private   ResponseVO responseVO;
+
+/*    @Value("${ftp.address}")
+    private String ftpAddress;
+    @Value("${ftp.prodaddress}")
+    private String targetFtpAddress;
+    @Value("${ftp.port}")
+    private int ftpPort;
+    @Value("${ftp.name}")
+    private String ftpName;
+    @Value("${ftp.password}")
+    private String ftpPassword;
+    @Value("${ftp.mscname}")
+    private String mscname;
+    @Value("${ftp.mscpassword}")
+    private String mscpassword;
+
+    @Value("${ftp.qrCodePath}")
+    private String qrCodePath;
+    @Value("${ftp.postUrlPath}")
+    private String postUrlPath;
+    @Value("${ftp.postBackgroundPath}")
+    private String postBackgroundPath;*/
 
     private static final Logger logger = LoggerFactory.getLogger(MktCamResourceQRCodeImpl.class);
 
@@ -87,8 +108,8 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
             qrUrl = this.getQRUrlByMktResourceId(requestId,h5Url,mktCamResourceId.toString());
             String pathName = "/app/cpcp_cxzx/qrcode"; //保存地址，本地暂存与ftp地址一致
             qrUrlToUse = base64SaveToFtp(qrUrl,pathName);
-            logger.info("二维码url保存地址" + qrUrlToUse);
-            //保存电子券综合表中
+            logger.info("二维码url保存地保存电子券综合表中址" + qrUrlToUse);
+            //
             mktCamResourceQRCodeMapper.updateQRUrlbyMktResourceId(qrUrlToUse,mktCamResourceId.longValue());
         }
         resultMap.put("resourceId",resourceId);
@@ -138,13 +159,18 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         List<String> files = sftpUtils.listFiles(pathName,sftp);
+        List<PostBackgroundDO> postList = new ArrayList<>();
+        for(String postPath: files){
+            PostBackgroundDO p = new PostBackgroundDO();
+            p.setPostUrlPath(postPath);
+            postList.add(p);
+        }
+        logger.info("postList" + postList);
         PageHelper.startPage(pageNum,pageSize,orderBy);
         resultMap.put("files",files);
-        resultMap.put("pageInfo",new Page(new PageInfo<>(files)));
+        resultMap.put("pageInfo",new Page(new PageInfo<>(postList)));
         return resultMap;
     }
-
-
 
     // 将base64的字符流转为图片保存到指定ftp路径
     public String  base64SaveToFtp(String base64Url,String pathName) throws Exception {
@@ -167,6 +193,7 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         sftpUtils.changeDir(pathName, sftp);
         FileInputStream fio = new FileInputStream(new File(pathName + File.separator + fileName));
         sftpUtils.uploadFile(pathName,fileName,fio,sftp);//上传到ftp
+        sftp.quit();
 
         return  pathName + "/"+  fileName;
     }

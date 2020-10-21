@@ -493,6 +493,7 @@ public class CampaignController extends BaseController {
         try {
             map = mktCampaignService.getMktCampaign(mktCampaignId);
         } catch (Exception e) {
+            e.printStackTrace();
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "查询活动失败");
         }
@@ -920,6 +921,26 @@ public class CampaignController extends BaseController {
         result.put("data",data);
         return result;
     }
-
+    /*
+     * 根据需求函类型获取审批人
+     */
+    @PostMapping(value = "/getStaffByMktRequest")
+    @CrossOrigin
+    public Map<String, Object> getStaffByMktRequest(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCampaignService.getStaffByMktRequest(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "获取失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "获取成功");
+        result.put("data",data);
+        return result;
+    }
 
 }

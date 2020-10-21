@@ -205,7 +205,7 @@
 
     <!--4.6	查询电子券关联销售品-->
     <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.cpc.query.service.api.ICouponApplyObjectService" id="iCouponApplyObjectService" version="1.0" check="false">
-        <dubbo:method name="qryCouponApplyObjectList" servicecode="00.1076.qryCouponApplyObjectList"/>
+        <dubbo:method name="qryCouponApplyObjectList" servicecode="00.1076.qryCouponApplyObjectListForMkt"/>
     </dubbo:reference>
 
     <!--4.7	4.7	按指定数量自动生成电子券实例-->

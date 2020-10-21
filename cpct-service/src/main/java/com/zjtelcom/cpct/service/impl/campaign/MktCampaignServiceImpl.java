@@ -529,7 +529,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
     private final static String CITY_PUBLISH = "CITY_PUBLISH";
     // 集团活动指定承接人
     private final static String GROUP_CAMPAIGN_RECIPIENT = "GROUP_CAMPAIGN_RECIPIENT";
-
+    @Autowired
+    private MktRequestMapper  mktRequestMapper;
     /**
      * 校验协同渠道时间是否在活动时间范围之内
      *
@@ -710,31 +711,31 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 mktCampaignDO.setCreateChannel(PostEnum.ADMIN.getPostCode());
             }
 
-            // 判断是否有创建人信息和岗位信息
-            if (mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "创建人信息和岗位信息都为空，请核实工号已选中的岗位权限");
-                logger.info("创建人信息和岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
-                return maps;
-            }
-            if (mktCampaignDO.getCreateChannel() == null) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "岗位信息都为空，请核实工号已选中的岗位权限");
-                logger.info("岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
-                return maps;
-            }
-            if (mktCampaignDO.getCreateStaff() == 1) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "创建人信息为空，请核实工号已选中的岗位权限");
-                logger.info("创建人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
-                return maps;
-            }
-            if (mktCampaignDO.getUpdateStaff() == 1) {
-                maps.put("resultCode", CommonConstant.CODE_FAIL);
-                maps.put("resultMsg", "更新人信息为空，请核实工号已选中的岗位权限");
-                logger.info("更新人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
-                return maps;
-            }
+//            // 判断是否有创建人信息和岗位信息
+//            if (mktCampaignDO.getCreateChannel() == null && mktCampaignDO.getCreateStaff() == 1) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "创建人信息和岗位信息都为空，请核实工号已选中的岗位权限");
+//                logger.info("创建人信息和岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+//                return maps;
+//            }
+//            if (mktCampaignDO.getCreateChannel() == null) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "岗位信息都为空，请核实工号已选中的岗位权限");
+//                logger.info("岗位信息都为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+//                return maps;
+//            }
+//            if (mktCampaignDO.getCreateStaff() == 1) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "创建人信息为空，请核实工号已选中的岗位权限");
+//                logger.info("创建人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+//                return maps;
+//            }
+//            if (mktCampaignDO.getUpdateStaff() == 1) {
+//                maps.put("resultCode", CommonConstant.CODE_FAIL);
+//                maps.put("resultMsg", "更新人信息为空，请核实工号已选中的岗位权限");
+//                logger.info("更新人信息为空，请核实工号已选中的岗位权限" + JSON.toJSONString(mktCampaignDO));
+//                return maps;
+//            }
 
             mktCampaignDO.setServiceType(StatusCode.CUST_TYPE.getStatusCode()); // 1000 - 客账户类
             mktCampaignDO.setLanId(AreaCodeEnum.getLandIdByRegionId(mktCampaignDO.getRegionId()));
@@ -747,7 +748,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             logger.info("C5: ===" + (Long) landFourAndFiveMap.get("C5"));
 
 
-//             保存活动活动名称默认拼上地市信息
+//          保存活动活动名称默认拼上地市信息
             String c3Name = "";
             String c4Name = "";
             if (mktCampaignDO.getLanIdFour() != null) {
@@ -977,13 +978,14 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             ObjLabelRelCreate(mktCampaignDO);
 
             //活动级别创建电子券模板信息
-            MktCamResource mktCamResource = new MktCamResource();
+            MktCamResource mktCamResource = mktCampaignVO.getMktCamResource();
             mktCamResource.setFrameFlg(FrameFlgEnum.YES.getValue()); // 是否电子券框架类型, yes-是，no-不是
             mktCamResource.setMktCampaignId(mktCampaignId);
             mktCamResource.setCreateStaff(UserUtil.loginId());
             mktCamResource.setCreateDate(new Date());
             mktCamResource.setUpdateStaff(UserUtil.loginId());
             mktCamResource.setUpdateDate(new Date());
+            mktCamResource.setStatusCd("1000");
             mktCamResourceMapper.insert(mktCamResource);
 
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
@@ -1535,7 +1537,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             mktStrategyConfDetailList.add(mktStrategyConfDetail);
         }
         mktCampaignVO.setMktStrategyConfDetailList(mktStrategyConfDetailList);
-        List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.YES.getValue());
+        List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.YES.getValue(),null);
         if (mktCamResourceList != null && mktCamResourceList.size()>0) {
             mktCampaignVO.setMktCamResource(mktCamResourceList.get(0));
         }
@@ -4120,6 +4122,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 }
             }
         }
+//        resutlMap.put("C4", Long.valueOf("57001"));
+//        resutlMap.put("C5", Long.valueOf("800000002004"));
         return resutlMap;
     }
 
@@ -4397,5 +4401,59 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             return resultMap;
         }
     }
+    @Override
+    public Map<String, Object> getStaffByMktRequest(Map<String, Object> paramMap) {
+
+        Map<String,Object> resultMap  = new HashMap<>();
+        String requestType =(String) paramMap.get("requestType");
+        String nodeId = (String)paramMap.get("nodeId");
+        Integer mktCamId = (Integer)paramMap.get("mktCamId");
+        Map<String,Object> dataMap  = new HashMap<>();
+        logger.info("需求函类型获取审批员工：" + requestType);
+        logger.info("需求函类型获取审批员工：" + nodeId);
+        logger.info("需求函类型获取审批员工：" + mktCamId);
+        try {
+
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamId.longValue());
+            logger.info(mktCampaignDO.getDirectoryId() + "需求函类型获取审批员工");
+            logger.info(mktCampaignDO.getLanId() + "需求函类型获取审批员工");
+            //12是外场营销目录
+            if(mktCampaignDO.getDirectoryId() == 12 && mktCampaignDO.getLanId() == 571){
+                MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId.longValue());
+                logger.info("需求函类型获取审批员工：" + mktRequestDO);
+                dataMap.put("requestId",mktRequestDO.getRequestId());
+                dataMap.put("requestType",mktRequestDO.getRequestType());
+                dataMap.put("nodeId",mktRequestDO.getNodeId());
+                dataMap.put("catelogId",mktRequestDO.getCatelogId());
+                dataMap.put("lanId",mktRequestDO.getLanId());
+                String staffjson  = mktRequestDO.getStaff();
+                JSONArray objects  = JSONObject.parseArray(staffjson);
+                List<StaffDO> staffList = new ArrayList();
+                for(int i=0; i<objects.size(); i++){
+                    //通过数组下标取到object，使用强转转为JSONObject，之后进行操作
+                    JSONObject object = (JSONObject) objects.get(i);
+                    String name = object.getString("name");
+                    String staffId = object.getString("staffid");
+                    logger.info(name + "需求函类型获取审批员工" + staffId);
+                    StaffDO staffDO = new StaffDO();
+                    staffDO.setName(name);
+                    staffDO.setStaffid(staffId);
+                    staffList.add(staffDO);
+                }
+                dataMap.put("staff",staffList);
+            }
+
+        }catch ( Exception e){
+            e.printStackTrace();
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMessage","消息返回异常");
+            return resultMap;
+        }
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMessage","消息返回成功");
+        resultMap.put("data",dataMap);
+        return resultMap;
+    }
+
 
 }

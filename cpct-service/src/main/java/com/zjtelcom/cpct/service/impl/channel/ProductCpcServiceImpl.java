@@ -31,6 +31,7 @@ import com.zjtelcom.cpct.dto.channel.OfferDetail;
 import com.zjtelcom.cpct.dto.channel.ProductParam;
 import com.zjtelcom.cpct.enums.*;
 import com.zjtelcom.cpct.service.BaseService;
+import com.zjtelcom.cpct.service.channel.CamElectronService;
 import com.zjtelcom.cpct.service.channel.ProductService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
 import com.zjtelcom.cpct.util.*;
@@ -93,28 +94,32 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private MktCamResourceMapper mktCamResourceMapper;
     @Autowired
     private SysParamsMapper sysParamsMapper;
-
+    @Autowired
+    private CamElectronService camElectronService;
 
 
     @Override
-    public Map<String, Object> copyMktCamResource(Long oldResourceId, Long newResourceId, Long ruleId) {
-
-
+    public Map<String, Object> copyMktCamResource4Cam(Long oldCampaignId, Long newCampaignId) {
         return null;
     }
 
     @Override
-    public Map<String, Object> copyMktProductAttr(Long oldProductId, Long newProductId, Long ruleId) {
+    public Map<String, Object> copyMktCamResource4Rule(Long oldRuleId, Long newRuleId) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> copyMktProductAttr4Cam(Long oldProductItemId, Long newProductItemId) {
         Map<String,Object> result = new HashMap<>();
         MktProductAttr  mktProductAttr = new MktProductAttr();
-        mktProductAttr.setProductId(oldProductId);
+        mktProductAttr.setProductId(oldProductItemId);
+        mktProductAttr.setFrameFlg(FrameFlgEnum.YES.getValue());
         List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
         if (!productAttrs.isEmpty()){
             for (MktProductAttr oldAttr : productAttrs) {
                 MktProductAttr newAttr = BeanUtil.create(oldAttr, new MktProductAttr());
                 newAttr.setMktProductAttrId(null);
-                newAttr.setProductId(newProductId);
-                newAttr.setRuleId(ruleId);
+                newAttr.setProductId(newProductItemId);
                 mktProductAttrMapper.insert(newAttr);
             }
         }
@@ -122,6 +127,29 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         result.put("resultMsg",productAttrs);
         return result;
     }
+
+    @Override
+    public Map<String, Object> copyMktProductAttr4Rule(Long oldProductItemId, Long newProductItemId, Long oldRuleId, Long newRuleId) {
+        Map<String,Object> result = new HashMap<>();
+        MktProductAttr  mktProductAttr = new MktProductAttr();
+        mktProductAttr.setProductId(oldProductItemId);
+        mktProductAttr.setFrameFlg(FrameFlgEnum.NO.getValue());
+        mktProductAttr.setRuleId(oldRuleId);
+        List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+        if (!productAttrs.isEmpty()){
+            for (MktProductAttr oldAttr : productAttrs) {
+                MktProductAttr newAttr = BeanUtil.create(oldAttr, new MktProductAttr());
+                newAttr.setMktProductAttrId(null);
+                newAttr.setProductId(newProductItemId);
+                newAttr.setRuleId(newRuleId);
+                mktProductAttrMapper.insert(newAttr);
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",productAttrs);
+        return result;
+    }
+
 
 
     @Override
@@ -397,6 +425,9 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             newItem.setMktCamItemId(null);
             newItem.setMktCampaignId(newCampaignId);
             camItemMapper.insert(newItem);
+            if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
+                copyMktProductAttr4Cam(item.getItemId(),newItem.getItemId());
+            }
             itemMap.put(item.getMktCamItemId(), newItem.getMktCamItemId());
             idList.add(newItem.getMktCamItemId());
         }
@@ -756,7 +787,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         Map<String, Object> resultMap = new HashMap<>();
         try {
             //查询
-            List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue());
+            List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue(),null);
             for (MktCamResource mktCamResource : mktCamResourceList) {
                 Long mktResId = mktCamResource.getResourceId();
                 MktResCouponDto mktResCouponDto = new MktResCouponDto();
@@ -937,6 +968,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                     CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
                     logger.info("13--->>> 出参（ADD）" + JSON.toJSONString(booleanCpcResultObject));
                 }
+
+                Map<String, Object> map = camElectronService.publish4Mktcamresource(mktCamResource);
             }
 
             resultMap.put("resultCode", CommonConstant.CODE_SUCCESS);

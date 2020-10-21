@@ -43,11 +43,11 @@ public class SysAreaServiceImpl implements SysAreaService {
     private RedisUtils redisUtils;
 
     @Override
-    public Map<String, Object> listAreaByCityList(List<String> parentList) {
+    public Map<String, Object> listAreaByCityList(List<Integer> parentList) {
         Map<String, Object> map = new HashMap<>();
         List<SysArea> childList = new ArrayList<>();
-        for (String parent : parentList) {
-            List<SysArea> sysAreaList = sysAreaMapper.selectByParnetArea(Integer.valueOf(parent));
+        for (Integer parent : parentList) {
+            List<SysArea> sysAreaList = sysAreaMapper.selectByParnetArea(parent);
             childList.addAll(sysAreaList);
         }
         map.put("resultCode", CommonConstant.CODE_SUCCESS);

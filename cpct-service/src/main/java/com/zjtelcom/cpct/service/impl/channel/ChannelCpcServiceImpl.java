@@ -2,6 +2,7 @@ package com.zjtelcom.cpct.service.impl.channel;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ctzj.smt.bss.cpc.model.daoObject.ChannelDo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zjpii.biz.service.uam.SyncService;
@@ -512,11 +513,22 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
     @Override
-    public  List<String> getChannelByChannelName(Long regionId, String channelName) {
+    public  List<Channel> getChannelByChannelName(String channelParam) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<String> channelList = channelMapper.getChannelInfoByRegionId(regionId,channelName);
+        List<Channel> channelNbrList = channelMapper.getChannelbyChannelNbr(channelParam);
+        List<Channel> channelNameList = channelMapper.getChannelbyChannelName(channelParam);
+        if(channelNbrList.size() > 0){
+            return channelNbrList;
+        }else {
+            return channelNameList;
+        }
 
-        return channelList;
+    }
+
+    @Override
+    public List<Channel> getAllChannelById(List<Integer> channelId) {
+        List<Channel> channelNbrList = channelMapper.getAllChannelById(channelId);
+        return channelNbrList;
     }
 
 }

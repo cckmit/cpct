@@ -13,15 +13,28 @@ import com.ctzj.smt.bss.mktcenter.coupon.service.api.IMktResBatchRecDubboService
 import com.ctzj.smt.bss.mktcenter.model.common.MktResResultObject;
 import com.ctzj.smt.bss.mktcenter.model.dto.ImportCouponInstReq;
 import com.ctzj.smt.bss.mktcenter.model.dto.MktResCouponReq;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.dao.campaign.MktCamItemMapper;
+import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.channel.MktCamResourceMapper;
 import com.zjtelcom.cpct.dao.channel.MktProductAttrMapper;
+import com.zjtelcom.cpct.dao.system.SysAreaMapper;
+import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamItem;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.domain.channel.MktProductAttr;
+import com.zjtelcom.cpct.dto.channel.MktCamResourceVO;
+import com.zjtelcom.cpct.enums.ResourceTypeEnum;
+import com.zjtelcom.cpct.enums.StatusCode;
+import com.zjtelcom.cpct.enums.SubTypeEnum;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.channel.CamElectronService;
+import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.ChannelUtil;
+import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
 @Service
 public class CamElectronServiceImpl extends BaseService implements CamElectronService {
@@ -48,12 +63,66 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
     private MktProductAttrMapper mktProductAttrMapper;
     @Autowired
     private MktCamItemMapper mktCamItemMapper;
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+    @Autowired
+    private SysAreaMapper sysAreaMapper;
+
+    @Override
+    public Map<String, Object> listCampaign4Resource(MktCamResourceVO camResource) {
+        Map<String,Object> result = new HashMap<>();
+        MktCamResource mktCamResource = BeanUtil.create(camResource, new MktCamResource());
+        //框架6400 自主6100
+        mktCamResource.setFrameFlg(mktCamResource.getFrameFlg().equals("1") ? "(6100)" : "(6300，6400)");
+        List<MktCamResource> list = mktCamResourceMapper.listPage(mktCamResource);
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",list);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> listCampaignPage4Resource(MktCamResourceVO camResource) {
+        Map<String,Object> result = new HashMap<>();
+        PageHelper.startPage(camResource.getPage(),camResource.getPageSize());
+        MktCamResource mktCamResource = BeanUtil.create(camResource, new MktCamResource());
+        //框架6400 自主6100
+        mktCamResource.setFrameFlg(mktCamResource.getFrameFlg().equals("1") ? "(6100)" : "(6300,6400)");
+        List<MktCamResource> list = mktCamResourceMapper.listPage(mktCamResource);
+        Page pageInfo = new Page(new PageInfo(list));
+        List<MktCamResourceVO> resourceVOS = new ArrayList<>();
+        for (MktCamResource resource : list) {
+            MktCamResourceVO mktCamResourceVO = BeanUtil.create(resource, new MktCamResourceVO());
+            String typeName = ResourceTypeEnum.getNameByCode(resource.getResourceType());
+            String subType = SubTypeEnum.getNameByCode(resource.getResourceSubtype());
+            mktCamResourceVO.setTypeString(typeName+"-"+subType);
+            List<String> idList = ChannelUtil.StringToList(resource.getUseArea());
+           List<String> list1 = new ArrayList<>();
+            for (String aLong : idList) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(aLong));
+                list1.add(sysArea.getName());
+            }
+            MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(resource.getMktCampaignId());
+            if (campaignDO!=null ){
+                mktCamResourceVO.setMktCampaignNbr(campaignDO.getMktActivityNbr());
+                mktCamResourceVO.setStaffName(campaignDO.getCreateStaff().toString());
+            }
+            mktCamResourceVO.setUseAreaInfo(ChannelUtil.list2String(list1,","));
+            mktCamResourceVO.setStatusCd(StatusCode.getMsgByCode(resource.getStatusCd()));
+            mktCamResourceVO.setGetStartTime(DateUtil.date2StringDate(resource.getGetEndTime()));
+            mktCamResourceVO.setGetEndTime(DateUtil.date2StringDate(resource.getGetEndTime()));
+            resourceVOS.add(mktCamResourceVO);
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg",resourceVOS);
+        result.put("page",pageInfo);
+        return result;
+    }
 
 
     @Override
     public Map<String, Object> publish4Mktcamresource( MktCamResource mktCamResource) {
         Map<String,Object> result = new HashMap<>();
-        Long staffId = UserUtil.getUser().getStaffId();
+        Long staffId = UserUtil.getStaffId();
         //4.7	按指定数量自动生成电子券实例
         logger.info("【按指定数量自动生成电子券实例】--->>> 入参：" + JSON.toJSONString(mktCamResource.getResourceId()));
         Map<String, Object> map = autoCreateCouponInst(mktCamResource.getResourceId(), mktCamResource.getResourceApplyNum());
@@ -121,7 +190,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
     @Override
     public Map<String, Object> autoCreateCouponInst(Long resourceId,Long num) {
         Map<String,Object> result = new HashMap<>();
-        Long staffId = UserUtil.getUser().getStaffId();
+        Long staffId = UserUtil.getStaffId();
         ImportCouponInstReq param = new ImportCouponInstReq();
         param.setStaffId(staffId);
         param.setMktResId(resourceId);
@@ -139,7 +208,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
      */
     @Override
     public Map<String, Object> editCouponStatusCd(List<Long> resourceIdList,String type) {
-        Long staffId = UserUtil.getUser().getStaffId();
+        Long staffId = UserUtil.getStaffId();
         MktResCouponReq param = new MktResCouponReq();
         param.setStaffId(staffId);
         param.setMktResIds(resourceIdList);
@@ -176,7 +245,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
 
     @Override
     public Map<String, Object> qryChannelByOrgRelForMkt(Long resourceId) {
-        Long staffId = UserUtil.getUser().getStaffId();
+        Long staffId = UserUtil.getStaffId();
         CpcResultObject<CpcPage<ChannelCouponDto>> cpcPageCpcResultObject = orgRelInfoService.qryChannelByOrgRel(resourceId, 1, 1000);
         CpcPage<ChannelCouponDto> resultObject = cpcPageCpcResultObject.getResultObject();
         List<ChannelCouponDto> datas = resultObject.getDatas();
@@ -188,7 +257,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
 
     @Override
     public Map<String, Object> qrySelectProdByCouponForMkt(Long resourceId) {
-        Long staffId = UserUtil.getUser().getStaffId();
+        Long staffId = UserUtil.getStaffId();
         CpcResultObject<CpcPage<ProductCouponDto>> cpcPageCpcResultObject = orgRelInfoService.qrySelectProdByCoupon(resourceId, 1, 1000);
         List<ProductCouponDto> datas = cpcPageCpcResultObject.getResultObject().getDatas();
         for (ProductCouponDto data : datas) {

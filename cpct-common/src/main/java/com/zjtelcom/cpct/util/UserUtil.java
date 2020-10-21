@@ -41,14 +41,32 @@ public class UserUtil {
      * @return
      */
     public static SystemUserDto getUser(){
-        SystemUserDto userDetail = new SystemUserDto();
+        SystemUserDto userDetail = null;
         try {
              userDetail = BssSessionHelp.getCpctSystemUserDto();
         }catch (Exception e){
             e.printStackTrace();
-            return userDetail;
+            return null;
         }
         return userDetail;
+    }
+
+    /**
+     * 获取用户全量信息
+     * @return
+     */
+    public static Long getStaffId(){
+     Long staffId = 0L;
+        try {
+           SystemUserDto userDetail = BssSessionHelp.getCpctSystemUserDto();
+            if (userDetail!=null){
+                staffId =  userDetail.getStaffId();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return staffId;
+        }
+        return staffId;
     }
 
     /**

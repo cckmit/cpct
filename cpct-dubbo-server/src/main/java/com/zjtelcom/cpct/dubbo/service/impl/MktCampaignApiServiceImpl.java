@@ -1,5 +1,8 @@
 package com.zjtelcom.cpct.dubbo.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.*;
 import com.zjtelcom.cpct.dao.filter.FilterRuleMapper;
@@ -29,6 +32,7 @@ import com.zjtelcom.cpct.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.JsonbHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -272,22 +276,38 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         Map<String,Object> resultMap  = new HashMap<>();
         String requestType =(String) paramMap.get("requestType");
         String nodeId = (String)paramMap.get("nodeId");
-        Long mktCamId = (Long)paramMap.get("mktCamId");
+        Integer mktCamId = (Integer)paramMap.get("mktCamId");
         Map<String,Object> dataMap  = new HashMap<>();
         logger.info("需求函类型获取审批员工：" + requestType);
         logger.info("需求函类型获取审批员工：" + nodeId);
         logger.info("需求函类型获取审批员工：" + mktCamId);
         try {
-            MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId);
+
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamId.longValue());
             //12是外场营销目录
-            if(mktRequestDO.getCatelogId() == 12){
+            if(mktCampaignDO.getDirectoryId() == 12 && mktCampaignDO.getLanId() == 571){
+                MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId.longValue());
                 logger.info("需求函类型获取审批员工：" + mktRequestDO);
                 dataMap.put("requestId",mktRequestDO.getRequestId());
                 dataMap.put("requestType",mktRequestDO.getRequestType());
                 dataMap.put("nodeId",mktRequestDO.getNodeId());
                 dataMap.put("catelogId",mktRequestDO.getCatelogId());
                 dataMap.put("lanId",mktRequestDO.getLanId());
-                dataMap.put("staff",mktRequestDO.getStaff());
+                String staffjson  = mktRequestDO.getStaff();
+                JSONArray objects  = JSONObject.parseArray(staffjson);
+                List<StaffDO> staffList = new ArrayList();
+                for(int i=0; i<objects.size(); i++){
+                    //通过数组下标取到object，使用强转转为JSONObject，之后进行操作
+                    JSONObject object = (JSONObject) objects.get(i);
+                    String name = object.getString("name");
+                    String staffId = object.getString("staffid");
+                    logger.info(name + "需求函类型获取审批员工" + staffId);
+                    StaffDO staffDO = new StaffDO();
+                    staffDO.setName(name);
+                    staffDO.setStaffid(staffId);
+                    staffList.add(staffDO);
+                }
+                dataMap.put("staff",staffList);
             }
 
         }catch ( Exception e){

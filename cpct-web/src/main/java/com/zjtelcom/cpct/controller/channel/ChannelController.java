@@ -1,6 +1,7 @@
 package com.zjtelcom.cpct.controller.channel;
 
 import com.zjtelcom.cpct.controller.BaseController;
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 import com.zjtelcom.cpct.service.channel.ChannelService;
 import com.zjtelcom.cpct.util.UserUtil;
@@ -353,16 +354,39 @@ public class ChannelController extends BaseController {
     @CrossOrigin
     public Map<String,Object> getChannelByChannelName(@RequestBody Map<String,Object> param) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<String> channelNameList = new ArrayList<>();
+        List<Channel> channelNameList = new ArrayList<>();
         try {
-            Integer regionId =(Integer)(param.get("regionId"));
-            String channelName = (String)param.get("channelName");
-            channelNameList = channelService.getChannelByChannelName(regionId.longValue(),channelName);
+            String channelParam = (String)param.get("channelParam");
+            channelNameList = channelService.getChannelByChannelName(channelParam);
 
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getChannelByChannelName",e);
             resultMap.put("resultCode",CODE_FAIL);
             resultMap.put("resultMsg", "门店名称模糊查询失败");
+            return resultMap;
+        }
+        resultMap.put("resultCode",CODE_SUCCESS);
+        resultMap.put("resultMessage","消息返回成功");
+        resultMap.put("data",channelNameList);
+        return resultMap;
+    }
+
+    /**
+     * 门店 id获取名称
+     */
+    @PostMapping("getAllChannelById")
+    @CrossOrigin
+    public Map<String,Object> getAllChannelById(@RequestBody Map<String,Object> param) {
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Channel> channelNameList = new ArrayList<>();
+        try {
+            List<Integer> channelId = (List)param.get("channelId");
+            channelNameList = channelService.getAllChannelById(channelId);
+
+        } catch (Exception e) {
+            logger.error("[op:ChannelController] fail to getChannelByChannelName",e);
+            resultMap.put("resultCode",CODE_FAIL);
+            resultMap.put("resultMsg", "门店名称查询失败");
             return resultMap;
         }
         resultMap.put("resultCode",CODE_SUCCESS);
