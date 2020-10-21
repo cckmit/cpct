@@ -10,7 +10,6 @@ spring:
     url: jdbc:mysql://134.108.27.240:15001/smt_bss_cpc2?useUnicode=true&characterEncoding=UTF-8&useSSL=true
     username: cpc_user
     password: cpc_user_123
-
 # 第二数据源
   datasourceprd:
     driver-class-name: com.mysql.jdbc.Driver
@@ -85,3 +84,16 @@ ctg:
   # 服务包队列
   cpctSerpackageTopic: cpct_es_servicepackage_pst
   cpctSerpackageGroup: cpct_es_servicepackage_group_pst
+#ftp
+ftp:
+  address: 134.108.3.130
+  prodaddress: 134.108.0.93
+  port: 22
+  name: ftp
+  password: V1p9*2_9%3#
+  mscname: ftp
+  mscpassword: V1p9*2_9%3#
+
+  qrCodePath: /app/cpcp_cxzx/qrcode
+  postUrlPath: /app/cpcp_cxzx/post_url
+  postBackgroundPath: /app/cpcp_cxzx/post_background

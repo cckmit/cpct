@@ -52,7 +52,7 @@ public interface ProductService {
 
     Map<String, Object> copyMktCamResource4Cam(Long oldCampaignId,Long newCampaignId);
 
-    Map<String, Object> copyMktCamResource4Rule(Long oldRuleId,Long newRuleId);
+    Map<String, Object> copyMktCamResource4Rule(Long newCampaignId,Long oldRuleId,Long newRuleId);
 
     Map<String, Object> mktCamResourceService(Long mktCampaignId);
 

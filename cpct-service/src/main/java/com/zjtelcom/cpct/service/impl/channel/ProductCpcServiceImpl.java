@@ -96,16 +96,68 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     private SysParamsMapper sysParamsMapper;
     @Autowired
     private CamElectronService camElectronService;
+    @Autowired
+    private MktCamItemMapper mktCamItemMapper;
 
 
     @Override
     public Map<String, Object> copyMktCamResource4Cam(Long oldCampaignId, Long newCampaignId) {
-        return null;
+        Map<String,Object> result = new HashMap<>();
+        List<MktCamResource> mktCamResources = mktCamResourceMapper.selectByCampaignId(oldCampaignId, FrameFlgEnum.YES.getValue(), null);
+        if (!mktCamResources.isEmpty()){
+            MktCamResource old = mktCamResources.get(0);
+            old.setMktCamResourceId(null);
+            old.setMktCampaignId(newCampaignId);
+            List<Long> offerList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.OFFER.getValue());
+            old.setOfferId(ChannelUtil.idList2String(offerList));
+            List<Long> deppendOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_OFFER.getValue());
+            old.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
+            List<Long> deppendProductList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_PRODUCT.getValue());
+            old.setDependProductId(ChannelUtil.idList2String(deppendProductList));
+            List<Long> differentOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DIFFERENT_OFFER.getValue());
+            old.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
+            mktCamResourceMapper.insert(old);
+        }
+        return result;
     }
 
     @Override
-    public Map<String, Object> copyMktCamResource4Rule(Long oldRuleId, Long newRuleId) {
-        return null;
+    public Map<String, Object> copyMktCamResource4Rule(Long newCampaignId,Long oldRuleId, Long newRuleId) {
+        Map<String,Object> result = new HashMap<>();
+        MktCamResource oldResource = mktCamResourceMapper.selectByRuleId(oldRuleId, FrameFlgEnum.YES.getValue());
+        if (oldResource!=null){
+            oldResource.setMktCamResourceId(null);
+            oldResource.setMktCampaignId(newCampaignId);
+            MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(newRuleId);
+            if (ruleDO!=null && ruleDO.getProductId()!=null && !ruleDO.getProductId().equals("")){
+                List<Long> idList = ChannelUtil.StringToIdList(ruleDO.getProductId());
+                List<MktCamItem> camItemList = mktCamItemMapper.selectByBatch(idList);
+                List<Long> offerList = new ArrayList<>();
+                List<Long> deppendOfferList = new ArrayList<>();
+                List<Long> deppendProductList = new ArrayList<>();
+                List<Long> differentOfferList = new ArrayList<>();
+                for (MktCamItem item : camItemList) {
+                    if (CamItemType.OFFER.getValue().equals(item.getItemType())){
+                        offerList.add(item.getMktCamItemId());
+                    }
+                    if (CamItemType.DEPEND_OFFER.getValue().equals(item.getItemType())){
+                        deppendOfferList.add(item.getMktCamItemId());
+                    }
+                    if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
+                        deppendProductList.add(item.getMktCamItemId());
+                    }
+                    if (CamItemType.DIFFERENT_OFFER.getValue().equals(item.getItemType())){
+                        differentOfferList.add(item.getMktCamItemId());
+                    }
+                }
+                oldResource.setOfferId(ChannelUtil.idList2String(offerList));
+                oldResource.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
+                oldResource.setDependProductId(ChannelUtil.idList2String(deppendProductList));
+                oldResource.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
+                mktCamResourceMapper.insert(oldResource);
+            }
+        }
+        return result;
     }
 
     @Override
