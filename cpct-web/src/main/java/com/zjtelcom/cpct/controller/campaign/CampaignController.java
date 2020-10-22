@@ -41,6 +41,7 @@ import java.util.concurrent.Executors;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_FAIL;
 import static com.zjtelcom.cpct.constants.CommonConstant.CODE_SUCCESS;
 
+
 @RestController
 @RequestMapping("${adminPath}/campaign")
 public class CampaignController extends BaseController {
@@ -67,6 +68,8 @@ public class CampaignController extends BaseController {
     private CatalogService catalogService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
+    @Autowired
+    private MktCampaignApiService apiService;
 
     @Autowired
     private MktCamResourceQRCodeService mktCamResourceQRCodeService;
@@ -942,5 +945,7 @@ public class CampaignController extends BaseController {
         result.put("data",data);
         return result;
     }
+
+
 
 }
