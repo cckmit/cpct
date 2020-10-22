@@ -379,8 +379,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktCamResourceMapper.insert(resource);
             }
 
-
-
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.SAVE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktStrategyConfRuleDO", mktStrategyConfRuleDO);

@@ -73,7 +73,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         Map<String,Object> result = new HashMap<>();
         MktCamResource mktCamResource = BeanUtil.create(camResource, new MktCamResource());
         //框架6400 自主6100
-        mktCamResource.setFrameFlg(mktCamResource.getFrameFlg().equals("1") ? "(6100)" : "(6300，6400)");
+        mktCamResource.setFrameFlg(mktCamResource.getFrameFlg().equals("1") ? "(6100)" : "(6300,6400)");
         List<MktCamResource> list = mktCamResourceMapper.listPage(mktCamResource);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",list);
@@ -87,6 +87,12 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         MktCamResource mktCamResource = BeanUtil.create(camResource, new MktCamResource());
         //框架6400 自主6100
         mktCamResource.setFrameFlg(mktCamResource.getFrameFlg().equals("1") ? "(6100)" : "(6300,6400)");
+        if (camResource.getGetStartTime()!=null && !"".equals(camResource.getGetStartTime())){
+            mktCamResource.setGetStartTime(DateUtil.string2DateTimeAll(camResource.getGetStartTime()));
+        }
+        if (camResource.getGetEndTime()!=null && !"".equals(camResource.getGetEndTime())){
+            mktCamResource.setGetEndTime(DateUtil.string2DateTimeAll(camResource.getGetEndTime()));
+        }
         List<MktCamResource> list = mktCamResourceMapper.listPage(mktCamResource);
         Page pageInfo = new Page(new PageInfo(list));
         List<MktCamResourceVO> resourceVOS = new ArrayList<>();
@@ -104,7 +110,8 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(resource.getMktCampaignId());
             if (campaignDO!=null ){
                 mktCamResourceVO.setMktCampaignNbr(campaignDO.getMktActivityNbr());
-                mktCamResourceVO.setStaffName(campaignDO.getCreateStaff().toString());
+                mktCamResourceVO.setStaffName(mktCamResource.getApplyUser());
+                mktCamResourceVO.setStaffTel(mktCamResource.getApplyUserPhone());
             }
             mktCamResourceVO.setUseAreaInfo(ChannelUtil.list2String(list1,","));
             mktCamResourceVO.setStatusCd(StatusCode.getMsgByCode(resource.getStatusCd()));

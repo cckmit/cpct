@@ -200,7 +200,7 @@
       AND cam.MKT_CAMPAIGN_NAME like CONCAT('%',#{camResourceName,jdbcType=VARCHAR},'%')
     </if>
     <if test="resourceType!=null and resourceType != ''">
-      AND cr.crRESOURCE_TYPE = #{resourceType}
+      AND cr.RESOURCE_TYPE = #{resourceType}
     </if>
     <if test="resourceSubtype!=null and resourceSubtype != ''">
       AND cr.RESOURCE_SUBTYPE = #{resourceSubtype}
@@ -209,13 +209,13 @@
       AND cam.STATUS_CD = #{statusCd}
     </if>
     <if test="useArea!=null and useArea != ''">
-      AND cr.USE_AREA = #{userArea}
+      AND cr.USE_AREA like CONCAT('%',#{useArea,jdbcType=VARCHAR},'%')
     </if>
     <if test="getStartTime!=null ">
-      AND cr.GET_START_TIME = #{getStartTime}
+      AND cr.GET_START_TIME >= #{getStartTime}
     </if>
     <if test="getEndTime!=null">
-      AND cr.GET_END_TIME = #{getEndTime}
+      AND cr.GET_END_TIME &lt;= #{getEndTime}
     </if>
     order by CREATE_DATE DESC
   </select>

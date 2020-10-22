@@ -42,7 +42,7 @@
     </resultMap>
 
     <select id="selectRecordByRuleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select MKT_CAM_RESOURCE_ID, RULE_ID from mkt_cam_resource where MKT_CAM_RESOURCE_ID = #{mktCamResourceId};
+        select MKT_CAM_RESOURCE_ID, RULE_ID,RESOURCE_ID from mkt_cam_resource where MKT_CAM_RESOURCE_ID = #{mktCamResourceId};
     </select>
     <select id="updateQRUrlbyMktResourceId" >
         update mkt_cam_resource

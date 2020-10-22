@@ -447,7 +447,7 @@ public class PpmProductController extends BaseController  {
     @RequestMapping("/mktCamResourceService")
     @CrossOrigin
     public String mktCamResourceService(@RequestBody Map<String, Object> params) {
-        Long mktCampaignId = (Long) params.get("mktCampaignId");
+        Long mktCampaignId = MapUtil.getLongNum(params.get("mktCampaignId"));
         Map<String, Object> resultMap = productService.mktCamResourceService(mktCampaignId);
         return JSON.toJSONString(resultMap);
     }

@@ -5,5 +5,5 @@ import lombok.Data;
 
 @Data
 public class PostBackgroundDO {
-    private  String postUrlPath;
+    private  String postUrl;
 }

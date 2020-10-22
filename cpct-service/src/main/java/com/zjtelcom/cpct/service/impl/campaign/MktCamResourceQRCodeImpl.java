@@ -162,6 +162,7 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         List<String> postList = new ArrayList<>();
         String tempFilePath = "/app/cpcp_cxzx/post_background/";//保存到本地地址
         File pathDir = new File(tempFilePath);
+        List<String> fileList = new ArrayList<>();
         if(!pathDir.exists()){
             boolean isExist = pathDir.mkdir();
         }
@@ -172,12 +173,15 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
             String path = sftpUtils.cd(postBackgroundPath, sftp);
             boolean result = sftpUtils.download(sftp, path + "/", fileName, tempFilePath);
             String base64Jpg = FileUtil.convertFileToBase64(tempFilePath + fileName );
+          /*  PostBackgroundDO postBackgroundDO = new PostBackgroundDO();
+            postBackgroundDO.setPostUrl(base64Jpg);*/
             postList.add(base64Jpg);
+            fileList.add(fileName);
         }
         logger.info("postList" + postList);
-        PageHelper.startPage(pageNum,pageSize,orderBy);
-        resultMap.put("files",files);
-        resultMap.put("pageInfo",new Page(new PageInfo<>(postList)));
+//        PageHelper.startPage(pageNum,pageSize,orderBy);
+        resultMap.put("pageInfo",PageUtil.startPage(postList,pageNum,pageSize));
+        resultMap.put("files",PageUtil.startPage(fileList,pageNum,pageSize));
         return resultMap;
     }
 
