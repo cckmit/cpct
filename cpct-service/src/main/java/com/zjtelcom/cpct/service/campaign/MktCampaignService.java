@@ -96,4 +96,7 @@ public interface MktCampaignService {
 
     Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params);
 
+    //根据需求函类型获取审批人
+    Map<String, Object> getStaffByMktRequest(Map<String, Object> paramMap);
+
 }

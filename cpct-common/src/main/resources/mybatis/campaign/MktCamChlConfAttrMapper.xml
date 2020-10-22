@@ -224,4 +224,13 @@
       </foreach>
     </where>
   </update>
+  
+  <update id="updateAttridByChannelId" parameterType="java.lang.Long">
+    update mkt_cam_chl_conf_attr
+    set ATTR_ID = #{attrId, jdbcType = BIGINT},
+    ATTR_VALUE_ID =#{attrValueId,jdbcType = BIGINT},
+    ATTR_VALUE = #{attrValue,jdbcType = VARCHAR}
+    where
+    EVT_CONTACT_CONF_ID = #{channelId,jdbcType=BIGINT}
+  </update>
 </mapper>

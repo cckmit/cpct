@@ -46,9 +46,13 @@ public interface ProductService {
 
     Map<String, Object> deleteMktProductItem(MktProductAttr mktProductAttr);
 
-    Map<String, Object> copyMktProductAttr(Long oldProductId,Long newProductId,Long ruleId);
+    Map<String, Object> copyMktProductAttr4Cam(Long oldProductItemId,Long newProductItemId);
 
-    Map<String, Object> copyMktCamResource(Long oldResourceId,Long newResourceId,Long ruleId);
+    Map<String, Object> copyMktProductAttr4Rule(Long oldProductItemId,Long newProductItemId, Long oldRuleId,Long newRuleId);
+
+    Map<String, Object> copyMktCamResource4Cam(Long oldCampaignId,Long newCampaignId);
+
+    Map<String, Object> copyMktCamResource4Rule(Long newCampaignId,Long oldRuleId,Long newRuleId);
 
     Map<String, Object> mktCamResourceService(Long mktCampaignId);
 

@@ -106,4 +106,22 @@ public class MktCampaignApiTestController {
         }
         return JSON.toJSONString(retCamResult);
     }
+
+
+    /**
+     * 需求函根据目录获取不同审批人
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getStaffByMktRequest", method = RequestMethod.POST)
+    @CrossOrigin
+    public Map<String,Object> getStaffByMktRequest(@RequestBody Map<String,Object> paramMap) {
+        Map<String,Object> resultMap = new HashMap<>();
+        try {
+            resultMap = mktCampaignApiService.getStaffByMktRequest(paramMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
 }

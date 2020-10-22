@@ -176,6 +176,11 @@
                 <artifactId>bss-mktcenter-model</artifactId>
                 <version>${bss-cpc-resource.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.zjtelcom.cpct</groupId>
+                <artifactId>cpct-qrcode</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
             <!--<dependency>-->
             <!--<groupId>com.alibaba</groupId>-->

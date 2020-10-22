@@ -1,28 +1,24 @@
 package com.zjtelcom.cpct.enums;
 
-public enum CamItemType {
-
-    OFFER("1000", "销售品"),
-    PACKAGE("2000","礼包"),
-    RESOURCE("3000", "营销资源"),
-    SERVICE("4000", "服务"),
-    DEPEND_OFFER("5000", "依赖销售品"),
-    DEPEND_PRODUCT("6000","依赖产品"),
-    DIFFERENT_OFFER("7000","批零差产品");
-
+public enum SubTypeEnum {
+    //电子券型号
+    DEPART_REAL_RESOURCE("105001011", "市场部实体券"),
+    DEPART_ELECTRON("105001012", "市场部电子券"),
+    CHANNEL_REAL("105001013", "电渠电子券"),
+    CHANNEL_OTHERS("105004001", "电渠第三方券");
 
     private String value;
     private String name;
 
-    CamItemType(String value, String name) {
+    SubTypeEnum(String value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public static CamItemType getNameByCode(String code) {
-        for (CamItemType trialStatus : CamItemType.values()) {
+    public static String getNameByCode(String code) {
+        for (SubTypeEnum trialStatus : SubTypeEnum.values()) {
             if (code != null && code.equals(trialStatus.value)) {
-                return trialStatus;
+                return trialStatus.getName();
             }
         }
         return null;

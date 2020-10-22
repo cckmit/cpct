@@ -80,7 +80,7 @@ public class SysAreaController {
     @RequestMapping(value = "/listAreaByCityList", method = RequestMethod.POST)
     @CrossOrigin
     public String listAreaByCityList(@RequestBody  Map<String, Object> params) {
-        List<String> list = (List<String>)params.get("list");
+        List<Integer> list = (List<Integer>)params.get("list");
         Map<String, Object> resulut = null;
         try {
             resulut = sysAreaService.listAreaByCityList(list);
@@ -160,7 +160,7 @@ public class SysAreaController {
 //            Long orgId = Long.valueOf(user.getOrgId());
             SystemUserDto user = BssSessionHelp.getSystemUserDto();
             Long staffId = user.getStaffId();
-//            Long orgId = Long.valueOf(regionId);
+//            Long orgId = Long.valueOf(regionId);            
             map = sysAreaService.getCityByAreaTree(staffId);
 
 //            }

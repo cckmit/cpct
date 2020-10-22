@@ -33,5 +33,5 @@ public interface SysAreaService {
 
     Map<String,Object> getCityByAreaTree(Long staffId);
 
-    Map<String, Object> listAreaByCityList(List<String> parentList);
+    Map<String, Object> listAreaByCityList(List<Integer> parentList);
 }

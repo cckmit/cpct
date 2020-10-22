@@ -181,5 +181,45 @@
     PARENT_ID, DIFFERENT_OFFER_ID, DEAL_SHOPS
     from mkt_cam_resource
   </select>
+  <select id="listPage" resultMap="BaseResultMap">
+    select cr.MKT_CAM_RESOURCE_ID, cr.MKT_CAMPAIGN_ID, cr.RULE_ID, cr.RESOURCE_ID, cr.RESOURCE_TYPE,
+    cr.RESOURCE_SUBTYPE, cr.RESOURCE_TOTAL_NUM, cr.RESOURCE_APPLY_NUM, cr.RECEIVE_TYPE, cr.DAYS, cr.START_TIME,
+    cr.END_TIME, cr.OFFER_ID, cr.DEPEND_OFFER_ID, cr.DEPEND_PRODUCT_ID, cr.FRAME_FLG, cr.STATUS_CD, cr.CREATE_STAFF,
+    cr.CREATE_DATE, cr.UPDATE_STAFF, cr.UPDATE_DATE, cr.REMARK, cr.LAN_ID, cr.OFFER_CODE, cr.OFFER_NAME,
+    cam.MKT_CAMPAIGN_NAME as CAM_RESOURCE_NAME ,
+    cr.FACE_AMOUNT, cr.DIFFERENT_PRICE, cr.RELEASE_TYPE, cr.GET_START_TIME, cr.GET_END_TIME, cr.QC_CODE_URL,
+    cr.USE_AREA, cr.USE_AREA_C4, cr.PUBLISH_AREA, cr.APPLY_USER, cr.APPLY_USER_PHONE, cr.RESOURCE_ODD_NUM,
+    cr.PARENT_ID, cr.DIFFERENT_OFFER_ID, cr.DEAL_SHOPS
+    from mkt_cam_resource cr
+    LEFT JOIN mkt_campaign cam on cam.MKT_CAMPAIGN_ID = cr.MKT_CAMPAIGN_ID
+    where cam.MKT_CAMPAIGN_TYPE = 8000
+    <if test="frameFlg!=null and frameFlg != ''" >
+      AND cam.MANAGE_TYPE in ${frameFlg}
+    </if>
+    <if test="camResourceName!=null and camResourceName != ''" >
+      AND cam.MKT_CAMPAIGN_NAME like CONCAT('%',#{camResourceName,jdbcType=VARCHAR},'%')
+    </if>
+    <if test="resourceType!=null and resourceType != ''">
+      AND cr.RESOURCE_TYPE = #{resourceType}
+    </if>
+    <if test="resourceSubtype!=null and resourceSubtype != ''">
+      AND cr.RESOURCE_SUBTYPE = #{resourceSubtype}
+    </if>
+    <if test="statusCd!=null and statusCd != ''">
+      AND cam.STATUS_CD = #{statusCd}
+    </if>
+    <if test="useArea!=null and useArea != ''">
+      AND cr.USE_AREA like CONCAT('%',#{useArea,jdbcType=VARCHAR},'%')
+    </if>
+    <if test="getStartTime!=null ">
+      AND cr.GET_START_TIME >= #{getStartTime}
+    </if>
+    <if test="getEndTime!=null">
+      AND cr.GET_END_TIME &lt;= #{getEndTime}
+    </if>
+    order by CREATE_DATE DESC
+  </select>
+
+
 
 </mapper>

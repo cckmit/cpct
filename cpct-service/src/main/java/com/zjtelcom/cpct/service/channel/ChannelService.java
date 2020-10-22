@@ -1,5 +1,6 @@
 package com.zjtelcom.cpct.service.channel;
 
+import com.zjtelcom.cpct.domain.channel.Channel;
 import com.zjtelcom.cpct.dto.channel.ContactChannelDetail;
 
 import java.util.HashMap;
@@ -47,5 +48,8 @@ public interface ChannelService {
     Map<String,Object> selectBatchByCode(List<String> contactChlCodeList);
 
     Map<String,Object> getUamServicePswd(String accountID, String areaCode, String custID);
+
+    List<Channel>  getChannelByChannelName(String channelParam);
+    List<Channel>  getAllChannelById(List<Integer> channelId);
 
 }
