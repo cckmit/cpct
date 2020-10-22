@@ -22,5 +22,7 @@ public interface MktCampaignApiService {
     Map<String, Object> copyMktCampaign(Long mktCampaignId);
 
     Map<String, Object> rollBackMktCampaign(Long mktCampaignId);
+    //根据需求函类型获取审批人
+    Map<String, Object> getStaffByMktRequest(Map<String, Object> paramMap);
 
 }

@@ -1,11 +1,8 @@
 package com.zjtelcom.cpct.service.channel;
 
 import com.ctzj.smt.bss.cpc.model.dto.MktResOrgRelDto;
-import com.ctzj.smt.bss.cpc.write.service.api.IMktCouponRelService;
-import com.ctzj.smt.bss.mktcenter.model.dto.ImportCouponInstReq;
-import com.ctzj.smt.bss.mktcenter.model.dto.MktResCouponReq;
 import com.zjtelcom.cpct.domain.channel.MktCamResource;
-import com.zjtelcom.cpct.dto.channel.CamScriptAddVO;
+import com.zjtelcom.cpct.dto.channel.MktCamResourceVO;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +26,10 @@ public interface CamElectronService {
     Map<String, Object> qrySelectProdByCouponForMkt(Long resourceId);
 
     Map<String,Object> publish4Mktcamresource( MktCamResource mktCamResource);
+
+    Map<String,Object> listCampaignPage4Resource( MktCamResourceVO camResource);
+
+    Map<String,Object> listCampaign4Resource( MktCamResourceVO camResource);
 
 
 

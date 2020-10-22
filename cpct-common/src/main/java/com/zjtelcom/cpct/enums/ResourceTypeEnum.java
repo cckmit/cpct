@@ -1,26 +1,27 @@
 package com.zjtelcom.cpct.enums;
 
-public enum FrameFlgEnum {
+public enum ResourceTypeEnum {
+    //电子券型号
+    REAL("1001", "实体"),
+    ELECTRON("1002","电子");
 
-    YES("1", "是电子券框架类型"),
-    NO("0","不是电子券框架类型");
 
 
     private String value;
     private String name;
 
-    FrameFlgEnum(String value, String name) {
+    ResourceTypeEnum(String value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public static FrameFlgEnum getNameByCode(String code) {
-        for (FrameFlgEnum trialStatus : FrameFlgEnum.values()) {
+    public static String getNameByCode(String code) {
+        for (ResourceTypeEnum trialStatus : ResourceTypeEnum.values()) {
             if (code != null && code.equals(trialStatus.value)) {
-                return trialStatus;
+                return trialStatus.getName();
             }
         }
-        return null;
+        return "";
     }
 
     public String getValue() {

@@ -127,7 +127,9 @@
     from mkt_cam_item
     WHERE MKT_CAMPAIGN_ID = #{mktCampaignId, jdbcType=BIGINT}
     AND ITEM_TYPE = #{itemType, jdbcType=VARCHAR}
+    <if test="itemId != null">
     AND ITEM_ID = #{itemId, jdbcType=BIGINT}
+    </if>
   </select>
 
   <select id="selectCamItemIdByCampaignId" parameterType="java.lang.Long" resultType="java.lang.Long">
@@ -145,6 +147,18 @@
     </foreach>
     AND ITEM_TYPE = '1000' GROUP BY MKT_CAMPAIGN_ID
   </select>
+
+
+  <select id="listCamItemIdByCampaign" resultType="java.lang.Long">
+    select MKT_CAM_ITEM_ID
+    from mkt_cam_item
+    WHERE MKT_CAMPAIGN_ID = #{mktCampaignId, jdbcType=BIGINT}
+    AND ITEM_TYPE = #{itemType, jdbcType=VARCHAR}
+    <if test="itemId != null">
+      AND ITEM_ID = #{itemId, jdbcType=BIGINT}
+    </if>
+  </select>
+
 
 
 

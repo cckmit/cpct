@@ -7,6 +7,8 @@ import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Auther: anson
@@ -175,6 +177,20 @@ public class FtpUtils {
         return flag;
     }
 
+    /*列出指定目录下文件*/
+    public List<String> listFiles(String directory){
+       List<String> files = new ArrayList<>();
+        try {
+            FTPFile [] ftpFiles  = ftpClient.listFiles(directory);
+            for(FTPFile ftpFile: ftpFiles){
+                String fileName = ftpFile.getName();
+                files.add(fileName);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  files;
+    }
     //创建多层目录文件，如果有ftp服务器已存在该文件，则不创建，如果无，则创建
     public boolean CreateDirecroty(String remote) throws IOException {
         boolean success = true;

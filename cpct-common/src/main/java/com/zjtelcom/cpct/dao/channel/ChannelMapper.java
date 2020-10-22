@@ -17,4 +17,12 @@ public interface ChannelMapper {
     int updateByPrimaryKey(Channel record);
 
     Channel selectByPrimaryKeyFromShiTi(Long aLong);
+
+    //门店模糊匹配
+    List<Channel> getChannelbyChannelNbr(String channelNbr);
+
+    List<Channel> getChannelbyChannelName(String channelName);
+
+    List<Channel> getAllChannelById(List<Integer> channelId);
+
 }

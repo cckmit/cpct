@@ -1,5 +1,9 @@
 package com.zjtelcom.cpct.util;
 
+import org.apache.commons.codec.binary.Base64;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
 import java.io.*;
 
 /**
@@ -171,5 +175,64 @@ public class FileUtil {
     }
 
 
+    //base64字符串转化成图片
+    public static boolean GenerateImage(String imgStr, String filePath, String fileName)
+    {   //对字节数组字符串进行Base64解码并生成图片
+        if (imgStr == null) //图像数据为空
+            return false;
+        BASE64Decoder decoder = new BASE64Decoder();
+        try
+        {
+            //Base64解码
+            byte[] b = decoder.decodeBuffer(imgStr);
+            for(int i=0;i<b.length;++i)
+            {
+                if(b[i]<0)
+                {//调整异常数据
+                    b[i]+=256;
+                }
+            }
+            //生成jpeg图片
+            File dir = new File(filePath);
+            if (!dir.exists()) {//判断文件目录是否存在
+                dir.mkdirs();
+                System.out.println("创建文件夹");
+            }
 
+            String imgFilePath = filePath + File.separator + fileName;//新生成的图片
+            System.out.println(imgFilePath);
+            OutputStream out = new FileOutputStream(imgFilePath);
+            out.write(b);
+            out.flush();
+            out.close();
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+    /**
+     * 本地文件（图片、excel等）转换成Base64字符串
+     *
+     * @param imgPath
+     */
+
+    public static String convertFileToBase64(String imgPath) {
+        byte[] data = null;
+        // 读取图片字节数组
+        try {
+            InputStream in = new FileInputStream(imgPath);
+            System.out.println("文件大小（字节）="+in.available());
+            data = new byte[in.available()];
+            in.read(data);
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 对字节数组进行Base64编码，得到Base64编码的字符串
+        BASE64Encoder encoder = new BASE64Encoder();
+        String base64Str = encoder.encode(data);
+        return base64Str;
+    }
 }

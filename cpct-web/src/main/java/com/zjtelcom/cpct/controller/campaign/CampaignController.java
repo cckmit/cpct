@@ -17,6 +17,7 @@ import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dubbo.out.OpenApiScheService;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.MqService;
+import com.zjtelcom.cpct.service.campaign.MktCamResourceQRCodeService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.MktCampaignService;
 import com.zjtelcom.cpct.service.channel.CatalogService;
@@ -66,6 +67,9 @@ public class CampaignController extends BaseController {
     private CatalogService catalogService;
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
+
+    @Autowired
+    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
 
     /**
      * 需求函类型限制活动类型校验
@@ -489,6 +493,7 @@ public class CampaignController extends BaseController {
         try {
             map = mktCampaignService.getMktCampaign(mktCampaignId);
         } catch (Exception e) {
+            e.printStackTrace();
             map.put("resultCode", CommonConstant.CODE_FAIL);
             map.put("resultMsg", "查询活动失败");
         }
@@ -825,6 +830,116 @@ public class CampaignController extends BaseController {
             e.printStackTrace();
 
         }
+        return result;
+    }
+
+/*
+*生成二维码url，如果存在则直接获取
+ */
+    @PostMapping(value = "/generatePoster")
+    @CrossOrigin
+    public Map<String, Object> generatePoster(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.generatePoster(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "失败");
+            result.put("data",data);
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     *保存海报url到渠道属性表
+     */
+    @PostMapping(value = "/savePostUrl")
+    @CrossOrigin
+    public Map<String, Object> savePostToChanlAttr(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.savePostUrl(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "保存失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "保存成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     *上传海报背景图
+     */
+    @PostMapping(value = "/savePostBackgroundUrl")
+    @CrossOrigin
+    public Map<String, Object> savePostBackgroundUrl(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "保存失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "保存成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     * 海报背景图分页查询
+     */
+    @PostMapping(value = "/getPostgroundPathPage")
+    @CrossOrigin
+    public Map<String, Object> getPostgroundPathPage(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "获取失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "获取成功");
+        result.put("data",data);
+        return result;
+    }
+    /*
+     * 根据需求函类型获取审批人
+     */
+    @PostMapping(value = "/getStaffByMktRequest")
+    @CrossOrigin
+    public Map<String, Object> getStaffByMktRequest(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = mktCampaignService.getStaffByMktRequest(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "获取失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "获取成功");
+        result.put("data",data);
         return result;
     }
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjtelcom.cpct.dao.campaign.MktRequestMapper">
+    <resultMap id="BaseResultMap" type="com.zjtelcom.cpct.domain.campaign.MktRequestDO">
+        <id column="REQUEST_ID" jdbcType="BIGINT" property="requestId" />
+        <result column="REQUEST_TYPE" jdbcType="VARCHAR" property="requestType" />
+        <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+        <result column="CATALOG_ID" jdbcType="BIGINT" property="catelogId" />
+        <result column="LANID" jdbcType="BIGINT" property="lanId" />
+        <result column="STAFF" jdbcType="VARCHAR" property="staff" />
+        <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+        <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+        <result column="COMMENT" jdbcType="VARCHAR" property="comment" />
+    </resultMap>
+
+
+    <select id="getRequestInfoByMktId" resultMap="BaseResultMap">
+        select mr.REQUEST_ID, mr.NODE_ID,mr.REQUEST_TYPE, a.DIRECTORY_ID, a.LAN_ID_FOUR, mr.STAFF from mkt_request mr,
+        (select mc.DIRECTORY_ID, mc.LAN_ID_FOUR from mkt_campaign mc where mc.MKT_CAMPAIGN_ID =#{mktCamId}) a
+        WHERE mr.REQUEST_TYPE = #{requestType}  and mr.NODE_ID = #{nodeId};
+    </select>
+
+</mapper>

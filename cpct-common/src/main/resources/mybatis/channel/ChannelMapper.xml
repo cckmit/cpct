@@ -91,4 +91,27 @@
     where STATUS_CD = 1000 AND CHN_TYPE_CD in (110101,110102,110201,110202) AND  ORG_ID = #{orgId,jdbcType=BIGINT}
   </select>
 
+  <select id="getChannelbyChannelNbr"  resultMap="BaseResultMap">
+    select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE,
+    SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE,
+    REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF
+    from channel where CHANNEL_NBR like CONCAT('%',#{channelNbr},'%') or CHANNEL_NAME like CONCAT("%",#{channelName},'%')
+  </select>
+
+  <select id="getChannelbyChannelName"  resultMap="BaseResultMap">
+    select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE,
+    SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE,
+    REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF
+    from channel where CHANNEL_NAME like CONCAT("%",#{channelName},'%')
+  </select>
+  <select id="getAllChannelById"  parameterType="list" resultMap="BaseResultMap">
+    select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE,
+    SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE,
+    REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF
+    from channel where ORG_ID in
+    <foreach collection="list" item="orgId" index="index" open="(" close=")" separator=",">
+      #{orgId}
+    </foreach>
+  </select>
+
 </mapper>
