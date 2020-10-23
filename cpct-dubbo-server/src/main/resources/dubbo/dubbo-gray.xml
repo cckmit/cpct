@@ -55,6 +55,7 @@
         <dubbo:method name="qryMktCampaignDetail" servicecode="00.1083.qryMktCampaignDetail" timeout="10000"/>
         <!--活动复制服务-->
         <dubbo:method name="copyMktCampaign" servicecode="00.1083.copyMktCampaign" timeout="10000"/>
+        <dubbo:method name="getStaffByMktRequest" servicecode="00.1083.getStaffByMktRequest" timeout="10000"/>
     </dubbo:service>
 
 

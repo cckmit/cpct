@@ -32,6 +32,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.SearchLabelService;
 import com.zjtelcom.cpct.service.event.EventRedisService;
 import com.zjtelcom.cpct.util.BeanUtil;
+import com.zjtelcom.cpct.util.ChannelUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -428,7 +429,29 @@ public class EventRedisServiceImpl implements EventRedisService {
             Channel channelMessage = contactChannelMapper.selectByCode(eventCode);
             redisUtils.set(key + eventCode, channelMessage);
             resutlt.put(key + eventCode, channelMessage);
+        } else if ("OFFER_EVENT_LIST".equals(key)) {   // 销售品套餐办理
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("OFFER_EVENT_LIST_SYS");
+            String value = "";
+            if (!sysParamsList.isEmpty()){
+                value = sysParamsList.get(0).getParamValue();
+            }
+            List<String> stringList = ChannelUtil.StringToList(value);
+            redisUtils.set(key,stringList);
+            resutlt.put(key , stringList);
+        } else if ("OFFER_EVENT_LIST_TWO".equals(key)) {   // 销售品套餐办理
+            List<SysParams> sysParamsList = sysParamsMapper.listParamsByKeyForCampaign("OFFER_EVENT_LIST_TWO_SYS");
+            String value = "";
+            if (!sysParamsList.isEmpty()){
+                value = sysParamsList.get(0).getParamValue();
+            }
+            List<String> stringList = ChannelUtil.StringToList(value);
+            redisUtils.set(key,stringList);
+            resutlt.put(key , stringList);
         }
+
+
+
+
         return resutlt;
     }
 

@@ -626,13 +626,10 @@ public class EventApiServiceImpl implements EventApiService {
                     String cpcpNeedFlow = getCpcpNeedFlow((String) evtParams.get("CPCP_USED_FLOW"), (String) evtParams.get("CPCP_LEFT_FLOW"));
                     labelItems.put("CPCP_NEED_FLOW", cpcpNeedFlow);
                 }
-
-
                 // 计费短信合并功能 CPCP_JIFEI_CONTENT
                 if (evtParams != null) {
                     cpcpJifeiContent(labelItems, evtParams);
                 }
-
                 //获取事件推荐活动数
                 int recCampaignAmount;
                 String recCampaignAmountStr = event.getRecCampaignAmount();
@@ -1121,8 +1118,15 @@ public class EventApiServiceImpl implements EventApiService {
                         log.info("reultMap的值为：" + JSON.toJSONString(reultMap));
                     }
                 }
+
                 //套餐生效套餐变更事件，畅享套餐变更生效事件
-                if("EVTS000001138".equals(eventCode) || "EVTS000001139".equals(eventCode) || "EVTS000001140".equals(eventCode) || "EVTS000001142".equals(eventCode) || "EVTS000001143".equals(eventCode)){
+                List<String>  offerEventList = new ArrayList<>();
+                Map<String, Object> offerEventRedis = eventRedisService.getRedis("OFFER_EVENT_LIST");
+                if (offerEventRedis != null) {
+                    offerEventList = (List<String>) offerEventRedis.get("OFFER_EVENT_LIST");
+                }
+                if (offerEventList.contains(eventCode)){
+//                if("EVTS000001138".equals(eventCode) || "EVTS000001139".equals(eventCode) || "EVTS000001140".equals(eventCode) || "EVTS000001142".equals(eventCode) || "EVTS000001143".equals(eventCode)){
                     log.info("接入事件： "+ eventCode);
                     DefaultContext<String, Object> reultMap = resultMapList.get(0);
                     String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
@@ -1142,7 +1146,14 @@ public class EventApiServiceImpl implements EventApiService {
                         offerName = offerExpe.getTemplateInstName();
                         amount = offerExpe.getAmount();
                     }
-
+                    //套餐生效套餐变更事件，畅享套餐变更生效事件
+                    if (offerExpenseDO.isEmpty()){
+                        List<OfferExpenseDO> offerInfoList = commonRegionMapper.getExpenseByOfferInfo(offerNbr);
+                        if (!offerInfoList.isEmpty()){
+                            offerName = offerInfoList.get(0).getTemplateInstName();
+                            amount = offerInfoList.get(0).getAmount();
+                        }
+                    }
                     reultMap.put("CPCP_VIR_SUB_NAME", offerName);
                     reultMap.put("CPCP_EXPENSES", amount.toString());
                     reultMap.put("CPCP_TOTAL_FLOW", CPCP_TOTAL_FLOW.toString());
@@ -1151,6 +1162,30 @@ public class EventApiServiceImpl implements EventApiService {
                     resultMapList.add(reultMap);
                     log.info("resultMapList" + resultMapList);
 
+                }
+
+                List<String>  offerEventList2 = new ArrayList<>();
+                Map<String, Object> oel2 = eventRedisService.getRedis("OFFER_EVENT_LIST_TWO");
+                if (oel2 != null) {
+                    offerEventList2 = (List<String>) oel2.get("OFFER_EVENT_LIST_TWO");
+                }
+                if (offerEventList2.contains(eventCode)){
+                    log.info("接入事件： "+ eventCode);
+                    DefaultContext<String, Object> reultMap = resultMapList.get(0);
+                    String offerNbr = (String)evtContent.get("CPCP_PROM_DIR_NBR");
+                    log.info("销售品编码"+ offerNbr);
+                    String offerName = ""; //套餐名称
+                    Long amount = 0L; //套餐费用
+                    List<OfferExpenseDO> offerInfoList = commonRegionMapper.getExpenseByOfferInfo(offerNbr);
+                    if (!offerInfoList.isEmpty()) {
+                        offerName = offerInfoList.get(0).getTemplateInstName();
+                        amount = offerInfoList.get(0).getAmount();
+                    }
+                    reultMap.put("CPCP_VIR_SUB_NAME", offerName);
+                    reultMap.put("CPCP_EXPENSES", amount.toString());
+                    resultMapList.clear();
+                    resultMapList.add(reultMap);
+                    log.info("resultMapList" + resultMapList);
                 }
 
                 //5G套餐办理变更事件

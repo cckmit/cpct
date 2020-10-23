@@ -17,7 +17,7 @@
     <select id="getRequestInfoByMktId" resultMap="BaseResultMap">
         select mr.REQUEST_ID, mr.NODE_ID,mr.REQUEST_TYPE, a.DIRECTORY_ID, a.LAN_ID_FOUR, mr.STAFF from mkt_request mr,
         (select mc.DIRECTORY_ID, mc.LAN_ID_FOUR from mkt_campaign mc where mc.MKT_CAMPAIGN_ID =#{mktCamId}) a
-        WHERE mr.REQUEST_TYPE = #{requestType}  and mr.NODE_ID = #{nodeId};
+        WHERE mr.REQUEST_TYPE = #{requestType}
     </select>
 
 </mapper>

@@ -242,6 +242,7 @@ public class RedisUtils {
             try {
                 jedis = ctgJedisPool.getResource();
                 jedis.set(key, serialize(value));
+                jedis.expire(key,43200);
                 result = true;
             } catch (Throwable je) {
                 System.out.println("REDIS*********" + key);

@@ -90,7 +90,7 @@ public class UserUtil {
      * @return
      */
     public static String getSysUserLevel() {
-        String sysPostCode = "";
+        String sysPostCode = "C4";
         try {
             SystemUserDto userDetail = BssSessionHelp.getCpctSystemUserDto();
             ArrayList<String> arrayList = new ArrayList<>();

@@ -117,6 +117,25 @@
         AND a.OFFER_NBR = #{offerNbr}
     </select>
 
+    <!--根据销售品编码获取销售品详情-->
+    <select id="getExpenseByOfferInfo"  parameterType="java.lang.String"  resultMap="offerResultMap">
+       SELECT
+	a.OFFER_ID,
+	a.OFFER_NBR,
+	a.offer_name,
+	a1.AMOUNT
+FROM
+	offer a
+JOIN offer_prod_rel b ON a.OFFER_ID = b.OFFER_ID
+JOIN offer_ext a1 ON a.OFFER_ID = a1.OFFER_ID
+WHERE
+	a.offer_type = '11'
+AND b.ROLE_ID = '10100002'
+AND a.STATUS_CD = '1000'
+AND b.PROD_ID = '1429695'
+        AND a.OFFER_NBR = #{offerNbr}
+    </select>
+
     <resultMap id="offerResultMap" type="com.zjtelcom.cpct.domain.event.OfferExpenseDO">
         <id column="OFFER_ID" jdbcType="BIGINT"  property="offerId" />
         <result column="OFFER_NBR" jdbcType="VARCHAR"  property="offerNbr" />
