@@ -22,7 +22,7 @@ public class BatchSendController {
     protected Logger logger = LoggerFactory.getLogger(BatchSendController.class);
     @Autowired
     private  BatchSendService batchSendService;
-    @Autowired
+    @Autowired(required = false)
     private MktCampaignApiService mktCampaignApiService;
     /*
      **获取下发批次列表
@@ -97,7 +97,7 @@ public class BatchSendController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCampaignApiService.getStaffByMktRequest(params);
+            //data = mktCampaignApiService.getStaffByMktRequest(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);

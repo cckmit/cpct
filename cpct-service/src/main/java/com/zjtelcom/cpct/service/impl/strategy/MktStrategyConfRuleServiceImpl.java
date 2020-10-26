@@ -361,21 +361,25 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
             }
 
             List<MktCamResource> camResource = mktCamResourceMapper.selectByCampaignId(mktStrategyConfRule.getMktCampaignId(), FrameFlgEnum.YES.getValue(),null);
-            if (!camResource.isEmpty()){
+
+            MktCampaignDO mktCampaignDO = campaignMapper.selectByPrimaryKey(mktStrategyConfRule.getMktCampaignId());
+            if (!camResource.isEmpty()
+                    && (StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaignDO.getMktCampaignCategory())||
+                    StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaignDO.getMktCampaignCategory())) ){
                 //规则级别创建电子券实例信息
-                MktResource4RuleVO resourceVo = mktStrategyConfRule.getMktResource4RuleVO();
+                MktCamResource mktCamResource = mktStrategyConfRule.getMktCamResource();
                 MktCamResource resource = BeanUtil.create(camResource.get(0), new MktCamResource());
-                BeanUtil.copy(resource,mktStrategyConfRule.getMktResource4RuleVO());
+                BeanUtil.copy(mktStrategyConfRule.getMktCamResource(), resource);
                 resource.setMktCamResourceId(null);
                 resource.setFrameFlg(FrameFlgEnum.NO.getValue()); // 是否电子券框架类型, yes-是，no-不是
                 resource.setMktCampaignId(mktStrategyConfRule.getMktCampaignId());
-                resource.setRuleId(mktStrategyConfRule.getMktStrategyConfRuleId());
+                resource.setRuleId(mktStrategyConfRuleDO.getMktStrategyConfRuleId());
                 resource.setCreateStaff(UserUtil.loginId());
                 resource.setCreateDate(new Date());
                 resource.setUpdateStaff(UserUtil.loginId());
                 resource.setUpdateDate(new Date());
                 resource.setStatusCd("1000");
-                resource.setDealShops(ChannelUtil.list2String(resourceVo.getDealShops(),"/"));
+                resource.setDealShops(ChannelUtil.list2String(mktCamResource.getDealShopList(),"/"));
                 mktCamResourceMapper.insert(resource);
             }
 
@@ -645,14 +649,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 trialOp.setCreateStaff(TrialCreateType.IMPORT_USER_LIST.getValue());
                 trialOperationMapper.insert(trialOp);
             }
-
-            //规则级别修改电子券实例信息
-            MktCamResource mktCamResource = new MktCamResource();
-            mktCamResource.setUpdateStaff(UserUtil.loginId());
-            mktCamResource.setUpdateDate(new Date());
-            mktCamResourceMapper.updateByPrimaryKey(mktCamResource);
-
-
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("resultMsg", ErrorCode.UPDATE_MKT_RULE_STR_CONF_RULE_SUCCESS.getErrorMsg());
             mktStrategyConfRuleMap.put("mktCamChlResultIds", mktCamChlResultIds);
@@ -827,13 +823,6 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
             }
 
-            //规则级别查询电子券实例信息
-            MktCamResource mktCamResource = mktCamResourceMapper.selectByRuleId(mktStrategyConfRuleId, FrameFlgEnum.NO.getValue());
-            if (mktCamResource!=null){
-                MktResource4RuleVO resource4RuleVO = BeanUtil.create(mktCamResource, new MktResource4RuleVO());
-                resource4RuleVO.setDealShops(ChannelUtil.StringToList(mktCamResource.getDealShops()));
-                mktStrategyConfRule.setMktResource4RuleVO(resource4RuleVO);
-            }
             if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId())!=null){
                 mktStrategyConfRule.setOrganizationList((List<Long> )redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId()));
             }
@@ -1051,15 +1040,10 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
 
             // 电子券
             MktCamResource mktCamResourceParent = mktCamResourceMapper.selectByRuleId(parentMktStrategyConfRuleId, FrameFlgEnum.NO.getValue());
-            MktCamResource mktCamResource = new MktCamResource();
+            MktCamResource mktCamResource = BeanUtil.create(mktCamResourceParent, new MktCamResource());
             mktCamResource.setRuleId(chiledMktStrategyConfRuleId);
-            mktCamResource.setMktCampaignId(mktCamResourceParent.getMktCampaignId());
             mktCamResource.setCreateDate(new Date());
             mktCamResource.setFrameFlg(FrameFlgEnum.NO.getValue());
-            mktCamResource.setResourceApplyNum(mktCamResourceParent.getResourceApplyNum());
-            mktCamResource.setStartTime(mktCamResourceParent.getStartTime());
-            mktCamResource.setEndTime(mktCamResourceParent.getEndTime());
-            mktCamResource.setDays(mktCamResourceParent.getDays());
             mktCamResourceMapper.insert(mktCamResource);
 
             // initId
@@ -1313,6 +1297,9 @@ public class MktStrategyConfRuleServiceImpl extends BaseService implements MktSt
                 List<MktCamChlResult> mktCamChlResultList = (List<MktCamChlResult>) mktCamChlResultFuture.get().get("mktCamChlResultList");
                 mktStrategyConfRule.setMktCamChlResultList(mktCamChlResultList);
             }
+            mktStrategyConfRule.setMktCamResource(parentMktStrategyConfRule.getMktCamResource());
+
+
             executorService.shutdown();
             mktStrategyConfRuleMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktStrategyConfRuleMap.put("mktStrategyConfRule", mktStrategyConfRule);
