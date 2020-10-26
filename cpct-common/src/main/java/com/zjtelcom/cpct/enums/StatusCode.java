@@ -62,6 +62,7 @@ public enum StatusCode {
     FRAMEWORK_CAMPAIGN("框架活动", "6100"),
     ENFORCEMENT_CAMPAIGN("强制活动", "6200"),
     AUTONOMICK_CAMPAIGN("自主活动", "6300"),
+    CONTINUE_CAMPAIGN("承接活动", "6400"),
     JITUAN_FRAMEWORK_CAMPAIGN("集团框架活动", "5100"),
     JITUAN_ENFORCEMENT_CAMPAIGN("集团强制活动", "5200"),
 

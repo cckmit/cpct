@@ -68,8 +68,8 @@ public class CampaignController extends BaseController {
     @Autowired(required = false)
     private OpenApiScheService openApiScheService;
 
-    @Autowired
-    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
+//    @Autowired
+//    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
 
     /**
      * 需求函类型限制活动类型校验
@@ -842,7 +842,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.generatePoster(params);
+            //data = mktCamResourceQRCodeService.generatePoster(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -865,7 +865,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.savePostUrl(params);
+            //data = mktCamResourceQRCodeService.savePostUrl(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -887,7 +887,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
+            //data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -909,7 +909,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
+            //data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
