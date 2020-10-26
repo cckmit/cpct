@@ -11,7 +11,6 @@ import com.zjtelcom.cpct.dao.campaign.MktCampaignMapper;
 import com.zjtelcom.cpct.dao.filter.MktStrategyCloseRuleRelMapper;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.dubbo.service.EventApiService;
-import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.service.api.TestService;
 import com.zjtelcom.cpct.service.campaign.OpenCampaignScheService;
 import com.zjtelcom.cpct.service.channel.EventRelService;
@@ -69,8 +68,6 @@ public class EventApiController extends BaseController {
     private EventRelService mktOfferEventService;
     @Autowired
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
-    @Autowired
-    private MktCampaignApiService mktCampaignApiService;
 
 
     @PostMapping("mktStrategyCloseRuleRelMapper")

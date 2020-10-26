@@ -95,7 +95,7 @@
     select ORG_ID, CHANNEL_NBR, CHANNEL_NAME, CHANNEL_CLASS, SALES_FIRST_TYPE, SALES_SECOND_TYPE,
     SALES_THIRD_TYPE, CHN_TYPE_CD, PARTY_ID, CHANNEL_DESC, CHANNEL_LEVEL, APPLY_CODE,
     REGION_ID, CREATE_DATE, CREATE_STAFF, STATUS_CD, STATUS_DATE, UPDATE_DATE, UPDATE_STAFF
-    from channel where CHANNEL_NBR like CONCAT('%',#{channelNbr},'%') or CHANNEL_NAME like CONCAT("%",#{channelName},'%')
+    from channel where CHANNEL_NBR like CONCAT('%',#{channelNbr},'%')
   </select>
 
   <select id="getChannelbyChannelName"  resultMap="BaseResultMap">

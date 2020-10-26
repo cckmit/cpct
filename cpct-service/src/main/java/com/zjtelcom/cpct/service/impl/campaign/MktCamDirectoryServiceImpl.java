@@ -84,6 +84,7 @@ public class MktCamDirectoryServiceImpl implements MktCamDirectoryService {
 
     public  List<MktCamDirectory>  listCatalogItemTree() {
         List<MktCamDirectory> resultList = new ArrayList<>();
+
         List<CatalogItem> parentList = catItemMapper.selectByParentId(0L);
         for (CatalogItem parent : parentList) {
             MktCamDirectory detail = new MktCamDirectory();

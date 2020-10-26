@@ -4418,7 +4418,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             logger.info(mktCampaignDO.getDirectoryId() + "需求函类型获取审批员工");
             logger.info(mktCampaignDO.getLanId() + "需求函类型获取审批员工");
             //12是外场营销目录
-            if(mktCampaignDO.getDirectoryId() == 12 && mktCampaignDO.getLanId() == 571){
+            if(mktCampaignDO.getDirectoryId() == 614401299 && mktCampaignDO.getLanId() == 571){
                 MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId.longValue());
                 logger.info("需求函类型获取审批员工：" + mktRequestDO);
                 dataMap.put("requestId",mktRequestDO.getRequestId());
