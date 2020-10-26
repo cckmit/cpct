@@ -19,9 +19,9 @@ public interface ChannelMapper {
     Channel selectByPrimaryKeyFromShiTi(Long aLong);
 
     //门店模糊匹配
-    List<Channel> getChannelbyChannelNbr(String channelNbr);
+    List<Channel> getChannelbyChannelNbr(@Param("channelNbr") String channelNbr);
 
-    List<Channel> getChannelbyChannelName(String channelName);
+    List<Channel> getChannelbyChannelName(@Param("channelName") String channelName);
 
     List<Channel> getAllChannelById(List<Integer> channelId);
 

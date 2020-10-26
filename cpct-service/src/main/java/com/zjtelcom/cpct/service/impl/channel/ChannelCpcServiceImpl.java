@@ -520,10 +520,12 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
         List<Channel> channelNbrList = channelMapper.getChannelbyChannelNbr(channelParam);
         List<Channel> channelNameList = channelMapper.getChannelbyChannelName(channelParam);
         if(channelNbrList.size() > 0){
-         resultMap.put("pageInfo",new Page(new PageInfo<>(channelNbrList)));
-         return  resultMap;
+            resultMap.put("channelList",channelNbrList);
+            resultMap.put("pageInfo",new Page(new PageInfo<Channel>(channelNbrList)));
+            return  resultMap;
         }else {
-            resultMap.put("pageInfo",new Page(new PageInfo<>(channelNameList)));
+            resultMap.put("channelList",channelNameList);
+            resultMap.put("pageInfo",new Page(new PageInfo<Channel>(channelNameList)));
             return  resultMap;
         }
 
