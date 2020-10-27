@@ -1408,7 +1408,8 @@ public class EventApiServiceImpl implements EventApiService {
          */
         private void specailEventDeal(Map<String, String> map, Map<String, Object> evtContent, String eventCode, List<DefaultContext<String, Object>> resultMapList) {
             if ("EVT0000000101".equals(eventCode) || "EVT0000000102".equals(eventCode)
-                    || "EVT0000000105".equals(eventCode) || "EVT0000000107".equals(eventCode) ) {
+                    || "EVT0000000105".equals(eventCode) || "EVT0000000107".equals(eventCode)
+                    || "EVT0000000108".equals(eventCode)||"EVT0000000109".equals(eventCode) ) {
                 DefaultContext<String, Object> reultMap = resultMapList.get(0);
                 evtContent.put("400600000040", "");
                 evtContent.put("400600000041", "");
@@ -1466,7 +1467,7 @@ public class EventApiServiceImpl implements EventApiService {
                         }
                     }
                     Object flg = evtContent.get("400600000052");
-                    if ("EVT0000000105".equals(eventCode)|| (flg!=null && "1".equals(flg.toString()))){
+                    if ("EVT0000000105".equals(eventCode)|| "EVT0000000108".equals(eventCode)||"EVT0000000109".equals(eventCode)|| (flg!=null && "1".equals(flg.toString()))){
                         if (onlineMap.get("wgbm")==null){
                             staffCode = "GIS网格编码查询为空";
                         }else {
