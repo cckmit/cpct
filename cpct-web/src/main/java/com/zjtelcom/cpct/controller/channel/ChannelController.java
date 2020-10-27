@@ -358,7 +358,7 @@ public class ChannelController extends BaseController {
         try {
             String channelParam = (String)param.get("channelParam");
             Integer pageSize = (Integer)param.get("pageSize");
-            Integer pageNum = (Integer)param.get("pageNum");
+            Integer pageNum = (Integer)param.get("page");
             logger.info(param.toString());
             dataMap = channelService.getChannelByChannelName(channelParam, pageSize.intValue(),pageNum.intValue());
 
