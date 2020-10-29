@@ -1,7 +1,6 @@
 package com.zjtelcom.cpct.controller.campaign;
 
 import com.zjtelcom.cpct.domain.campaign.BatchSendDO;
-import com.zjtelcom.cpct.dubbo.service.MktCampaignApiService;
 import com.zjtelcom.cpct.service.campaign.BatchSendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,6 @@ public class BatchSendController {
     protected Logger logger = LoggerFactory.getLogger(BatchSendController.class);
     @Autowired
     private  BatchSendService batchSendService;
-    @Autowired(required = false)
-    private MktCampaignApiService mktCampaignApiService;
     /*
      **获取下发批次列表
      */
@@ -87,26 +84,4 @@ public class BatchSendController {
         return result;
     }
 
-
-    /*
-     * 根据需求函类型获取审批人
-     */
-    @PostMapping(value = "/getStaffByMktRequest")
-    @CrossOrigin
-    public Map<String, Object> getStaffByMktRequest(@RequestBody Map<String, Object> params) {
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> data = new HashMap<>();
-        try {
-            //data = mktCampaignApiService.getStaffByMktRequest(params);
-        }catch (Exception e) {
-            e.printStackTrace();
-            result.put("resultCode", CODE_FAIL);
-            result.put("resultMsg", "获取失败");
-            return  result;
-        }
-        result.put("resultCode", CODE_SUCCESS);
-        result.put("resultMsg", "获取成功");
-        result.put("data",data);
-        return result;
-    }
 }

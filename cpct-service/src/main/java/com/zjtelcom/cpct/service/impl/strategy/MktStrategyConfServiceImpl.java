@@ -207,6 +207,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 添加属性配置信息
             MktStrategyConfDO mktStrategyConfDO = new MktStrategyConfDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
+            mktStrategyConfDO.setMktStrategyConfId(null);
             mktStrategyConfDO.setCreateStaff(UserUtil.loginId());
             mktStrategyConfDO.setCreateDate(new Date());
             mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());

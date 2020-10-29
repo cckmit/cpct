@@ -48,6 +48,7 @@ public enum StatusCode {
     SERVICE_CAMPAIGN("服务活动", "5000"),
     SERVICE_SALES_CAMPAIGN("服务随销活动", "6000"),
     XIETONG_SCENE("协同场景", "7000"),
+    CAM_RESOURCE("电子券活动", "8000"),
 
     /*活动周期性*/
     ONE_TIME("一次性", "1000"),

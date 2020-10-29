@@ -23,4 +23,6 @@ public interface MktProductAttrMapper {
 
     List<MktProductAttr> selectByProduct(MktProductAttr record);
 
+    List<MktProductAttr> selectByRule(Long ruleId);
+
 }

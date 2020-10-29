@@ -38,6 +38,30 @@ public class PpmProductController extends BaseController  {
      * parram: list
      * @return
      */
+    @PostMapping("addProductAttr4Rule")
+    @CrossOrigin
+    public Map<String, Object> addProductAttr4Rule(@RequestBody Map<String,Object> param) {
+        Map<String ,Object> result = new HashMap<>();
+        try {
+            List<Integer> productItemId = (List<Integer>)param.get("productItemId");
+            Long ruleId = MapUtil.getLongNum(param.get("ruleId"));
+            result = productService.addProductAttr4Rule(productItemId,ruleId);
+        }catch (Exception e){
+            logger.error("[op:PpmProductController] fail to addProductAttr4Rule",e);
+            result.put("resultCode",CODE_FAIL);
+            result.put("resultMsg"," fail to addProductAttr4Rule");
+            return result;
+        }
+        return result;
+    }
+
+
+
+    /**
+     * 电子券活动列表（不分页）
+     * parram: list
+     * @return
+     */
     @PostMapping("listCampaign4Resource")
     @CrossOrigin
     public Map<String, Object> listCampaign4Resource(@RequestBody MktCamResourceVO camResource) {

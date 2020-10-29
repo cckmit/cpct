@@ -285,7 +285,7 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
 
             MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamId.longValue());
             //12是外场营销目录
-            if(mktCampaignDO.getDirectoryId() == 12 && mktCampaignDO.getLanId() == 571){
+            if(mktCampaignDO.getDirectoryId() == 614401299L && mktCampaignDO.getLanId() == 571){
                 MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId.longValue());
                 logger.info("需求函类型获取审批员工：" + mktRequestDO);
                 dataMap.put("requestId",mktRequestDO.getRequestId());

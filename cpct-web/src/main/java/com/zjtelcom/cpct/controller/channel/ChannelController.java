@@ -358,9 +358,9 @@ public class ChannelController extends BaseController {
         try {
             String channelParam = (String)param.get("channelParam");
             Integer pageSize = (Integer)param.get("pageSize");
-            Integer pageNum = (Integer)param.get("page");
+            Integer page = (Integer)param.get("page");
             logger.info(param.toString());
-            dataMap = channelService.getChannelByChannelName(channelParam, pageSize.intValue(),pageNum.intValue());
+            dataMap = channelService.getChannelByChannelName(channelParam, pageSize.intValue(),page.intValue());
 
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getChannelByChannelName",e);

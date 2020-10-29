@@ -32,22 +32,22 @@ public class ApplicationStart implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-         //加载系统参数到redis
-        if(isTrue()) {
-            List<SysParams> sysParams = sysParamsMapper.selectAll(null, null);
-            log.info("初始化系统参数到redis：" + JSONObject.toJSONString(JSON.toJSON(sysParams)));
-            for (SysParams params : sysParams) {
-                if (StringUtils.isNotBlank(params.getParamKey())) {
-                    try {
-                        redisUtils.set(params.getParamKey(), params.getParamValue());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        log.info("redis插入数据错误");
-                    }
-                }
-            }
-            log.info("系统参数缓存完毕");
-        }
+//         //加载系统参数到redis
+//        if(isTrue()) {
+//            List<SysParams> sysParams = sysParamsMapper.selectAll(null, null);
+//            log.info("初始化系统参数到redis：" + JSONObject.toJSONString(JSON.toJSON(sysParams)));
+//            for (SysParams params : sysParams) {
+//                if (StringUtils.isNotBlank(params.getParamKey())) {
+//                    try {
+//                        redisUtils.set(params.getParamKey(), params.getParamValue());
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        log.info("redis插入数据错误");
+//                    }
+//                }
+//            }
+//            log.info("系统参数缓存完毕");
+//        }
     }
 
     /**

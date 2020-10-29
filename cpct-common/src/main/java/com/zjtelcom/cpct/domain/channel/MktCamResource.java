@@ -89,6 +89,7 @@ public class MktCamResource implements Serializable {
     private String differentOfferId;
 
     private String dealShops;
+    private String postUrl;
 
     private List<String> dealShopList;
 }

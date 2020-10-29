@@ -60,6 +60,8 @@ public interface MktCampaignService {
 
     Map<String, Object> getMktCampaignTemplate(Long preMktCampaignId) throws Exception;
 
+    Map<String, Object> getMktCampaignTemplate4CamResource(Long preMktCampaignId) throws Exception ;
+
     Map<String, Object> copyMktCampaign(Long parentMktCampaignId);
 
     Map<String, Object> dueMktCampaign();

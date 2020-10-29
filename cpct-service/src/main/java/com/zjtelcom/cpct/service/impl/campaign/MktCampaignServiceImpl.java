@@ -84,6 +84,7 @@ import java.util.concurrent.*;
 import static com.zjtelcom.cpct.constants.CommonConstant.*;
 import static com.zjtelcom.cpct.enums.DateUnit.MONTH;
 import static com.zjtelcom.cpct.enums.DateUnit.YEAR;
+import static com.zjtelcom.cpct.enums.StatusCode.CAM_RESOURCE;
 import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_PUBLISHED;
 import static com.zjtelcom.cpct.enums.StatusCode.STATUS_CODE_ROLL;
 import static com.zjtelcom.cpct.util.DateUtil.*;
@@ -886,6 +887,7 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                 // redisUtils.del("CAM_IDS_EVT_REL_" + eventDTO.getEventId());
             }
 
+
             //更新推荐条目
             if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
                 List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
@@ -894,6 +896,21 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     mktCamItemMapper.updateByPrimaryKey(mktCamItem);
                 }
             }
+//            //更新推荐条目
+//            if (mktCampaignVO.getMktCamItemIdList() != null && !mktCampaignVO.getMktCamItemIdList().isEmpty()) {
+//                List<MktCamItem> mktCamItemList = mktCamItemMapper.selectByBatch(mktCampaignVO.getMktCamItemIdList());
+//                if (mktCampaignVO.getMktCamResource() != null && mktCampaignVO.getMktCamResource().getParentId() != null) {
+//                    Map<String, Object> stringObjectMap = productService.copyItemByCampaign(mktCampaignVO.getMktCamResource().getParentId(), mktCampaignId);
+//                    if (CODE_SUCCESS.equals(stringObjectMap.get("resultCode"))){
+//                        mktCamItemList = (List<Long>)stringObjectMap.get("resultMsg");
+//                    }
+//                }
+//                for (MktCamItem mktCamItem : mktCamItemList) {
+//                    mktCamItem.setMktCampaignId(mktCampaignId);
+//                    mktCamItemMapper.updateByPrimaryKey(mktCamItem);
+//                }
+//
+//            }
 
             //需求涵id不为空添加与活动的关系
             if (mktCampaignVO.getRequestId() != null) {
@@ -979,16 +996,27 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             ObjLabelRelCreate(mktCampaignDO);
 
             //活动级别创建电子券模板信息
-            MktCamResource mktCamResource = mktCampaignVO.getMktCamResource();
-            mktCamResource.setFrameFlg(FrameFlgEnum.YES.getValue()); // 是否电子券框架类型, yes-是，no-不是
-            mktCamResource.setMktCampaignId(mktCampaignId);
-            mktCamResource.setCreateStaff(UserUtil.loginId());
-            mktCamResource.setCreateDate(new Date());
-            mktCamResource.setUpdateStaff(UserUtil.loginId());
-            mktCamResource.setUpdateDate(new Date());
-            mktCamResource.setStatusCd("1000");
-            mktCamResourceMapper.insert(mktCamResource);
-
+            if (mktCampaignVO.getMktCamResource()!=null){
+                MktCamResource mktCamResource = mktCampaignVO.getMktCamResource();
+                if (mktCamResource.getParentId()!=null){
+                    List<MktCamResource> mktCamResources = mktCamResourceMapper.selectByCampaignId(mktCamResource.getParentId(), FrameFlgEnum.YES.getValue(), null);
+                    if (!mktCamResources.isEmpty()){
+                        mktCamResource = mktCamResources.get(0);
+                        mktCamResource.setMktCamResourceId(null);
+                    }
+                }
+                List<Long> camItemIdList = mktCampaignVO.getMktCamItemIdList();
+                List<MktCamItem> camItemList = mktCamItemMapper.selectByBatch(camItemIdList);
+                ChannelUtil.addItem2CamResource(mktCamResource,camItemList);
+                mktCamResource.setFrameFlg(FrameFlgEnum.YES.getValue()); // 是否电子券框架类型, yes-是，no-不是
+                mktCamResource.setMktCampaignId(mktCampaignId);
+                mktCamResource.setCreateStaff(UserUtil.loginId());
+                mktCamResource.setCreateDate(new Date());
+                mktCamResource.setUpdateStaff(UserUtil.loginId());
+                mktCamResource.setUpdateDate(new Date());
+                mktCamResource.setStatusCd("1000");
+                mktCamResourceMapper.insert(mktCamResource);
+            }
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             if (StatusCode.STATUS_CODE_DRAFT.getStatusCode().equals(mktCampaignVO.getStatusCd())) {
                 maps.put("resultMsg", ErrorCode.SAVE_MKT_CAMPAIGN_SUCCESS.getErrorMsg());
@@ -1395,6 +1423,9 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             //修改电子券的信息
             MktCamResource mktCamResource = mktCampaignVO.getMktCamResource();
             if (mktCamResource != null) {
+                List<Long> camItemIdList = mktCampaignVO.getMktCamItemIdList();
+                List<MktCamItem> camItemList = mktCamItemMapper.selectByBatch(camItemIdList);
+                ChannelUtil.addItem2CamResource(mktCamResource,camItemList);
                 mktCamResource.setUpdateStaff(UserUtil.loginId());
                 mktCamResource.setUpdateDate(new Date());
                 mktCamResourceMapper.updateByPrimaryKey(mktCamResource);
@@ -2833,6 +2864,10 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
                     generateRequest(mktCampaignDO, mktCamCityRelDO.getCityId());
                 }
             }
+            if (CAM_RESOURCE.getStatusCode().equals(mktCampaignDO.getMktCampaignType())){
+                logger.info("【电子券活动发布调用资源中心开始】：" + JSON.toJSONString(mktCampaignDO));
+                productService.mktCamResourceService(mktCampaignDO.getMktCampaignId());
+            }
             mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
             mktCampaignMap.put("resultMsg", "发布活动成功！");
             mktCampaignMap.put("childMktCampaignIdList", childMktCampaignIdList);
@@ -3147,6 +3182,111 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
 
 
     /**
+     * 选择模板(电子券)
+     *
+     * @param preMktCampaignId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> getMktCampaignTemplate4CamResource(Long preMktCampaignId) throws Exception {
+        Map<String, Object> maps = new HashMap<>();
+        try {
+            // 获取关系
+            List<MktCampaignRelDO> mktCampaignRelDOList = mktCampaignRelMapper.selectByAmktCampaignId(preMktCampaignId, StatusCode.STATUS_CODE_EFFECTIVE.getStatusCode());
+            List<CityProperty> applyRegionIds = new ArrayList<>();
+            // 获取活动基本信息
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(preMktCampaignId);
+
+            MktCampaignDetailVO mktCampaignVO = new MktCampaignDetailVO();
+            CopyPropertiesUtil.copyBean2Bean(mktCampaignVO, mktCampaignDO);
+            // 获取下发城市集合
+            List<MktCamCityRelDO> mktCamCityRelDOList = mktCamCityRelMapper.selectByMktCampaignId(mktCampaignVO.getMktCampaignId());
+            for (MktCamCityRelDO mktCamCityRelDO : mktCamCityRelDOList) {
+                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(mktCamCityRelDO.getCityId().intValue());
+                CityProperty cityProperty = new CityProperty();
+                cityProperty.setCityPropertyId(sysArea.getAreaId().longValue());
+                cityProperty.setCityPropertyName(sysArea.getName());
+                applyRegionIds.add(cityProperty);
+            }
+            mktCampaignVO.setApplyRegionIdList(applyRegionIds);
+
+            CatalogItem catalogItem = catalogItemMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+            if (catalogItem != null) {
+                mktCampaignVO.setDirectoryName(catalogItem.getCatalogItemName());
+            } else {
+                MktCamDirectoryDO mktCamDirectoryDO = mktCamDirectoryMapper.selectByPrimaryKey(mktCampaignDO.getDirectoryId());
+                if (mktCamDirectoryDO != null) {
+                    mktCampaignVO.setDirectoryName(mktCamDirectoryDO.getMktCamDirectoryName());
+                }
+            }
+            // 获取所有的sysParam
+            Map<String, String> paramMap = new HashMap<>();
+            List<SysParams> sysParamList = sysParamsMapper.selectAll("", "");
+            for (SysParams sysParams : sysParamList) {
+                paramMap.put(sysParams.getParamKey() + sysParams.getParamValue(), sysParams.getParamName());
+            }
+            mktCampaignVO.setTiggerTypeValue(paramMap.
+                    get(ParamKeyEnum.TIGGER_TYPE.getParamKey() + mktCampaignDO.getTiggerType()));
+            mktCampaignVO.setMktCampaignCategoryValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_CATEGORY.getParamKey() + mktCampaignDO.getMktCampaignCategory()));
+            mktCampaignVO.setMktCampaignTypeValue(paramMap.
+                    get(ParamKeyEnum.MKT_CAMPAIGN_TYPE.getParamKey() + mktCampaignDO.getMktCampaignType()));
+            mktCampaignVO.setStatusCdValue(paramMap.
+                    get(ParamKeyEnum.STATUS_CD.getParamKey() + mktCampaignDO.getStatusCd()));
+            mktCampaignVO.setExecTypeValue(paramMap.
+                    get(ParamKeyEnum.EXEC_TYPE.getParamKey() + mktCampaignDO.getExecType()));
+
+            // 获取活动关联的事件
+            List<MktCamEvtRelDO> mktCamEvtRelDOList = mktCamEvtRelMapper.selectByMktCampaignId(mktCampaignDO.getMktCampaignId());
+            if (mktCamEvtRelDOList != null) {
+                List<EventDTO> eventDTOList = new ArrayList<>();
+                for (MktCamEvtRelDO mktCamEvtRelDO : mktCamEvtRelDOList) {
+                    Long eventId = mktCamEvtRelDO.getEventId();
+                    ContactEvt contactEvt = contactEvtMapper.getEventById(eventId);
+                    if (contactEvt != null) {
+                        EventDTO eventDTO = new EventDTO();
+                        eventDTO.setEventId(eventId);
+                        eventDTO.setEventName(contactEvt.getContactEvtName());
+                        eventDTOList.add(eventDTO);
+                    }
+                }
+                mktCampaignVO.setEventDTOS(eventDTOList);
+            }
+
+            List<Long> camItemIdList = mktCamItemMapper.selectCamItemIdByCampaignId(preMktCampaignId);
+
+            Map<String, Object> stringObjectMap = productService.copyProductRule(UserUtil.loginId(), camItemIdList);
+            List<Long> ruleIdList = (List<Long>) stringObjectMap.get("ruleIdList");
+            mktCampaignVO.setMktCamItemIdList(ruleIdList);
+
+            // 获取过滤规则集合
+            List<Long> filterRuleIdList = mktStrategyFilterRuleRelMapper.selectByStrategyId(preMktCampaignId);
+            mktCampaignVO.setFilterRuleIdList(filterRuleIdList);
+
+            // 获取关单规则集合
+            List<Long> closeRuleIdList = mktStrategyCloseRuleRelMapper.selectByStrategyId(preMktCampaignId);
+            mktCampaignVO.setCloseRuleIdList(closeRuleIdList);
+
+            Map<String, Object> strategyTemplateMap = mktStrategyConfService.getStrategyTemplate(preMktCampaignId);
+            List<MktStrategyConfDetail> mktStrategyConfDetailList = (List<MktStrategyConfDetail>) strategyTemplateMap.get("mktStrategyConfDetailList");
+            mktCampaignVO.setMktStrategyConfDetailList(mktStrategyConfDetailList);
+
+            List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(preMktCampaignId, FrameFlgEnum.YES.getValue(), null);
+            if (mktCamResourceList != null && mktCamResourceList.size() > 0) {
+                mktCampaignVO.setMktCamResource(mktCamResourceList.get(0));
+            }
+            maps.put("resultCode", CommonConstant.CODE_SUCCESS);
+            maps.put("mktCampaignVO", mktCampaignVO);
+        } catch (Exception e) {
+            logger.error("[op:MktCampaignServiceImpl] failed to getMktCampaignTemplate by preMktCampaignId = {}, Exception = ", preMktCampaignId, e);
+            maps.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return maps;
+    }
+
+
+    /**
      * 选择模板
      *
      * @param preMktCampaignId
@@ -3359,7 +3499,8 @@ public class MktCampaignServiceImpl extends BaseService implements MktCampaignSe
             if (mktCamStrategyConfRelDONewList != null && !mktCamStrategyConfRelDONewList.isEmpty()) {
                 mktCamStrategyConfRelMapper.insertBatch(mktCamStrategyConfRelDONewList);
             }
-
+            //复制电子券
+            productService.copyMktCamResource4Cam(parentMktCampaignId,newMktCampaignId);
             maps.put("resultCode", CommonConstant.CODE_SUCCESS);
             maps.put("mktCampaignId", newMktCampaignId);
         } catch (Exception e) {

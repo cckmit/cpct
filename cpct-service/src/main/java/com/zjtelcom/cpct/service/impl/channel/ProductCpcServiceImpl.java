@@ -103,24 +103,51 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     @Autowired
     private SysAreaMapper sysAreaMapper;
 
+    @Override
+    public Map<String, Object> addProductAttr4Rule( List<Integer> itemList, Long ruleId) {
+        Map<String,Object> result = new HashMap<>();
+        for (Integer aLong : itemList) {
+            MktProductAttr  mktProductAttr = new MktProductAttr();
+            mktProductAttr.setProductId(Long.valueOf(aLong.toString()));
+            mktProductAttr.setFrameFlg(FrameFlgEnum.YES.getValue());
+            List<MktProductAttr> productAttrs = mktProductAttrMapper.selectByProduct(mktProductAttr);
+            if (!productAttrs.isEmpty()){
+                for (MktProductAttr oldAttr : productAttrs) {
+                    MktProductAttr newAttr = BeanUtil.create(oldAttr, new MktProductAttr());
+                    newAttr.setMktProductAttrId(null);
+                    newAttr.setProductId(Long.valueOf(aLong.toString()));
+                    newAttr.setRuleId(ruleId);
+                    newAttr.setFrameFlg(FrameFlgEnum.NO.getValue());
+                    mktProductAttrMapper.insert(newAttr);
+                }
+            }
+        }
+        result.put("resultCode",CODE_SUCCESS);
+        result.put("resultMsg","成功");
+        return result;
+    }
 
     @Override
     public Map<String, Object> copyMktCamResource4Cam(Long oldCampaignId, Long newCampaignId) {
         Map<String,Object> result = new HashMap<>();
-        List<MktCamResource> mktCamResources = mktCamResourceMapper.selectByCampaignId(oldCampaignId, FrameFlgEnum.YES.getValue(), null);
-        if (!mktCamResources.isEmpty()){
-            MktCamResource old = mktCamResources.get(0);
-            old.setMktCamResourceId(null);
-            old.setMktCampaignId(newCampaignId);
-            List<Long> offerList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.OFFER.getValue());
-            old.setOfferId(ChannelUtil.idList2String(offerList));
-            List<Long> deppendOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_OFFER.getValue());
-            old.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
-            List<Long> deppendProductList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_PRODUCT.getValue());
-            old.setDependProductId(ChannelUtil.idList2String(deppendProductList));
-            List<Long> differentOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DIFFERENT_OFFER.getValue());
-            old.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
-            mktCamResourceMapper.insert(old);
+        try {
+            List<MktCamResource> mktCamResources = mktCamResourceMapper.selectByCampaignId(oldCampaignId, FrameFlgEnum.YES.getValue(), null);
+            if (!mktCamResources.isEmpty()){
+                MktCamResource old = mktCamResources.get(0);
+                old.setMktCamResourceId(null);
+                old.setMktCampaignId(newCampaignId);
+                List<Long> offerList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.OFFER.getValue());
+                old.setOfferId(ChannelUtil.idList2String(offerList));
+                List<Long> deppendOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_OFFER.getValue());
+                old.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
+                List<Long> deppendProductList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DEPEND_PRODUCT.getValue());
+                old.setDependProductId(ChannelUtil.idList2String(deppendProductList));
+                List<Long> differentOfferList = mktCamItemMapper.listCamItemIdByCampaign(null, newCampaignId, CamItemType.DIFFERENT_OFFER.getValue());
+                old.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
+                mktCamResourceMapper.insert(old);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -128,38 +155,42 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
     @Override
     public Map<String, Object> copyMktCamResource4Rule(Long newCampaignId,Long oldRuleId, Long newRuleId) {
         Map<String,Object> result = new HashMap<>();
-        MktCamResource oldResource = mktCamResourceMapper.selectByRuleId(oldRuleId, FrameFlgEnum.YES.getValue());
-        if (oldResource!=null){
-            oldResource.setMktCamResourceId(null);
-            oldResource.setMktCampaignId(newCampaignId);
-            MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(newRuleId);
-            if (ruleDO!=null && ruleDO.getProductId()!=null && !ruleDO.getProductId().equals("")){
-                List<Long> idList = ChannelUtil.StringToIdList(ruleDO.getProductId());
-                List<MktCamItem> camItemList = mktCamItemMapper.selectByBatch(idList);
-                List<Long> offerList = new ArrayList<>();
-                List<Long> deppendOfferList = new ArrayList<>();
-                List<Long> deppendProductList = new ArrayList<>();
-                List<Long> differentOfferList = new ArrayList<>();
-                for (MktCamItem item : camItemList) {
-                    if (CamItemType.OFFER.getValue().equals(item.getItemType())){
-                        offerList.add(item.getMktCamItemId());
+        try {
+            MktCamResource oldResource = mktCamResourceMapper.selectByRuleId(oldRuleId, FrameFlgEnum.YES.getValue());
+            if (oldResource!=null){
+                oldResource.setMktCamResourceId(null);
+                oldResource.setMktCampaignId(newCampaignId);
+                MktStrategyConfRuleDO ruleDO = ruleMapper.selectByPrimaryKey(newRuleId);
+                if (ruleDO!=null && ruleDO.getProductId()!=null && !ruleDO.getProductId().equals("")){
+                    List<Long> idList = ChannelUtil.StringToIdList(ruleDO.getProductId());
+                    List<MktCamItem> camItemList = mktCamItemMapper.selectByBatch(idList);
+                    List<Long> offerList = new ArrayList<>();
+                    List<Long> deppendOfferList = new ArrayList<>();
+                    List<Long> deppendProductList = new ArrayList<>();
+                    List<Long> differentOfferList = new ArrayList<>();
+                    for (MktCamItem item : camItemList) {
+                        if (CamItemType.OFFER.getValue().equals(item.getItemType())){
+                            offerList.add(item.getMktCamItemId());
+                        }
+                        if (CamItemType.DEPEND_OFFER.getValue().equals(item.getItemType())){
+                            deppendOfferList.add(item.getMktCamItemId());
+                        }
+                        if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
+                            deppendProductList.add(item.getMktCamItemId());
+                        }
+                        if (CamItemType.DIFFERENT_OFFER.getValue().equals(item.getItemType())){
+                            differentOfferList.add(item.getMktCamItemId());
+                        }
                     }
-                    if (CamItemType.DEPEND_OFFER.getValue().equals(item.getItemType())){
-                        deppendOfferList.add(item.getMktCamItemId());
-                    }
-                    if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
-                        deppendProductList.add(item.getMktCamItemId());
-                    }
-                    if (CamItemType.DIFFERENT_OFFER.getValue().equals(item.getItemType())){
-                        differentOfferList.add(item.getMktCamItemId());
-                    }
+                    oldResource.setOfferId(ChannelUtil.idList2String(offerList));
+                    oldResource.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
+                    oldResource.setDependProductId(ChannelUtil.idList2String(deppendProductList));
+                    oldResource.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
+                    mktCamResourceMapper.insert(oldResource);
                 }
-                oldResource.setOfferId(ChannelUtil.idList2String(offerList));
-                oldResource.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
-                oldResource.setDependProductId(ChannelUtil.idList2String(deppendProductList));
-                oldResource.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
-                mktCamResourceMapper.insert(oldResource);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -421,9 +452,12 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 MktCamItem newItem = BeanUtil.create(item, new MktCamItem());
                 newItem.setMktCamItemId(null);
                 newItem.setMktCampaignId(-1L);
+                camItemMapper.insert(newItem);
                 mktCamItems.add(newItem);
+                if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
+                    copyMktProductAttr4Cam(item.getMktCamItemId(),newItem.getMktCamItemId());
+                }
             }
-            camItemMapper.insertByBatch(mktCamItems);
             for(MktCamItem item : mktCamItems){
                 redisUtils.set("MKT_CAM_ITEM_" + item.getMktCamItemId(), item);
                 ruleIdList.add(item.getMktCamItemId());
@@ -474,6 +508,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
         Map<String,Object> result = new HashMap<>();
         Map<Long, Long> itemMap = new HashMap<>();
         List<Long> idList = new ArrayList<>();
+        List<MktCamItem> itemList = new ArrayList<>();
         List<MktCamItem> oldItemList = camItemMapper.selectByCampaignId(oldCampaignId);
         for (MktCamItem item : oldItemList){
             MktCamItem newItem = BeanUtil.create(item,new MktCamItem());
@@ -482,14 +517,16 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             newItem.setMktCampaignId(newCampaignId);
             camItemMapper.insert(newItem);
             if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
-                copyMktProductAttr4Cam(item.getItemId(),newItem.getItemId());
+                copyMktProductAttr4Cam(item.getMktCamItemId(),newItem.getMktCamItemId());
             }
             itemMap.put(item.getMktCamItemId(), newItem.getMktCamItemId());
             idList.add(newItem.getMktCamItemId());
+            itemList.add(newItem);
         }
         result.put("itemMap", itemMap);
         result.put("resultCode",CODE_SUCCESS);
         result.put("resultMsg",idList);
+        result.put("itemList",itemList);
         return result;
     }
 
@@ -845,6 +882,8 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
             //查询
             List<MktCamResource> mktCamResourceList = mktCamResourceMapper.selectByCampaignId(mktCampaignId, FrameFlgEnum.NO.getValue(),null);
             for (MktCamResource mktCamResource : mktCamResourceList) {
+
+                logger.info("【电子券发布开始】：" + JSON.toJSONString(mktCamResource));
                 Long mktResId = mktCamResource.getResourceId();
                 MktResCouponDto mktResCouponDto = new MktResCouponDto();
                 mktResCouponDto.setShowAmount(Double.valueOf(mktCamResource.getFaceAmount()) + Double.valueOf(mktCamResource.getDifferentPrice()));
@@ -870,24 +909,30 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                 mktResCouponDto.setStatusCd("1000");
                 if (mktResId != null) {
                     // 有电子券 -> 修改
-                    mktResCouponDto.setActType("MOD");
-                    logger.info("1--->>> 入参（MOD）：" + JSON.toJSONString(mktResCouponDto));
-                    CpcResultObject<String> stringCpcResultObject = iMktResCouponWriteService.modifyMktresCoupon(mktResCouponDto);
-                    logger.info("1--->>> 出参（MOD）：" + JSON.toJSONString(stringCpcResultObject));
-                    CpcResultObject<CouponEffExpDto> couponEffExpDtoCpcResultObject = iCouponEffExpRuleService.qryCouponEffExpRule(mktResId);
-                    if (couponEffExpDtoCpcResultObject.getResultCode().equals("0")){
-                        Long effExpRuleId = couponEffExpDtoCpcResultObject.getResultObject().getEffExpRuleId();
-                        CouponEffExpDto couponEffExpDto = new CouponEffExpDto();
-                        couponEffExpDto.setEffExpRuleId(effExpRuleId);
-                        couponEffExpDto.setMktResId(mktCamResource.getResourceId());
-                        couponEffExpDto.setRemark(mktCamResource.getRemark());
-                        couponEffExpDto.setEffDate(mktCamResource.getStartTime());
-                        couponEffExpDto.setExpDate(mktCamResource.getEndTime());
-                        couponEffExpDto.setStaffId(mktCamResource.getCreateStaff());
-                        couponEffExpDto.setActType("MOD");
-                        logger.info("2--->>> 入参（MOD）：" + JSON.toJSONString(couponEffExpDto));
-                        CpcResultObject cpcResultObject = iCouponEffExpRuleWriteService.modifyCouponEffExpRlue(couponEffExpDto);
-                        logger.info("2--->>> 出参（MOD）：" + JSON.toJSONString(cpcResultObject));
+                    CpcResultObject<MktResCouponDto> mktResCouponDtoCpcResultObject = iCpcMktResCouponDubboService.qryMktResCouponById(mktResId);
+                    if (mktResCouponDtoCpcResultObject.getResultCode().equals("0")){
+                        Long mktResId1 = mktResCouponDtoCpcResultObject.getResultObject().getMktResId();
+                        mktResCouponDto.setActType("MOD");
+                        mktResCouponDto.setMktResId(mktResId1);
+                        logger.info("1--->>> 入参（MOD）：" + JSON.toJSONString(mktResCouponDto));
+                        CpcResultObject<String> stringCpcResultObject = iMktResCouponWriteService.modifyMktresCoupon(mktResCouponDto);
+                        logger.info("1--->>> 出参（MOD）：" + JSON.toJSONString(stringCpcResultObject));
+                        CpcResultObject<CouponEffExpDto> couponEffExpDtoCpcResultObject = iCouponEffExpRuleService.qryCouponEffExpRule(mktResId);
+                        logger.info("【电子券关系表查询】 出参（MOD）：" + JSON.toJSONString(couponEffExpDtoCpcResultObject));
+                        if (couponEffExpDtoCpcResultObject.getResultCode().equals("0")){
+                            Long effExpRuleId = couponEffExpDtoCpcResultObject.getResultObject().getEffExpRuleId();
+                            CouponEffExpDto couponEffExpDto = new CouponEffExpDto();
+                            couponEffExpDto.setEffExpRuleId(effExpRuleId);
+                            couponEffExpDto.setMktResId(mktCamResource.getResourceId());
+                            couponEffExpDto.setRemark(mktCamResource.getRemark());
+                            couponEffExpDto.setEffDate(mktCamResource.getStartTime());
+                            couponEffExpDto.setExpDate(mktCamResource.getEndTime());
+                            couponEffExpDto.setStaffId(mktCamResource.getCreateStaff());
+                            couponEffExpDto.setActType("MOD");
+                            logger.info("2--->>> 入参（MOD）：" + JSON.toJSONString(couponEffExpDto));
+                            CpcResultObject cpcResultObject = iCouponEffExpRuleWriteService.modifyCouponEffExpRlue(couponEffExpDto);
+                            logger.info("2--->>> 出参（MOD）：" + JSON.toJSONString(cpcResultObject));
+                        }
                     }
                 } else {
                     // 没有电子券 -> 新增
@@ -1030,7 +1075,7 @@ public class ProductCpcServiceImpl extends BaseService implements ProductService
                     CpcResultObject<Boolean> booleanCpcResultObject = iCouponApplyObjectWriteService.modifyCouponApplyObject(couponApplyObjectDtos);
                     logger.info("13--->>> 出参（ADD）" + JSON.toJSONString(booleanCpcResultObject));
                 }
-
+                mktCamResource.setResourceId(mktResId);
                 Map<String, Object> map = camElectronService.publish4Mktcamresource(mktCamResource);
             }
 

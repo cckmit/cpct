@@ -206,6 +206,7 @@
     UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
   where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
 </update>
+
   <update id="updateResourceId" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
     update mkt_cam_resource
     set RESOURCE_ID = #{resourceId,jdbcType=BIGINT}

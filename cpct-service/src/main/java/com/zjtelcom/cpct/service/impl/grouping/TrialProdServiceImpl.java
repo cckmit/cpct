@@ -289,7 +289,12 @@ public class TrialProdServiceImpl implements TrialProdService {
             campaignMap.put("camPoolKey", key);
             redisUtils.setRedisUnit("CAM_POLL_GOING_"+key,"true",300);
             result = campaignIndexTask(campaignMap);
-            mktDttsLogService.saveMktDttsLog("2222", "自动派发成功", new Date(), new Date(), "自动派发成功", JSON.toJSONString(param));
+            List<Map<String,Object>>  list =  (List<Map<String,Object>>)result.get("result");
+            for (Map<String, Object> stringObjectMap : list) {
+                String name = MapUtil.getString(stringObjectMap.get("name"));
+                String batchNum = MapUtil.getString(stringObjectMap.get("batchNum"));
+                mktDttsLogService.saveMktDttsLog("2222", "活动池派发:"+name, new Date(), new Date(),batchNum, JSON.toJSONString(param));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);

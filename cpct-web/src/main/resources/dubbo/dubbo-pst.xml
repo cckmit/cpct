@@ -82,6 +82,14 @@
         <dubbo:method name="qrySystemUserByStaffId" servicecode="00.1077.qrySystemUserByStaffId" timeout="10000"/>
     </dubbo:reference>
 
+    <!-- 门户-用户编码查询岗位 -->
+    <dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.ISystemUserPostDubboService"
+                     id="iSystemUserPostDubboService" version="1.0" retries="0" check="false">
+        <dubbo:method name="qrySystemUserPostDetailBySysUserCode" servicecode="00.1077.qrySystemUserPostDetailBySysUserCode" timeout="10000"/>
+    </dubbo:reference>
+
+
+
     <!--&lt;!&ndash; 门户-获取用户岗位信息 &ndash;&gt;-->
     <!--<dubbo:reference registry="esb3" interface="com.ctzj.smt.bss.sysmgr.privilege.service.dubbo.api.IDictionaryDubboService"-->
                      <!--id="dictionaryDubboService" version="1.0" retries="0" check="false">-->

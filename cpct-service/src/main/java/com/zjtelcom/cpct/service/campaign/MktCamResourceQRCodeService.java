@@ -16,6 +16,8 @@ public interface MktCamResourceQRCodeService {
 
     //海报分页查询接口
     Map<String,Object> getPostgroundPathPage(Map<String,Object> params) throws SftpException;
+    //根据规则获取获取海报
+    Map<String,Object> getPostUrlByRuleId(Map<String,Object> params) throws SftpException;
 
 
 }

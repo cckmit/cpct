@@ -1,12 +1,14 @@
 package com.zjtelcom.cpct.util;
 
 import com.zjtelcom.cpct.domain.SysArea;
+import com.zjtelcom.cpct.domain.campaign.MktCamItem;
 import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
 import com.zjtelcom.cpct.domain.channel.*;
 import com.zjtelcom.cpct.domain.question.Question;
 import com.zjtelcom.cpct.domain.question.Questionnaire;
 import com.zjtelcom.cpct.dto.campaign.CampaignVO;
 import com.zjtelcom.cpct.dto.channel.*;
+import com.zjtelcom.cpct.enums.CamItemType;
 import com.zjtelcom.cpct.enums.Operator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -19,6 +21,32 @@ import java.util.*;
 
 @Component
 public class ChannelUtil  {
+
+
+    public static void addItem2CamResource(MktCamResource resource, List<MktCamItem> camItemList) {
+        List<Long> offerList = new ArrayList<>();
+        List<Long> deppendOfferList = new ArrayList<>();
+        List<Long> deppendProductList = new ArrayList<>();
+        List<Long> differentOfferList = new ArrayList<>();
+        for (MktCamItem item : camItemList) {
+            if (CamItemType.OFFER.getValue().equals(item.getItemType())){
+                offerList.add(item.getMktCamItemId());
+            }
+            if (CamItemType.DEPEND_OFFER.getValue().equals(item.getItemType())){
+                deppendOfferList.add(item.getMktCamItemId());
+            }
+            if (CamItemType.DEPEND_PRODUCT.getValue().equals(item.getItemType())){
+                deppendProductList.add(item.getMktCamItemId());
+            }
+            if (CamItemType.DIFFERENT_OFFER.getValue().equals(item.getItemType())){
+                differentOfferList.add(item.getMktCamItemId());
+            }
+        }
+        resource.setOfferId(ChannelUtil.idList2String(offerList));
+        resource.setDependOfferId(ChannelUtil.idList2String(deppendOfferList));
+        resource.setDependProductId(ChannelUtil.idList2String(deppendProductList));
+        resource.setDifferentOfferId(ChannelUtil.idList2String(differentOfferList));
+    }
 
     public static boolean equalsList(List<Long> list1, List<Long> list2){
         // null情况
@@ -510,6 +538,9 @@ public class ChannelUtil  {
 
 
     public static List<String> StringToList(String var1) {
+        if (var1==null || var1.equals("")){
+            return new ArrayList<>();
+        }
         String[] array = var1.split(",");
         List<String> list = new ArrayList<String>();
         for (String str : array)

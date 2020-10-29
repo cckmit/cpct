@@ -54,5 +54,7 @@
         set POST_URL = #{postUrl, jdbcType = VARCHAR}
         where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
     </select>
-
+    <select id="getPostPathByRuleId" resultType="java.lang.String">
+        SELECT POST_URL from mkt_cam_resource where RULE_ID = #{ruleId}
+    </select>
 </mapper>

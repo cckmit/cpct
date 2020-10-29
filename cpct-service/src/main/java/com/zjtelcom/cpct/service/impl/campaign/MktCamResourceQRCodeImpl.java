@@ -53,7 +53,7 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
     @Value("${ftp.address}")
     private String ftpAddress;
     @Value("${ftp.prodaddress}")
-    private String targetFtpAddress;
+    private String prodaddress;
     @Value("${ftp.port}")
     private int ftpPort;
     @Value("${ftp.name}")
@@ -131,7 +131,7 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         String postUrl =(String) params.get("postUrl");
         String pathName = "/app/cpcp_cxzx/post_url"; //保存地址，本地暂存与ftp地址一致
         String postUrlPathToUse = base64SaveToFtp(postUrl,postUrlPath);
-        mktCamResourceQRCodeMapper.updatePostUrlbyMktResourceId(postUrlPath,mktCamResourceId.longValue());
+        mktCamResourceQRCodeMapper.updatePostUrlbyMktResourceId(postUrlPathToUse,mktCamResourceId.longValue());
         resultMap.put("postUrlPath",postUrlPathToUse);
         return resultMap;
     }
@@ -193,6 +193,26 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
 //        PageHelper.startPage(pageNum,pageSize,orderBy);
         resultMap.put("pageInfo",PageUtil.startPage(postList,pageNum,pageSize));
         resultMap.put("files",PageUtil.startPage(fileList,pageNum,pageSize));
+        return resultMap;
+    }
+//海报获取
+    @Override
+    public Map<String, Object> getPostUrlByRuleId(Map<String, Object> params) throws SftpException {
+        Map<String,Object> resultMap = new HashMap<>();
+        String tempFilePath = postUrlPath;//本地暂存地址
+        Integer ruleId = (Integer)params.get("ruleId");
+        String postPath = mktCamResourceQRCodeMapper.getPostPathByRuleId(ruleId.longValue());
+        SftpUtils sftpUtils = new SftpUtils();
+        final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
+        String path = sftpUtils.cd(postUrlPath, sftp);
+        int lastIndex = postPath.lastIndexOf("/");
+        String fileName = postPath.substring(lastIndex + 1,postPath.length());
+        logger.info("根据规则id获取海报 postPath ： " +postPath);
+        logger.info("根据规则id获取海报 path " +path);
+        logger.info("根据规则id获取海报 fileName " +fileName);
+        boolean result = sftpUtils.download(sftp, path + "/",fileName,tempFilePath);
+        String base64Jpg = FileUtil.convertFileToBase64(tempFilePath + fileName);
+        resultMap.put("data",base64Jpg);
         return resultMap;
     }
 
