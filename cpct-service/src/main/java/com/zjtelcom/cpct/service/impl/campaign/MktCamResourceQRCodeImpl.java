@@ -1,6 +1,7 @@
+/*
 package com.zjtelcom.cpct.service.impl.campaign;
 
-import com.ctzj.service.outbound.QrCodeService;
+//import com.ctzj.service.outbound.QrCodeService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jcraft.jsch.ChannelSftp;
@@ -36,8 +37,12 @@ import java.util.*;
 @Service
 @Transactional
 public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
+*/
+/*
     @Autowired(required = false)
     private QrCodeService qrCodeService;
+*//*
+
     @Autowired
     private MktCamResourceQRCodeMapper mktCamResourceQRCodeMapper;
     @Autowired
@@ -77,7 +82,7 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         paraMap.put("url",h5Url);
         paraMap.put("urlParams",urlParams);
         logger.info("获取二维码url  paramMap:" + paraMap);
-        Map<String,Object> qrResultMap = qrCodeService.generate(paraMap);
+        Map<String,Object> qrResultMap = null; //qrCodeService.generate(paraMap);
         logger.info("获取二维码url  qrResultMap:" + qrResultMap);
         String code =(String)qrResultMap.get("code");
         String qrUrl = "";
@@ -132,7 +137,9 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
     }
 
 
-    /*海报背景图上传*/
+    */
+/*海报背景图上传*//*
+
     @Override
     public Map<String, Object> savePostBackgroundUrl(Map<String, Object> params) throws Exception {
         Map<String,Object> resultMap = new HashMap<>();
@@ -144,7 +151,9 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         return resultMap;
     }
 
-    /*海报背景图分页*/
+    */
+/*海报背景图分页*//*
+
     @Override
     public Map<String, Object> getPostgroundPathPage(Map<String,Object> params) throws SftpException {
         Map<String,Object> resultMap = new HashMap<>();
@@ -173,8 +182,10 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
             String path = sftpUtils.cd(postBackgroundPath, sftp);
             boolean result = sftpUtils.download(sftp, path + "/", fileName, tempFilePath);
             String base64Jpg = FileUtil.convertFileToBase64(tempFilePath + fileName );
-          /*  PostBackgroundDO postBackgroundDO = new PostBackgroundDO();
-            postBackgroundDO.setPostUrl(base64Jpg);*/
+          */
+/*  PostBackgroundDO postBackgroundDO = new PostBackgroundDO();
+            postBackgroundDO.setPostUrl(base64Jpg);*//*
+
             postList.add(base64Jpg);
             fileList.add(fileName);
         }
@@ -193,10 +204,12 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
         String nowDate = simpleDateFormat.format(date2);
         String fileName =nowDate + Math.round(Math.random() * 1000) + ".jpg"; //二维码图片名
         FileUtil.GenerateImage(base64Url,pathName,fileName); //保存为图片到本地
-      /*  String ftpAddress = "134.108.3.130";
+      */
+/*  String ftpAddress = "134.108.3.130";
         int ftpPort = 22;
         String ftpName= "ftp";
-        String ftpPassword = "V1p9*2_9%3#";*/
+        String ftpPassword = "V1p9*2_9%3#";*//*
+
         SftpUtils sftpUtils = new SftpUtils();
         final ChannelSftp sftp = sftpUtils.connect(ftpAddress, ftpPort, ftpName, ftpPassword);
         File pathDir = new File(pathName);
@@ -213,3 +226,4 @@ public class MktCamResourceQRCodeImpl implements MktCamResourceQRCodeService {
 
 
 }
+*/

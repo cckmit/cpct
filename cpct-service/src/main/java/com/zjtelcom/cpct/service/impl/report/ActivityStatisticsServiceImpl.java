@@ -564,6 +564,10 @@ public class ActivityStatisticsServiceImpl implements ActivityStatisticsService 
         }
         //多个id  “，”拼接
         String substring = stringBuilder.toString().substring(0, stringBuilder.length() - 1);
+        if ("".equals(params.get("mktCampaignId").toString()) && "".equals(params.get("theMe").toString())
+                && "".equals(params.get("mktCampaignName").toString()) && "".equals(params.get("mktCampaignType").toString())){
+            substring = "all";
+        }
         paramMap.put("mktCampaignId", substring);
         //省公司(必填)
         Object orglevel1 = params.get("orglevel1");

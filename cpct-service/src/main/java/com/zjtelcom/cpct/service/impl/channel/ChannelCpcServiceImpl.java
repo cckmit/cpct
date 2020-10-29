@@ -513,14 +513,20 @@ public class ChannelCpcServiceImpl extends BaseService implements ChannelService
     }
 
     @Override
-    public  List<Channel> getChannelByChannelName(String channelParam) {
+    public Map<String,Object> getChannelByChannelName(String channelParam, int pageSize, int pageNum) {
         Map<String,Object> resultMap = new HashMap<>();
+        String orderBy = "ORG_ID desc";
+        PageHelper.startPage(pageNum,pageSize,orderBy);
         List<Channel> channelNbrList = channelMapper.getChannelbyChannelNbr(channelParam);
         List<Channel> channelNameList = channelMapper.getChannelbyChannelName(channelParam);
         if(channelNbrList.size() > 0){
-            return channelNbrList;
+            resultMap.put("channelList",channelNbrList);
+            resultMap.put("pageInfo",new Page(new PageInfo<Channel>(channelNbrList)));
+            return  resultMap;
         }else {
-            return channelNameList;
+            resultMap.put("channelList",channelNameList);
+            resultMap.put("pageInfo",new Page(new PageInfo<Channel>(channelNameList)));
+            return  resultMap;
         }
 
     }

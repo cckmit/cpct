@@ -354,10 +354,13 @@ public class ChannelController extends BaseController {
     @CrossOrigin
     public Map<String,Object> getChannelByChannelName(@RequestBody Map<String,Object> param) {
         Map<String,Object> resultMap = new HashMap<>();
-        List<Channel> channelNameList = new ArrayList<>();
+        Map<String,Object> dataMap = new HashMap<>();
         try {
             String channelParam = (String)param.get("channelParam");
-            channelNameList = channelService.getChannelByChannelName(channelParam);
+            Integer pageSize = (Integer)param.get("pageSize");
+            Integer pageNum = (Integer)param.get("page");
+            logger.info(param.toString());
+            dataMap = channelService.getChannelByChannelName(channelParam, pageSize.intValue(),pageNum.intValue());
 
         } catch (Exception e) {
             logger.error("[op:ChannelController] fail to getChannelByChannelName",e);
@@ -367,7 +370,7 @@ public class ChannelController extends BaseController {
         }
         resultMap.put("resultCode",CODE_SUCCESS);
         resultMap.put("resultMessage","消息返回成功");
-        resultMap.put("data",channelNameList);
+        resultMap.put("data",dataMap);
         return resultMap;
     }
 

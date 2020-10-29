@@ -69,6 +69,8 @@ public class EventApiController extends BaseController {
     private EventRelService mktOfferEventService;
     @Autowired
     private MktStrategyCloseRuleRelMapper mktStrategyCloseRuleRelMapper;
+    @Autowired(required = false)
+    private MktCampaignApiService mktCampaignApiService;
 
 
     @PostMapping("mktStrategyCloseRuleRelMapper")
