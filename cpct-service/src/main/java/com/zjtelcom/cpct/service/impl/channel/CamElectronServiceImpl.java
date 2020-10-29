@@ -101,8 +101,9 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
             String typeName = ResourceTypeEnum.getNameByCode(resource.getResourceType());
             String subType = SubTypeEnum.getNameByCode(resource.getResourceSubtype());
             mktCamResourceVO.setTypeString(typeName+"-"+subType);
-            List<String> idList = ChannelUtil.StringToList(resource.getUseArea());
+            List<String> idList = ChannelUtil.StringToList4LabelValue(resource.getUseArea());
            List<String> list1 = new ArrayList<>();
+           if(idList!=null && idList.size()>0 && !"".equals(idList.get(0)))
             for (String aLong : idList) {
                 SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(aLong));
                 list1.add(sysArea.getName());
