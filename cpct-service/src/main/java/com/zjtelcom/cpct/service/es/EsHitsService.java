@@ -3,7 +3,6 @@ package com.zjtelcom.cpct.service.es;
 import com.alibaba.fastjson.JSONObject;
 import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 
-
 import java.util.List;
 import java.util.Map;
 

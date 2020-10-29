@@ -103,7 +103,7 @@ ctg:
   cpctSerpackageGroup: cpct_es_servicepackage_group_prod
 
   ftp:
-    address: 134.108.0.93
+    address: 134.108.0.92
     port: 22
     name: ftp
     password: V1p9*2_9%3#

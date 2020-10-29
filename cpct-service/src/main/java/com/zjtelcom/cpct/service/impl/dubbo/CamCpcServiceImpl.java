@@ -395,7 +395,7 @@ public class CamCpcServiceImpl implements CamCpcService {
         //初始化线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         //遍历策略列表
-//        log.info("strategyMapList = " + JSON.toJSONString(strategyMapList));
+        log.info("strategyMapList = " + JSON.toJSONString(strategyMapList));
         for (Map<String, Object> strategyMap : strategyMapList) {
             Long strategyConfId = (Long) strategyMap.get("strategyConfId");
             String strategyConfName = (String) strategyMap.get("strategyConfName");

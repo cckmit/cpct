@@ -7,14 +7,13 @@ import com.zjtelcom.cpct.elastic.model.CampaignHitParam;
 import com.zjtelcom.cpct.elastic.model.CampaignHitResponse;
 import com.zjtelcom.cpct.elastic.model.CampaignInfoTree;
 import com.zjtelcom.cpct.elastic.model.TotalModel;
+import com.zjtelcom.cpct.elastic.util.DateUtil;
 import com.zjtelcom.cpct.elastic.util.EsSearchUtil;
 import com.zjtelcom.cpct.enums.Operator;
 import com.zjtelcom.cpct.service.es.EsHitsService;
-import com.zjtelcom.cpct.util.DateUtil;
 import com.zjtelcom.cpct.util.RedisUtils;
-
+import com.zjtelcom.cpct.util.RedisUtils_prd;
 import com.zjtelcom.es.es.service.EsService;
-
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -36,8 +35,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.zjtelcom.cpct.config.IndexList.*;
-
+import static com.zjtelcom.cpct.elastic.config.IndexList.*;
 
 @Service
 public class EsHitsServiceImpl implements EsHitsService {
