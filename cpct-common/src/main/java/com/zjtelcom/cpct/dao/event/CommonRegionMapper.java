@@ -22,4 +22,8 @@ public interface CommonRegionMapper {
 
     List<OfferExpenseDO> getExpenseByOfferNbr(String offerNbr);
 
+    List<OfferExpenseDO> getExpenseByOfferInfo(String offerNbr);
+
+
+
 }

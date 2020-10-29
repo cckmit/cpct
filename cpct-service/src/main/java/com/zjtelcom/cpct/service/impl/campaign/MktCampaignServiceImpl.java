@@ -97,8 +97,6 @@ import static com.zjtelcom.cpct.util.DateUtil.*;
 @Service
 @Transactional
 public class MktCampaignServiceImpl extends BaseService implements MktCampaignService {
-
-
 //    @Override
 //    public Map<String, Object> checkCampaignByRequestInfo(Map<String, Object> params) {
 //        Map<String,Object> result = new HashMap<>();
