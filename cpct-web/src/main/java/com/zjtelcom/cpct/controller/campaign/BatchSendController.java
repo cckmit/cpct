@@ -83,4 +83,5 @@ public class BatchSendController {
         result.put("resultMsg","下发成功");
         return result;
     }
+
 }

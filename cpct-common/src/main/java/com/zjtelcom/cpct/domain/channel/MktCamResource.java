@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class MktCamResource implements Serializable {
@@ -88,6 +89,7 @@ public class MktCamResource implements Serializable {
     private String differentOfferId;
 
     private String dealShops;
+    private String postUrl;
 
-
+    private List<String> dealShopList;
 }

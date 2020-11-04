@@ -56,6 +56,8 @@ public interface ProductService {
 
     Map<String, Object> mktCamResourceService(Long mktCampaignId);
 
+    Map<String, Object> addProductAttr4Rule( List<Integer> camItemId,Long ruleId);
+
 
 
 }

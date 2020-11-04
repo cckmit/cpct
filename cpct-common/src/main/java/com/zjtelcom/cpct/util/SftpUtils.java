@@ -305,7 +305,25 @@ public class SftpUtils {
             return false;
         }
     }
-
+    /**
+     * sftp 下载
+     */
+    public boolean downloadByAbsolutePath(ChannelSftp sftp, String filePath, String targetPath) {
+        try {
+            String dst = targetPath ;
+            String src = filePath;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+            logger.info("开始下载，sftp服务器路径：[" + src + "]目标服务器路径：[" + dst + "]");
+            //logger.info("开始时间：" + simpleDateFormat.format(new Date()));
+            sftp.get(src, dst);
+            logger.info("下载成功");
+            //logger.info("结束时间：" + simpleDateFormat.format(new Date()));
+            return true;
+        } catch (Exception e) {
+            logger.error("下载失败", e);
+            return false;
+        }
+    }
 
     public List<String> read(String directory, String readFile, ChannelSftp sftp, String charSetName) {
         List<String> stringlist = new ArrayList<>();

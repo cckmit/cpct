@@ -71,8 +71,8 @@ public class CampaignController extends BaseController {
     @Autowired
     private MktCampaignApiService apiService;
 
-    @Autowired
-    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
+//    @Autowired
+//    private MktCamResourceQRCodeService mktCamResourceQRCodeService;
 
     /**
      * 需求函类型限制活动类型校验
@@ -185,19 +185,19 @@ public class CampaignController extends BaseController {
                     {
                         aLong = 614406331L;
                     }
-                        final List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
-                        if (objCatItemRels.isEmpty()){
-                            ObjCatItemRel objCatItemRel = new ObjCatItemRel();
-                            objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
-                            objCatItemRel.setCatalogItemId(aLong);
-                            objCatItemRel.setStatusCd("1000");
-                            objCatItemRel.setObjType("6000");
-                            objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
-                            objCatItemRel.setCreateDate(new Date());
-                            objCatItemRel.setStatusDate(new Date());
-                            objCatItemRel.setUpdateDate(new Date());
-                            objCatItemRelMapper.insert(objCatItemRel);
-                        }
+                    final List<ObjCatItemRel> objCatItemRels = objCatItemRelMapper.selectByObjId(mktCampaignDO.getMktCampaignId());
+                    if (objCatItemRels.isEmpty()){
+                        ObjCatItemRel objCatItemRel = new ObjCatItemRel();
+                        objCatItemRel.setObjId(mktCampaignDO.getMktCampaignId());
+                        objCatItemRel.setCatalogItemId(aLong);
+                        objCatItemRel.setStatusCd("1000");
+                        objCatItemRel.setObjType("6000");
+                        objCatItemRel.setObjNbr(mktCampaignDO.getMktActivityNbr());
+                        objCatItemRel.setCreateDate(new Date());
+                        objCatItemRel.setStatusDate(new Date());
+                        objCatItemRel.setUpdateDate(new Date());
+                        objCatItemRelMapper.insert(objCatItemRel);
+                    }
 
                 }
             }
@@ -613,7 +613,7 @@ public class CampaignController extends BaseController {
     public String upgradeMktCampaign(@RequestBody Map<String, String> params) throws Exception {
         Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
         Map<String, Object> mktCampaignMap = mktCampaignService.upgradeMktCampaign(parentMktCampaignId);
-     //   mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
+        //   mktCampaignService.changeMktCampaignStatus(parentMktCampaignId, StatusCode.STATUS_CODE_ROLL.getStatusCode());
         return JSON.toJSONString(mktCampaignMap);
     }
 
@@ -639,6 +639,31 @@ public class CampaignController extends BaseController {
         }
         return JSON.toJSONString(mktCampaignMap);
     }
+
+    /**
+     * 获取活动模板
+     *
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getMktCampaignTemplate4CamResource", method = RequestMethod.POST)
+    @CrossOrigin
+    public String getMktCampaignTemplate4CamResource(@RequestBody Map<String, String> params) throws Exception {
+        Long parentMktCampaignId = Long.valueOf(params.get("mktCampaignId"));
+        Map<String, Object> mktCampaignMap = null;
+        try {
+            mktCampaignMap = mktCampaignService.getMktCampaignTemplate4CamResource(parentMktCampaignId);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_SUCCESS);
+        } catch (Exception e) {
+            logger.error("[op:CampaignController] failed to getMktCampaignTemplate by getMktCampaignTemplate4CamResource = {}, Exception = ", parentMktCampaignId, e);
+            mktCampaignMap.put("resultCode", CommonConstant.CODE_FAIL);
+        }
+        return JSON.toJSONString(mktCampaignMap);
+    }
+
+
+
 
 
 
@@ -836,16 +861,16 @@ public class CampaignController extends BaseController {
         return result;
     }
 
-/*
-*生成二维码url，如果存在则直接获取
- */
+    /*
+    *生成二维码url，如果存在则直接获取
+     */
     @PostMapping(value = "/generatePoster")
     @CrossOrigin
     public Map<String, Object> generatePoster(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.generatePoster(params);
+            //data = mktCamResourceQRCodeService.generatePoster(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -868,7 +893,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.savePostUrl(params);
+            //data = mktCamResourceQRCodeService.savePostUrl(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -890,7 +915,7 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
+            //data = mktCamResourceQRCodeService.savePostBackgroundUrl(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);
@@ -912,7 +937,29 @@ public class CampaignController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         try {
-            data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
+            //data = mktCamResourceQRCodeService.getPostgroundPathPage(params);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("resultCode", CODE_FAIL);
+            result.put("resultMsg", "获取失败");
+            return  result;
+        }
+        result.put("resultCode", CODE_SUCCESS);
+        result.put("resultMsg", "获取成功");
+        result.put("data",data);
+        return result;
+    }
+
+    /*
+     * 根据规则id获取海报
+     */
+    @PostMapping(value = "/getPostUrlByRuleId")
+    @CrossOrigin
+    public Map<String, Object> getPostUrlByRuleId(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        try {
+//            data = mktCamResourceQRCodeService.getPostUrlByRuleId(params);
         }catch (Exception e) {
             e.printStackTrace();
             result.put("resultCode", CODE_FAIL);

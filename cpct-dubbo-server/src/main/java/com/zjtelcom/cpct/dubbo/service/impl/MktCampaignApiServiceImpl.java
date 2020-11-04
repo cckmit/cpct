@@ -276,16 +276,16 @@ public class MktCampaignApiServiceImpl implements MktCampaignApiService {
         Map<String,Object> resultMap  = new HashMap<>();
         String requestType =(String) paramMap.get("requestType");
         String nodeId = (String)paramMap.get("nodeId");
-        Long mktCamId = MapUtil.getLongNum(paramMap.get("mktCamId"));
+        Integer mktCamId = (Integer)paramMap.get("mktCamId");
         Map<String,Object> dataMap  = new HashMap<>();
         logger.info("需求函类型获取审批员工：" + requestType);
         logger.info("需求函类型获取审批员工：" + nodeId);
         logger.info("需求函类型获取审批员工：" + mktCamId);
         try {
 
-            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamId);
+            MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktCamId.longValue());
             //12是外场营销目录
-            if("614401299".equals(mktCampaignDO.getDirectoryId().toString()) && "571".equals(mktCampaignDO.getLanId().toString())){
+            if(mktCampaignDO.getDirectoryId() == 614401299L && mktCampaignDO.getLanId() == 571){
                 MktRequestDO  mktRequestDO = mktRequestMapper.getRequestInfoByMktId(requestType,nodeId,mktCamId.longValue());
                 logger.info("需求函类型获取审批员工：" + mktRequestDO);
                 dataMap.put("requestId",mktRequestDO.getRequestId());

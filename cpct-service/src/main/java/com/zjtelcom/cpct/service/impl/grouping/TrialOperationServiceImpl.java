@@ -11,7 +11,7 @@ import com.github.pagehelper.PageInfo;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
-import com.mysql.jdbc.StringUtils;
+
 import com.zjtelcom.cpct.common.Page;
 import com.zjtelcom.cpct.constants.CommonConstant;
 import com.zjtelcom.cpct.dao.campaign.*;
@@ -68,6 +68,7 @@ import com.zjtelcom.es.es.entity.model.TrialOperationParamES;
 import com.zjtelcom.es.es.entity.model.TrialResponseES;
 import com.zjtelcom.es.es.service.EsService;
 import com.zjtelcom.es.es.service.EsServiceInfo;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -245,7 +246,7 @@ public class TrialOperationServiceImpl extends BaseService implements TrialOpera
                 if (organization!=null){
                     String orgNameC4 = organization.getOrgNameC4();
                     String orgNameC5 = organization.getOrgNameC5();
-                    if (org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC4) || org.apache.commons.lang3.StringUtils.isNotBlank(orgNameC5)){
+                    if (StringUtils.isNotBlank(orgNameC4) || StringUtils.isNotBlank(orgNameC5)){
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("orgNameC4",orgNameC4);
                         map.put("orgNameC5",orgNameC5);
@@ -1951,7 +1952,7 @@ private String getWgbmByLanId(String lanId,String c4,String addr){
 
     private String dataDesensitization(String sfz) {
         String sfzyc = "";
-        if (!StringUtils.isNullOrEmpty(sfz)) {
+        if (!StringUtils.isNotBlank(sfz)) {
             if (sfz.length() == 18 || sfz.length() == 15) {
                 sfzyc = (sfz.substring(0, 6) + "********" + sfz.substring(sfz.length() - 4, sfz.length()));
             } else if (sfz.length() == 10) {

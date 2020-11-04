@@ -12,5 +12,5 @@ public interface MktCamResourceQRCodeMapper {
     MktCamResource selectRecordByRuleId(@Param("mktCamResourceId") Long mktCamResourceId);
     void updateQRUrlbyMktResourceId(@Param("qrUrl") String qrUrl,@Param("mktCamResourceId") Long mktCamResourceId);
     void updatePostUrlbyMktResourceId(@Param("postUrl") String postUrl,@Param("mktCamResourceId") Long mktCamResourceId);
-
+    String getPostPathByRuleId(@Param("ruleId") Long ruleId);
 }

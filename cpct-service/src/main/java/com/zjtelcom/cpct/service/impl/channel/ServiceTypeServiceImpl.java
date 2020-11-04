@@ -10,7 +10,7 @@ import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.channel.ServiceTypeService;
 import com.zjtelcom.cpct.util.BeanUtil;
 import com.zjtelcom.cpct.util.MapUtil;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

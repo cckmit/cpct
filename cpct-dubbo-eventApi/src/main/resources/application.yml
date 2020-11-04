@@ -94,6 +94,20 @@ uccp:
   password: 908234
   sceneId: 7149
 
+#ftp
+ftp:
+  address: 134.108.3.130
+  prodaddress: 134.108.0.93
+  port: 22
+  name: ftp
+  password: V1p9*2_9%3#
+  mscname: ftp
+  mscpassword: V1p9*2_9%3#
+
+  qrCodePath: /app/cpcp_cxzx/qrcode
+  postUrlPath: /app/cpcp_cxzx/post_url
+  postBackgroundPath: /app/cpcp_cxzx/post_background
+
 
 
 

@@ -49,7 +49,7 @@ public interface ChannelService {
 
     Map<String,Object> getUamServicePswd(String accountID, String areaCode, String custID);
 
-    List<Channel>  getChannelByChannelName(String channelParam);
+    Map<String,Object>  getChannelByChannelName(String channelParam, int pageSize, int pageNum);
     List<Channel>  getAllChannelById(List<Integer> channelId);
 
 }

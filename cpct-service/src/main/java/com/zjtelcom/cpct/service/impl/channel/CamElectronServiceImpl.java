@@ -101,22 +101,31 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
             String typeName = ResourceTypeEnum.getNameByCode(resource.getResourceType());
             String subType = SubTypeEnum.getNameByCode(resource.getResourceSubtype());
             mktCamResourceVO.setTypeString(typeName+"-"+subType);
-            List<String> idList = ChannelUtil.StringToList(resource.getUseArea());
-           List<String> list1 = new ArrayList<>();
-            for (String aLong : idList) {
-                SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(aLong));
-                list1.add(sysArea.getName());
+            if (resource.getUseArea()!=null && !resource.getUseArea().equals("")){
+                List<String> idList = ChannelUtil.StringToList(resource.getUseArea());
+                List<String> list1 = new ArrayList<>();
+                for (String aLong : idList) {
+                    SysArea sysArea = sysAreaMapper.selectByPrimaryKey(Integer.valueOf(aLong));
+                    list1.add(sysArea.getName());
+                }
+                mktCamResourceVO.setUseAreaInfo(ChannelUtil.list2String(list1,","));
             }
             MktCampaignDO campaignDO = mktCampaignMapper.selectByPrimaryKey(resource.getMktCampaignId());
             if (campaignDO!=null ){
                 mktCamResourceVO.setMktCampaignNbr(campaignDO.getMktActivityNbr());
-                mktCamResourceVO.setStaffName(mktCamResource.getApplyUser());
-                mktCamResourceVO.setStaffTel(mktCamResource.getApplyUserPhone());
+                mktCamResourceVO.setCamStatus(StatusCode.getMsgByCode(campaignDO.getStatusCd()));
             }
-            mktCamResourceVO.setUseAreaInfo(ChannelUtil.list2String(list1,","));
+            mktCamResourceVO.setStaffName(mktCamResource.getApplyUser());
+            mktCamResourceVO.setStaffTel(mktCamResource.getApplyUserPhone());
             mktCamResourceVO.setStatusCd(StatusCode.getMsgByCode(resource.getStatusCd()));
             mktCamResourceVO.setGetStartTime(DateUtil.date2StringDate(resource.getGetEndTime()));
             mktCamResourceVO.setGetEndTime(DateUtil.date2StringDate(resource.getGetEndTime()));
+            if (mktCamResourceVO.getResourceType()!=null){
+                mktCamResourceVO.setResourceTypeName(ResourceTypeEnum.getNameByCode(mktCamResourceVO.getResourceType()));
+            }
+            if (mktCamResourceVO.getResourceSubtype()!=null){
+                mktCamResourceVO.setResourceSubtypeName(SubTypeEnum.getNameByCode(mktCamResourceVO.getResourceType()));
+            }
             resourceVOS.add(mktCamResourceVO);
         }
         result.put("resultCode",CODE_SUCCESS);
@@ -131,7 +140,7 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         Map<String,Object> result = new HashMap<>();
         Long staffId = UserUtil.getStaffId();
         //4.7	按指定数量自动生成电子券实例
-        logger.info("【按指定数量自动生成电子券实例】--->>> 入参：" + JSON.toJSONString(mktCamResource.getResourceId()));
+        logger.info("【按指定数量自动生成电子券实例】--->>> 入参：" + JSON.toJSONString(mktCamResource));
         Map<String, Object> map = autoCreateCouponInst(mktCamResource.getResourceId(), mktCamResource.getResourceApplyNum());
         logger.info("【按指定数量自动生成电子券实例】--->>> 出参：" + JSON.toJSONString(map));
         //4.8	电子券发布接口
@@ -142,11 +151,13 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         logger.info("【查询电子券关联渠道网点】--->>> 入参：" + JSON.toJSONString(mktCamResource.getResourceId()));
         CpcResultObject<CpcPage<ChannelCouponDto>> cpcPageCpcResultObject = orgRelInfoService.qryChannelByOrgRel(mktCamResource.getResourceId(), 1, 1000);
         logger.info("【查询电子券关联渠道网点】--->>> 出参：" + JSON.toJSONString(cpcPageCpcResultObject));
-        CpcPage<ChannelCouponDto> resultObject = cpcPageCpcResultObject.getResultObject();
-        List<ChannelCouponDto> datas = resultObject.getDatas();
-        for (ChannelCouponDto data : datas) {
-            CpcResultObject<String> stringCpcResultObject = couponRelService.delCouponOrgRel(data.getOrgRelId(), staffId);
-            logger.info("【删除电子券关联渠道网点】--->>> 出参："+ data.getOrgRelId()+":"+ JSON.toJSONString(stringCpcResultObject));
+        if (cpcPageCpcResultObject.getResultCode().equals("0")) {
+            CpcPage<ChannelCouponDto> resultObject = cpcPageCpcResultObject.getResultObject();
+            List<ChannelCouponDto> datas = resultObject.getDatas();
+            for (ChannelCouponDto data : datas) {
+                CpcResultObject<String> stringCpcResultObject = couponRelService.delCouponOrgRel(data.getOrgRelId(), staffId);
+                logger.info("【删除电子券关联渠道网点】--->>> 出参：" + data.getOrgRelId() + ":" + JSON.toJSONString(stringCpcResultObject));
+            }
         }
         //4.9	新增宽带券和渠道网点关联
         List<String> shopList = ChannelUtil.StringToList(mktCamResource.getDealShops());
@@ -162,10 +173,12 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         //删除宽带券和产品属性关联
         CpcResultObject<CpcPage<ProductCouponDto>> object2 = orgRelInfoService.qrySelectProdByCoupon(mktCamResource.getResourceId(), 1, 1000);
         logger.info("【查询宽带券和产品属性关联】--->>> 出参：" + JSON.toJSONString(object2));
-        List<ProductCouponDto> datas2 = object2.getResultObject().getDatas();
-        for (ProductCouponDto data : datas2) {
-            CpcResultObject<String> object = couponRelService.delCouponProdAttr(data.getMktResAttrId(), staffId);
-            logger.info("【删除宽带券和产品属性关联】--->>> 出参："+ data.getMktResAttrId()+":"+ JSON.toJSONString(object));
+        if (object2.getResultCode().equals("0")){
+            List<ProductCouponDto> datas2 = object2.getResultObject().getDatas();
+            for (ProductCouponDto data : datas2) {
+                CpcResultObject<String> object = couponRelService.delCouponProdAttr(data.getMktResAttrId(), staffId);
+                logger.info("【删除宽带券和产品属性关联】--->>> 出参："+ data.getMktResAttrId()+":"+ JSON.toJSONString(object));
+            }
         }
         //4.10 新增宽带券和产品属性依赖
         List<String> productItemList = ChannelUtil.StringToList(mktCamResource.getDependProductId());
@@ -220,7 +233,9 @@ public class CamElectronServiceImpl extends BaseService implements CamElectronSe
         param.setStaffId(staffId);
         param.setMktResIds(resourceIdList);
         param.setType(type);
-        batchRecDubboService.editCouponStatusCd(param);
+        logger.info("【电子券发布】--->>> 入参：" + JSON.toJSONString(param));
+        MktResResultObject<Object> objectMktResResultObject = batchRecDubboService.editCouponStatusCd(param);
+        logger.info("【电子券发布】--->>> 返回：" + JSON.toJSONString(objectMktResResultObject));
         return null;
     }
 

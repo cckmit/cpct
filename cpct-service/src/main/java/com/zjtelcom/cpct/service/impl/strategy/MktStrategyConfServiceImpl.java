@@ -8,28 +8,30 @@ package com.zjtelcom.cpct.service.impl.strategy;
 
 import com.alibaba.fastjson.JSON;
 import com.zjtelcom.cpct.constants.CommonConstant;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlConfMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamChlResultMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamGrpRulMapper;
-import com.zjtelcom.cpct.dao.campaign.MktCamStrategyConfRelMapper;
+import com.zjtelcom.cpct.dao.campaign.*;
 import com.zjtelcom.cpct.dao.channel.ContactChannelMapper;
 import com.zjtelcom.cpct.dao.channel.InjectionLabelMapper;
+import com.zjtelcom.cpct.dao.channel.MktCamResourceMapper;
 import com.zjtelcom.cpct.dao.grouping.TarGrpConditionMapper;
 import com.zjtelcom.cpct.dao.strategy.*;
 import com.zjtelcom.cpct.dao.system.SysAreaMapper;
 import com.zjtelcom.cpct.domain.SysArea;
 import com.zjtelcom.cpct.domain.campaign.MktCamChlResultDO;
 import com.zjtelcom.cpct.domain.campaign.MktCamStrategyConfRelDO;
+import com.zjtelcom.cpct.domain.campaign.MktCampaignDO;
+import com.zjtelcom.cpct.domain.channel.MktCamResource;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyConfRuleRelDO;
 import com.zjtelcom.cpct.domain.strategy.MktStrategyFilterRuleRelDO;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlConfDetail;
 import com.zjtelcom.cpct.dto.campaign.MktCamChlResult;
+import com.zjtelcom.cpct.dto.channel.MktResource4RuleVO;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfDetail;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRule;
 import com.zjtelcom.cpct.dto.strategy.MktStrategyConfRuleRel;
 import com.zjtelcom.cpct.enums.ErrorCode;
+import com.zjtelcom.cpct.enums.FrameFlgEnum;
 import com.zjtelcom.cpct.enums.StatusCode;
 import com.zjtelcom.cpct.service.BaseService;
 import com.zjtelcom.cpct.service.strategy.MktStrategyConfRuleService;
@@ -139,6 +141,12 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
     @Autowired
     private MktCamChlResultMapper mktCamChlResultMapper;
 
+    @Autowired
+    private MktCamResourceMapper mktCamResourceMapper;
+
+    @Autowired
+    private MktCampaignMapper mktCampaignMapper;
+
 
     /**
      * 删除活动配置
@@ -199,6 +207,7 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
             // 添加属性配置信息
             MktStrategyConfDO mktStrategyConfDO = new MktStrategyConfDO();
             CopyPropertiesUtil.copyBean2Bean(mktStrategyConfDO, mktStrategyConfDetail);
+            mktStrategyConfDO.setMktStrategyConfId(null);
             mktStrategyConfDO.setCreateStaff(UserUtil.loginId());
             mktStrategyConfDO.setCreateDate(new Date());
             mktStrategyConfDO.setUpdateStaff(UserUtil.loginId());
@@ -410,6 +419,18 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                             mktStrategyConfRuleRelMapper.insert(mktStrategyConfRuleRelDO);
                         }
                         MktStrategyConfRuleDO mktStrategyConfRuleDO = (MktStrategyConfRuleDO) mktStrategyConfRuleMap.get("mktStrategyConfRuleDO");
+
+                        //规则级别修改电子券实例信息
+                        MktCampaignDO mktCampaignDO = mktCampaignMapper.selectByPrimaryKey(mktStrategyConfRule.getMktCampaignId());
+                        if(mktCampaignDO!=null && (StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaignDO.getMktCampaignCategory())||
+                                StatusCode.AUTONOMICK_CAMPAIGN.getStatusCode().equals(mktCampaignDO.getMktCampaignCategory())) ){
+                            MktCamResource mktCamResource = mktStrategyConfRule.getMktCamResource();
+                            mktCamResource.setUpdateStaff(UserUtil.loginId());
+                            mktCamResource.setUpdateDate(new Date());
+                            mktCamResourceMapper.updateByPrimaryKey(mktCamResource);
+                        }
+
+
                         // 线程池执行规则存入redis
                         executorService.submit(new TarGrpRule(mktStrategyConfDetail.getMktCampaignId(), mktStrategyConfId, mktStrategyConfRuleDO, redisUtils, tarGrpConditionMapper, injectionLabelMapper));
                     }
@@ -531,6 +552,16 @@ public class MktStrategyConfServiceImpl extends BaseService implements MktStrate
                 if (redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId())!=null){
                     mktStrategyConfRule.setOrganizationList((List<Long> )redisUtils.get("ORG_"+mktStrategyConfRule.getMktStrategyConfRuleId()));
                 }
+
+                //规则级别查询电子券实例信息
+                MktCamResource mktCamResource = mktCamResourceMapper.selectByRuleId(mktStrategyConfRule.getMktStrategyConfRuleId(), FrameFlgEnum.NO.getValue());
+                if (mktCamResource != null) {
+                    if (mktCamResource.getDealShops() != null) {
+                        mktCamResource.setDealShopList(ChannelUtil.StringToList4LabelValue(mktCamResource.getDealShops()));
+                    }
+                    mktStrategyConfRule.setMktCamResource(mktCamResource);
+                }
+
                 mktStrategyConfRuleList.add(mktStrategyConfRule);
             }
             mktStrategyConfDetail.setMktStrategyConfRuleList(mktStrategyConfRuleList);

@@ -15,6 +15,10 @@ public class MktCamResourceVO implements Serializable {
 
     private String resourceSubtype;
 
+    private String resourceTypeName;
+
+    private String resourceSubtypeName;
+
     private String frameFlg;
 
     private String statusCd;
@@ -40,5 +44,7 @@ public class MktCamResourceVO implements Serializable {
     private String staffName;
 
     private String staffTel;
+
+    private String camStatus;
 
 }

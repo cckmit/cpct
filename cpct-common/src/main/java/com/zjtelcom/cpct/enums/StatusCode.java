@@ -48,6 +48,7 @@ public enum StatusCode {
     SERVICE_CAMPAIGN("服务活动", "5000"),
     SERVICE_SALES_CAMPAIGN("服务随销活动", "6000"),
     XIETONG_SCENE("协同场景", "7000"),
+    CAM_RESOURCE("电子券活动", "8000"),
 
     /*活动周期性*/
     ONE_TIME("一次性", "1000"),
@@ -62,6 +63,7 @@ public enum StatusCode {
     FRAMEWORK_CAMPAIGN("框架活动", "6100"),
     ENFORCEMENT_CAMPAIGN("强制活动", "6200"),
     AUTONOMICK_CAMPAIGN("自主活动", "6300"),
+    CONTINUE_CAMPAIGN("承接活动", "6400"),
     JITUAN_FRAMEWORK_CAMPAIGN("集团框架活动", "5100"),
     JITUAN_ENFORCEMENT_CAMPAIGN("集团强制活动", "5200"),
 

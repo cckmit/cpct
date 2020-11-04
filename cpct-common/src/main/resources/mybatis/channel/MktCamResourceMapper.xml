@@ -85,47 +85,128 @@
   <update id="updateByPrimaryKey" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
   update mkt_cam_resource
   set MKT_CAMPAIGN_ID = #{mktCampaignId,jdbcType=BIGINT},
-  RULE_ID = #{ruleId,jdbcType=BIGINT},
-  RESOURCE_ID = #{resourceId,jdbcType=BIGINT},
-  RESOURCE_TYPE = #{resourceType,jdbcType=VARCHAR},
-  RESOURCE_SUBTYPE = #{resourceSubtype,jdbcType=VARCHAR},
-  RESOURCE_TOTAL_NUM = #{resourceTotalNum,jdbcType=BIGINT},
-  RESOURCE_APPLY_NUM = #{resourceApplyNum,jdbcType=BIGINT},
-  RECEIVE_TYPE = #{receiveType,jdbcType=VARCHAR},
-  DAYS = #{days,jdbcType=BIGINT},
-  START_TIME = #{startTime,jdbcType=TIMESTAMP},
-  END_TIME = #{endTime,jdbcType=TIMESTAMP},
-  OFFER_ID = #{offerId,jdbcType=VARCHAR},
-  DEPEND_OFFER_ID = #{dependOfferId,jdbcType=VARCHAR},
-  DEPEND_PRODUCT_ID = #{dependProductId,jdbcType=VARCHAR},
-  FRAME_FLG = #{frameFlg,jdbcType=VARCHAR},
-  STATUS_CD = #{statusCd,jdbcType=VARCHAR},
-  CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
-  CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
-  UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
-  UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
-  REMARK = #{remark,jdbcType=VARCHAR},
-  LAN_ID = #{lanId,jdbcType=BIGINT},
-  OFFER_CODE = #{offerCode,jdbcType=VARCHAR},
-  OFFER_NAME = #{offerName,jdbcType=VARCHAR},
-  CAM_RESOURCE_NAME = #{camResourceName,jdbcType=VARCHAR},
-  FACE_AMOUNT = #{faceAmount,jdbcType=VARCHAR},
-  DIFFERENT_PRICE = #{differentPrice,jdbcType=VARCHAR},
-  RELEASE_TYPE = #{releaseType,jdbcType=VARCHAR},
-  GET_START_TIME = #{getStartTime,jdbcType=TIMESTAMP},
-  GET_END_TIME = #{getEndTime,jdbcType=TIMESTAMP},
-  QC_CODE_URL = #{qcCodeUrl,jdbcType=VARCHAR},
-  USE_AREA = #{useArea,jdbcType=VARCHAR},
-  USE_AREA_C4 = #{useAreaC4,jdbcType=VARCHAR},
-  PUBLISH_AREA = #{publishArea,jdbcType=VARCHAR},
-  APPLY_USER = #{applyUser,jdbcType=VARCHAR},
-  APPLY_USER_PHONE = #{applyUserPhone,jdbcType=VARCHAR},
-  RESOURCE_ODD_NUM = #{resourceOddNum,jdbcType=BIGINT},
-  PARENT_ID = #{parentId,jdbcType=BIGINT},
-  DIFFERENT_OFFER_ID = #{differentOfferId,jdbcType=VARCHAR},
-  DEAL_SHOPS = #{dealShops,jdbcType=VARCHAR}
+    <if test="ruleId!=null">
+      RULE_ID = #{ruleId,jdbcType=BIGINT},
+    </if>
+    <if test="resourceId!=null">
+     RESOURCE_ID = #{resourceId,jdbcType=BIGINT},
+    </if>
+    <if test="resourceType!=null">
+      RESOURCE_TYPE = #{resourceType,jdbcType=VARCHAR},
+    </if>
+    <if test="resourceSubtype!=null">
+      RESOURCE_SUBTYPE = #{resourceSubtype,jdbcType=VARCHAR},
+    </if>
+    <if test="resourceTotalNum!=null">
+      RESOURCE_TOTAL_NUM = #{resourceTotalNum,jdbcType=BIGINT},
+    </if>
+    <if test="resourceApplyNum!=null">
+      RESOURCE_APPLY_NUM = #{resourceApplyNum,jdbcType=BIGINT},
+    </if>
+    <if test="receiveType!=null">
+      RECEIVE_TYPE = #{receiveType,jdbcType=VARCHAR},
+    </if>
+    <if test="days!=null">
+      DAYS = #{days,jdbcType=BIGINT},
+    </if>
+    <if test="startTime!=null">
+      START_TIME = #{startTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="endTime!=null">
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="endTime!=null">
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="offerId!=null">
+      OFFER_ID = #{offerId,jdbcType=VARCHAR},
+    </if>
+    <if test="dependOfferId!=null">
+      DEPEND_OFFER_ID = #{dependOfferId,jdbcType=VARCHAR},
+    </if>
+    <if test="dependProductId!=null">
+      DEPEND_PRODUCT_ID = #{dependProductId,jdbcType=VARCHAR},
+    </if>
+    <if test="frameFlg!=null">
+      FRAME_FLG = #{frameFlg,jdbcType=VARCHAR},
+    </if>
+    <if test="statusCd!=null">
+      STATUS_CD = #{statusCd,jdbcType=VARCHAR},
+    </if>
+    <if test="createStaff!=null">
+      CREATE_STAFF = #{createStaff,jdbcType=BIGINT},
+    </if>
+    <if test="createDate!=null">
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="updateStaff!=null">
+      UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    </if>
+    <if test="dealShops!=null">
+      DEAL_SHOPS = #{dealShops,jdbcType=VARCHAR}
+    </if>
+    <if test="remark!=null">
+      REMARK = #{remark,jdbcType=VARCHAR},
+    </if>
+    <if test="lanId!=null">
+      LAN_ID = #{lanId,jdbcType=BIGINT},
+    </if>
+    <if test="offerCode!=null">
+      OFFER_CODE = #{offerCode,jdbcType=VARCHAR},
+    </if>
+    <if test="offerName!=null">
+      OFFER_NAME = #{offerName,jdbcType=VARCHAR},
+    </if>
+    <if test="camResourceName!=null">
+      CAM_RESOURCE_NAME = #{camResourceName,jdbcType=VARCHAR},
+    </if>
+    <if test="faceAmount!=null">
+      FACE_AMOUNT = #{faceAmount,jdbcType=VARCHAR},
+    </if>
+    <if test="differentPrice!=null">
+      DIFFERENT_PRICE = #{differentPrice,jdbcType=VARCHAR},
+    </if>
+    <if test="releaseType!=null">
+      RELEASE_TYPE = #{releaseType,jdbcType=VARCHAR},
+    </if>
+    <if test="getStartTime!=null">
+      GET_START_TIME = #{getStartTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="getEndTime!=null">
+      GET_END_TIME = #{getEndTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="resourceApplyNum!=null">
+      QC_CODE_URL = #{qcCodeUrl,jdbcType=VARCHAR},
+    </if>
+    <if test="useArea!=null">
+      USE_AREA = #{useArea,jdbcType=VARCHAR},
+    </if>
+    <if test="useAreaC4!=null">
+      USE_AREA_C4 = #{useAreaC4,jdbcType=VARCHAR},
+    </if>
+    <if test="publishArea!=null">
+      PUBLISH_AREA = #{publishArea,jdbcType=VARCHAR},
+    </if>
+    <if test="applyUser!=null">
+      APPLY_USER = #{applyUser,jdbcType=VARCHAR},
+    </if>
+    <if test="applyUserPhone!=null">
+      APPLY_USER_PHONE = #{applyUserPhone,jdbcType=VARCHAR},
+    </if>
+    <if test="resourceOddNum!=null">
+      RESOURCE_ODD_NUM = #{resourceOddNum,jdbcType=BIGINT},
+    </if>
+    <if test="parentId!=null">
+      PARENT_ID = #{parentId,jdbcType=BIGINT},
+    </if>
+    <if test="differentOfferId!=null">
+      DIFFERENT_OFFER_ID = #{differentOfferId,jdbcType=VARCHAR},
+    </if>
+    UPDATE_STAFF = #{updateStaff,jdbcType=BIGINT},
+    UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
   where MKT_CAM_RESOURCE_ID = #{mktCamResourceId,jdbcType=BIGINT}
 </update>
+
   <update id="updateResourceId" parameterType="com.zjtelcom.cpct.domain.channel.MktCamResource">
     update mkt_cam_resource
     set RESOURCE_ID = #{resourceId,jdbcType=BIGINT}
